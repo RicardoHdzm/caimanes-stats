@@ -151,7 +151,9 @@ playerForm.addEventListener("submit", (e) => {
   const number = data.get("number");
   const name = data.get("name").trim();
   const position = data.get("position").trim();
-  const code = `  { id: ${JSON.stringify(id)}, number: ${number === "" ? "null" : Number(number)}, name: ${JSON.stringify(name)}, position: ${JSON.stringify(position)} },`;
+  const photo = data.get("photo").trim();
+  const photoField = photo ? `, photo: ${JSON.stringify(photo)}` : "";
+  const code = `  { id: ${JSON.stringify(id)}, number: ${number === "" ? "null" : Number(number)}, name: ${JSON.stringify(name)}, position: ${JSON.stringify(position)}${photoField} },`;
   playerCode.textContent = code;
   playerOutput.hidden = false;
 });

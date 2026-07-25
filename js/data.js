@@ -21,6 +21,9 @@ export const TEAM = {
 //   JD (Jugador Designado — batea, eventualmente puede entrar al campo;
 //       normalmente batea en lugar del pitcher).
 // Si juega más de una posición, sepáralas con "/" (máximo 3), ej. "2B/SS".
+// photo: opcional, ruta o URL a una foto del jugador (ej. "img/players/p1.jpg").
+// Si no la tienes, simplemente omite el campo y se muestra un avatar con
+// sus iniciales en su lugar.
 export const PLAYERS = [
   { id: "p1", number: 23, name: "Axel Medina", position: "SS/LF/CF" },
   { id: "p2", number: 7, name: "Carlos Baez", position: "RF" },

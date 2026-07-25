@@ -117,7 +117,7 @@ export function renderResumen(container) {
       (p) => `${p.name} — AVG ${p.AVG}`
     ) +
     leaderCardHtml(
-      "fa-fire",
+      "fa-bomb",
       "Líder de jonrones",
       hrSorted,
       (p) => `${p.name} — ${p.HR} HR`,

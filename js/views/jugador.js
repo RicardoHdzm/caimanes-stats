@@ -1,6 +1,6 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar } from "../ui.js";
 
 function formatAvg(h, ab) {
   if (!ab) return ".000";
@@ -30,6 +30,7 @@ export function renderJugadorDetalle(container, playerId) {
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
+    <div style="margin-bottom: 12px;">${renderAvatar(player, 72)}</div>
     <div class="game-hero-teams">
       <span>#${player.number ?? "-"}</span>
       <span class="game-hero-vs">·</span>

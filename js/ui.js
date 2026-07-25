@@ -101,6 +101,22 @@ export function renderPositionBadges(value) {
     .join(" ");
 }
 
+// Avatar de un jugador: foto si `player.photo` está definido, si no un
+// círculo con sus iniciales. `size` en px (default 40).
+export function renderAvatar(player, size = 40) {
+  const style = `width:${size}px;height:${size}px;font-size:${size * 0.4}px;`;
+  if (player.photo) {
+    return `<img class="avatar" src="${player.photo}" alt="${player.name}" style="${style}">`;
+  }
+  const initials = (player.name ?? "")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+  return `<span class="avatar avatar-initials" style="${style}">${initials}</span>`;
+}
+
 // Glosario chiquito debajo de una tabla: "AB = Turnos al bat · H = Hits ...".
 // Solo incluye las columnas que traen `full` definido.
 export function renderGlossary(container, columns) {

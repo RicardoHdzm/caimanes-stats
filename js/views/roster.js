@@ -1,6 +1,6 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
 
 export function renderRoster(container) {
   heading(container, "Roster");
@@ -12,6 +12,11 @@ export function renderRoster(container) {
   }));
 
   const columns = [
+    {
+      key: "photo",
+      label: "",
+      render: (_value, row) => renderAvatar(row, 32),
+    },
     { key: "number", label: "#", full: "Número", numeric: true },
     { key: "name", label: "Nombre" },
     {

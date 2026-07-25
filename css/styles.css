@@ -663,6 +663,23 @@ main h3::before {
   color: var(--muted);
 }
 
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.avatar-initials {
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
 .footer {
   text-align: center;
   color: var(--muted);
