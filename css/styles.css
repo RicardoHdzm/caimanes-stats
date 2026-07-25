@@ -33,10 +33,7 @@ body {
 }
 
 .topbar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 28px 24px 20px;
+  padding: 14px 24px;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, #15181c 0%, var(--bg) 100%);
   position: relative;
@@ -51,25 +48,42 @@ body {
   pointer-events: none;
 }
 
-.brand {
-  display: flex;
-  justify-content: center;
+.topbar-inner {
   position: relative;
   z-index: 1;
-  margin-top: 14px;
+  max-width: 1150px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .brand-logo {
-  height: 300px;
-  width: 300px;
+  height: 44px;
+  width: 44px;
   object-fit: contain;
 }
 
-.season-row {
-  position: relative;
-  z-index: 1;
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.topbar-meta {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .season {
@@ -84,14 +98,6 @@ body {
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
-}
-
-.social-row {
-  position: relative;
-  z-index: 1;
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
 }
 
 .social-link {
@@ -156,6 +162,15 @@ body {
 }
 
 @media (max-width: 640px) {
+  .topbar-inner {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .brand-name {
+    font-size: 1rem;
+  }
+
   .tabs {
     flex-wrap: wrap;
     overflow-x: visible;
