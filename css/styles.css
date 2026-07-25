@@ -174,16 +174,16 @@ main {
 }
 
 h2 {
-  margin: 0 0 4px;
+  margin: 0 0 22px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  font-size: 1.4rem;
+  font-size: 1.9rem;
   font-weight: 800;
   font-style: italic;
   transform: skewX(-3deg);
   display: inline-block;
   border-bottom: 3px solid var(--accent);
-  padding-bottom: 4px;
+  padding-bottom: 6px;
 }
 
 main h3 {
