@@ -397,7 +397,7 @@ main h3::before {
 }
 
 .card-icon {
-  font-size: 2.6rem;
+  font-size: 2.3rem;
   margin-bottom: 12px;
 }
 
@@ -512,7 +512,7 @@ main h3::before {
 
 .leader-card h3 i {
   color: var(--accent);
-  font-size: 2.6rem;
+  font-size: 2.3rem;
 }
 
 @media (max-width: 640px) {
