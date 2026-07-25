@@ -204,10 +204,10 @@ export function renderResumen(container) {
     ) +
     leaderCardHtml(
       "fa-beer-mug-empty",
-      "Líder de ponches",
+      "Expendio",
       soSorted,
-      (p) => `${p.name} — ${p.SO} ponches`,
-      (p) => `${p.name} — ${p.SO} ponches`
+      (p) => `${p.name} — ${p.SO * 12} botes`,
+      (p) => `${p.name} — ${p.SO * 12} botes`
     );
   container.appendChild(leadersRow);
 }
