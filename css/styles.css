@@ -283,6 +283,7 @@ main h3::before {
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+  margin-bottom: 12px;
 }
 
 .game-hero-date {

@@ -2,7 +2,7 @@ import { GAMES, TEAM } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
 
-const RESULT_LABEL = { W: "Ganado", L: "Perdido", T: "Empate" };
+const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
 
 function formatAvg(h, ab) {
@@ -38,6 +38,9 @@ export function renderJuegoDetalle(container, gameId) {
   hero.className = "game-hero";
   hero.innerHTML = `
     <div class="game-hero-date">${game.date}</div>
+    <div class="game-hero-meta">
+      <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
+    </div>
     <div class="game-hero-teams">
       <span>${TEAM.name}</span>
       <span class="game-hero-vs">vs</span>
@@ -45,9 +48,6 @@ export function renderJuegoDetalle(container, gameId) {
     </div>
     <div class="game-hero-score${known ? "" : " pending"}">
       ${known ? `${game.scoreUs}<span class="sep">-</span>${game.scoreThem}` : "Marcador pendiente"}
-    </div>
-    <div class="game-hero-meta">
-      <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
     </div>
     ${
       game.replayUrl
