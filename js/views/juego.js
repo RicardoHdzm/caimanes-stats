@@ -94,7 +94,7 @@ export function renderJuegoDetalle(container, gameId) {
     { key: "2B", label: "2B", full: "Dobles", numeric: true },
     { key: "3B", label: "3B", full: "Triples", numeric: true },
     { key: "HR", label: "HR", full: "Jonrones", numeric: true },
-    { key: "R", label: "R", full: "Carreras", numeric: true, render: (v) => coloredStat(v, "stat-green") },
+    { key: "R", label: "R", full: "Carreras", numeric: true },
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
     { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
     { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
