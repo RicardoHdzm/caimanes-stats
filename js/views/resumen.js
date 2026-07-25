@@ -204,7 +204,7 @@ export function renderResumen(container) {
     ) +
     leaderCardHtml(
       "fa-beer-mug-empty",
-      "Expendio",
+      "Líder cervecero",
       soSorted,
       (p) => `${p.name} — ${p.SO * 12} botes`,
       (p) => `${p.name} — ${p.SO * 12} botes`
