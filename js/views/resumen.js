@@ -3,7 +3,6 @@ import {
   teamRecord,
   battingTotals,
   pitchingTotals,
-  fieldingTotals,
   gameResult,
   currentStreak,
   teamBattingTotals,
@@ -160,9 +159,7 @@ export function renderResumen(container) {
   const batSorted = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")));
   const hrSorted = [...battingList].sort((a, b) => b.HR - a.HR);
   const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
-  const fldSorted = fieldingTotals(GAMES).sort((a, b) => Number(b.FPCT.replace(".", "0.")) - Number(a.FPCT.replace(".", "0.")));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
-  const sbSorted = [...battingList].sort((a, b) => b.SB - a.SB);
 
   const leadersRow = document.createElement("div");
   leadersRow.className = "leaders grid-3 section-gap";
@@ -187,20 +184,6 @@ export function renderResumen(container) {
       pitSorted,
       (p) => `${p.name} — ERA ${p.ERA}, ${p.SO} K en ${p.IP} IP`,
       (p) => `${p.name} — ERA ${p.ERA}`
-    ) +
-    leaderCardHtml(
-      "fa-shield",
-      "Líder de fildeo",
-      fldSorted,
-      (p) => `${p.name} — FPCT ${p.FPCT}, ${p.PO} PO, ${p.A} A`,
-      (p) => `${p.name} — FPCT ${p.FPCT}`
-    ) +
-    leaderCardHtml(
-      "fa-person-running",
-      "Líder de robo de bases",
-      sbSorted,
-      (p) => `${p.name} — ${p.SB} SB`,
-      (p) => `${p.name} — ${p.SB} SB`
     ) +
     leaderCardHtml(
       "fa-beer-mug-empty",
