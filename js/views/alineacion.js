@@ -62,26 +62,34 @@ function assignDefense(statsById) {
   return assignment;
 }
 
-// Heurística clásica simplificada: 1-2 mejor OBP (table-setters), 3 mejor OPS
-// (mejor bateador), 4 mejor SLG (poder/cuarto bat), el resto por OPS.
+// Heurística clásica simplificada: el 4to bat (cleanup) se reserva primero
+// para el líder de jonrones, sin importar su OBP. Luego 1-2 mejor OBP
+// (table-setters) y 3 mejor OPS (mejor bateador) salen del resto del grupo;
+// el resto se acomoda por OPS.
 function battingOrder(rows) {
   const pool = [...rows];
 
-  function takeBest(key) {
+  function takeBestBy(scoreFn) {
     if (pool.length === 0) return null;
     let bestIdx = 0;
+    let bestScore = scoreFn(pool[0]);
     for (let i = 1; i < pool.length; i++) {
-      if (Number(pool[i][key]) > Number(pool[bestIdx][key])) bestIdx = i;
+      const score = scoreFn(pool[i]);
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
     }
     return pool.splice(bestIdx, 1)[0];
   }
 
-  const order = [];
-  for (const key of ["OBP", "OBP", "OPS", "SLG"]) {
-    const picked = takeBest(key);
-    if (picked) order.push(picked);
-  }
-  while (pool.length > 0) order.push(takeBest("OPS"));
+  const cleanup = takeBestBy((r) => r.HR * 1000 + Number(r.OPS));
+  const slot1 = takeBestBy((r) => Number(r.OBP));
+  const slot2 = takeBestBy((r) => Number(r.OBP));
+  const slot3 = takeBestBy((r) => Number(r.OPS));
+
+  const order = [slot1, slot2, slot3, cleanup].filter(Boolean);
+  while (pool.length > 0) order.push(takeBestBy((r) => Number(r.OPS)));
   return order;
 }
 
