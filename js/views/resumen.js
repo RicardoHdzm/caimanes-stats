@@ -140,7 +140,7 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders";
+  teamRow.className = "leaders team-stats-row";
   teamRow.innerHTML = `
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
@@ -214,7 +214,7 @@ export function renderResumen(container) {
       (p) => `${p.name} — ${p.SB} SB`
     ) +
     leaderCardHtml(
-      "fa-skull",
+      "fa-beer-mug-empty",
       "Líder de ponches",
       soSorted,
       (p) => `${p.name} — ${p.SO} ponches`,
