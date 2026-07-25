@@ -165,8 +165,12 @@ export function renderResumen(container) {
   const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
 
+  const leadersHeading = document.createElement("h3");
+  leadersHeading.textContent = "Líderes de la temporada";
+  container.appendChild(leadersHeading);
+
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-4 section-gap leader-row";
+  leadersRow.className = "leaders grid-4 leader-row";
   leadersRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
