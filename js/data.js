@@ -11,6 +11,8 @@ export const TEAM = {
   seasonsInLeague: 4, // temporadas jugando en esta liga
   seasonsTotal: 8, // temporadas del equipo en total
   gamesInSeason: 10, // juegos de temporada regular, sin contar playoffs
+  leaguePosition: null, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
+  leagueTeams: null, // total de equipos en la liga
 };
 
 // Roster del equipo.
@@ -164,6 +166,7 @@ export const GAMES = [
       { inning: 4, type: "campo", playerOut: "p6", playerIn: "p3", position: "LF" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/2028259977789373",
+    mvp: "p12",
   },
   {
     id: "g1",
@@ -213,6 +216,7 @@ export const GAMES = [
       { inning: 3, type: "campo", playerOut: "p3", playerIn: "p1", position: "SS" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1781320186374782",
+    mvp: "p10",
   },
   {
     id: "g2",
