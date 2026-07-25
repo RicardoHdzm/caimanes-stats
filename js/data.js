@@ -54,6 +54,10 @@ export const PLAYERS = [
 // (1, 2, 3...) y `position` la posición que jugó ese jugador ESE juego (puede
 // cambiar de un juego a otro, por eso no se usa la posición fija del roster).
 //
+// `HR` es el total de jonrones (de campo + los que se van por la barda).
+// `HRC` es cuántos de esos HR fueron "de campo" (inside-the-park) — es un
+// subconjunto de HR, igual que "2B"/"3B" son subconjunto de H.
+//
 // Criterio de anotación de esta liga: cuando el bateador se embasa por un
 // error de fildeo (no por un batazo que el rival no pudo convertir en out
 // jugando bien), aquí SÍ se cuenta como hit (H) para el bateador/pitcher,
@@ -83,7 +87,7 @@ export const PLAYERS = [
 //     scoreUs: 8,
 //     scoreThem: 5,
 //     batting: [
-//       { playerId: "p1", order: 1, position: "SS", AB: 4, H: 2, "2B": 1, "3B": 0, HR: 0, RBI: 2, R: 1, BB: 0, SO: 1, SB: 0 },
+//       { playerId: "p1", order: 1, position: "SS", AB: 4, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 1, SB: 0 },
 //     ],
 //     pitching: [
 //       { playerId: "p2", IP: 5.0, H: 4, R: 3, ER: 2, BB: 2, SO: 6, HR: 0, decision: "W" },
@@ -166,7 +170,7 @@ export const GAMES = [
       { playerId: "p10", order: 1, position: "LF", AB: 4, H: 4, "2B": 3, "3B": 0, HR: 0, RBI: 7, R: 3, BB: 0, SO: 0, SB: 1 },
       { playerId: "p18", order: 2, position: "SS", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, RBI: 2, R: 2, BB: 0, SO: 0, SB: 1 },
       { playerId: "p5", order: 3, position: "2B", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, RBI: 2, R: 0, BB: 0, SO: 0, SB: 1 },
-      { playerId: "p19", order: 4, position: "3B", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 1, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p19", order: 4, position: "3B", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 1, HRC: 1, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
       { playerId: "p12", order: 5, position: "1B", AB: 3, H: 3, "2B": 2, "3B": 0, HR: 1, RBI: 0, R: 4, BB: 1, SO: 0, SB: 3 },
       { playerId: "p7", order: 6, position: "JD", AB: 2, H: 1, "2B": 1, "3B": 0, HR: 0, RBI: 3, R: 4, BB: 2, SO: 0, SB: 2 },
       { playerId: "p15", order: 7, position: "JC", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, RBI: 2, R: 2, BB: 1, SO: 0, SB: 1 },
@@ -214,13 +218,13 @@ export const GAMES = [
     batting: [
       { playerId: "p10", order: 1, position: "LF", AB: 5, H: 3, "2B": 1, "3B": 0, HR: 0, RBI: 0, R: 3, BB: 0, SO: 1, SB: 3 },
       { playerId: "p5", order: 2, position: "CF", AB: 5, H: 3, "2B": 0, "3B": 0, HR: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
-      { playerId: "p19", order: 3, position: "SS", AB: 4, H: 3, "2B": 1, "3B": 0, HR: 1, RBI: 2, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p19", order: 3, position: "SS", AB: 4, H: 3, "2B": 1, "3B": 0, HR: 1, HRC: 1, RBI: 2, R: 3, BB: 0, SO: 0, SB: 1 },
       { playerId: "p12", order: 4, position: "1B", AB: 4, H: 2, "2B": 1, "3B": 0, HR: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 1 },
       { playerId: "p15", order: 5, position: "3B", AB: 3, H: 3, "2B": 1, "3B": 0, HR: 0, RBI: 2, R: 3, BB: 1, SO: 0, SB: 3 },
       { playerId: "p9", order: 6, position: "2B", AB: 4, H: 2, "2B": 2, "3B": 0, HR: 0, RBI: 3, R: 1, BB: 0, SO: 0, SB: 1 },
       { playerId: "p6", order: 7, position: "C", AB: 4, H: 3, "2B": 1, "3B": 0, HR: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 1 },
       { playerId: "p14", order: 8, position: "P", AB: 4, H: 2, "2B": 0, "3B": 1, HR: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 1 },
-      { playerId: "p3", order: 9, position: "RF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 1, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p3", order: 9, position: "RF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 1, HRC: 1, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
     ],
     pitching: [
       { playerId: "p14", IP: 6, H: 15, R: 7, ER: 0, BB: 0, SO: 4, HR: 0, decision: "W" },

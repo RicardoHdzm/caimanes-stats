@@ -13,6 +13,7 @@ const BATTING_FIELDS = [
   { key: "2B", label: "2B", full: "Dobles", type: "number" },
   { key: "3B", label: "3B", full: "Triples", type: "number" },
   { key: "HR", label: "HR", full: "Jonrones", type: "number" },
+  { key: "HRC", label: "HRC", full: "Jonrones de campo", type: "number" },
   { key: "RBI", label: "RBI", full: "Impulsadas", type: "number" },
   { key: "R", label: "R", full: "Carreras", type: "number" },
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },

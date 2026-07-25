@@ -22,7 +22,7 @@ function fmt3(n) {
 }
 
 function emptyBatting() {
-  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 };
+  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 };
 }
 
 function emptyPitching() {
@@ -48,6 +48,7 @@ export function battingTotals(games = GAMES) {
       t["2B"] += line["2B"] ?? 0;
       t["3B"] += line["3B"] ?? 0;
       t.HR += line.HR ?? 0;
+      t.HRC += line.HRC ?? 0;
       t.RBI += line.RBI ?? 0;
       t.R += line.R ?? 0;
       t.BB += line.BB ?? 0;
