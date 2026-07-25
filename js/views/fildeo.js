@@ -20,6 +20,9 @@ export function renderFildeo(container) {
     columns,
     rows: fieldingTotals(),
     defaultSort: "FPCT",
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
 
   renderGlossary(container, columns);

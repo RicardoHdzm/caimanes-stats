@@ -69,6 +69,7 @@ export function renderJuegoDetalle(container, gameId) {
   const lineupRows = [...(game.batting ?? [])]
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
     .map((line) => ({
+      playerId: line.playerId,
       order: line.order ?? "",
       name: playerName(line.playerId),
       position: line.position ?? "",
@@ -116,6 +117,9 @@ export function renderJuegoDetalle(container, gameId) {
     rows: lineupRows,
     defaultSort: "order",
     defaultDir: 1,
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
   renderGlossary(container, lineupColumns);
 
@@ -124,6 +128,7 @@ export function renderJuegoDetalle(container, gameId) {
   container.appendChild(pitchingHeading);
 
   const pitchingRows = (game.pitching ?? []).map((line) => ({
+    playerId: line.playerId,
     name: playerName(line.playerId),
     IP: line.IP ?? 0,
     H: line.H ?? 0,
@@ -153,6 +158,9 @@ export function renderJuegoDetalle(container, gameId) {
     columns: pitchingColumns,
     rows: pitchingRows,
     defaultSort: "IP",
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
   renderGlossary(container, pitchingColumns);
 
@@ -161,6 +169,7 @@ export function renderJuegoDetalle(container, gameId) {
   container.appendChild(fieldingHeading);
 
   const fieldingRows = (game.fielding ?? []).map((line) => ({
+    playerId: line.playerId,
     name: playerName(line.playerId),
     PO: line.PO ?? 0,
     A: line.A ?? 0,
@@ -180,6 +189,9 @@ export function renderJuegoDetalle(container, gameId) {
     columns: fieldingColumns,
     rows: fieldingRows,
     defaultSort: "PO",
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
   renderGlossary(container, fieldingColumns);
 

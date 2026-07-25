@@ -6,6 +6,7 @@ import { renderPitcheo } from "./views/pitcheo.js";
 import { renderFildeo } from "./views/fildeo.js";
 import { renderJuegos } from "./views/juegos.js";
 import { renderJuegoDetalle } from "./views/juego.js";
+import { renderJugadorDetalle } from "./views/jugador.js";
 
 const routes = {
   resumen: renderResumen,
@@ -29,6 +30,9 @@ function currentRoute() {
   const [first, second] = hash.split("/");
   if (first === "juegos" && second) {
     return { tab: "juegos", render: (container) => renderJuegoDetalle(container, second) };
+  }
+  if (first === "jugador" && second) {
+    return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
   }
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };

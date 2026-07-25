@@ -31,6 +31,9 @@ export function renderBateo(container) {
     columns,
     rows: battingTotals(),
     defaultSort: "AVG",
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
 
   renderGlossary(container, columns);

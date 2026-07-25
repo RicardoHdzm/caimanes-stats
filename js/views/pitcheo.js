@@ -29,6 +29,9 @@ export function renderPitcheo(container) {
     rows: pitchingTotals(),
     defaultSort: "ERA",
     defaultDir: 1,
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
   });
 
   renderGlossary(container, columns);

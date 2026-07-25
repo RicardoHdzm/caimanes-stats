@@ -31,6 +31,9 @@ export function renderRoster(container) {
     rows,
     defaultSort: "number",
     defaultDir: 1,
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.id}`;
+    },
   });
 
   renderGlossary(container, columns);
