@@ -148,6 +148,20 @@ export function gameResult(g) {
   return g.result ?? null;
 }
 
+// Racha activa: cuántos juegos seguidos (contando desde el más reciente hacia
+// atrás) tienen el mismo resultado. null si no hay juegos con resultado.
+export function currentStreak(games = GAMES) {
+  const known = [...games].filter((g) => gameResult(g) != null).sort((a, b) => a.date.localeCompare(b.date));
+  if (known.length === 0) return null;
+  const lastResult = gameResult(known[known.length - 1]);
+  let count = 0;
+  for (let i = known.length - 1; i >= 0; i--) {
+    if (gameResult(known[i]) !== lastResult) break;
+    count++;
+  }
+  return { type: lastResult, count };
+}
+
 // Cuántos juegos de la temporada jugó cada jugador (aparece en bateo,
 // pitcheo o fildeo de ese juego), sin contar dos veces el mismo juego.
 export function gamesPlayedByPlayer(games = GAMES) {
@@ -178,4 +192,66 @@ export function teamRecord(games = GAMES) {
     else if (result === "T") T += 1;
   }
   return { W, L, T, RF, RA, G: games.length };
+}
+
+// Stats del equipo completo (todas las líneas juntas, no por jugador).
+export function teamBattingTotals(games = GAMES) {
+  let AB = 0, H = 0, B2 = 0, B3 = 0, HR = 0, HRC = 0, RBI = 0, R = 0, BB = 0, SO = 0, SB = 0;
+  for (const game of games) {
+    for (const line of game.batting ?? []) {
+      AB += line.AB ?? 0;
+      H += line.H ?? 0;
+      B2 += line["2B"] ?? 0;
+      B3 += line["3B"] ?? 0;
+      HR += line.HR ?? 0;
+      HRC += line.HRC ?? 0;
+      RBI += line.RBI ?? 0;
+      R += line.R ?? 0;
+      BB += line.BB ?? 0;
+      SO += line.SO ?? 0;
+      SB += line.SB ?? 0;
+    }
+  }
+  const homers = HR + HRC;
+  const singles = H - B2 - B3 - homers;
+  const TB = singles + 2 * B2 + 3 * B3 + 4 * homers;
+  const AVG = div(H, AB);
+  const OBP = div(H + BB, AB + BB);
+  const SLG = div(TB, AB);
+  return {
+    AB, H, "2B": B2, "3B": B3, HR, HRC, RBI, R, BB, SO, SB,
+    AVG: fmt3(AVG), OBP: fmt3(OBP), SLG: fmt3(SLG), OPS: fmt3(OBP + SLG),
+  };
+}
+
+export function teamPitchingTotals(games = GAMES, inningsPerGame = 7) {
+  let outs = 0, H = 0, R = 0, ER = 0, BB = 0, SO = 0, HR = 0;
+  for (const game of games) {
+    for (const line of game.pitching ?? []) {
+      outs += ipToOuts(line.IP ?? 0);
+      H += line.H ?? 0;
+      R += line.R ?? 0;
+      ER += line.ER ?? 0;
+      BB += line.BB ?? 0;
+      SO += line.SO ?? 0;
+      HR += line.HR ?? 0;
+    }
+  }
+  const ipReal = outs / 3;
+  const ERA = ipReal > 0 ? (ER * inningsPerGame) / ipReal : 0;
+  const WHIP = ipReal > 0 ? (BB + H) / ipReal : 0;
+  return { IP: outsToIp(outs).toFixed(1), H, R, ER, BB, SO, HR, ERA: ERA.toFixed(2), WHIP: WHIP.toFixed(2) };
+}
+
+export function teamFieldingTotals(games = GAMES) {
+  let PO = 0, A = 0, E = 0;
+  for (const game of games) {
+    for (const line of game.fielding ?? []) {
+      PO += line.PO ?? 0;
+      A += line.A ?? 0;
+      E += line.E ?? 0;
+    }
+  }
+  const chances = PO + A + E;
+  return { PO, A, E, FPCT: fmt3(div(PO + A, chances)) };
 }

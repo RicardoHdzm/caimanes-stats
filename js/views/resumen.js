@@ -1,5 +1,15 @@
 import { GAMES, SCHEDULE, TEAM } from "../data.js";
-import { teamRecord, battingTotals, pitchingTotals, fieldingTotals, gameResult } from "../stats.js";
+import {
+  teamRecord,
+  battingTotals,
+  pitchingTotals,
+  fieldingTotals,
+  gameResult,
+  currentStreak,
+  teamBattingTotals,
+  teamPitchingTotals,
+  teamFieldingTotals,
+} from "../stats.js";
 import { heading } from "../ui.js";
 
 const FORM_CHIP = {
@@ -57,9 +67,38 @@ export function renderResumen(container) {
       <i class="fa-solid fa-calendar-check card-icon"></i>
       <span class="card-value">${rec.G}/${TEAM.gamesInSeason}</span>
       <span class="card-label">Juegos jugados</span>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: ${Math.min(100, (rec.G / TEAM.gamesInSeason) * 100)}%"></div>
+      </div>
     </div>
   `;
   container.appendChild(cards);
+
+  const teamBat = teamBattingTotals(GAMES);
+  const teamPit = teamPitchingTotals(GAMES);
+  const teamFld = teamFieldingTotals(GAMES);
+
+  const teamHeading = document.createElement("h3");
+  teamHeading.textContent = "Stats de equipo";
+  container.appendChild(teamHeading);
+
+  const teamRow = document.createElement("div");
+  teamRow.className = "leaders";
+  teamRow.innerHTML = `
+    <div class="leader-card">
+      <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
+      <p>AVG ${teamBat.AVG} · OBP ${teamBat.OBP} · SLG ${teamBat.SLG}</p>
+    </div>
+    <div class="leader-card">
+      <h3><i class="fa-solid fa-baseball"></i>Pitcheo de equipo</h3>
+      <p>ERA ${teamPit.ERA} · WHIP ${teamPit.WHIP}</p>
+    </div>
+    <div class="leader-card">
+      <h3><i class="fa-solid fa-shield"></i>Fildeo de equipo</h3>
+      <p>FPCT ${teamFld.FPCT}</p>
+    </div>
+  `;
+  container.appendChild(teamRow);
 
   const battingList = battingTotals(GAMES);
   const batSorted = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")));
@@ -68,7 +107,7 @@ export function renderResumen(container) {
   const fldSorted = fieldingTotals(GAMES).sort((a, b) => Number(b.FPCT.replace(".", "0.")) - Number(a.FPCT.replace(".", "0.")));
 
   const battingRow = document.createElement("div");
-  battingRow.className = "leaders";
+  battingRow.className = "leaders section-gap";
   battingRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
@@ -107,6 +146,21 @@ export function renderResumen(container) {
 
   const bottomRow = document.createElement("div");
   bottomRow.className = "leaders section-gap";
+
+  const streak = currentStreak(GAMES);
+  if (streak) {
+    const STREAK_LABEL = { W: "victoria", L: "derrota", T: "empate" };
+    const STREAK_ICON = { W: "fa-fire", L: "fa-arrow-trend-down", T: "fa-equals" };
+    const word = STREAK_LABEL[streak.type];
+    const plural = streak.count === 1 ? word : `${word}s`;
+    const streakCard = document.createElement("div");
+    streakCard.className = "leader-card";
+    streakCard.innerHTML = `
+      <h3><i class="fa-solid ${STREAK_ICON[streak.type]}"></i>Racha actual</h3>
+      <p>${streak.count} ${plural} seguida${streak.count === 1 ? "" : "s"}</p>
+    `;
+    bottomRow.appendChild(streakCard);
+  }
 
   const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
   if (recentGames.length > 0) {
