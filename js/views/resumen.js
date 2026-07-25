@@ -166,7 +166,7 @@ export function renderResumen(container) {
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-4 section-gap";
+  leadersRow.className = "leaders grid-4 section-gap leader-row";
   leadersRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
