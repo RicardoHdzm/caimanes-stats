@@ -5,6 +5,7 @@ import { renderBateo } from "./views/bateo.js";
 import { renderPitcheo } from "./views/pitcheo.js";
 import { renderFildeo } from "./views/fildeo.js";
 import { renderJuegos } from "./views/juegos.js";
+import { renderCalendario } from "./views/calendario.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 
@@ -15,6 +16,7 @@ const routes = {
   pitcheo: renderPitcheo,
   fildeo: renderFildeo,
   juegos: renderJuegos,
+  calendario: renderCalendario,
 };
 
 const app = document.getElementById("app");
