@@ -58,8 +58,9 @@ export function battingTotals(games = GAMES) {
     }
   }
   return [...totals.entries()].map(([playerId, t]) => {
-    const singles = t.H - t["2B"] - t["3B"] - t.HR;
-    const TB = singles + 2 * t["2B"] + 3 * t["3B"] + 4 * t.HR;
+    const homers = t.HR + t.HRC; // ambos valen 4 bases, aunque se lideran por separado
+    const singles = t.H - t["2B"] - t["3B"] - homers;
+    const TB = singles + 2 * t["2B"] + 3 * t["3B"] + 4 * homers;
     const AVG = div(t.H, t.AB);
     const OBP = div(t.H + t.BB, t.AB + t.BB);
     const SLG = div(TB, t.AB);
