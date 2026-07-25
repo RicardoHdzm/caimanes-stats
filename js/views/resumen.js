@@ -170,7 +170,7 @@ export function renderResumen(container) {
   container.appendChild(leadersHeading);
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-4 leader-row";
+  leadersRow.className = "leaders grid-4";
   leadersRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
