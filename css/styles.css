@@ -293,6 +293,11 @@ main h3::before {
   letter-spacing: 0.04em;
 }
 
+.game-hero-meta .badge {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
 .game-hero-replay {
   margin-top: 10px;
 }
@@ -300,13 +305,13 @@ main h3::before {
 .replay-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   color: #fff;
   background: var(--accent);
   text-decoration: none;
-  padding: 2px 9px;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.03em;
