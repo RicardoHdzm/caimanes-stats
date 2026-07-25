@@ -162,6 +162,8 @@ export function renderResumen(container) {
   const hrSorted = [...battingList].sort((a, b) => b.HR - a.HR);
   const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
   const fldSorted = fieldingTotals(GAMES).sort((a, b) => Number(b.FPCT.replace(".", "0.")) - Number(a.FPCT.replace(".", "0.")));
+  const soSorted = [...pitchingTotals(GAMES)].sort((a, b) => b.SO - a.SO);
+  const sbSorted = [...battingList].sort((a, b) => b.SB - a.SB);
 
   const battingRow = document.createElement("div");
   battingRow.className = "leaders section-gap";
@@ -200,4 +202,23 @@ export function renderResumen(container) {
       (p) => `${p.name} — FPCT ${p.FPCT}`
     );
   container.appendChild(pitchingRow);
+
+  const extraRow = document.createElement("div");
+  extraRow.className = "leaders section-gap";
+  extraRow.innerHTML =
+    leaderCardHtml(
+      "fa-skull",
+      "Líder de ponches",
+      soSorted,
+      (p) => `${p.name} — ${p.SO} K`,
+      (p) => `${p.name} — ${p.SO} K`
+    ) +
+    leaderCardHtml(
+      "fa-person-running",
+      "Líder de robo de bases",
+      sbSorted,
+      (p) => `${p.name} — ${p.SB} SB`,
+      (p) => `${p.name} — ${p.SB} SB`
+    );
+  container.appendChild(extraRow);
 }
