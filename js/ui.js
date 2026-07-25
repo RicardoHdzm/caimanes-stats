@@ -88,14 +88,16 @@ export function coloredStat(value, colorClass) {
   return Number(value) > 0 ? `<span class="${colorClass}">${value}</span>` : String(value);
 }
 
-const INFIELD_POSITIONS = new Set(["1B", "2B", "3B", "SS", "C"]);
+const INFIELD_POSITIONS = new Set(["1B", "2B", "3B", "SS"]);
 const OUTFIELD_POSITIONS = new Set(["LF", "CF", "RF"]);
 const SPECIAL_POSITIONS = new Set(["JD", "JC"]);
 
-// Clase de color según el tipo de posición: pitcher (azul), infield (amarillo),
-// outfield (verde), bateadores especiales JD/JC (rosa). DH/UTIL quedan neutros.
+// Clase de color según el tipo de posición: pitcher (azul), catcher (morado),
+// infield (amarillo), outfield (verde), bateadores especiales JD/JC (rosa).
+// DH/UTIL quedan neutros.
 function positionBadgeClass(code) {
   if (code === "P") return "pos-badge-p";
+  if (code === "C") return "pos-badge-c";
   if (INFIELD_POSITIONS.has(code)) return "pos-badge-if";
   if (OUTFIELD_POSITIONS.has(code)) return "pos-badge-of";
   if (SPECIAL_POSITIONS.has(code)) return "pos-badge-special";

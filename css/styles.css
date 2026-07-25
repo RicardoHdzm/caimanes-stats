@@ -14,6 +14,7 @@
   --tie: #8d96a0;
   --scheduled: #f5a623;
   --pos-pitcher: #4a9eff;
+  --pos-catcher: #a855f7;
   --pos-infield: #e2c93f;
   --pos-outfield: #3fb56f;
   --pos-special: #ff6fb5;
@@ -708,6 +709,12 @@ main h3::before {
   border-color: var(--pos-pitcher);
   color: var(--pos-pitcher);
   background: rgba(74, 158, 255, 0.12);
+}
+
+.pos-badge-c {
+  border-color: var(--pos-catcher);
+  color: var(--pos-catcher);
+  background: rgba(168, 85, 247, 0.12);
 }
 
 .pos-badge-if {
