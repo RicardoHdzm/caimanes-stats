@@ -33,42 +33,30 @@ body {
 }
 
 .topbar {
-  padding: 14px 24px 0;
+  padding: 18px 24px 0;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, #15181c 0%, var(--bg) 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.topbar::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 60%, var(--accent-glow) 100%);
-  pointer-events: none;
 }
 
 .topbar-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 1150px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
 }
 
 .brand-logo {
-  height: 64px;
-  width: 64px;
+  height: 100px;
+  width: 100px;
   object-fit: contain;
-  justify-self: start;
+}
+
+.season-row {
+  display: flex;
+  justify-content: center;
+  padding: 10px 24px;
 }
 
 .season {
-  justify-self: center;
   display: inline-block;
   text-align: center;
   color: var(--muted);
@@ -86,7 +74,6 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: end;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -107,8 +94,6 @@ body {
 }
 
 .tabs {
-  position: relative;
-  z-index: 1;
   display: flex;
   justify-content: center;
   gap: 6px;
@@ -145,13 +130,9 @@ body {
 }
 
 @media (max-width: 640px) {
-  .topbar-inner {
-    grid-template-columns: auto 1fr auto;
-  }
-
   .brand-logo {
-    height: 48px;
-    width: 48px;
+    height: 72px;
+    width: 72px;
   }
 
   .season {
