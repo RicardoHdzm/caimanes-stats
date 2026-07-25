@@ -138,11 +138,15 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders grid-3";
+  teamRow.className = "leaders grid-4";
   teamRow.innerHTML = `
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
       <p>AVG ${teamBat.AVG} · OBP ${teamBat.OBP} · SLG ${teamBat.SLG}</p>
+    </div>
+    <div class="leader-card">
+      <h3><i class="fa-solid fa-bomb"></i>Home runs de equipo</h3>
+      <p>${teamBat.HR} HR</p>
     </div>
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball"></i>Pitcheo de equipo</h3>
@@ -164,12 +168,6 @@ export function renderResumen(container) {
   const leadersRow = document.createElement("div");
   leadersRow.className = "leaders grid-4 section-gap";
   leadersRow.innerHTML =
-    `
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-bomb"></i>Home runs de equipo</h3>
-      <p>${teamBat.HR} HR</p>
-    </div>
-    ` +
     leaderCardHtml(
       "fa-baseball-bat-ball",
       "Líder de bateo",
