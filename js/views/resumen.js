@@ -138,7 +138,7 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders grid-4";
+  teamRow.className = "leaders grid-4 team-stats-row";
   teamRow.innerHTML = `
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
