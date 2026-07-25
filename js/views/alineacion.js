@@ -13,25 +13,43 @@ function emptyStats(playerId) {
   return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0 };
 }
 
-// Asigna cada una de las 9 posiciones al mejor candidato disponible (por OPS),
-// resolviendo primero las posiciones con menos candidatos elegibles para no
-// dejarlas sin cubrir por un jugador multi-posición tomado antes en otro lado.
+// La primera posición listada en el roster (ej. "SS" en "SS/LF/CF") es la
+// posición principal del jugador.
+function primaryPosition(player) {
+  return positionsOf(player.position)[0] ?? null;
+}
+
+// Asigna las 9 posiciones en dos pasadas:
+// 1) cada jugador va a su posición principal si está libre (mejor OPS decide
+//    cuando dos jugadores comparten la misma posición principal).
+// 2) las posiciones que quedaron vacías se llenan con posiciones secundarias
+//    disponibles, resolviendo primero las que tengan menos candidatos.
 function assignDefense(statsById) {
   const used = new Set();
-  const remaining = new Set(DEFENSE_POSITIONS);
   const assignment = {};
 
-  function candidatesFor(pos) {
-    return PLAYERS.filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
-      .map((p) => statsById.get(p.id) ?? emptyStats(p.id))
-      .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+  function statsFor(p) {
+    return statsById.get(p.id) ?? emptyStats(p.id);
   }
 
+  for (const pos of DEFENSE_POSITIONS) {
+    const candidates = PLAYERS.filter((p) => primaryPosition(p) === pos && !used.has(p.id))
+      .map(statsFor)
+      .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+    if (candidates.length > 0) {
+      assignment[pos] = candidates[0];
+      used.add(candidates[0].playerId);
+    }
+  }
+
+  const remaining = new Set(DEFENSE_POSITIONS.filter((pos) => !assignment[pos]));
   while (remaining.size > 0) {
     let bestPos = null;
     let bestCandidates = null;
     for (const pos of remaining) {
-      const candidates = candidatesFor(pos);
+      const candidates = PLAYERS.filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
+        .map(statsFor)
+        .sort((a, b) => Number(b.OPS) - Number(a.OPS));
       if (bestCandidates === null || candidates.length < bestCandidates.length) {
         bestPos = pos;
         bestCandidates = candidates;
