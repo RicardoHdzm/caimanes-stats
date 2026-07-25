@@ -131,6 +131,7 @@ export function renderAlineacion(container) {
   }
 
   const jd = bestBenchPlayer();
+  let pitcherBats = false;
   if (jd) {
     usedIds.add(jd.playerId);
     starters.push(jd);
@@ -139,6 +140,7 @@ export function renderAlineacion(container) {
     // Sin banca disponible: el pitcher batea por su cuenta.
     starters.push(assignment.P);
     batterLabel.set(assignment.P.playerId, "P");
+    pitcherBats = true;
   }
 
   const jc = bestBenchPlayer();
@@ -156,6 +158,7 @@ export function renderAlineacion(container) {
 
   const orderRows = order.map((row, i) => ({
     slot: i + 1,
+    slotDisplay: String(i + 1),
     name: row.name,
     position: batterLabel.get(row.playerId) ?? "",
     AVG: row.AVG,
@@ -166,8 +169,26 @@ export function renderAlineacion(container) {
     RBI: row.RBI,
   }));
 
+  // El pitcher no batea, pero se muestra al final como referencia de quién
+  // ocupa esa posición defensiva.
+  if (!pitcherBats && assignment.P) {
+    const pitcherStats = statsById.get(assignment.P.playerId) ?? emptyStats(assignment.P.playerId);
+    orderRows.push({
+      slot: orderRows.length + 1,
+      slotDisplay: "P",
+      name: pitcherStats.name,
+      position: "P",
+      AVG: pitcherStats.AVG,
+      OBP: pitcherStats.OBP,
+      SLG: pitcherStats.SLG,
+      OPS: pitcherStats.OPS,
+      HR: pitcherStats.HR,
+      RBI: pitcherStats.RBI,
+    });
+  }
+
   const orderColumns = [
-    { key: "slot", label: "#", full: "Turno al bat", numeric: true },
+    { key: "slot", label: "#", full: "Turno al bat", numeric: true, render: (_v, row) => row.slotDisplay },
     { key: "name", label: "Jugador" },
     { key: "position", label: "Pos", full: "Posición", render: (v) => renderPositionBadge(v) },
     { key: "AVG", label: "AVG", full: "Promedio", numeric: true },
