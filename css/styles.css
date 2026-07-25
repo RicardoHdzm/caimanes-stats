@@ -544,16 +544,12 @@ main h3::before {
   border-top-color: var(--leader-yellow);
 }
 
-.leader-row .leader-card h3 {
-  color: #fff;
-}
-
 .leader-row .leader-card h3 i {
   color: var(--gold);
 }
 
 .leader-row .leader-card h3 i::before {
-  background: linear-gradient(135deg, #f0d264, var(--gold));
+  background: linear-gradient(135deg, #ffe08c, #b8860b);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
