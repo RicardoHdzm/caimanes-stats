@@ -135,7 +135,6 @@ export function renderResumen(container) {
   const teamFld = teamFieldingTotals(GAMES);
 
   const teamHeading = document.createElement("h3");
-  teamHeading.className = "team-stats-heading";
   teamHeading.textContent = "Stats de equipo";
   container.appendChild(teamHeading);
 
