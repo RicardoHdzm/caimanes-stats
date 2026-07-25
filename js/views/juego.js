@@ -166,7 +166,7 @@ export function renderJuegoDetalle(container, gameId) {
     { key: "name", label: "Jugador" },
     { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
     { key: "A", label: "A", full: "Asistencias", numeric: true },
-    { key: "E", label: "E", full: "Errores", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+    { key: "E", label: "E", full: "Errores", numeric: true },
   ];
 
   const fieldingEl = document.createElement("div");

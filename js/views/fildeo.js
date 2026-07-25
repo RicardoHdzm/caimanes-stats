@@ -1,5 +1,5 @@
 import { fieldingTotals } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary } from "../ui.js";
 
 export function renderFildeo(container) {
   heading(container, "Estadísticas de fildeo");
@@ -9,7 +9,7 @@ export function renderFildeo(container) {
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
     { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
     { key: "A", label: "A", full: "Asistencias", numeric: true },
-    { key: "E", label: "E", full: "Errores", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+    { key: "E", label: "E", full: "Errores", numeric: true },
     { key: "FPCT", label: "FPCT", full: "Porcentaje de fildeo", numeric: true },
   ];
 

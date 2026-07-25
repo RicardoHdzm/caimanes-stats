@@ -428,14 +428,16 @@ main h3::before {
 }
 
 .leader-card h3 {
-  margin: 0 0 10px;
-  font-size: 0.8rem;
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--muted);
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
 .leader-card h3::before {
@@ -444,12 +446,15 @@ main h3::before {
 
 .leader-card h3 i {
   color: var(--accent);
+  font-size: 2rem;
 }
 
 .leader-card p {
   margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .form-strip {
