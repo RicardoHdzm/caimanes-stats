@@ -74,6 +74,54 @@ export function renderResumen(container) {
   `;
   container.appendChild(cards);
 
+  const bottomRow = document.createElement("div");
+  bottomRow.className = "leaders section-gap";
+
+  const streak = currentStreak(GAMES);
+  if (streak) {
+    const STREAK_LABEL = { W: "victoria", L: "derrota", T: "empate" };
+    const STREAK_ICON = { W: "fa-fire", L: "fa-arrow-trend-down", T: "fa-equals" };
+    const word = STREAK_LABEL[streak.type];
+    const plural = streak.count === 1 ? word : `${word}s`;
+    const streakCard = document.createElement("div");
+    streakCard.className = "leader-card";
+    streakCard.innerHTML = `
+      <h3><i class="fa-solid ${STREAK_ICON[streak.type]}"></i>Racha actual</h3>
+      <p>${streak.count} ${plural} seguida${streak.count === 1 ? "" : "s"}</p>
+    `;
+    bottomRow.appendChild(streakCard);
+  }
+
+  const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
+  if (recentGames.length > 0) {
+    const form = document.createElement("div");
+    form.className = "leader-card form-card";
+    form.innerHTML = `
+      <h3><i class="fa-solid fa-clock-rotate-left"></i>Racha reciente</h3>
+      <div class="form-strip">
+        ${recentGames
+          .map((g) => {
+            const chip = FORM_CHIP[gameResult(g)] ?? { letter: "?", cls: "badge-unknown" };
+            return `<span class="badge form-chip ${chip.cls}" title="${g.opponent} — ${g.date}">${chip.letter}</span>`;
+          })
+          .join("")}
+      </div>
+    `;
+    bottomRow.appendChild(form);
+  }
+
+  for (const g of SCHEDULE) {
+    const next = document.createElement("div");
+    next.className = "leader-card";
+    next.innerHTML = `
+      <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
+      <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
+    `;
+    bottomRow.appendChild(next);
+  }
+
+  if (bottomRow.children.length > 0) container.appendChild(bottomRow);
+
   const teamBat = teamBattingTotals(GAMES);
   const teamPit = teamPitchingTotals(GAMES);
   const teamFld = teamFieldingTotals(GAMES);
@@ -143,52 +191,4 @@ export function renderResumen(container) {
       (p) => `${p.name} — FPCT ${p.FPCT}`
     );
   container.appendChild(pitchingRow);
-
-  const bottomRow = document.createElement("div");
-  bottomRow.className = "leaders section-gap";
-
-  const streak = currentStreak(GAMES);
-  if (streak) {
-    const STREAK_LABEL = { W: "victoria", L: "derrota", T: "empate" };
-    const STREAK_ICON = { W: "fa-fire", L: "fa-arrow-trend-down", T: "fa-equals" };
-    const word = STREAK_LABEL[streak.type];
-    const plural = streak.count === 1 ? word : `${word}s`;
-    const streakCard = document.createElement("div");
-    streakCard.className = "leader-card";
-    streakCard.innerHTML = `
-      <h3><i class="fa-solid ${STREAK_ICON[streak.type]}"></i>Racha actual</h3>
-      <p>${streak.count} ${plural} seguida${streak.count === 1 ? "" : "s"}</p>
-    `;
-    bottomRow.appendChild(streakCard);
-  }
-
-  const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
-  if (recentGames.length > 0) {
-    const form = document.createElement("div");
-    form.className = "leader-card form-card";
-    form.innerHTML = `
-      <h3><i class="fa-solid fa-clock-rotate-left"></i>Racha reciente</h3>
-      <div class="form-strip">
-        ${recentGames
-          .map((g) => {
-            const chip = FORM_CHIP[gameResult(g)] ?? { letter: "?", cls: "badge-unknown" };
-            return `<span class="badge form-chip ${chip.cls}" title="${g.opponent} — ${g.date}">${chip.letter}</span>`;
-          })
-          .join("")}
-      </div>
-    `;
-    bottomRow.appendChild(form);
-  }
-
-  for (const g of SCHEDULE) {
-    const next = document.createElement("div");
-    next.className = "leader-card";
-    next.innerHTML = `
-      <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
-      <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
-    `;
-    bottomRow.appendChild(next);
-  }
-
-  if (bottomRow.children.length > 0) container.appendChild(bottomRow);
 }
