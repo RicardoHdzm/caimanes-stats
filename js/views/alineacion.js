@@ -104,12 +104,50 @@ export function renderAlineacion(container) {
   const statsById = new Map(battingList.map((r) => [r.playerId, r]));
 
   const assignment = assignDefense(statsById);
-  const positionByPlayer = new Map();
-  for (const [pos, row] of Object.entries(assignment)) {
-    if (row) positionByPlayer.set(row.playerId, pos);
+
+  // El pitcher no batea en esta liga: el mejor bateador de banca disponible
+  // (un JD, Jugador Designado) toma su turno. Además se agrega el siguiente
+  // mejor de banca como JC (Jugador de Cortesía), un bateador extra — ninguno
+  // de los dos juega campo.
+  const usedIds = new Set(Object.values(assignment).filter(Boolean).map((r) => r.playerId));
+
+  function bestBenchPlayer() {
+    return (
+      PLAYERS.filter((p) => !usedIds.has(p.id))
+        .map((p) => statsById.get(p.id) ?? emptyStats(p.id))
+        .sort((a, b) => Number(b.OPS) - Number(a.OPS))[0] ?? null
+    );
   }
 
-  const starters = Object.values(assignment).filter(Boolean);
+  const batterLabel = new Map();
+  const starters = [];
+
+  for (const pos of DEFENSE_POSITIONS.filter((p) => p !== "P")) {
+    const row = assignment[pos];
+    if (row) {
+      starters.push(row);
+      batterLabel.set(row.playerId, pos);
+    }
+  }
+
+  const jd = bestBenchPlayer();
+  if (jd) {
+    usedIds.add(jd.playerId);
+    starters.push(jd);
+    batterLabel.set(jd.playerId, "JD");
+  } else if (assignment.P) {
+    // Sin banca disponible: el pitcher batea por su cuenta.
+    starters.push(assignment.P);
+    batterLabel.set(assignment.P.playerId, "P");
+  }
+
+  const jc = bestBenchPlayer();
+  if (jc) {
+    usedIds.add(jc.playerId);
+    starters.push(jc);
+    batterLabel.set(jc.playerId, "JC");
+  }
+
   const order = battingOrder(starters);
 
   const orderHeading = document.createElement("h3");
@@ -119,7 +157,7 @@ export function renderAlineacion(container) {
   const orderRows = order.map((row, i) => ({
     slot: i + 1,
     name: row.name,
-    position: positionByPlayer.get(row.playerId) ?? "",
+    position: batterLabel.get(row.playerId) ?? "",
     AVG: row.AVG,
     OBP: row.OBP,
     SLG: row.SLG,
