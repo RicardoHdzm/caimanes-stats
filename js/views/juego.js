@@ -48,12 +48,12 @@ export function renderJuegoDetalle(container, gameId) {
     </div>
     <div class="game-hero-meta">
       <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
-      ${
-        game.replayUrl
-          ? `<a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a>`
-          : ""
-      }
     </div>
+    ${
+      game.replayUrl
+        ? `<div class="game-hero-replay"><a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a></div>`
+        : ""
+    }
   `;
   container.appendChild(hero);
 
