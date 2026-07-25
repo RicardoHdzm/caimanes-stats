@@ -14,6 +14,23 @@ function formatGameDate(dateStr) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+// Tarjeta de líder con el #1 en grande y el 2do/3er lugar chico debajo.
+function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat) {
+  const [first, second, third] = sortedList;
+  const mainHtml = first ? `<p>${mainFormat(first)}</p>` : "<p>Sin datos todavía.</p>";
+  const runnersUp = [second, third].filter(Boolean);
+  const runnersHtml = runnersUp.length
+    ? `<ol class="runner-ups" start="2">${runnersUp.map((p) => `<li>${shortFormat(p)}</li>`).join("")}</ol>`
+    : "";
+  return `
+    <div class="leader-card">
+      <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+      ${mainHtml}
+      ${runnersHtml}
+    </div>
+  `;
+}
+
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
@@ -44,34 +61,49 @@ export function renderResumen(container) {
   `;
   container.appendChild(cards);
 
-  const leaders = document.createElement("div");
-  leaders.className = "leaders";
-
   const battingList = battingTotals(GAMES);
-  const bat = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")))[0];
-  const hrLeader = [...battingList].sort((a, b) => b.HR - a.HR)[0];
-  const pit = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA))[0];
-  const fld = fieldingTotals(GAMES).sort((a, b) => Number(b.FPCT.replace(".", "0.")) - Number(a.FPCT.replace(".", "0.")))[0];
+  const batSorted = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")));
+  const hrSorted = [...battingList].sort((a, b) => b.HR - a.HR);
+  const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
+  const fldSorted = fieldingTotals(GAMES).sort((a, b) => Number(b.FPCT.replace(".", "0.")) - Number(a.FPCT.replace(".", "0.")));
 
-  leaders.innerHTML = `
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-baseball-bat-ball"></i>Líder de bateo</h3>
-      ${bat ? `<p>${bat.name} — AVG ${bat.AVG}, ${bat.HR} HR, ${bat.RBI} RBI</p>` : "<p>Sin datos todavía.</p>"}
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-fire"></i>Líder de jonrones</h3>
-      ${hrLeader ? `<p>${hrLeader.name} — ${hrLeader.HR} HR</p>` : "<p>Sin datos todavía.</p>"}
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-baseball"></i>Líder de pitcheo</h3>
-      ${pit ? `<p>${pit.name} — ERA ${pit.ERA}, ${pit.SO} K en ${pit.IP} IP</p>` : "<p>Sin datos todavía.</p>"}
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-shield"></i>Líder de fildeo</h3>
-      ${fld ? `<p>${fld.name} — FPCT ${fld.FPCT}, ${fld.PO} PO, ${fld.A} A</p>` : "<p>Sin datos todavía.</p>"}
-    </div>
-  `;
-  container.appendChild(leaders);
+  const battingRow = document.createElement("div");
+  battingRow.className = "leaders";
+  battingRow.innerHTML =
+    leaderCardHtml(
+      "fa-baseball-bat-ball",
+      "Líder de bateo",
+      batSorted,
+      (p) => `${p.name} — AVG ${p.AVG}, ${p.HR} HR, ${p.RBI} RBI`,
+      (p) => `${p.name} — AVG ${p.AVG}`
+    ) +
+    leaderCardHtml(
+      "fa-fire",
+      "Líder de jonrones",
+      hrSorted,
+      (p) => `${p.name} — ${p.HR} HR`,
+      (p) => `${p.name} — ${p.HR} HR`
+    );
+  container.appendChild(battingRow);
+
+  const pitchingRow = document.createElement("div");
+  pitchingRow.className = "leaders section-gap";
+  pitchingRow.innerHTML =
+    leaderCardHtml(
+      "fa-baseball",
+      "Líder de pitcheo",
+      pitSorted,
+      (p) => `${p.name} — ERA ${p.ERA}, ${p.SO} K en ${p.IP} IP`,
+      (p) => `${p.name} — ERA ${p.ERA}`
+    ) +
+    leaderCardHtml(
+      "fa-shield",
+      "Líder de fildeo",
+      fldSorted,
+      (p) => `${p.name} — FPCT ${p.FPCT}, ${p.PO} PO, ${p.A} A`,
+      (p) => `${p.name} — FPCT ${p.FPCT}`
+    );
+  container.appendChild(pitchingRow);
 
   const bottomRow = document.createElement("div");
   bottomRow.className = "leaders section-gap";

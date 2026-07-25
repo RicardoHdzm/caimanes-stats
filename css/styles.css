@@ -384,9 +384,16 @@ main h3::before {
 }
 
 .card-icon {
-  color: var(--accent);
   font-size: 2rem;
   margin-bottom: 6px;
+}
+
+.card-icon::before,
+.leader-card h3 i::before {
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .card-value {
@@ -455,6 +462,16 @@ main h3::before {
   font-weight: 700;
   font-style: italic;
   line-height: 1.4;
+}
+
+.runner-ups {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .form-strip {
