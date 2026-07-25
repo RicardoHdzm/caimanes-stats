@@ -196,7 +196,7 @@ main h3 {
 }
 
 .team-stats-heading {
-  font-size: 1rem;
+  font-size: 1.3rem;
 }
 
 main h3::before {
@@ -455,12 +455,21 @@ main h3::before {
 
 .grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media (max-width: 640px) {
+  .cards,
+  .leaders {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .leaders {
+    display: grid;
+  }
+
   .grid-3 {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -471,15 +480,10 @@ main h3::before {
 .leader-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 4px solid var(--accent);
+  border-top: 4px solid var(--accent);
   border-radius: 10px;
   padding: 18px;
   box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
-}
-
-.leader-card-top {
-  border-left: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
 }
 
 .leader-card h3 {

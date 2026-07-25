@@ -81,7 +81,7 @@ export function renderResumen(container) {
     const word = STREAK_LABEL[streak.type];
     const plural = streak.count === 1 ? word : `${word}s`;
     const streakCard = document.createElement("div");
-    streakCard.className = "leader-card leader-card-top";
+    streakCard.className = "leader-card";
     streakCard.innerHTML = `
       <h3><i class="fa-solid ${STREAK_ICON[streak.type]}"></i>Racha actual</h3>
       <p>${streak.count} ${plural} seguida${streak.count === 1 ? "" : "s"}</p>
@@ -92,7 +92,7 @@ export function renderResumen(container) {
   const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
   if (recentGames.length > 0) {
     const form = document.createElement("div");
-    form.className = "leader-card leader-card-top form-card";
+    form.className = "leader-card form-card";
     form.innerHTML = `
       <h3><i class="fa-solid fa-clock-rotate-left"></i>Racha reciente</h3>
       <div class="form-strip">
@@ -109,7 +109,7 @@ export function renderResumen(container) {
 
   for (const g of SCHEDULE) {
     const next = document.createElement("div");
-    next.className = "leader-card leader-card-top";
+    next.className = "leader-card";
     next.innerHTML = `
       <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
       <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
@@ -118,7 +118,7 @@ export function renderResumen(container) {
   }
 
   const gamesPlayedCard = document.createElement("div");
-  gamesPlayedCard.className = "leader-card leader-card-top";
+  gamesPlayedCard.className = "leader-card";
   gamesPlayedCard.innerHTML = `
     <h3><i class="fa-solid fa-calendar-check"></i>Juegos jugados</h3>
     <p>${rec.G}/${TEAM.gamesInSeason}</p>
