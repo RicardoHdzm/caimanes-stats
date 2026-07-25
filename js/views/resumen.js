@@ -162,8 +162,14 @@ export function renderResumen(container) {
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-3 section-gap";
+  leadersRow.className = "leaders grid-4 section-gap";
   leadersRow.innerHTML =
+    `
+    <div class="leader-card">
+      <h3><i class="fa-solid fa-bomb"></i>Home runs de equipo</h3>
+      <p>${teamBat.HR} HR</p>
+    </div>
+    ` +
     leaderCardHtml(
       "fa-baseball-bat-ball",
       "Líder de bateo",
