@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin (local) — Caimanes de Villas</title>
+<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo admin-logo" />
+  </div>
+  <div class="season-row">
+    <span class="season">Herramienta local para generar código de data.js</span>
+  </div>
+</header>
+
+<main id="admin-app" class="admin-main">
+  <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
+
+  <section class="admin-section">
+    <h2>Agregar jugador</h2>
+    <p class="subtitle">Llena el formulario y copia el código en <code>PLAYERS</code> dentro de <code>js/data.js</code>.</p>
+    <form id="player-form" class="admin-form">
+      <label>ID (único)<input type="text" name="id" required /></label>
+      <label>Número<input type="number" name="number" /></label>
+      <label>Nombre<input type="text" name="name" required /></label>
+      <label>Posición
+        <select name="position" id="player-position">
+          <option value="">—</option>
+        </select>
+      </label>
+      <button type="submit"><i class="fa-solid fa-code"></i> Generar código</button>
+    </form>
+    <div class="code-output" id="player-output" hidden>
+      <pre><code id="player-code"></code></pre>
+      <button type="button" class="copy-btn" data-target="player-code"><i class="fa-solid fa-copy"></i> Copiar</button>
+    </div>
+  </section>
+
+  <section class="admin-section">
+    <h2>Agregar / editar juego</h2>
+    <p class="subtitle">Llena los datos del juego y las líneas de bateo/pitcheo/fildeo, luego copia el código en <code>GAMES</code> dentro de <code>js/data.js</code>. Para editar uno que ya existe, selecciónalo abajo: se rellena el formulario y el código generado reemplaza ese bloque completo.</p>
+    <label class="game-select-label">Editar juego existente
+      <select id="game-select">
+        <option value="">— Nuevo juego —</option>
+      </select>
+    </label>
+    <form id="game-form" class="admin-form">
+      <label>ID (único)<input type="text" name="id" required /></label>
+      <label>Fecha<input type="date" name="date" required /></label>
+      <label>Rival<input type="text" name="opponent" required /></label>
+      <label>Sede
+        <select name="weCloseBatting">
+          <option value="unknown">No sé todavía</option>
+          <option value="true">Local (cerramos bateando)</option>
+          <option value="false">Visitante (cierra el rival)</option>
+        </select>
+      </label>
+      <label>¿Ya tienes el marcador?
+        <select name="scoreKnown" id="score-known">
+          <option value="yes">Sí</option>
+          <option value="no">No todavía</option>
+        </select>
+      </label>
+      <div id="score-fields">
+        <label>Carreras nosotras<input type="number" name="scoreUs" /></label>
+        <label>Carreras rival<input type="number" name="scoreThem" /></label>
+      </div>
+      <div id="result-field" hidden>
+        <label>Resultado
+          <select name="result">
+            <option value="W">Ganado</option>
+            <option value="L">Perdido</option>
+            <option value="T">Empate</option>
+          </select>
+        </label>
+      </div>
+    </form>
+
+    <h3>Bateo / line-up</h3>
+    <div id="batting-rows"></div>
+    <button type="button" class="add-row-btn" data-section="batting"><i class="fa-solid fa-plus"></i> Agregar jugador al bateo</button>
+
+    <h3>Pitcheo</h3>
+    <div id="pitching-rows"></div>
+    <button type="button" class="add-row-btn" data-section="pitching"><i class="fa-solid fa-plus"></i> Agregar pitcher</button>
+
+    <h3>Fildeo</h3>
+    <div id="fielding-rows"></div>
+    <button type="button" class="add-row-btn" data-section="fielding"><i class="fa-solid fa-plus"></i> Agregar jugador al fildeo</button>
+
+    <h3>Cambios de jugador (entra a batear o a jugar campo por otro)</h3>
+    <div id="substitutions-rows"></div>
+    <button type="button" class="add-row-btn" data-section="substitutions"><i class="fa-solid fa-plus"></i> Agregar cambio</button>
+
+    <button type="button" id="generate-game-btn" class="generate-btn"><i class="fa-solid fa-code"></i> Generar código del juego</button>
+
+    <div class="code-output" id="game-output" hidden>
+      <pre><code id="game-code"></code></pre>
+      <button type="button" class="copy-btn" data-target="game-code"><i class="fa-solid fa-copy"></i> Copiar</button>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  Herramienta local — no guarda nada, solo genera el código para pegar en <code>js/data.js</code>
+</footer>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

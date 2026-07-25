@@ -1,0 +1,65 @@
+# Caimanes de Villas — Stats
+
+Página estática (sin servidor, sin base de datos) para llevar las estadísticas
+del equipo: roster, bateo, pitcheo, fildeo y resultados de juegos. Se hostea
+gratis en **GitHub Pages**.
+
+## Cómo actualizar los datos
+
+Todo el contenido vive en [`js/data.js`](js/data.js). No hay panel de admin
+con base de datos, pero sí una herramienta local —
+[`admin.html`](admin.html) — que a partir de formularios te genera el bloque
+de código listo para pegar en `data.js` (no guarda nada por sí sola, solo
+arma el texto). Después de pegar el código, sube (commit + push) los cambios
+a GitHub para que se reflejen en la página publicada.
+
+- **`PLAYERS`**: agrega un objeto por jugador con `id` (único, ej. `"p5"`),
+  `number`, `name` y `position`.
+- **`GAMES`**: agrega un objeto por juego jugado, con el marcador y un arreglo
+  `batting`, `pitching` y `fielding` con una línea por jugador que participó
+  en cada rubro (si un jugador no bateó/pitcheó/fildeó ese juego, simplemente
+  no lo incluyas en ese arreglo).
+
+Las entradas pitcheadas (`IP`) usan la notación estándar de béisbol/softbol:
+`.1` = 1 out, `.2` = 2 outs (ej. `4.2` = 4 entradas completas + 2 outs).
+
+Todos los promedios (AVG, OBP, SLG, ERA, WHIP, FPCT, etc.) se calculan solos
+en [`js/stats.js`](js/stats.js) a partir de las líneas de cada juego — nunca
+los edites a mano.
+
+## Logo del equipo
+
+`assets/logo.png` — el logo real del equipo, referenciado desde `index.html`.
+
+## Publicar en GitHub Pages
+
+1. Sube esta carpeta a un repositorio nuevo de GitHub.
+2. En el repo, ve a **Settings → Pages** y en "Build and deployment" elige
+   **Deploy from a branch**, rama `main`, carpeta `/ (root)`.
+3. En un par de minutos la página estará en
+   `https://tu-usuario.github.io/tu-repo/`.
+
+## Estructura del proyecto
+
+```
+index.html          shell de la app
+admin.html            herramienta local: genera el código para pegar en data.js
+css/styles.css       estilos
+css/admin.css          estilos de admin.html
+js/data.js             roster y juegos (lo editas tú cada semana)
+js/stats.js             cálculo de promedios y totales de temporada
+js/ui.js                 tabla ordenable reutilizable
+js/main.js               router de las pestañas
+js/admin.js              lógica de admin.html
+js/views/                 una vista por pestaña (resumen, roster, bateo, pitcheo, fildeo, juegos)
+assets/logo.png         logo del equipo
+```
+
+## Notas
+
+- No se necesita build ni instalar dependencias: corre directo en el
+  navegador con módulos JS nativos.
+- No hay login ni base de datos todavía — es un sitio de solo lectura para
+  cualquiera que entre al link, y tú controlas los datos editando el código.
+  Si más adelante quieres que los jugadores capturen sus propias stats o
+  necesitas cuentas de usuario, se puede migrar a Supabase más adelante.

@@ -1,0 +1,26 @@
+import { fieldingTotals } from "../stats.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
+
+export function renderFildeo(container) {
+  heading(container, "Estadísticas de fildeo");
+
+  const columns = [
+    { key: "name", label: "Jugador" },
+    { key: "G", label: "J", full: "Juegos jugados", numeric: true },
+    { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
+    { key: "A", label: "A", full: "Asistencias", numeric: true },
+    { key: "E", label: "E", full: "Errores", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+    { key: "FPCT", label: "FPCT", full: "Porcentaje de fildeo", numeric: true },
+  ];
+
+  const tableEl = document.createElement("div");
+  container.appendChild(tableEl);
+
+  renderSortableTable(tableEl, {
+    columns,
+    rows: fieldingTotals(),
+    defaultSort: "FPCT",
+  });
+
+  renderGlossary(container, columns);
+}
