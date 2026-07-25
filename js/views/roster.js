@@ -35,7 +35,7 @@ export function renderRoster(container) {
       numeric: true,
       render: (value) => {
         const cls = value >= PLAYOFF_MIN_GAMES ? "stat-green" : "stat-red";
-        return `<span class="${cls}">${value}/${TEAM.gamesInSeason}</span>`;
+        return `<span class="${cls}">${value}</span>/${TEAM.gamesInSeason}</span>`;
       },
     },
   ];

@@ -45,8 +45,8 @@ body {
 }
 
 .brand-logo {
-  height: 100px;
-  width: 100px;
+  height: 250px;
+  width: 250px;
   object-fit: contain;
 }
 
@@ -131,8 +131,8 @@ body {
 
 @media (max-width: 640px) {
   .brand-logo {
-    height: 72px;
-    width: 72px;
+    height: 125px;
+    width: 125px;
   }
 
   .season {
@@ -612,12 +612,12 @@ main h3::before {
 
 .stat-red {
   color: var(--loss);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .stat-green {
   color: var(--win);
-  font-weight: 700;
+  font-weight: 400;
 }
 
 .badge {
