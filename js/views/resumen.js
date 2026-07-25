@@ -140,7 +140,7 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders team-stats-row";
+  teamRow.className = "leaders grid-3";
   teamRow.innerHTML = `
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
@@ -165,9 +165,9 @@ export function renderResumen(container) {
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
   const sbSorted = [...battingList].sort((a, b) => b.SB - a.SB);
 
-  const battingRow = document.createElement("div");
-  battingRow.className = "leaders section-gap";
-  battingRow.innerHTML =
+  const leadersRow = document.createElement("div");
+  leadersRow.className = "leaders grid-3 section-gap";
+  leadersRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
       "Líder de bateo",
@@ -181,12 +181,7 @@ export function renderResumen(container) {
       hrSorted,
       (p) => `${p.name} — ${p.HR} HR`,
       (p) => `${p.name} — ${p.HR} HR`
-    );
-  container.appendChild(battingRow);
-
-  const pitchingRow = document.createElement("div");
-  pitchingRow.className = "leaders section-gap";
-  pitchingRow.innerHTML =
+    ) +
     leaderCardHtml(
       "fa-baseball",
       "Líder de pitcheo",
@@ -200,12 +195,7 @@ export function renderResumen(container) {
       fldSorted,
       (p) => `${p.name} — FPCT ${p.FPCT}, ${p.PO} PO, ${p.A} A`,
       (p) => `${p.name} — FPCT ${p.FPCT}`
-    );
-  container.appendChild(pitchingRow);
-
-  const extraRow = document.createElement("div");
-  extraRow.className = "leaders section-gap";
-  extraRow.innerHTML =
+    ) +
     leaderCardHtml(
       "fa-person-running",
       "Líder de robo de bases",
@@ -220,5 +210,5 @@ export function renderResumen(container) {
       (p) => `${p.name} — ${p.SO} ponches`,
       (p) => `${p.name} — ${p.SO} ponches`
     );
-  container.appendChild(extraRow);
+  container.appendChild(leadersRow);
 }

@@ -465,13 +465,13 @@ main h3::before {
   flex: 1 1 240px;
 }
 
-.team-stats-row {
+.grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
 
 @media (max-width: 640px) {
-  .team-stats-row {
+  .grid-3 {
     grid-template-columns: 1fr;
   }
 }
