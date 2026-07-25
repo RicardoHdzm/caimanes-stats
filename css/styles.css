@@ -188,17 +188,11 @@ main h3 {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-@media (max-width: 640px) {
-  main h3 {
-    font-size: 1rem;
-  }
 }
 
 main h3::before {
