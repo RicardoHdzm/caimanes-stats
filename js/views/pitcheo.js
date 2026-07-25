@@ -16,7 +16,7 @@ export function renderPitcheo(container) {
     { key: "ER", label: "ER", full: "Carreras limpias", numeric: true },
     { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
     { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-green") },
-    { key: "HR", label: "HR", full: "Jonrones permitidos", numeric: true },
+    { key: "HR", label: "HR", full: "Home runs permitidos", numeric: true },
     { key: "ERA", label: "ERA", full: "Efectividad", numeric: true },
     { key: "WHIP", label: "WHIP", full: "(BB+H) por entrada", numeric: true },
   ];

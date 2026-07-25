@@ -176,7 +176,7 @@ export function renderResumen(container) {
     ) +
     leaderCardHtml(
       "fa-bomb",
-      "Líder de jonrones",
+      "Líder de home runs",
       hrSorted,
       (p) => `${p.name} — ${p.HR} HR`,
       (p) => `${p.name} — ${p.HR} HR`

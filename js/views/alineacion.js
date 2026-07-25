@@ -63,7 +63,7 @@ function assignDefense(statsById) {
 }
 
 // Heurística clásica simplificada: el 4to bat (cleanup) se reserva primero
-// para el líder de jonrones, sin importar su OBP. Luego 1-2 mejor OBP
+// para el líder de home runs, sin importar su OBP. Luego 1-2 mejor OBP
 // (table-setters) y 3 mejor OPS (mejor bateador) salen del resto del grupo;
 // el resto se acomoda por OPS.
 function battingOrder(rows) {
@@ -195,7 +195,7 @@ export function renderAlineacion(container) {
     { key: "OBP", label: "OBP", full: "Porcentaje de embasado", numeric: true },
     { key: "SLG", label: "SLG", full: "Porcentaje de slugging", numeric: true },
     { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
-    { key: "HR", label: "HR", full: "Jonrones", numeric: true },
+    { key: "HR", label: "HR", full: "Home runs", numeric: true },
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
   ];
 

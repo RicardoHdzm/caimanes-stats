@@ -68,7 +68,7 @@ export function renderJugadorDetalle(container, playerId) {
       <div class="card">
         <i class="fa-solid fa-fire card-icon"></i>
         <span class="card-value">${battingSeason.HR}</span>
-        <span class="card-label">Jonrones</span>
+        <span class="card-label">Home runs</span>
       </div>
       <div class="card">
         <i class="fa-solid fa-tornado card-icon"></i>
@@ -184,8 +184,8 @@ export function renderJugadorDetalle(container, playerId) {
       { key: "H", label: "H", full: "Hits", numeric: true },
       { key: "2B", label: "2B", full: "Dobles", numeric: true },
       { key: "3B", label: "3B", full: "Triples", numeric: true },
-      { key: "HR", label: "HR", full: "Jonrones", numeric: true },
-      { key: "HRC", label: "HRC", full: "Jonrones de campo", numeric: true },
+      { key: "HR", label: "HR", full: "Home runs", numeric: true },
+      { key: "HRC", label: "HRC", full: "Home runs de campo", numeric: true },
       { key: "R", label: "R", full: "Carreras", numeric: true },
       { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
       { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
@@ -242,7 +242,7 @@ export function renderJugadorDetalle(container, playerId) {
       { key: "ER", label: "ER", full: "Carreras limpias", numeric: true },
       { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
       { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-green") },
-      { key: "HR", label: "HR", full: "Jonrones permitidos", numeric: true },
+      { key: "HR", label: "HR", full: "Home runs permitidos", numeric: true },
       { key: "decision", label: "Decisión" },
     ];
 

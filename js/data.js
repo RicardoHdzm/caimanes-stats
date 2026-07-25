@@ -59,10 +59,10 @@ export const PLAYERS = [
 // (1, 2, 3...) y `position` la posición que jugó ese jugador ESE juego (puede
 // cambiar de un juego a otro, por eso no se usa la posición fija del roster).
 //
-// `HR` son los jonrones que se van por la barda (jonrón "puro"). `HRC` son
-// los jonrones de campo (inside-the-park). Son conteos INDEPENDIENTES, no
-// uno subconjunto del otro — un jonrón es HR o HRC, nunca los dos. El líder
-// de jonrones se calcula solo con HR; para bases totales (SLG) se suman
+// `HR` son los home runs que se van por la barda (home run "puro"). `HRC` son
+// los home runs de campo (inside-the-park). Son conteos INDEPENDIENTES, no
+// uno subconjunto del otro — un home run es HR o HRC, nunca los dos. El líder
+// de home runs se calcula solo con HR; para bases totales (SLG) se suman
 // ambos, ya que los dos valen 4 bases.
 //
 // Criterio de anotación de esta liga: cuando el bateador se embasa por un

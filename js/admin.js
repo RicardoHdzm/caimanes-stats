@@ -12,8 +12,8 @@ const BATTING_FIELDS = [
   { key: "H", label: "H", full: "Hits", type: "number" },
   { key: "2B", label: "2B", full: "Dobles", type: "number" },
   { key: "3B", label: "3B", full: "Triples", type: "number" },
-  { key: "HR", label: "HR", full: "Jonrones", type: "number" },
-  { key: "HRC", label: "HRC", full: "Jonrones de campo", type: "number" },
+  { key: "HR", label: "HR", full: "Home runs", type: "number" },
+  { key: "HRC", label: "HRC", full: "Home runs de campo", type: "number" },
   { key: "RBI", label: "RBI", full: "Impulsadas", type: "number" },
   { key: "R", label: "R", full: "Carreras", type: "number" },
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },
@@ -29,7 +29,7 @@ const PITCHING_FIELDS = [
   { key: "ER", label: "ER", full: "Carreras limpias", type: "number" },
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },
   { key: "SO", label: "SO", full: "Ponches", type: "number" },
-  { key: "HR", label: "HR", full: "Jonrones permitidos", type: "number" },
+  { key: "HR", label: "HR", full: "Home runs permitidos", type: "number" },
   { key: "decision", label: "Decisión", type: "select", options: ["", "W", "L", "SV"] },
 ];
 
