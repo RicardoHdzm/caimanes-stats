@@ -13,6 +13,9 @@
   --loss: #e2202f;
   --tie: #8d96a0;
   --scheduled: #f5a623;
+  --pos-pitcher: #4a9eff;
+  --pos-infield: #e2c93f;
+  --pos-outfield: #3fb56f;
 }
 
 * {
@@ -202,6 +205,10 @@ main h3 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.team-stats-heading {
+  font-size: 1rem;
 }
 
 main h3::before {
@@ -658,6 +665,24 @@ main h3::before {
   font-weight: 700;
   text-align: center;
   color: var(--muted);
+}
+
+.pos-badge-p {
+  border-color: var(--pos-pitcher);
+  color: var(--pos-pitcher);
+  background: rgba(74, 158, 255, 0.12);
+}
+
+.pos-badge-if {
+  border-color: var(--pos-infield);
+  color: var(--pos-infield);
+  background: rgba(226, 201, 63, 0.12);
+}
+
+.pos-badge-of {
+  border-color: var(--pos-outfield);
+  color: var(--pos-outfield);
+  background: rgba(63, 181, 111, 0.12);
 }
 
 .avatar {

@@ -88,6 +88,23 @@ export function coloredStat(value, colorClass) {
   return Number(value) > 0 ? `<span class="${colorClass}">${value}</span>` : String(value);
 }
 
+const INFIELD_POSITIONS = new Set(["1B", "2B", "3B", "SS", "C"]);
+const OUTFIELD_POSITIONS = new Set(["LF", "CF", "RF"]);
+
+// Clase de color según el tipo de posición: pitcher (azul), infield (amarillo),
+// outfield (verde). Posiciones sin clasificar (DH, UTIL, JC, JD) quedan neutras.
+function positionBadgeClass(code) {
+  if (code === "P") return "pos-badge-p";
+  if (INFIELD_POSITIONS.has(code)) return "pos-badge-if";
+  if (OUTFIELD_POSITIONS.has(code)) return "pos-badge-of";
+  return "";
+}
+
+export function renderPositionBadge(value) {
+  if (!value) return "";
+  return `<span class="pos-badge ${positionBadgeClass(value)}">${value}</span>`;
+}
+
 // Un jugador puede jugar hasta 3 posiciones en el mismo juego (ej. "2B/SS").
 // Convierte ese string en uno o varios pos-badge, uno por posición.
 export function renderPositionBadges(value) {
@@ -97,7 +114,7 @@ export function renderPositionBadges(value) {
     .map((v) => v.trim())
     .filter(Boolean)
     .slice(0, 3)
-    .map((v) => `<span class="pos-badge">${v}</span>`)
+    .map((v) => renderPositionBadge(v))
     .join(" ");
 }
 

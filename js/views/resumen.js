@@ -64,12 +64,9 @@ export function renderResumen(container) {
       <span class="card-label">Carreras permitidas</span>
     </div>
     <div class="card">
-      <i class="fa-solid fa-calendar-check card-icon"></i>
-      <span class="card-value">${rec.G}/${TEAM.gamesInSeason}</span>
-      <span class="card-label">Juegos jugados</span>
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: ${Math.min(100, (rec.G / TEAM.gamesInSeason) * 100)}%"></div>
-      </div>
+      <i class="fa-solid fa-ranking-star card-icon"></i>
+      <span class="card-value">${TEAM.leaguePosition ? `${TEAM.leaguePosition}°` : "—"}</span>
+      <span class="card-label">Posición en la liga${TEAM.leagueTeams ? ` (de ${TEAM.leagueTeams})` : ""}</span>
     </div>
   `;
   container.appendChild(cards);
@@ -120,17 +117,16 @@ export function renderResumen(container) {
     bottomRow.appendChild(next);
   }
 
-  const positionCard = document.createElement("div");
-  positionCard.className = "leader-card leader-card-top";
-  positionCard.innerHTML = `
-    <h3><i class="fa-solid fa-ranking-star"></i>Posición en la liga</h3>
-    <p>${
-      TEAM.leaguePosition
-        ? `${TEAM.leaguePosition}°${TEAM.leagueTeams ? ` de ${TEAM.leagueTeams}` : ""}`
-        : "Pendiente"
-    }</p>
+  const gamesPlayedCard = document.createElement("div");
+  gamesPlayedCard.className = "leader-card leader-card-top";
+  gamesPlayedCard.innerHTML = `
+    <h3><i class="fa-solid fa-calendar-check"></i>Juegos jugados</h3>
+    <p>${rec.G}/${TEAM.gamesInSeason}</p>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: ${Math.min(100, (rec.G / TEAM.gamesInSeason) * 100)}%"></div>
+    </div>
   `;
-  bottomRow.appendChild(positionCard);
+  bottomRow.appendChild(gamesPlayedCard);
 
   if (bottomRow.children.length > 0) container.appendChild(bottomRow);
 
@@ -139,6 +135,7 @@ export function renderResumen(container) {
   const teamFld = teamFieldingTotals(GAMES);
 
   const teamHeading = document.createElement("h3");
+  teamHeading.className = "team-stats-heading";
   teamHeading.textContent = "Stats de equipo";
   container.appendChild(teamHeading);
 

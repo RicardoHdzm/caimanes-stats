@@ -1,6 +1,6 @@
 import { GAMES, TEAM } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge } from "../ui.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
@@ -94,7 +94,7 @@ export function renderJuegoDetalle(container, gameId) {
       key: "position",
       label: "Pos",
       full: "Posición",
-      render: (value) => (value ? `<span class="pos-badge">${value}</span>` : ""),
+      render: (value) => renderPositionBadge(value),
     },
     { key: "AB", label: "AB", full: "Turnos al bat", numeric: true },
     { key: "H", label: "H", full: "Hits", numeric: true },
@@ -220,7 +220,7 @@ export function renderJuegoDetalle(container, gameId) {
         key: "position",
         label: "Pos",
         full: "Posición",
-        render: (value) => (value ? `<span class="pos-badge">${value}</span>` : ""),
+        render: (value) => renderPositionBadge(value),
       },
     ];
 
