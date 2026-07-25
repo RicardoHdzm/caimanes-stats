@@ -317,6 +317,22 @@ main h3::before {
   margin-top: 10px;
 }
 
+.mvp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid #f5b942;
+  background: rgba(245, 185, 66, 0.12);
+  color: #f5b942;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;

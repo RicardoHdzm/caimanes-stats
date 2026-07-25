@@ -50,6 +50,11 @@ export function renderJuegoDetalle(container, gameId) {
       ${known ? `${game.scoreUs}<span class="sep">-</span>${game.scoreThem}` : "Marcador pendiente"}
     </div>
     ${
+      game.mvp
+        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
+        : ""
+    }
+    ${
       game.replayUrl
         ? `<div class="game-hero-replay"><a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a></div>`
         : ""

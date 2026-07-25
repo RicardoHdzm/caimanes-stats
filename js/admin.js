@@ -196,6 +196,7 @@ function resetGameForm() {
   gameForm.querySelector('[name="scoreUs"]').value = "";
   gameForm.querySelector('[name="scoreThem"]').value = "";
   gameForm.querySelector('[name="replayUrl"]').value = "";
+  mvpSelect.value = "";
 
   battingEditor.clearRows();
   battingEditor.addRow();
@@ -222,6 +223,7 @@ function loadGameIntoForm(game) {
   gameForm.querySelector('[name="scoreThem"]').value = known ? game.scoreThem : "";
   gameForm.querySelector('[name="result"]').value = game.result ?? "W";
   gameForm.querySelector('[name="replayUrl"]').value = game.replayUrl ?? "";
+  mvpSelect.value = game.mvp ?? "";
 
   battingEditor.clearRows();
   for (const line of game.batting ?? []) battingEditor.addRow(line);
@@ -239,6 +241,9 @@ function loadGameIntoForm(game) {
   for (const line of game.substitutions ?? []) substitutionsEditor.addRow(line);
   if (!(game.substitutions ?? []).length) substitutionsEditor.addRow();
 }
+
+const mvpSelect = document.getElementById("mvp-select");
+mvpSelect.innerHTML = playerOptionsHtml();
 
 const gameSelect = document.getElementById("game-select");
 for (const g of GAMES) {
@@ -299,6 +304,8 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   lines.push("    ],");
   const replayUrl = data.get("replayUrl").trim();
   if (replayUrl) lines.push(`    replayUrl: ${JSON.stringify(replayUrl)},`);
+  const mvp = data.get("mvp");
+  if (mvp) lines.push(`    mvp: ${JSON.stringify(mvp)},`);
   lines.push("  },");
 
   gameCode.textContent = lines.join("\n");

@@ -101,6 +101,7 @@ export const PLAYERS = [
 //       { inning: 5, type: "campo", playerOut: "p1", playerIn: "p3", position: "SS" },
 //     ],
 //     replayUrl: "https://youtube.com/...", // opcional, link al video del juego
+//     mvp: "p1", // opcional, id del jugador más destacado del juego
 //   },
 // ];
 export const GAMES = [
