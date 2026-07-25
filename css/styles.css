@@ -212,9 +212,10 @@ main h3::before {
 
 .glossary {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   line-height: 1.7;
-  margin: 8px 2px 0;
+  margin: 25px 2px 0;
+  text-align: center;
 }
 
 .glossary strong {
