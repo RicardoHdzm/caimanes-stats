@@ -385,7 +385,7 @@ main h3::before {
 
 .card-icon {
   font-size: 2rem;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
 }
 
 .card-icon::before,
@@ -444,7 +444,7 @@ main h3::before {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 14px;
 }
 
 .leader-card h3::before {
