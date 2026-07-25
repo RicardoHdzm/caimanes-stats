@@ -65,7 +65,7 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-label">Jonrones</span>
       </div>
       <div class="card">
-        <i class="fa-solid fa-hand-holding-dollar card-icon"></i>
+        <i class="fa-solid fa-tornado card-icon"></i>
         <span class="card-value">${battingSeason.RBI}</span>
         <span class="card-label">Impulsadas</span>
       </div>

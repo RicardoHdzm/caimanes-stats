@@ -249,6 +249,7 @@ export const GAMES = [
     substitutions: [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1036862952326417",
+    mvp: "p14",
   },
 ];
 
