@@ -61,7 +61,7 @@ body {
   display: inline-block;
   text-align: center;
   color: var(--accent);
-  font-size: 0.78rem;
+  font-size: 0.62rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -140,7 +140,7 @@ body {
   }
 
   .season {
-    font-size: 0.68rem;
+    font-size: 0.58rem;
     padding: 4px 8px;
   }
 
