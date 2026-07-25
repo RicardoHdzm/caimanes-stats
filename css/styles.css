@@ -51,6 +51,7 @@ body {
   justify-content: center;
   position: relative;
   z-index: 1;
+  margin-top: 14px;
 }
 
 .brand-logo {
@@ -62,7 +63,6 @@ body {
 .season-row {
   position: relative;
   z-index: 1;
-  margin-top: 14px;
   display: flex;
   justify-content: center;
 }
@@ -93,17 +93,23 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--muted);
   text-decoration: none;
-  transition: color 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 .social-link:hover {
   color: var(--accent);
+  border-color: var(--accent);
 }
 
 .social-link i {
-  font-size: 2.2rem;
+  font-size: 1rem;
 }
 
 .tabs {
