@@ -161,7 +161,7 @@ export function renderResumen(container) {
 
   const battingList = battingTotals(GAMES);
   const batSorted = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")));
-  const hrSorted = [...battingList].sort((a, b) => b.HR - a.HR);
+  const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
   const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
 
@@ -183,8 +183,8 @@ export function renderResumen(container) {
       "fa-bomb",
       "Líder de home runs",
       hrSorted,
-      (p) => `${p.name} — ${p.HR} HR`,
-      (p) => `${p.name} — ${p.HR} HR`
+      (p) => (p.HR > 0 ? `${p.name} — ${p.HR} HR` : `${p.name} — ${p.HRC} HRC`),
+      (p) => (p.HR > 0 ? `${p.name} — ${p.HR} HR` : `${p.name} — ${p.HRC} HRC`)
     ) +
     leaderCardHtml(
       "fa-baseball",
