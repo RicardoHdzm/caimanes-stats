@@ -194,6 +194,7 @@ function resetGameForm() {
   resultField.hidden = true;
   gameForm.querySelector('[name="scoreUs"]').value = "";
   gameForm.querySelector('[name="scoreThem"]').value = "";
+  gameForm.querySelector('[name="replayUrl"]').value = "";
 
   battingEditor.clearRows();
   battingEditor.addRow();
@@ -219,6 +220,7 @@ function loadGameIntoForm(game) {
   gameForm.querySelector('[name="scoreUs"]').value = known ? game.scoreUs : "";
   gameForm.querySelector('[name="scoreThem"]').value = known ? game.scoreThem : "";
   gameForm.querySelector('[name="result"]').value = game.result ?? "W";
+  gameForm.querySelector('[name="replayUrl"]').value = game.replayUrl ?? "";
 
   battingEditor.clearRows();
   for (const line of game.batting ?? []) battingEditor.addRow(line);
@@ -294,6 +296,8 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   lines.push("    substitutions: [");
   for (const row of substitutionsEditor.getRows()) lines.push(`      ${lineToCode(SUBSTITUTION_FIELDS, row)},`);
   lines.push("    ],");
+  const replayUrl = data.get("replayUrl").trim();
+  if (replayUrl) lines.push(`    replayUrl: ${JSON.stringify(replayUrl)},`);
   lines.push("  },");
 
   gameCode.textContent = lines.join("\n");

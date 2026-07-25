@@ -293,6 +293,26 @@ main h3::before {
   letter-spacing: 0.04em;
 }
 
+.replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  background: var(--accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: filter 0.15s;
+}
+
+.replay-btn:hover {
+  filter: brightness(1.15);
+}
+
 @keyframes badge-blink {
   0%, 100% {
     opacity: 1;

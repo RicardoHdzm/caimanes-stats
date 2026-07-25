@@ -60,6 +60,10 @@ export const PLAYERS = [
 // a diferencia de la regla oficial de béisbol. El error (E) se sigue
 // anotando aparte, normal, en la línea de fildeo del jugador que lo cometió.
 //
+// El elevado o toque de sacrificio (el bateador sale out a propósito para
+// avanzar/anotar a un corredor) NO cuenta como turno al bat (AB), siguiendo
+// la regla oficial — aunque sí puede impulsar carrera (RBI) si alguien anota.
+//
 // `substitutions` es el registro de cambios de jugador durante el juego
 // (entra alguien a batear o a jugar campo por otro). No afecta los cálculos
 // de stats (esos siempre salen de las líneas en batting/pitching/fielding);
@@ -90,6 +94,7 @@ export const PLAYERS = [
 //     substitutions: [
 //       { inning: 5, type: "campo", playerOut: "p1", playerIn: "p3", position: "SS" },
 //     ],
+//     replayUrl: "https://youtube.com/...", // opcional, link al video del juego
 //   },
 // ];
 export const GAMES = [
@@ -110,14 +115,45 @@ export const GAMES = [
     id: "g0",
     date: "2026-06-25",
     opponent: "Muñekos",
-    weCloseBatting: null,
-    result: "L", // marcador todavía no capturado
-    scoreUs: null,
-    scoreThem: null,
-    batting: [],
-    pitching: [],
-    fielding: [],
-    substitutions: [],
+    weCloseBatting: false,
+    scoreUs: 16,
+    scoreThem: 17,
+    batting: [
+      { playerId: "p6", order: 1, position: "C", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p4", order: 2, position: "LF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p1", order: 3, position: "CF", AB: 4, H: 2, "2B": 2, "3B": 0, HR: 0, RBI: 3, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p19", order: 4, position: "SS", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, RBI: 2, R: 2, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p12", order: 5, position: "1B", AB: 4, H: 3, "2B": 2, "3B": 0, HR: 1, RBI: 2, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p15", order: 6, position: "3B", AB: 4, H: 1, "2B": 1, "3B": 0, HR: 0, RBI: 2, R: 0, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p9", order: 7, position: "2B", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p17", order: 8, position: "JD", AB: 4, H: 3, "2B": 0, "3B": 0, HR: 0, RBI: 0, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p13", order: 9, position: "RF", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, RBI: 1, R: 2, BB: 1, SO: 0, SB: 1 },
+      { playerId: "p2", order: 10, position: "JC", AB: 4, H: 0, "2B": 0, "3B": 0, HR: 0, RBI: 0, R: 0, BB: 0, SO: 2, SB: 0 },
+      { playerId: "p3", order: 1, position: "LF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, RBI: 1, R: 2, BB: 1, SO: 0, SB: 1 },
+    ],
+    pitching: [
+      { playerId: "p14", IP: 4, H: 16, R: 10, ER: 0, BB: 1, SO: 1, HR: 0, decision: "L" },
+      { playerId: "p16", IP: 2, H: 10, R: 7, ER: 0, BB: 1, SO: 0, HR: 1, decision: "" },
+    ],
+    fielding: [
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p4", PO: 1, A: 0, E: 1 },
+      { playerId: "p1", PO: 2, A: 0, E: 0 },
+      { playerId: "p19", PO: 0, A: 1, E: 0 },
+      { playerId: "p12", PO: 6, A: 0, E: 0 },
+      { playerId: "p15", PO: 1, A: 2, E: 2 },
+      { playerId: "p9", PO: 1, A: 1, E: 0 },
+      { playerId: "p17", PO: 0, A: 0, E: 0 },
+      { playerId: "p13", PO: 0, A: 0, E: 1 },
+      { playerId: "p2", PO: 0, A: 0, E: 0 },
+      { playerId: "p14", PO: 0, A: 1, E: 0 },
+      { playerId: "p16", PO: 1, A: 0, E: 0 },
+      { playerId: "p3", PO: 1, A: 0, E: 0 },
+    ],
+    substitutions: [
+      { inning: 4, type: "campo", playerOut: "p6", playerIn: "p3", position: "LF" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/2028259977789373",
   },
   {
     id: "g1",
@@ -165,6 +201,7 @@ export const GAMES = [
     ],
     substitutions: [
     ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1036862952326417",
   },
 ];
 
