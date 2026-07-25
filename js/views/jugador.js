@@ -27,6 +27,7 @@ export function renderJugadorDetalle(container, playerId) {
   container.appendChild(back);
 
   const played = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
+  const mvpCount = GAMES.filter((g) => g.mvp === player.id).length;
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
@@ -40,6 +41,11 @@ export function renderJugadorDetalle(container, playerId) {
       ${player.position ? renderPositionBadges(player.position) : ""}
     </div>
     <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
+    ${
+      mvpCount > 0
+        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
+        : ""
+    }
   `;
   container.appendChild(hero);
 
