@@ -24,8 +24,6 @@ const routes = {
 const app = document.getElementById("app");
 const tabs = document.getElementById("tabs");
 
-document.getElementById("brand-name").textContent = TEAM.name;
-
 document.getElementById("season-label").textContent =
   `Temporada ${TEAM.season} - ${TEAM.league} ${TEAM.seasonsInLeague}ta Temporada - ${TEAM.seasonsTotal}va Temporada de Caimanes`;
 
