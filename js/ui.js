@@ -3,7 +3,9 @@
 //   render(value, row) puede devolver HTML (ej. para badges) en vez de texto plano.
 // rows: arreglo de objetos con esas keys
 // defaultSort: key por la que ordena al cargar (descendente si numeric)
-export function renderSortableTable(container, { columns, rows, defaultSort, defaultDir, onRowClick }) {
+// sortable: false deja las columnas fijas (sin click para reordenar), útil para
+// tablas donde el orden importa (ej. line-up de un juego).
+export function renderSortableTable(container, { columns, rows, defaultSort, defaultDir, onRowClick, sortable = true }) {
   let sortKey = defaultSort ?? columns[0].key;
   let sortDir = defaultDir ?? -1;
 
@@ -25,7 +27,7 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
     wrap.className = "table-wrap";
 
     const table = document.createElement("table");
-    table.className = "stats-table";
+    table.className = sortable ? "stats-table" : "stats-table not-sortable";
 
     const thead = document.createElement("thead");
     const headRow = document.createElement("tr");
@@ -34,15 +36,17 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
       th.textContent = col.label;
       th.dataset.key = col.key;
       if (col.numeric) th.classList.add("numeric");
-      if (col.key === sortKey) th.classList.add(sortDir === 1 ? "sort-asc" : "sort-desc");
-      th.addEventListener("click", () => {
-        if (sortKey === col.key) sortDir *= -1;
-        else {
-          sortKey = col.key;
-          sortDir = -1;
-        }
-        draw();
-      });
+      if (sortable) {
+        if (col.key === sortKey) th.classList.add(sortDir === 1 ? "sort-asc" : "sort-desc");
+        th.addEventListener("click", () => {
+          if (sortKey === col.key) sortDir *= -1;
+          else {
+            sortKey = col.key;
+            sortDir = -1;
+          }
+          draw();
+        });
+      }
       headRow.appendChild(th);
     }
     thead.appendChild(headRow);

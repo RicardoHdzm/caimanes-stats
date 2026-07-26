@@ -160,6 +160,7 @@ export function renderJuegoDetalle(container, gameId) {
     rows: lineupRows,
     defaultSort: "order",
     defaultDir: 1,
+    sortable: false,
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
@@ -201,6 +202,7 @@ export function renderJuegoDetalle(container, gameId) {
     columns: pitchingColumns,
     rows: pitchingRows,
     defaultSort: "IP",
+    sortable: false,
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
@@ -232,6 +234,7 @@ export function renderJuegoDetalle(container, gameId) {
     columns: fieldingColumns,
     rows: fieldingRows,
     defaultSort: "PO",
+    sortable: false,
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
@@ -274,6 +277,7 @@ export function renderJuegoDetalle(container, gameId) {
       rows: subsRows,
       defaultSort: "inning",
       defaultDir: 1,
+      sortable: false,
     });
     renderGlossary(container, subsColumns);
   }

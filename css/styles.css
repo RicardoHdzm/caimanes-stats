@@ -620,6 +620,14 @@ main h3::before {
   color: var(--text);
 }
 
+.stats-table.not-sortable thead th {
+  cursor: default;
+}
+
+.stats-table.not-sortable thead th:hover {
+  color: var(--muted);
+}
+
 .stats-table thead th.sort-asc::after {
   content: " \25B2";
   color: var(--accent);
