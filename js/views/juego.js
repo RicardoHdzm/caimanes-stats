@@ -66,11 +66,17 @@ export function renderJuegoDetalle(container, gameId) {
   lineupHeading.textContent = "Line-up y bateo";
   container.appendChild(lineupHeading);
 
+  const substitutions0 = game.substitutions ?? [];
+  const subbedOut = new Map(substitutions0.map((s) => [s.playerOut, s.inning]));
+  const subbedIn = new Map(substitutions0.map((s) => [s.playerIn, s.inning]));
+
   const lineupRows = [...(game.batting ?? [])]
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
     .map((line) => ({
       playerId: line.playerId,
       order: line.order ?? "",
+      subStatus: subbedOut.has(line.playerId) ? "out" : subbedIn.has(line.playerId) ? "in" : "",
+      subInning: subbedOut.get(line.playerId) ?? subbedIn.get(line.playerId),
       name: playerName(line.playerId),
       position: line.position ?? "",
       AB: line.AB ?? 0,
@@ -88,7 +94,21 @@ export function renderJuegoDetalle(container, gameId) {
     }));
 
   const lineupColumns = [
-    { key: "order", label: "#", full: "Turno al bat", numeric: true },
+    {
+      key: "order",
+      label: "#",
+      full: "Turno al bat (rojo = salió, verde = entró de cambio)",
+      numeric: true,
+      render: (value, row) => {
+        if (row.subStatus === "out") {
+          return `<span class="stat-red" title="Salió en la entrada ${row.subInning}">${value}</span>`;
+        }
+        if (row.subStatus === "in") {
+          return `<span class="stat-green" title="Entró en la entrada ${row.subInning}">${value}</span>`;
+        }
+        return String(value);
+      },
+    },
     { key: "name", label: "Jugador" },
     {
       key: "position",
