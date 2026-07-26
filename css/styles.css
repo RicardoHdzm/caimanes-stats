@@ -630,12 +630,12 @@ main h3::before {
 
 .stats-table thead th.sort-asc::after {
   content: " \25B2";
-  color: var(--accent);
+  color: #fff;
 }
 
 .stats-table thead th.sort-desc::after {
   content: " \25BC";
-  color: var(--accent);
+  color: #fff;
 }
 
 .stats-table tbody tr:nth-child(even) {
