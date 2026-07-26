@@ -66,32 +66,55 @@ export function renderJuegoDetalle(container, gameId) {
   lineupHeading.textContent = "Line-up y bateo";
   container.appendChild(lineupHeading);
 
+  // Un jugador puede reingresar (solo por quien lo sustituyó), así que un
+  // mismo jugador puede tener varios eventos en el juego; el color del turno
+  // al bat refleja su ÚLTIMO evento cronológico (si terminó afuera o adentro).
   const substitutions0 = game.substitutions ?? [];
-  const subbedOut = new Map(substitutions0.map((s) => [s.playerOut, s.inning]));
-  const subbedIn = new Map(substitutions0.map((s) => [s.playerIn, s.inning]));
+  const subEventsByPlayer = new Map();
+  for (const s of substitutions0) {
+    if (s.playerOut) {
+      const list = subEventsByPlayer.get(s.playerOut) ?? [];
+      list.push({ inning: s.inning ?? 0, role: "out" });
+      subEventsByPlayer.set(s.playerOut, list);
+    }
+    if (s.playerIn) {
+      const list = subEventsByPlayer.get(s.playerIn) ?? [];
+      list.push({ inning: s.inning ?? 0, role: "in" });
+      subEventsByPlayer.set(s.playerIn, list);
+    }
+  }
+
+  function lastSubEvent(playerId) {
+    const events = subEventsByPlayer.get(playerId);
+    if (!events || events.length === 0) return null;
+    return [...events].sort((a, b) => a.inning - b.inning).at(-1);
+  }
 
   const lineupRows = [...(game.batting ?? [])]
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
-    .map((line) => ({
-      playerId: line.playerId,
-      order: line.order ?? "",
-      subStatus: subbedOut.has(line.playerId) ? "out" : subbedIn.has(line.playerId) ? "in" : "",
-      subInning: subbedOut.get(line.playerId) ?? subbedIn.get(line.playerId),
-      name: playerName(line.playerId),
-      position: line.position ?? "",
-      AB: line.AB ?? 0,
-      R: line.R ?? 0,
-      H: line.H ?? 0,
-      "2B": line["2B"] ?? 0,
-      "3B": line["3B"] ?? 0,
-      HR: line.HR ?? 0,
-      HRC: line.HRC ?? 0,
-      RBI: line.RBI ?? 0,
-      BB: line.BB ?? 0,
-      SO: line.SO ?? 0,
-      SB: line.SB ?? 0,
-      AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
-    }));
+    .map((line) => {
+      const lastEvent = lastSubEvent(line.playerId);
+      return {
+        playerId: line.playerId,
+        order: line.order ?? "",
+        subStatus: lastEvent?.role ?? "",
+        subInning: lastEvent?.inning,
+        name: playerName(line.playerId),
+        position: line.position ?? "",
+        AB: line.AB ?? 0,
+        R: line.R ?? 0,
+        H: line.H ?? 0,
+        "2B": line["2B"] ?? 0,
+        "3B": line["3B"] ?? 0,
+        HR: line.HR ?? 0,
+        HRC: line.HRC ?? 0,
+        RBI: line.RBI ?? 0,
+        BB: line.BB ?? 0,
+        SO: line.SO ?? 0,
+        SB: line.SB ?? 0,
+        AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
+      };
+    });
 
   const lineupColumns = [
     {
