@@ -118,21 +118,25 @@ export function renderJuegoDetalle(container, gameId) {
 
   const lineupColumns = [
     { key: "order", label: "#", full: "Turno al bat", numeric: true },
-    { key: "name", label: "Jugador" },
+    {
+      key: "name",
+      label: "Jugador",
+      full: "Flecha verde = entró de cambio, roja = salió",
+      render: (value, row) => {
+        if (row.subStatus === "in") {
+          return `${value} <span class="stat-green" title="Entró en la entrada ${row.subInning}">▲</span>`;
+        }
+        if (row.subStatus === "out") {
+          return `${value} <span class="stat-red" title="Salió en la entrada ${row.subInning}">▼</span>`;
+        }
+        return value;
+      },
+    },
     {
       key: "position",
       label: "Pos",
-      full: "Posición (flecha verde = entró de cambio, roja = salió)",
-      render: (value, row) => {
-        const badge = renderPositionBadge(value);
-        if (row.subStatus === "in") {
-          return `${badge} <i class="fa-solid fa-arrow-up stat-green" title="Entró en la entrada ${row.subInning}"></i>`;
-        }
-        if (row.subStatus === "out") {
-          return `${badge} <i class="fa-solid fa-arrow-down stat-red" title="Salió en la entrada ${row.subInning}"></i>`;
-        }
-        return badge;
-      },
+      full: "Posición",
+      render: (value) => renderPositionBadge(value),
     },
     { key: "AB", label: "AB", full: "Turnos al bat", numeric: true },
     { key: "H", label: "H", full: "Hits", numeric: true },
