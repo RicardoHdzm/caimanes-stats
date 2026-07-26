@@ -118,10 +118,29 @@ export const GAMES = [
     result: "L", // marcador todavía no capturado
     scoreUs: null,
     scoreThem: null,
-    batting: [],
-    pitching: [],
-    fielding: [],
-    substitutions: [],
+    batting: [
+      { playerId: "p1", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p5", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p18", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p15", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p13", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p19", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p14", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p16", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p6", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p4", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p7", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p2", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p12", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+    ],
+    pitching: [
+      { playerId: "p16", IP: 0, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+      { playerId: "p14", IP: 0, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+    ],
+    fielding: [
+    ],
+    substitutions: [
+    ],
   },
   {
     id: "g0",
