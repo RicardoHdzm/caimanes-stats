@@ -31,7 +31,7 @@ export function renderJugadorDetalle(container, playerId) {
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
-    <div style="margin-bottom: 12px;">${renderAvatar(player, 72)}</div>
+    <div style="margin-bottom: 12px;">${renderAvatar(player, 120)}</div>
     <div class="game-hero-teams">
       <span>#${player.number ?? "-"}</span>
       <span class="game-hero-vs">·</span>

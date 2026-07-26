@@ -25,7 +25,7 @@ const app = document.getElementById("app");
 const tabs = document.getElementById("tabs");
 
 document.getElementById("season-label").textContent =
-  `${TEAM.league} ${TEAM.seasonsInLeague}ta Temporada - ${TEAM.seasonsTotal}va Temporada Caiman`;
+  `${TEAM.league} ${TEAM.seasonsInLeague}ta Temporada - ${TEAM.seasonsTotal}va Temporada`;
 
 document.getElementById("footer-year").textContent = new Date().getFullYear();
 
