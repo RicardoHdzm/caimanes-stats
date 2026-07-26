@@ -212,7 +212,7 @@ export const GAMES = [
     ],
     substitutions: [
       { inning: 3, type: "campo", playerOut: "p5", playerIn: "p9", position: "2B" },
-      { inning: 3, type: "campo", playerOut: "p2", playerIn: "p18", position: "RF" },
+      { inning: 3, type: "campo", playerOut: "p18", playerIn: "p2", position: "RF" },
       { inning: 3, type: "campo", playerOut: "p3", playerIn: "p1", position: "SS" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1781320186374782",
