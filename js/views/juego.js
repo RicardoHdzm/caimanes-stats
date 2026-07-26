@@ -4,6 +4,7 @@ import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositi
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
+const FIELD_ORDER = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 
 function formatAvg(h, ab) {
   if (!ab) return ".000";
@@ -213,16 +214,32 @@ export function renderJuegoDetalle(container, gameId) {
   fieldingHeading.textContent = "Fildeo";
   container.appendChild(fieldingHeading);
 
-  const fieldingRows = (game.fielding ?? []).map((line) => ({
-    playerId: line.playerId,
-    name: playerName(line.playerId),
-    PO: line.PO ?? 0,
-    A: line.A ?? 0,
-    E: line.E ?? 0,
-  }));
+  const battingPositionByPlayer = new Map((game.batting ?? []).map((l) => [l.playerId, l.position]));
+  const pitcherIds = new Set((game.pitching ?? []).map((l) => l.playerId));
+
+  const fieldingRows = (game.fielding ?? [])
+    .map((line) => {
+      const position = battingPositionByPlayer.get(line.playerId) || (pitcherIds.has(line.playerId) ? "P" : "");
+      return {
+        playerId: line.playerId,
+        name: playerName(line.playerId),
+        position,
+        positionOrder: FIELD_ORDER.includes(position) ? FIELD_ORDER.indexOf(position) : 99,
+        PO: line.PO ?? 0,
+        A: line.A ?? 0,
+        E: line.E ?? 0,
+      };
+    })
+    .sort((a, b) => a.positionOrder - b.positionOrder);
 
   const fieldingColumns = [
     { key: "name", label: "Jugador" },
+    {
+      key: "position",
+      label: "Pos",
+      full: "Posición en el campo",
+      render: (value) => renderPositionBadge(value),
+    },
     { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
     { key: "A", label: "A", full: "Asistencias", numeric: true },
     { key: "E", label: "E", full: "Errores", numeric: true },
@@ -233,7 +250,8 @@ export function renderJuegoDetalle(container, gameId) {
   renderSortableTable(fieldingEl, {
     columns: fieldingColumns,
     rows: fieldingRows,
-    defaultSort: "PO",
+    defaultSort: "positionOrder",
+    defaultDir: 1,
     sortable: false,
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
