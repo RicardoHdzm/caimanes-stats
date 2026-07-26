@@ -117,11 +117,11 @@ export function renderJuegoDetalle(container, gameId) {
     });
 
   const lineupColumns = [
-    { key: "order", label: "#", full: "Turno al bat", numeric: true },
     {
-      key: "name",
-      label: "Jugador",
-      full: "Flecha verde = entró de cambio, roja = salió",
+      key: "order",
+      label: "#",
+      full: "Turno al bat (flecha verde = entró de cambio, roja = salió)",
+      numeric: true,
       render: (value, row) => {
         if (row.subStatus === "in") {
           return `${value} <span class="stat-green" title="Entró en la entrada ${row.subInning}">▲</span>`;
@@ -129,9 +129,10 @@ export function renderJuegoDetalle(container, gameId) {
         if (row.subStatus === "out") {
           return `${value} <span class="stat-red" title="Salió en la entrada ${row.subInning}">▼</span>`;
         }
-        return value;
+        return String(value);
       },
     },
+    { key: "name", label: "Jugador" },
     {
       key: "position",
       label: "Pos",
