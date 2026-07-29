@@ -326,5 +326,6 @@ export const GAMES = [
 ];
 
 // Próximos juegos (todavía sin jugar, sin marcador).
-export const SCHEDULE = [
-];
+// export const SCHEDULE = [
+//  { id: "s1", date: "2026-08-06", time: "19:00", opponent: "Pendiete" },
+// ];
