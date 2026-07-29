@@ -290,7 +290,7 @@ export const GAMES = [
       { playerId: "p18", order: 6, position: "SS", AB: 4, H: 4, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 2, BB: 0, SO: 0, SB: 2 },
       { playerId: "p15", order: 7, position: "3B", AB: 4, H: 2, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 4, R: 1, BB: 0, SO: 0, SB: 0 },
       { playerId: "p4", order: 8, position: "JD", AB: 4, H: 3, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
-      { playerId: "p13", order: 9, position: "DH", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p13", order: 9, position: "RF", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 2 },
       { playerId: "p2", order: 10, position: "JC", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
       { playerId: "p9", order: 10, position: "JC", AB: 1, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
       { playerId: "p8", order: 1, position: "C", AB: 1, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
