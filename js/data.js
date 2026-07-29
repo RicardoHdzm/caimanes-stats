@@ -274,9 +274,53 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/1036862952326417",
     mvp: "p14",
   },
-];
-
-// Próximos juegos (todavía sin jugar, sin marcador).
-export const SCHEDULE = [
-  { id: "s1", date: "2026-07-28", time: "19:00", opponent: "Tamagochis" },
+  {
+    id: "g5",
+    date: "2026-07-28",
+    opponent: "Tamagochis",
+    weCloseBatting: true,
+    scoreUs: 17,
+    scoreThem: 15,
+    batting: [
+      { playerId: "p6", order: 1, position: "C", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 2, BB: 0, SO: 0, SB: 3 },
+      { playerId: "p10", order: 2, position: "LF", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p5", order: 3, position: "2B", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 4 },
+      { playerId: "p12", order: 4, position: "1B", AB: 4, H: 3, "2B": 0, "3B": 2, HR: 0, HRC: 0, RBI: 2, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p1", order: 5, position: "CF", AB: 3, H: 3, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 4, R: 2, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p18", order: 6, position: "SS", AB: 4, H: 4, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 2, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p15", order: 7, position: "3B", AB: 4, H: 2, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 4, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p4", order: 8, position: "JD", AB: 4, H: 3, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p13", order: 9, position: "DH", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p2", order: 10, position: "JC", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p9", order: 10, position: "JC", AB: 1, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p8", order: 1, position: "C", AB: 1, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p3", order: 2, position: "2B", AB: 1, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+    ],
+    pitching: [
+      { playerId: "p14", IP: 4, H: 17, R: 9, ER: 0, BB: 0, SO: 0, HR: 1, decision: "W" },
+      { playerId: "p16", IP: 2, H: 9, R: 6, ER: 0, BB: 1, SO: 0, HR: 0, decision: "SV" },
+    ],
+    fielding: [
+      { playerId: "p14", PO: 1, A: 1, E: 1 },
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p12", PO: 4, A: 0, E: 0 },
+      { playerId: "p5", PO: 1, A: 0, E: 1 },
+      { playerId: "p15", PO: 1, A: 0, E: 0 },
+      { playerId: "p18", PO: 2, A: 1, E: 0 },
+      { playerId: "p10", PO: 2, A: 1, E: 1 },
+      { playerId: "p1", PO: 1, A: 0, E: 1 },
+      { playerId: "p13", PO: 0, A: 0, E: 0 },
+      { playerId: "p3", PO: 3, A: 0, E: 1 },
+      { playerId: "p16", PO: 0, A: 1, E: 0 },
+      { playerId: "p4", PO: 0, A: 0, E: 1 },
+      { playerId: "p8", PO: 0, A: 0, E: 0 },
+    ],
+    substitutions: [
+      { inning: 5, type: "bateo", playerOut: "p2", playerIn: "p9", position: "JC" },
+      { inning: 5, type: "bateo", playerOut: "p6", playerIn: "p8", position: "C" },
+      { inning: 5, type: "bateo", playerOut: "p3", playerIn: "p10", position: "2B" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1917285122301122",
+    mvp: "p14",
+  },
 ];
