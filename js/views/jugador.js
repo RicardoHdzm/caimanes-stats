@@ -71,6 +71,11 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-label">Home runs</span>
       </div>
       <div class="card">
+        <i class="fa-solid fa-bolt card-icon"></i>
+        <span class="card-value">${battingSeason.R}</span>
+        <span class="card-label">Carreras</span>
+      </div>
+      <div class="card">
         <i class="fa-solid fa-tornado card-icon"></i>
         <span class="card-value">${battingSeason.RBI}</span>
         <span class="card-label">Impulsadas</span>
@@ -81,18 +86,19 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-label">Bases robadas</span>
       </div>
       <div class="card">
-        <i class="fa-solid fa-bolt card-icon"></i>
-        <span class="card-value">${battingSeason.R}</span>
-        <span class="card-label">Carreras</span>
+        <i class="fa-solid fa-chart-line card-icon"></i>
+        <span class="card-value">${battingSeason.OPS}</span>
+        <span class="card-label">OPS</span>
       </div>
     `;
     container.appendChild(cards);
     renderGlossary(container, [
       { label: "AVG", full: "Promedio de bateo" },
       { label: "Home runs", full: "Jonrones que se van por la barda" },
+      { label: "Carreras", full: "Carreras anotadas (R)" },
       { label: "Impulsadas", full: "Carreras impulsadas (RBI)" },
       { label: "Bases robadas", full: "Bases robadas (SB)" },
-      { label: "Carreras", full: "Carreras anotadas (R)" },
+      { label: "OPS", full: "OBP + SLG" },
     ]);
   }
 
