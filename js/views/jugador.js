@@ -58,7 +58,7 @@ export function renderJugadorDetalle(container, playerId) {
     h3.textContent = "Bateo — temporada";
     container.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards";
+    cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
         <i class="fa-solid fa-baseball-bat-ball card-icon"></i>
@@ -107,7 +107,7 @@ export function renderJugadorDetalle(container, playerId) {
     h3.textContent = "Pitcheo — temporada";
     container.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards";
+    cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
         <i class="fa-solid fa-baseball card-icon"></i>
@@ -144,7 +144,7 @@ export function renderJugadorDetalle(container, playerId) {
     h3.textContent = "Fildeo — temporada";
     container.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards";
+    cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
         <i class="fa-solid fa-shield card-icon"></i>
