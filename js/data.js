@@ -46,7 +46,7 @@ export const PLAYERS = [
   { id: "p17", number: 23, name: "Teddy Sainz", position: "RF/2B/3B" },
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF" },
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS" },
-  { id: "p20", number: 69, name: "Andres Aceves", position: "CF/2B/SS" },
+  { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS" },
 ];
 
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se
@@ -323,6 +323,51 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1917285122301122",
     mvp: "p14",
+  },
+    {
+    id: "g6",
+    date: "2026-08-14",
+    opponent: "Jolinos",
+    weCloseBatting: true,
+    scoreUs: 13,
+    scoreThem: 16,
+    batting: [
+      { playerId: "p6", order: 1, position: "C", AB: 5, H: 3, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 2, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p7", order: 2, position: "LF", AB: 5, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p5", order: 3, position: "SS", AB: 4, H: 4, "2B": 2, "3B": 0, HR: 1, HRC: 0, RBI: 3, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p12", order: 4, position: "1B", AB: 3, H: 3, "2B": 0, "3B": 0, HR: 2, HRC: 0, RBI: 5, R: 3, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p20", order: 5, position: "JD", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p4", order: 6, position: "CF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p15", order: 7, position: "3B", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p13", order: 8, position: "RF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p8", order: 9, position: "2B", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p11", order: 10, position: "JC", AB: 4, H: 3, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p17", order: 9, position: "2B", AB: 2, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 2, BB: 0, SO: 0, SB: 1 },
+    ],
+    pitching: [
+      { playerId: "p16", IP: 4, H: 8, R: 4, ER: 0, BB: 0, SO: 2, HR: 0, decision: "W" },
+      { playerId: "p14", IP: 0, H: 14, R: 12, ER: 0, BB: 2, SO: 0, HR: 0, decision: "L" },
+      { playerId: "p16", IP: 0, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+    ],
+    fielding: [
+      { playerId: "p16", PO: 2, A: 0, E: 0 },
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p12", PO: 5, A: 0, E: 1 },
+      { playerId: "p8", PO: 1, A: 0, E: 0 },
+      { playerId: "p15", PO: 0, A: 1, E: 1 },
+      { playerId: "p5", PO: 0, A: 1, E: 3 },
+      { playerId: "p7", PO: 2, A: 0, E: 0 },
+      { playerId: "p4", PO: 2, A: 0, E: 2 },
+      { playerId: "p13", PO: 2, A: 0, E: 0 },
+      { playerId: "p14", PO: 0, A: 0, E: 1 },
+      { playerId: "p17", PO: 0, A: 0, E: 2 },
+      { playerId: "p20", PO: 0, A: 0, E: 0 },
+    ],
+    substitutions: [
+      { inning: 5, type: "bateo", playerOut: "p17", playerIn: "p8", position: "" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1756467548693744/",
+    mvp: "p12",
   },
 ];
 
