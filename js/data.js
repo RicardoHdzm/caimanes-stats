@@ -324,7 +324,7 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/1917285122301122",
     mvp: "p14",
   },
-    {
+  {
     id: "g6",
     date: "2026-08-14",
     opponent: "Jolinos",
@@ -345,9 +345,9 @@ export const GAMES = [
       { playerId: "p17", order: 9, position: "2B", AB: 2, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 2, BB: 0, SO: 0, SB: 1 },
     ],
     pitching: [
-      { playerId: "p16", IP: 4, H: 8, R: 4, ER: 0, BB: 0, SO: 2, HR: 0, decision: "W" },
-      { playerId: "p14", IP: 0, H: 14, R: 12, ER: 0, BB: 2, SO: 0, HR: 0, decision: "L" },
-      { playerId: "p16", IP: 0, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+      { playerId: "p16", IP: 4, H: 7, R: 3, ER: 0, BB: 0, SO: 2, HR: 0, decision: "" },
+      { playerId: "p14", IP: 3, H: 14, R: 12, ER: 0, BB: 2, SO: 0, HR: 0, decision: "L" },
+      { playerId: "p16", IP: 1, H: 1, R: 1, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
     ],
     fielding: [
       { playerId: "p16", PO: 2, A: 0, E: 0 },
@@ -364,7 +364,7 @@ export const GAMES = [
       { playerId: "p20", PO: 0, A: 0, E: 0 },
     ],
     substitutions: [
-      { inning: 5, type: "bateo", playerOut: "p17", playerIn: "p8", position: "" },
+      { inning: 5, type: "bateo", playerOut: "p8", playerIn: "p17", position: "" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1756467548693744/",
     mvp: "p12",
