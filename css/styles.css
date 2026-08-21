@@ -992,9 +992,9 @@ main h3::before {
 .walkup {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 14px;
-  padding: 10px 18px;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 26px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-alt);
@@ -1004,7 +1004,7 @@ main h3::before {
 }
 
 .walkup-icon {
-  font-size: 1.3rem;
+  font-size: 1.9rem;
   color: var(--accent);
   flex-shrink: 0;
 }
@@ -1012,33 +1012,38 @@ main h3::before {
 .walkup-text {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
   min-width: 0;
+  /* Un título de una sola palabra larguísima se saldría de la caja; así se
+     parte. `anywhere` además deja que el flex lo encoja de verdad. */
+  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .walkup-label {
-  font-size: 0.6rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
 .walkup-title {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .walkup-artist {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   color: var(--muted);
 }
 
 .walkup-out {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--muted);
   flex-shrink: 0;
+  margin-left: 4px;
 }
 
 .walkup-link {
@@ -1056,11 +1061,13 @@ main h3::before {
 @media (max-width: 640px) {
   .walkup {
     /* En el hero centrado, a ancho completo se lee mejor que una píldora
-       angosta con el título partido en tres renglones. */
+       angosta con el título partido en tres renglones. El grupo va centrado
+       para que no quede el texto pegado a la izquierda con un hueco al lado. */
     display: flex;
+    justify-content: center;
     width: 100%;
-    border-radius: 12px;
-    padding: 10px 14px;
+    border-radius: 16px;
+    padding: 16px 18px;
   }
 }
 
