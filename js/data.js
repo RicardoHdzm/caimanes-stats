@@ -47,7 +47,7 @@ export const PLAYERS = [
   { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" } },
   { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" } },
   { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" } },
-  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki" } },
+  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" } },
   { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" } },
   { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" } },
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" } },
