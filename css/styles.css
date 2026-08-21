@@ -992,58 +992,59 @@ main h3::before {
 .walkup {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  /* Va en un solo renglón. `wrap` es la red de seguridad: con un título muy
+     largo en pantalla angosta prefiero que baje de línea a que se desborde. */
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
   margin-top: 18px;
-  padding: 16px 26px;
+  padding: 11px 22px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface-alt);
-  text-align: left;
   text-decoration: none;
   color: var(--text);
-}
-
-.walkup-icon {
-  font-size: 1.9rem;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.walkup-text {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-  /* Un título de una sola palabra larguísima se saldría de la caja; así se
-     parte. `anywhere` además deja que el flex lo encoja de verdad. */
+  /* Un título de una sola palabra larguísima se saldría de la caja. */
   overflow-wrap: break-word;
   overflow-wrap: anywhere;
 }
 
+.walkup-icon {
+  font-size: 1.1rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
 .walkup-label {
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--muted);
+  flex-shrink: 0;
+}
+
+.walkup-sep {
+  font-size: 0.9rem;
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .walkup-title {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .walkup-artist {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--muted);
+  line-height: 1.3;
 }
 
 .walkup-out {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--muted);
   flex-shrink: 0;
-  margin-left: 4px;
 }
 
 .walkup-link {
@@ -1059,15 +1060,23 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
+  /* Se aprieta un poco para que el renglón siga cabiendo en un teléfono. */
   .walkup {
-    /* En el hero centrado, a ancho completo se lee mejor que una píldora
-       angosta con el título partido en tres renglones. El grupo va centrado
-       para que no quede el texto pegado a la izquierda con un hueco al lado. */
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    border-radius: 16px;
-    padding: 16px 18px;
+    gap: 6px;
+    padding: 10px 14px;
+  }
+
+  .walkup-label {
+    font-size: 0.72rem;
+  }
+
+  .walkup-icon {
+    font-size: 1rem;
+  }
+
+  .walkup-title,
+  .walkup-artist {
+    font-size: 0.9rem;
   }
 }
 

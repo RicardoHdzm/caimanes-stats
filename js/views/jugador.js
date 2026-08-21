@@ -38,15 +38,18 @@ function renderWalkup(walkup) {
   const parsed = safeUrl(walkup.url);
   const icon = walkupIcon(parsed);
   const title = escapeHtml(walkup.title);
-  const artist = walkup.artist ? `<span class="walkup-artist">${escapeHtml(walkup.artist)}</span>` : "";
+  // Formato de un solo renglón: "Walkup Song: [icono] - Título - Artista".
+  // Sin artista se corta después del título, sin dejar un guion colgado.
+  const artist = walkup.artist
+    ? `<span class="walkup-sep">-</span><span class="walkup-artist">${escapeHtml(walkup.artist)}</span>`
+    : "";
 
   const body = `
+    <span class="walkup-label">Walkup Song:</span>
     <i class="${icon} walkup-icon"></i>
-    <span class="walkup-text">
-      <span class="walkup-label">Canción de entrada</span>
-      <span class="walkup-title">${title}</span>
-      ${artist}
-    </span>
+    <span class="walkup-sep">-</span>
+    <span class="walkup-title">${title}</span>
+    ${artist}
   `;
 
   if (!parsed) return `<div class="walkup">${body}</div>`;
