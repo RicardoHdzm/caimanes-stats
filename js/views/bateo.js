@@ -5,7 +5,7 @@ export function renderBateo(container) {
   heading(container, "Estadísticas de bateo");
 
   const columns = [
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
     { key: "AB", label: "AB", full: "Turnos al bat", numeric: true },
     { key: "H", label: "H", full: "Hits", numeric: true },

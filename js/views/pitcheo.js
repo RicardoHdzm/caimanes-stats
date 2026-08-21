@@ -5,7 +5,7 @@ export function renderPitcheo(container) {
   heading(container, "Estadísticas de pitcheo");
 
   const columns = [
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
     { key: "W", label: "G", full: "Juegos ganados", numeric: true },
     { key: "L", label: "P", full: "Juegos perdidos", numeric: true },

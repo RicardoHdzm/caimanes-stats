@@ -123,6 +123,7 @@ export function renderJuegoDetalle(container, gameId) {
       label: "#",
       full: "Turno al bat (flecha verde = entró de cambio, roja = salió)",
       numeric: true,
+      sticky: true,
       render: (value, row) => {
         if (row.subStatus === "in") {
           return `${value} <span class="stat-green" title="Entró en la entrada ${row.subInning}">▲</span>`;
@@ -133,7 +134,7 @@ export function renderJuegoDetalle(container, gameId) {
         return String(value);
       },
     },
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     {
       key: "position",
       label: "Pos",
@@ -186,7 +187,7 @@ export function renderJuegoDetalle(container, gameId) {
   }));
 
   const pitchingColumns = [
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     { key: "IP", label: "IP", full: "Entradas lanzadas", numeric: true },
     { key: "H", label: "H", full: "Hits permitidos", numeric: true },
     { key: "R", label: "R", full: "Carreras permitidas", numeric: true },
@@ -233,7 +234,7 @@ export function renderJuegoDetalle(container, gameId) {
     .sort((a, b) => a.positionOrder - b.positionOrder);
 
   const fieldingColumns = [
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     {
       key: "position",
       label: "Pos",

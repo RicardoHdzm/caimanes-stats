@@ -52,7 +52,7 @@ export function renderJuegos(container) {
 
   renderSortableTable(tableEl, {
     columns: [
-      { key: "date", label: "Fecha" },
+      { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
       { key: "close", label: "Sede" },
       { key: "score", label: "Marcador" },

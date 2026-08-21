@@ -188,8 +188,8 @@ export function renderAlineacion(container) {
   }
 
   const orderColumns = [
-    { key: "slot", label: "#", full: "Turno al bat", numeric: true, render: (_v, row) => row.slotDisplay },
-    { key: "name", label: "Jugador" },
+    { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
+    { key: "name", label: "Jugador", sticky: true },
     { key: "position", label: "Pos", full: "Posición", render: (v) => renderPositionBadge(v) },
     { key: "AVG", label: "AVG", full: "Promedio", numeric: true },
     { key: "OBP", label: "OBP", full: "Porcentaje de embasado", numeric: true },

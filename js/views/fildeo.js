@@ -5,7 +5,7 @@ export function renderFildeo(container) {
   heading(container, "Estadísticas de fildeo");
 
   const columns = [
-    { key: "name", label: "Jugador" },
+    { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
     { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
     { key: "A", label: "A", full: "Asistencias", numeric: true },

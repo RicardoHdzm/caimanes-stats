@@ -37,6 +37,16 @@ export function playerName(playerId) {
   return PLAYERS.find((p) => p.id === playerId)?.name ?? playerId;
 }
 
+// Apariciones al plato (AB + BB) mínimas por juego del equipo para entrar a
+// los líderes de promedio — la misma regla que usan las ligas grandes. Sin un
+// mínimo, quien jugó un solo juego de 2-2 encabeza la tabla por encima de
+// quien lleva toda la temporada bateando.
+export const PA_PER_GAME_TO_QUALIFY = 2.7;
+
+export function minPlateAppearances(games = GAMES) {
+  return Math.ceil(games.length * PA_PER_GAME_TO_QUALIFY);
+}
+
 export function battingTotals(games = GAMES) {
   const totals = new Map();
   for (const game of games) {
@@ -57,10 +67,12 @@ export function battingTotals(games = GAMES) {
       totals.set(line.playerId, t);
     }
   }
+  const minPA = minPlateAppearances(games);
   return [...totals.entries()].map(([playerId, t]) => {
     const homers = t.HR + t.HRC; // ambos valen 4 bases, aunque se lideran por separado
     const singles = t.H - t["2B"] - t["3B"] - homers;
     const TB = singles + 2 * t["2B"] + 3 * t["3B"] + 4 * homers;
+    const PA = t.AB + t.BB;
     const AVG = div(t.H, t.AB);
     const OBP = div(t.H + t.BB, t.AB + t.BB);
     const SLG = div(TB, t.AB);
@@ -68,6 +80,8 @@ export function battingTotals(games = GAMES) {
       playerId,
       name: playerName(playerId),
       ...t,
+      PA,
+      qualified: PA >= minPA,
       AVG: fmt3(AVG),
       OBP: fmt3(OBP),
       SLG: fmt3(SLG),

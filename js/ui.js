@@ -1,6 +1,27 @@
+// Congela a la izquierda las columnas marcadas con `sticky` para que la
+// identidad de la fila (nombre, fecha) siga a la vista al scrollear la tabla
+// en horizontal. Deben ser contiguas desde la primera columna: el `left` de
+// cada una es la suma del ancho de las anteriores, y solo se sabe ya que la
+// tabla está en el DOM y medida.
+function applyStickyOffsets(table, columns) {
+  const headCells = table.tHead.rows[0].cells;
+  const bodyRows = table.tBodies[0].rows;
+  let offset = 0;
+  for (let i = 0; i < columns.length && columns[i].sticky; i++) {
+    const left = `${offset}px`;
+    headCells[i].style.left = left;
+    for (const row of bodyRows) {
+      // La fila de "sin datos" es una sola celda con colspan.
+      if (row.cells.length === columns.length) row.cells[i].style.left = left;
+    }
+    offset += headCells[i].getBoundingClientRect().width;
+  }
+}
+
 // Tabla ordenable simple, reutilizada por las vistas de stats.
-// columns: [{ key, label, numeric?, render? }]
+// columns: [{ key, label, numeric?, render?, sticky? }]
 //   render(value, row) puede devolver HTML (ej. para badges) en vez de texto plano.
+//   sticky marca la columna como congelada (ver applyStickyOffsets).
 // rows: arreglo de objetos con esas keys
 // defaultSort: key por la que ordena al cargar (descendente si numeric)
 // sortable: false deja las columnas fijas (sin click para reordenar), útil para
@@ -21,6 +42,20 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
     });
   }
 
+  const firstLooseIndex = columns.findIndex((c) => !c.sticky);
+  const lastStickyIndex = firstLooseIndex === -1 ? columns.length - 1 : firstLooseIndex - 1;
+
+  // Clases de la columna congelada: la primera lleva la barra de acento al
+  // pasar el mouse (queda encima de la de la fila) y la última, el filo que
+  // la separa de las columnas que sí se mueven.
+  function stickyClasses(index) {
+    if (!columns[index].sticky) return [];
+    const classes = ["sticky-col"];
+    if (index === 0) classes.push("sticky-col-first");
+    if (index === lastStickyIndex) classes.push("sticky-col-last");
+    return classes;
+  }
+
   function draw() {
     container.innerHTML = "";
     const wrap = document.createElement("div");
@@ -31,11 +66,12 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
 
     const thead = document.createElement("thead");
     const headRow = document.createElement("tr");
-    for (const col of columns) {
+    for (const [index, col] of columns.entries()) {
       const th = document.createElement("th");
       th.textContent = col.label;
       th.dataset.key = col.key;
       if (col.numeric) th.classList.add("numeric");
+      th.classList.add(...stickyClasses(index));
       if (sortable) {
         if (col.key === sortKey) th.classList.add(sortDir === 1 ? "sort-asc" : "sort-desc");
         th.addEventListener("click", () => {
@@ -55,9 +91,10 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
     const tbody = document.createElement("tbody");
     for (const row of sortedRows()) {
       const tr = document.createElement("tr");
-      for (const col of columns) {
+      for (const [index, col] of columns.entries()) {
         const td = document.createElement("td");
         if (col.numeric) td.classList.add("numeric");
+        td.classList.add(...stickyClasses(index));
         const value = row[col.key] ?? "";
         if (col.render) td.innerHTML = col.render(value, row);
         else td.textContent = value;
@@ -81,9 +118,21 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
     table.appendChild(tbody);
     wrap.appendChild(table);
     container.appendChild(wrap);
+    if (lastStickyIndex >= 0) applyStickyOffsets(table, columns);
   }
 
   draw();
+
+  // Al cambiar el ancho de la ventana cambian los anchos de columna, así que
+  // los `left` calculados se recalculan. El observer muere junto con la tabla
+  // cuando el router reemplaza la vista.
+  if (lastStickyIndex >= 0 && typeof ResizeObserver !== "undefined") {
+    const observer = new ResizeObserver(() => {
+      const table = container.querySelector("table");
+      if (table) applyStickyOffsets(table, columns);
+    });
+    observer.observe(container);
+  }
 }
 
 // Colorea un valor numérico (ej. rojo para ponches/errores, verde para

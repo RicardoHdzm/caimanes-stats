@@ -208,7 +208,7 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(h3);
 
     const battingColumns = [
-      { key: "date", label: "Fecha" },
+      { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
       { key: "AB", label: "AB", full: "Turnos al bat", numeric: true },
       { key: "H", label: "H", full: "Hits", numeric: true },
@@ -264,7 +264,7 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(h3);
 
     const pitchingColumns = [
-      { key: "date", label: "Fecha" },
+      { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
       { key: "IP", label: "IP", full: "Entradas lanzadas", numeric: true },
       { key: "H", label: "H", full: "Hits permitidos", numeric: true },
@@ -311,7 +311,7 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(h3);
 
     const fieldingColumns = [
-      { key: "date", label: "Fecha" },
+      { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
       { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
       { key: "A", label: "A", full: "Asistencias", numeric: true },

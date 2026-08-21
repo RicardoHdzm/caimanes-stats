@@ -8,6 +8,7 @@ import {
   teamBattingTotals,
   teamPitchingTotals,
   teamFieldingTotals,
+  minPlateAppearances,
 } from "../stats.js";
 import { heading } from "../ui.js";
 
@@ -24,18 +25,21 @@ function formatGameDate(dateStr) {
 }
 
 // Tarjeta de líder con el #1 en grande y el 2do/3er lugar chico debajo.
-function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat) {
+// `note` es una línea chica al pie (ej. el mínimo de turnos para calificar).
+function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) {
   const [first, second, third] = sortedList;
   const mainHtml = first ? `<p>${mainFormat(first)}</p>` : "<p>Sin datos todavía.</p>";
   const runnersUp = [second, third].filter(Boolean);
   const runnersHtml = runnersUp.length
     ? `<ol class="runner-ups" start="2">${runnersUp.map((p) => `<li>${shortFormat(p)}</li>`).join("")}</ol>`
     : "";
+  const noteHtml = note ? `<p class="leader-note">${note}</p>` : "";
   return `
     <div class="leader-card">
       <h3><i class="fa-solid ${icon}"></i>${title}</h3>
       ${mainHtml}
       ${runnersHtml}
+      ${noteHtml}
     </div>
   `;
 }
@@ -160,7 +164,10 @@ export function renderResumen(container) {
   container.appendChild(teamRow);
 
   const battingList = battingTotals(GAMES);
-  const batSorted = [...battingList].sort((a, b) => Number(b.AVG.replace(".", "0.")) - Number(a.AVG.replace(".", "0.")));
+  // El líder de promedio solo sale de entre los que llegan al mínimo de
+  // apariciones al plato; los demás siguen en la tabla de bateo completa.
+  const minPA = minPlateAppearances(GAMES);
+  const batSorted = battingList.filter((p) => p.qualified).sort((a, b) => Number(b.AVG) - Number(a.AVG));
   const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
   const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
@@ -177,7 +184,8 @@ export function renderResumen(container) {
       "Líder de bateo",
       batSorted,
       (p) => `${p.name} — AVG ${p.AVG}, ${p.HR} HR, ${p.RBI} RBI`,
-      (p) => `${p.name} — AVG ${p.AVG}`
+      (p) => `${p.name} — AVG ${p.AVG}`,
+      `Mínimo ${minPA} turnos (AB + BB) para calificar.`
     ) +
     leaderCardHtml(
       "fa-bomb",

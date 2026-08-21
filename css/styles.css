@@ -558,6 +558,15 @@ main h3::before {
   line-height: 1.4;
 }
 
+.leader-note {
+  margin: 10px 0 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
 .runner-ups {
   margin: 8px 0 0;
   padding-left: 18px;
@@ -659,6 +668,48 @@ main h3::before {
 
 .stats-table tbody tr.clickable-row {
   cursor: pointer;
+}
+
+/* Columna congelada: se queda a la vista mientras el resto de la tabla
+   scrollea en horizontal. El `left` lo calcula ui.js según el ancho real. */
+.stats-table th.sticky-col,
+.stats-table td.sticky-col {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--surface);
+}
+
+.stats-table thead th.sticky-col {
+  z-index: 3;
+  background-color: var(--surface-alt);
+}
+
+/* El velo de las filas pares vive en el <tr>, pero la celda congelada necesita
+   fondo opaco propio, así que se repinta aquí encima. */
+.stats-table tbody tr:nth-child(even) td.sticky-col {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0.015));
+}
+
+.stats-table tbody tr:hover td.sticky-col {
+  background-color: var(--surface-alt);
+}
+
+/* La barra de acento del hover la pinta el <tr>, pero queda tapada por la
+   celda congelada; se vuelve a dibujar sobre ella. */
+.stats-table tbody tr:hover td.sticky-col-first {
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Filo que marca dónde termina lo congelado y empieza lo que se mueve. */
+.stats-table th.sticky-col-last::before,
+.stats-table td.sticky-col-last::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
 }
 
 .stats-table td.empty {
