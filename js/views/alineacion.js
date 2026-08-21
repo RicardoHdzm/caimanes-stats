@@ -1,6 +1,7 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, playerName } from "../stats.js";
 import { heading, renderSortableTable, renderPositionBadge } from "../ui.js";
+import { renderComparar } from "./comparar.js";
 
 const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 
@@ -93,7 +94,9 @@ function battingOrder(rows) {
   return order;
 }
 
-export function renderAlineacion(container) {
+// compareLeft/compareRight vienen de #/alineacion/p1/p2 y solo alimentan al
+// comparador del final; sin ellos la alineación se dibuja igual.
+export function renderAlineacion(container, compareLeft, compareRight) {
   heading(
     container,
     "Sugerencia de alineación",
@@ -226,4 +229,6 @@ export function renderAlineacion(container) {
     `;
   }).join("");
   container.appendChild(defenseGrid);
+
+  renderComparar(container, compareLeft, compareRight);
 }

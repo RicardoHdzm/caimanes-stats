@@ -226,12 +226,12 @@ function bestInGame(games, listKey, valueFn, refine) {
   return { value: best, entries };
 }
 
-// "Fulano" · "Fulano y Mengano" · "Fulano, Mengano y 2 más"
+// Todos los que comparten el récord, por nombre: "Fulano, Mengano y Zutano".
+// Nadie se queda en un "y N más" — si empataron, aparecen.
 function namesLabel(entries) {
   const names = entries.map((e) => e.name);
   if (names.length === 1) return names[0];
-  if (names.length === 2) return `${names[0]} y ${names[1]}`;
-  return `${names[0]}, ${names[1]} y ${names.length - 2} más`;
+  return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
 }
 
 // Racha de juegos seguidos con al menos un hit. Solo cuentan los juegos en

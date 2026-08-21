@@ -1,6 +1,6 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
-import { heading, renderAvatar, renderPositionBadges } from "../ui.js";
+import { renderAvatar, renderPositionBadges } from "../ui.js";
 
 // dir: 1 = gana el número más alto, -1 = gana el más bajo (ponches, errores,
 // ERA...). `decimals` marca las stats que se comparan como número con punto
@@ -102,15 +102,14 @@ function playerHeader(player, played) {
   `;
 }
 
+// Se dibuja al final de la vista de Alineación. `leftId`/`rightId` vienen de
+// la URL (#/alineacion/p1/p2) para poder compartir una comparación armada.
 export function renderComparar(container, leftId, rightId) {
-  heading(container, "Comparar jugadores");
+  const h3 = document.createElement("h3");
+  h3.textContent = "Comparar jugadores";
+  container.appendChild(h3);
 
-  // Sin selección explícita arranca con los dos primeros del roster; así la
-  // vista nunca aparece vacía.
-  const left = PLAYERS.find((p) => p.id === leftId) ?? PLAYERS[0];
-  const right = PLAYERS.find((p) => p.id === rightId) ?? PLAYERS.find((p) => p.id !== left?.id) ?? PLAYERS[1];
-
-  if (!left || !right) {
+  if (PLAYERS.length < 2) {
     const p = document.createElement("p");
     p.className = "subtitle";
     p.textContent = "Se necesitan al menos dos jugadores en el roster para comparar.";
@@ -126,30 +125,47 @@ export function renderComparar(container, leftId, rightId) {
   const find = (list, id) => list.find((r) => r.playerId === id) ?? null;
 
   const wrap = document.createElement("div");
-  wrap.innerHTML = `
-    <div class="compare-picker">
-      ${playerSelect("compare-left", left.id)}
-      <span class="compare-vs">VS</span>
-      ${playerSelect("compare-right", right.id)}
-    </div>
-    <div class="compare-heads">
-      ${playerHeader(left, played.get(left.id) ?? 0)}
-      ${playerHeader(right, played.get(right.id) ?? 0)}
-    </div>
-    ${comparisonBlock("Bateo", BATTING_ROWS, find(batting, left.id), find(batting, right.id))}
-    ${comparisonBlock("Pitcheo", PITCHING_ROWS, find(pitching, left.id), find(pitching, right.id))}
-    ${comparisonBlock("Fildeo", FIELDING_ROWS, find(fielding, left.id), find(fielding, right.id))}
-  `;
   container.appendChild(wrap);
 
-  // La selección va en la URL para que la comparación se pueda compartir tal
-  // cual; el router se encarga de volver a dibujar.
-  function go(newLeft, newRight) {
-    location.hash = `#/comparar/${newLeft}/${newRight}`;
+  function draw(wantedLeft, wantedRight) {
+    // Sin selección explícita arranca con los dos primeros del roster; así la
+    // sección nunca aparece vacía.
+    const left = PLAYERS.find((p) => p.id === wantedLeft) ?? PLAYERS[0];
+    const right =
+      PLAYERS.find((p) => p.id === wantedRight) ?? PLAYERS.find((p) => p.id !== left.id) ?? PLAYERS[1];
+
+    wrap.innerHTML = `
+      <div class="compare-picker">
+        ${playerSelect("compare-left", left.id)}
+        <span class="compare-vs">VS</span>
+        ${playerSelect("compare-right", right.id)}
+      </div>
+      <div class="compare-heads">
+        ${playerHeader(left, played.get(left.id) ?? 0)}
+        ${playerHeader(right, played.get(right.id) ?? 0)}
+      </div>
+      ${comparisonBlock("Bateo", BATTING_ROWS, find(batting, left.id), find(batting, right.id))}
+      ${comparisonBlock("Pitcheo", PITCHING_ROWS, find(pitching, left.id), find(pitching, right.id))}
+      ${comparisonBlock("Fildeo", FIELDING_ROWS, find(fielding, left.id), find(fielding, right.id))}
+    `;
+
+    const leftSelect = wrap.querySelector("#compare-left");
+    const rightSelect = wrap.querySelector("#compare-right");
+
+    function onChange() {
+      // Se redibuja solo esta sección en vez de cambiar el hash: si el router
+      // volviera a montar toda la vista, la página saltaría hasta arriba y el
+      // comparador vive hasta abajo. La URL se actualiza con replaceState —
+      // que no dispara hashchange — para que siga siendo compartible.
+      const nextLeft = leftSelect.value;
+      const nextRight = rightSelect.value;
+      history.replaceState(null, "", `#/alineacion/${nextLeft}/${nextRight}`);
+      draw(nextLeft, nextRight);
+    }
+
+    leftSelect.addEventListener("change", onChange);
+    rightSelect.addEventListener("change", onChange);
   }
 
-  const leftSelect = wrap.querySelector("#compare-left");
-  const rightSelect = wrap.querySelector("#compare-right");
-  leftSelect.addEventListener("change", () => go(leftSelect.value, rightSelect.value));
-  rightSelect.addEventListener("change", () => go(leftSelect.value, rightSelect.value));
+  draw(leftId, rightId);
 }

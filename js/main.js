@@ -9,7 +9,6 @@ import { renderCalendario } from "./views/calendario.js";
 import { renderAlineacion } from "./views/alineacion.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
-import { renderComparar } from "./views/comparar.js";
 
 const routes = {
   resumen: renderResumen,
@@ -20,7 +19,6 @@ const routes = {
   juegos: renderJuegos,
   calendario: renderCalendario,
   alineacion: renderAlineacion,
-  comparar: renderComparar,
 };
 
 const app = document.getElementById("app");
@@ -40,9 +38,10 @@ function currentRoute() {
   if (first === "jugador" && second) {
     return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
   }
-  // #/comparar/p1/p2 — los dos jugadores viven en la URL para poder compartirla.
-  if (first === "comparar") {
-    return { tab: "comparar", render: (container) => renderComparar(container, second, third) };
+  // #/alineacion/p1/p2 — los dos jugadores del comparador que va al final de
+  // esa vista viven en la URL para poder compartir la comparación armada.
+  if (first === "alineacion") {
+    return { tab: "alineacion", render: (container) => renderAlineacion(container, second, third) };
   }
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };
