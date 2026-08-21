@@ -1,6 +1,7 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar } from "../ui.js";
+import { renderTrendChart } from "../charts.js";
 
 function formatAvg(h, ab) {
   if (!ab) return ".000";
@@ -200,6 +201,33 @@ export function renderJugadorDetalle(container, playerId) {
       SB: line.SB ?? 0,
       AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
     });
+  }
+
+  // ---- Tendencia de bateo ----
+  // Con un solo juego no hay tendencia que mostrar, solo un dato suelto.
+  const battedGames = battingRows.filter((r) => r.AB > 0);
+  if (battedGames.length > 1) {
+    const h3 = document.createElement("h3");
+    h3.textContent = "Tendencia de bateo";
+    container.appendChild(h3);
+
+    let cumulativeH = 0;
+    let cumulativeAB = 0;
+    const points = battedGames.map((row) => {
+      cumulativeH += row.H;
+      cumulativeAB += row.AB;
+      const gameAvg = row.H / row.AB;
+      const cumulativeAvg = cumulativeH / cumulativeAB;
+      return {
+        // La fecha completa no cabe debajo de cada barra; con día/mes basta.
+        label: row.date.slice(5).replace("-", "/"),
+        gameAvg,
+        cumulativeAvg,
+        tooltip: `${row.date} vs ${row.opponent} — ${row.H} de ${row.AB} (AVG ${formatAvg(row.H, row.AB)}) · acumulado ${formatAvg(cumulativeH, cumulativeAB)}`,
+      };
+    });
+
+    renderTrendChart(container, points);
   }
 
   if (battingRows.length > 0) {

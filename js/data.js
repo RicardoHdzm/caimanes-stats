@@ -43,7 +43,7 @@ export const PLAYERS = [
   { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P" },
   { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF" },
   { id: "p16", number: 8, name: "Ruben Perez", position: "P" },
-  { id: "p17", number: 23, name: "Teddy Sainz", position: "RF/2B/3B" },
+  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B" },
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF" },
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS" },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS" },

@@ -9,6 +9,7 @@ import {
   teamPitchingTotals,
   teamFieldingTotals,
   minPlateAppearances,
+  seasonRecords,
 } from "../stats.js";
 import { heading } from "../ui.js";
 
@@ -209,4 +210,42 @@ export function renderResumen(container) {
       (p) => `${p.name} — ${p.SO * 12} botes`
     );
   container.appendChild(leadersRow);
+
+  // ---- Récords de temporada ----
+  const records = seasonRecords(GAMES);
+  if (records.length > 0) {
+    const recordsHeading = document.createElement("h3");
+    recordsHeading.textContent = "Récords de la temporada";
+    container.appendChild(recordsHeading);
+
+    const recordsRow = document.createElement("div");
+    recordsRow.className = "records-grid";
+    recordsRow.innerHTML = records
+      .map(
+        (r) => `
+        <div class="record-card"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
+          <i class="fa-solid ${r.icon} record-icon"></i>
+          <div class="record-body">
+            <span class="record-label">${r.label}</span>
+            <span class="record-value">${r.value}</span>
+            <span class="record-detail">${r.detail}</span>
+            <span class="record-note">${r.note}</span>
+          </div>
+        </div>
+      `
+      )
+      .join("");
+
+    // Cada récord lleva al jugador (o al juego) que lo tiene.
+    for (const card of recordsRow.querySelectorAll(".record-card")) {
+      const { player, game } = card.dataset;
+      if (!player && !game) continue;
+      card.classList.add("record-clickable");
+      card.addEventListener("click", () => {
+        location.hash = player ? `#/jugador/${player}` : `#/juegos/${game}`;
+      });
+    }
+
+    container.appendChild(recordsRow);
+  }
 }

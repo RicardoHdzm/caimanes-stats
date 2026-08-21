@@ -9,6 +9,7 @@ import { renderCalendario } from "./views/calendario.js";
 import { renderAlineacion } from "./views/alineacion.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
+import { renderComparar } from "./views/comparar.js";
 
 const routes = {
   resumen: renderResumen,
@@ -19,6 +20,7 @@ const routes = {
   juegos: renderJuegos,
   calendario: renderCalendario,
   alineacion: renderAlineacion,
+  comparar: renderComparar,
 };
 
 const app = document.getElementById("app");
@@ -31,12 +33,16 @@ document.getElementById("footer-year").textContent = new Date().getFullYear();
 
 function currentRoute() {
   const hash = location.hash.replace(/^#\//, "");
-  const [first, second] = hash.split("/");
+  const [first, second, third] = hash.split("/");
   if (first === "juegos" && second) {
     return { tab: "juegos", render: (container) => renderJuegoDetalle(container, second) };
   }
   if (first === "jugador" && second) {
     return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
+  }
+  // #/comparar/p1/p2 — los dos jugadores viven en la URL para poder compartirla.
+  if (first === "comparar") {
+    return { tab: "comparar", render: (container) => renderComparar(container, second, third) };
   }
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };
@@ -53,3 +59,12 @@ function render() {
 
 window.addEventListener("hashchange", render);
 render();
+
+// Service worker: deja abrir la página sin señal (en el campo casi nunca hay
+// datos). Si falla el registro la app sigue funcionando normal, solo pierde
+// el modo offline — por eso el catch silencioso.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}

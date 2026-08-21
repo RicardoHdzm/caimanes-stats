@@ -44,16 +44,38 @@ los edites a mano.
 ```
 index.html          shell de la app
 admin.html            herramienta local: genera el código para pegar en data.js
-css/styles.css       estilos
-css/admin.css          estilos de admin.html
-js/data.js             roster y juegos (lo editas tú cada semana)
-js/stats.js             cálculo de promedios y totales de temporada
-js/ui.js                 tabla ordenable reutilizable
-js/main.js               router de las pestañas
-js/admin.js              lógica de admin.html
-js/views/                 una vista por pestaña (resumen, roster, bateo, pitcheo, fildeo, juegos)
-assets/logo.png         logo del equipo
+manifest.webmanifest   metadatos del PWA (nombre, iconos, colores)
+sw.js                   service worker: hace que la página abra sin señal
+css/styles.css           estilos
+css/admin.css             estilos de admin.html
+js/data.js                 roster y juegos (lo editas tú cada semana)
+js/stats.js                 cálculo de promedios, totales y récords
+js/ui.js                     tabla ordenable reutilizable
+js/charts.js                  gráficas en SVG (tendencia de bateo)
+js/main.js                     router de las pestañas
+js/admin.js                     lógica de admin.html
+js/views/                        una vista por pestaña
+assets/logo.png                   logo del equipo
+assets/thumbnail.png               preview al compartir el link (1200x630)
+assets/icon-*.png                   iconos del PWA (192, 512 y maskable)
 ```
+
+## Instalable y sin señal (PWA)
+
+La página se puede "agregar a inicio" desde el celular y abre aunque no haya
+datos en el campo. El service worker (`sw.js`) pide siempre primero a la red
+y solo usa la caché cuando no hay internet, así que **al subir cambios a
+`data.js` se ven en cuanto haya señal** — no hay que hacer nada extra.
+
+Solo si cambias la estrategia de caché o quieres forzar que todos los
+celulares tiren lo guardado, sube `CACHE_VERSION` dentro de `sw.js`.
+
+## Preview al compartir el link
+
+Los meta tags de `index.html` (Open Graph) apuntan a la URL pública en
+absoluto, porque WhatsApp y Facebook no resuelven rutas relativas. **Si algún
+día pones dominio propio hay que actualizar esas URLs** (`og:url`,
+`og:image`, `twitter:image` y `canonical`).
 
 ## Notas
 

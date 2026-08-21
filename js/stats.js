@@ -193,6 +193,178 @@ export function gamesPlayedByPlayer(games = GAMES) {
   return counts;
 }
 
+// ---- récords de temporada ----
+
+// Mejor marca individual en un solo juego. Devuelve TODOS los que empatan en
+// la marca, no el primero que se encontró: si dos jugadores tienen el récord,
+// los dos lo tienen.
+//
+// `refine` (opcional) afina el empate quedándose con los de menor valor según
+// esa función — ej. a mismos hits, gana quien los hizo en menos turnos. Los
+// que sobreviven están empatados de verdad.
+function bestInGame(games, listKey, valueFn, refine) {
+  let best = 0;
+  let entries = [];
+  for (const game of games) {
+    for (const line of game[listKey] ?? []) {
+      const value = valueFn(line);
+      if (value <= 0) continue;
+      if (value > best) {
+        best = value;
+        entries = [];
+      }
+      if (value === best) {
+        entries.push({ playerId: line.playerId, name: playerName(line.playerId), line, game });
+      }
+    }
+  }
+  if (entries.length === 0) return null;
+  if (refine && entries.length > 1) {
+    const bestRefined = Math.min(...entries.map(refine));
+    entries = entries.filter((e) => refine(e) === bestRefined);
+  }
+  return { value: best, entries };
+}
+
+// "Fulano" · "Fulano y Mengano" · "Fulano, Mengano y 2 más"
+function namesLabel(entries) {
+  const names = entries.map((e) => e.name);
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} y ${names[1]}`;
+  return `${names[0]}, ${names[1]} y ${names.length - 2} más`;
+}
+
+// Racha de juegos seguidos con al menos un hit. Solo cuentan los juegos en
+// que el jugador tuvo turnos: si no bateó, la racha no se corta ni avanza.
+// `active` = la racha sigue viva (llega hasta su último juego con turnos).
+export function hitStreaks(games = GAMES) {
+  const ordered = [...games].sort((a, b) => a.date.localeCompare(b.date));
+  const byPlayer = new Map();
+
+  for (const game of ordered) {
+    for (const line of game.batting ?? []) {
+      if ((line.AB ?? 0) <= 0) continue;
+      const state = byPlayer.get(line.playerId) ?? { current: 0, longest: 0 };
+      if ((line.H ?? 0) > 0) {
+        state.current += 1;
+        state.longest = Math.max(state.longest, state.current);
+      } else {
+        state.current = 0;
+      }
+      byPlayer.set(line.playerId, state);
+    }
+  }
+
+  return [...byPlayer.entries()]
+    .filter(([, s]) => s.longest > 0)
+    .map(([playerId, s]) => ({
+      playerId,
+      name: playerName(playerId),
+      longest: s.longest,
+      current: s.current,
+      active: s.current === s.longest && s.current > 0,
+    }));
+}
+
+// Récords de la temporada, ya formateados para pintarse como tarjetas.
+// Solo se incluye `playerId`/`gameId` cuando hay un único dueño del récord;
+// con empate la tarjeta no lleva a ningún lado porque no hay a quién apuntar.
+export function seasonRecords(games = GAMES) {
+  const records = [];
+  const gameLabel = (g) => `vs ${g.opponent} · ${g.date}`;
+
+  function pushRecord({ icon, label, unit, best, detailSuffix }) {
+    if (!best) return;
+    const solo = best.entries.length === 1 ? best.entries[0] : null;
+    records.push({
+      icon,
+      label,
+      value: `${best.value} ${unit}`,
+      detail: namesLabel(best.entries) + (solo && detailSuffix ? detailSuffix(solo) : ""),
+      note: solo ? gameLabel(solo.game) : `${best.entries.length} jugadores empatados`,
+      playerId: solo?.playerId,
+    });
+  }
+
+  pushRecord({
+    icon: "fa-baseball-bat-ball",
+    label: "Más hits en un juego",
+    unit: "H",
+    // A mismos hits, gana quien necesitó menos turnos.
+    best: bestInGame(games, "batting", (l) => l.H ?? 0, (e) => e.line.AB ?? 0),
+    detailSuffix: (e) => ` — ${e.line.H} de ${e.line.AB ?? 0}`,
+  });
+
+  pushRecord({
+    icon: "fa-tornado",
+    label: "Más impulsadas en un juego",
+    unit: "RBI",
+    best: bestInGame(games, "batting", (l) => l.RBI ?? 0),
+  });
+
+  pushRecord({
+    icon: "fa-bomb",
+    label: "Más jonrones en un juego",
+    unit: "HR",
+    // Los dos tipos valen lo mismo aquí: cuatro bases es cuatro bases.
+    best: bestInGame(games, "batting", (l) => (l.HR ?? 0) + (l.HRC ?? 0)),
+    detailSuffix: (e) => (e.line.HRC ? ` (${e.line.HRC} de campo)` : ""),
+  });
+
+  pushRecord({
+    icon: "fa-person-running",
+    label: "Más robos en un juego",
+    unit: "SB",
+    best: bestInGame(games, "batting", (l) => l.SB ?? 0),
+  });
+
+  pushRecord({
+    icon: "fa-baseball",
+    label: "Más ponches en un juego",
+    unit: "K",
+    best: bestInGame(games, "pitching", (l) => l.SO ?? 0),
+    detailSuffix: (e) => ` — ${e.line.IP ?? 0} IP`,
+  });
+
+  const streaks = hitStreaks(games);
+  if (streaks.length > 0) {
+    const longest = Math.max(...streaks.map((s) => s.longest));
+    const tied = streaks.filter((s) => s.longest === longest);
+    const solo = tied.length === 1 ? tied[0] : null;
+    const anyActive = tied.some((s) => s.active);
+    records.push({
+      icon: "fa-fire",
+      label: "Racha de hits más larga",
+      value: `${longest} juego${longest === 1 ? "" : "s"}`,
+      detail: namesLabel(tied),
+      note: solo
+        ? solo.active
+          ? "Sigue activa"
+          : "Ya terminó"
+        : `${tied.length} empatados${anyActive ? ", sigue activa" : ""}`,
+      playerId: solo?.playerId,
+    });
+  }
+
+  // Récord del equipo, no de un jugador.
+  const scored = games.filter((g) => g.scoreUs != null);
+  if (scored.length > 0) {
+    const most = Math.max(...scored.map((g) => g.scoreUs));
+    const tied = scored.filter((g) => g.scoreUs === most);
+    const solo = tied.length === 1 ? tied[0] : null;
+    records.push({
+      icon: "fa-bolt",
+      label: "Más carreras del equipo",
+      value: `${most} C`,
+      detail: solo ? `vs ${solo.opponent}` : `${tied.length} juegos empatados`,
+      note: solo ? solo.date : tied.map((g) => g.opponent).join(", "),
+      gameId: solo?.id,
+    });
+  }
+
+  return records;
+}
+
 export function teamRecord(games = GAMES) {
   let W = 0, L = 0, T = 0, RF = 0, RA = 0;
   for (const g of games) {

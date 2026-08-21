@@ -983,6 +983,309 @@ main h3::before {
   }
 }
 
+/* ---- gráfica de tendencia ---- */
+
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* El viewBox se arma con el ancho real en píxeles (ver charts.js), así que la
+   gráfica se dibuja a escala 1:1 y el texto de los ejes no se encoge. */
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  fill: var(--muted);
+  font-family: "Consolas", monospace;
+  font-size: 13px;
+}
+
+.chart-bar {
+  fill: var(--surface-raised);
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-dot {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.chart-swatch-bar {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+}
+
+.chart-swatch-line {
+  background: var(--accent);
+}
+
+/* ---- récords de temporada ---- */
+
+.records-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.record-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.record-clickable {
+  cursor: pointer;
+}
+
+.record-clickable:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.record-icon {
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.record-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.record-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.record-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-detail {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.record-note {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* ---- comparador ---- */
+
+.compare-picker {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.compare-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.compare-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.compare-vs {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.compare-heads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.compare-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: 10px;
+  padding: 16px 12px;
+}
+
+.compare-name {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.compare-number {
+  font-family: "Consolas", monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.compare-games {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.compare-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-row:last-child {
+  border-bottom: none;
+}
+
+.compare-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.compare-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-align: center;
+  /* La etiqueta manda: fija el centro para que los números no la muevan. */
+  min-width: 116px;
+}
+
+.compare-value {
+  font-family: "Consolas", monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.compare-row .compare-value:first-child {
+  text-align: right;
+}
+
+.compare-row .compare-value:last-child {
+  text-align: left;
+}
+
+.compare-win {
+  color: var(--win);
+}
+
+.compare-lose {
+  color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .compare-picker {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .compare-vs {
+    text-align: center;
+  }
+
+  .compare-label {
+    min-width: 0;
+    font-size: 0.62rem;
+  }
+
+  .compare-row {
+    padding: 9px 10px;
+    gap: 6px;
+  }
+
+  .compare-value {
+    font-size: 0.9rem;
+  }
+}
+
 .footer {
   text-align: center;
   color: var(--muted);
