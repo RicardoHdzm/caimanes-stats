@@ -47,7 +47,7 @@ export const PLAYERS = [
   { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B" },
   { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C" },
   { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P" },
-  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF" },
+  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Gote", artist: "Duki" } },
   { id: "p16", number: 8, name: "Ruben Perez", position: "P" },
   { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B" },
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF" },
