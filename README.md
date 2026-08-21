@@ -54,7 +54,7 @@ js/ui.js                     tabla ordenable reutilizable
 js/charts.js                  gráficas en SVG (tendencia de bateo)
 js/main.js                     router de las pestañas
 js/admin.js                     lógica de admin.html
-js/views/                        una vista por pestaña
+js/views/                        una vista por pestaña (comparar.js va dentro de alineacion.js)
 assets/logo.png                   logo del equipo
 assets/thumbnail.png               preview al compartir el link (1200x630)
 assets/icon-*.png                   iconos del PWA (192, 512 y maskable)

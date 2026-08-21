@@ -8,7 +8,7 @@
 //
 // Al cambiar cualquier archivo del proyecto sube CACHE_VERSION: eso tira la
 // caché vieja completa y evita mezclas de versiones.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE_NAME = `caimanes-${CACHE_VERSION}`;
 
 // Lo mínimo para que la app arranque estando offline desde cero.
@@ -63,7 +63,12 @@ function isImageOrFont(request, url) {
 async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request);
+    // `no-cache` obliga a revalidar contra el servidor. Sin esto la caché HTTP
+    // del navegador puede devolver el archivo viejo sin preguntar (GitHub
+    // Pages manda max-age=600) y "red primero" no serviría de nada: un push a
+    // data.js tardaría hasta 10 minutos en verse. No implica volver a
+    // descargar: si no cambió, el servidor contesta 304.
+    const response = await fetch(request, { cache: "no-cache" });
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch (error) {

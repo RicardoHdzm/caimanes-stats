@@ -558,13 +558,15 @@ main h3::before {
   line-height: 1.4;
 }
 
+/* Mismo tamaño y peso que .runner-ups (el 2do y 3er lugar), pero en rojo
+   para que se lea como una advertencia y no como un puesto más de la lista. */
 .leader-note {
   margin: 10px 0 0;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 500;
   font-style: normal;
-  line-height: 1.4;
-  color: var(--muted);
+  line-height: 1.6;
+  color: var(--accent);
 }
 
 .runner-ups {
@@ -1076,11 +1078,13 @@ main h3::before {
   gap: 14px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-top: 4px solid var(--accent);
+  /* Mismos colores que las tarjetas de "Stats de equipo": filo blanco arriba
+     en vez del rojo de acento. */
+  border-top: 4px solid #fff;
   border-radius: 10px;
   padding: 14px 16px;
   box-shadow: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.15s;
 }
 
 .record-clickable {
@@ -1089,14 +1093,21 @@ main h3::before {
 
 .record-clickable:hover {
   transform: translateY(-2px);
-  border-color: var(--accent);
 }
 
+/* El icono usa el mismo degradado blanco→gris que el de stats de equipo. */
 .record-icon {
-  color: var(--accent);
+  color: #fff;
   font-size: 1.5rem;
   margin-top: 2px;
   flex-shrink: 0;
+}
+
+.record-icon::before {
+  background: linear-gradient(135deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .record-body {
