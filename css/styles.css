@@ -1041,10 +1041,14 @@ main h3::before {
   line-height: 1.3;
 }
 
-.walkup-out {
-  font-size: 0.75rem;
+/* Botón de play al final del renglón; solo existe cuando la canción trae
+   link. Va más grande que el icono de plataforma porque es la acción. */
+.walkup-play {
+  font-size: 1.15rem;
   color: var(--muted);
   flex-shrink: 0;
+  margin-left: 2px;
+  transition: color 0.15s;
 }
 
 .walkup-link {
@@ -1055,7 +1059,7 @@ main h3::before {
   border-color: var(--accent);
 }
 
-.walkup-link:hover .walkup-out {
+.walkup-link:hover .walkup-play {
   color: var(--accent);
 }
 

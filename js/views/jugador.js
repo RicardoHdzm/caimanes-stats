@@ -53,7 +53,8 @@ function renderWalkup(walkup) {
   `;
 
   if (!parsed) return `<div class="walkup">${body}</div>`;
-  return `<a class="walkup walkup-link" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer">${body}<i class="fa-solid fa-arrow-up-right-from-square walkup-out"></i></a>`;
+  // Mismo icono de play que el botón "Ver replay" del detalle de juego.
+  return `<a class="walkup walkup-link" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer">${body}<i class="fa-solid fa-circle-play walkup-play"></i></a>`;
 }
 
 function formatAvg(h, ab) {
