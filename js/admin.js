@@ -153,7 +153,18 @@ playerForm.addEventListener("submit", (e) => {
   const position = data.get("position").trim();
   const photo = data.get("photo").trim();
   const photoField = photo ? `, photo: ${JSON.stringify(photo)}` : "";
-  const code = `  { id: ${JSON.stringify(id)}, number: ${number === "" ? "null" : Number(number)}, name: ${JSON.stringify(name)}, position: ${JSON.stringify(position)}${photoField} },`;
+
+  // La canción de entrada solo se escribe si al menos trae título; artista y
+  // link son opcionales dentro de ella.
+  const walkupTitle = data.get("walkupTitle").trim();
+  const walkupArtist = data.get("walkupArtist").trim();
+  const walkupUrl = data.get("walkupUrl").trim();
+  const walkupParts = [`title: ${JSON.stringify(walkupTitle)}`];
+  if (walkupArtist) walkupParts.push(`artist: ${JSON.stringify(walkupArtist)}`);
+  if (walkupUrl) walkupParts.push(`url: ${JSON.stringify(walkupUrl)}`);
+  const walkupField = walkupTitle ? `, walkup: { ${walkupParts.join(", ")} }` : "";
+
+  const code = `  { id: ${JSON.stringify(id)}, number: ${number === "" ? "null" : Number(number)}, name: ${JSON.stringify(name)}, position: ${JSON.stringify(position)}${photoField}${walkupField} },`;
   playerCode.textContent = code;
   playerOutput.hidden = false;
 });

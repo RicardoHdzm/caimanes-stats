@@ -135,6 +135,16 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
   }
 }
 
+// Escapa texto que va a meterse como HTML. Hace falta para datos libres que
+// no controla el código, como títulos de canciones ("Sex & Candy").
+export function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 // Colorea un valor numérico (ej. rojo para ponches/errores, verde para
 // carreras) solo cuando es distinto de 0 — el 0 se queda en blanco.
 export function coloredStat(value, colorClass) {

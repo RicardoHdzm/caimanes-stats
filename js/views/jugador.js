@@ -1,7 +1,57 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
+
+// Icono según de dónde venga el link de la canción de entrada.
+const WALKUP_PLATFORMS = [
+  { match: /(^|\.)spotify\.com$/, icon: "fa-brands fa-spotify" },
+  { match: /(^|\.)(youtube\.com|youtu\.be)$/, icon: "fa-brands fa-youtube" },
+  { match: /(^|\.)music\.apple\.com$/, icon: "fa-brands fa-apple" },
+  { match: /(^|\.)deezer\.com$/, icon: "fa-brands fa-deezer" },
+  { match: /(^|\.)soundcloud\.com$/, icon: "fa-brands fa-soundcloud" },
+];
+
+// Solo se aceptan links http(s): un `javascript:` en data.js correría al
+// abrirlo. Devuelve null si la URL no sirve, y entonces se pinta sin link.
+function safeUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function walkupIcon(parsedUrl) {
+  if (!parsedUrl) return "fa-solid fa-music";
+  const host = parsedUrl.hostname.toLowerCase();
+  return WALKUP_PLATFORMS.find((p) => p.match.test(host))?.icon ?? "fa-solid fa-music";
+}
+
+// Canción de entrada (walk-up song): la que suena cuando el jugador va al bat.
+// Sin `walkup` en el roster no se pinta nada.
+function renderWalkup(walkup) {
+  if (!walkup?.title) return "";
+
+  const parsed = safeUrl(walkup.url);
+  const icon = walkupIcon(parsed);
+  const title = escapeHtml(walkup.title);
+  const artist = walkup.artist ? `<span class="walkup-artist">${escapeHtml(walkup.artist)}</span>` : "";
+
+  const body = `
+    <i class="${icon} walkup-icon"></i>
+    <span class="walkup-text">
+      <span class="walkup-label">Canción de entrada</span>
+      <span class="walkup-title">${title}</span>
+      ${artist}
+    </span>
+  `;
+
+  if (!parsed) return `<div class="walkup">${body}</div>`;
+  return `<a class="walkup walkup-link" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer">${body}<i class="fa-solid fa-arrow-up-right-from-square walkup-out"></i></a>`;
+}
 
 function formatAvg(h, ab) {
   if (!ab) return ".000";
@@ -47,6 +97,7 @@ export function renderJugadorDetalle(container, playerId) {
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
         : ""
     }
+    ${renderWalkup(player.walkup)}
   `;
   container.appendChild(hero);
 

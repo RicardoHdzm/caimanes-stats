@@ -26,6 +26,12 @@ export const TEAM = {
 // photo: opcional, ruta o URL a una foto del jugador (ej. "img/players/p1.jpg").
 // Si no la tienes, simplemente omite el campo y se muestra un avatar con
 // sus iniciales en su lugar.
+// walkup: opcional, la canción de entrada (walk-up song) — la que suena
+// cuando el jugador va al bat. Se ve en su perfil. Formato:
+//   walkup: { title: "Enter Sandman", artist: "Metallica", url: "https://..." }
+// `url` es opcional (Spotify, YouTube, Apple Music o lo que sea); si la pones,
+// el título se vuelve un link con el icono de esa plataforma. Si no tienes la
+// canción de alguien, omite el campo completo y no se muestra nada.
 export const PLAYERS = [
   { id: "p1", number: 23, name: "Axel Medina", position: "CF/LF/SS" },
   { id: "p2", number: 7, name: "Carlos Baez", position: "RF/2B/3B" },

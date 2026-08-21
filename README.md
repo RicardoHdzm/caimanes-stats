@@ -14,7 +14,16 @@ arma el texto). Después de pegar el código, sube (commit + push) los cambios
 a GitHub para que se reflejen en la página publicada.
 
 - **`PLAYERS`**: agrega un objeto por jugador con `id` (único, ej. `"p5"`),
-  `number`, `name` y `position`.
+  `number`, `name` y `position`. Opcionalmente `photo` y `walkup` — la
+  canción de entrada (*walk-up song*), la que suena cuando va al bat:
+
+  ```js
+  walkup: { title: "Enter Sandman", artist: "Metallica", url: "https://open.spotify.com/track/..." }
+  ```
+
+  Se ve en el perfil del jugador. `artist` y `url` son opcionales; con `url`
+  el recuadro se vuelve un link y toma el icono de la plataforma (Spotify,
+  YouTube, Apple Music, Deezer o SoundCloud). Sin `walkup` no se muestra nada.
 - **`GAMES`**: agrega un objeto por juego jugado, con el marcador y un arreglo
   `batting`, `pitching` y `fielding` con una línea por jugador que participó
   en cada rubro (si un jugador no bateó/pitcheó/fildeó ese juego, simplemente
