@@ -18,6 +18,7 @@
   --pos-infield: #e2c93f;
   --pos-outfield: #3fb56f;
   --pos-special: #ff6fb5;
+  --pos-dh: #ff8c33;
 }
 
 * {
@@ -741,6 +742,12 @@ main h3::before {
   border-color: var(--pos-outfield);
   color: var(--pos-outfield);
   background: rgba(63, 181, 111, 0.12);
+}
+
+.pos-badge-jd {
+  border-color: var(--pos-dh);
+  color: var(--pos-dh);
+  background: rgba(255, 140, 51, 0.12);
 }
 
 .pos-badge-special {
