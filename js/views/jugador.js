@@ -148,14 +148,6 @@ export function renderJugadorDetalle(container, playerId) {
       </div>
     `;
     container.appendChild(cards);
-    renderGlossary(container, [
-      { label: "AVG", full: "Promedio de bateo" },
-      { label: "Home runs", full: "Jonrones que se van por la barda" },
-      { label: "Carreras", full: "Carreras anotadas (R)" },
-      { label: "Impulsadas", full: "Carreras impulsadas (RBI)" },
-      { label: "Bases robadas", full: "Bases robadas (SB)" },
-      { label: "OPS", full: "OBP + SLG" },
-    ]);
   }
 
   if (pitchingSeason) {
@@ -224,12 +216,6 @@ export function renderJugadorDetalle(container, playerId) {
       </div>
     `;
     container.appendChild(cards);
-    renderGlossary(container, [
-      { label: "FPCT", full: "Porcentaje de fildeo" },
-      { label: "Outs (PO)", full: "Outs realizados" },
-      { label: "Asistencias", full: "Asistencias en jugadas de out" },
-      { label: "Errores", full: "Errores cometidos" },
-    ]);
   }
 
   const gamesSorted = [...GAMES].sort((a, b) => a.date.localeCompare(b.date));
