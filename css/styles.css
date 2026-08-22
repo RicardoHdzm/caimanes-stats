@@ -88,6 +88,12 @@
   /* Velo de las filas pares. A 0.015 la diferencia era de 2 niveles por
      canal: rayado invisible. */
   --zebra: rgba(255, 255, 255, 0.03);
+
+  /* Trama diagonal del fondo, tipo raya de uniforme. Estos dos valores son
+     las perillas: subir --pattern-line la hace más marcada, bajar
+     --pattern-gap la hace más densa. */
+  --pattern-line: rgba(255, 255, 255, 0.035);
+  --pattern-gap: 16px;
 }
 
 * {
@@ -98,11 +104,21 @@ html {
   background: var(--bg);
 }
 
+/* La trama va en el <body> y no en <main> para que llegue de borde a borde:
+   `main` está limitado a 1150px y se le verían los cortes en pantallas
+   anchas. Solo asoma detrás del contenido porque el header, la nav y el
+   footer llevan fondo opaco propio — si a alguno se le quita, la trama se
+   le cuela. */
 body {
   margin: 0;
   min-height: 100vh;
   font-family: var(--font-body);
   background:
+    repeating-linear-gradient(
+      135deg,
+      var(--pattern-line) 0 1px,
+      transparent 1px var(--pattern-gap)
+    ),
     radial-gradient(1200px 500px at 50% -10%, #1a1e23 0%, var(--bg) 60%),
     var(--bg);
   color: var(--text);
@@ -1494,12 +1510,15 @@ main h3::before {
   }
 }
 
+/* Fondo opaco propio: sin esto la trama diagonal del body se vería a través
+   del footer, y la idea es que quede solo en el cuerpo. */
 .footer {
   text-align: center;
   color: var(--muted);
   font-size: var(--text-xs);
   padding: 28px 24px;
   border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .footer code {
