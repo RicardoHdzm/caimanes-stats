@@ -263,9 +263,7 @@ h2 {
   letter-spacing: 0.02em;
   font-size: var(--text-3xl);
   font-weight: 700;
-  /* Barlow Condensed trae itálica de verdad, así que ya no hace falta el
-     `transform: skewX(-3deg)` que inclinaba la fuente del sistema a mano. */
-  font-style: italic;
+  font-style: normal;
   display: inline-block;
   border-bottom: 3px solid var(--accent);
   padding-bottom: 6px;
@@ -1202,6 +1200,9 @@ main h3::before {
   stroke-width: 1;
 }
 
+/* Única excepción a la escala: esto vive dentro del SVG, donde la unidad es
+   la del viewBox. Como charts.js lo arma a escala 1:1 con los píxeles, 13px
+   aquí son 13px reales en pantalla; un rem se resolvería contra la raíz. */
 .chart-axis-label {
   fill: var(--muted);
   font-family: var(--font-mono);
