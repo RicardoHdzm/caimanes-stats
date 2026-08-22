@@ -38,23 +38,24 @@
 </head>
 <body>
   <header class="topbar">
-
     <div class="topbar-inner">
       <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
     </div>
-
-    <nav class="tabs" id="tabs">
-      <a href="#/resumen" data-route="resumen">Resumen</a>
-      <a href="#/roster" data-route="roster">Roster</a>
-      <a href="#/bateo" data-route="bateo">Bateo</a>
-      <a href="#/pitcheo" data-route="pitcheo">Pitcheo</a>
-      <a href="#/fildeo" data-route="fildeo">Fildeo</a>
-      <a href="#/juegos" data-route="juegos">Juegos</a>
-      <a href="#/calendario" data-route="calendario">Calendario</a>
-      <a href="#/alineacion" data-route="alineacion">Alineación</a>
-    </nav>
-
   </header>
+
+  <!-- La nav va FUERA del header a propósito: `position: sticky` solo pega
+       dentro de la caja del padre, así que dentro del header se iría junto
+       con el logo al hacer scroll. Aquí se queda fija toda la página. -->
+  <nav class="tabs" id="tabs">
+    <a href="#/resumen" data-route="resumen">Resumen</a>
+    <a href="#/roster" data-route="roster">Roster</a>
+    <a href="#/bateo" data-route="bateo">Bateo</a>
+    <a href="#/pitcheo" data-route="pitcheo">Pitcheo</a>
+    <a href="#/fildeo" data-route="fildeo">Fildeo</a>
+    <a href="#/juegos" data-route="juegos">Juegos</a>
+    <a href="#/calendario" data-route="calendario">Calendario</a>
+    <a href="#/alineacion" data-route="alineacion">Alineación</a>
+  </nav>
 
   <main id="app"></main>
 
