@@ -346,21 +346,29 @@ export function seasonRecords(games = GAMES) {
     });
   }
 
-  // Récord del equipo, no de un jugador.
-  const scored = games.filter((g) => g.scoreUs != null);
-  if (scored.length > 0) {
-    const most = Math.max(...scored.map((g) => g.scoreUs));
-    const tied = scored.filter((g) => g.scoreUs === most);
+  // Récords del equipo, no de un jugador: la mejor marca del marcador en un
+  // solo juego. `pick` decide si gana el número más alto o el más bajo.
+  // Los juegos sin marcador capturado quedan fuera; si no, un null contaría
+  // como cero y sería siempre el mínimo.
+  function pushTeamRecord({ icon, label, unit, key, pick }) {
+    const scored = games.filter((g) => g[key] != null);
+    if (scored.length === 0) return;
+    const values = scored.map((g) => g[key]);
+    const best = pick === "min" ? Math.min(...values) : Math.max(...values);
+    const tied = scored.filter((g) => g[key] === best);
     const solo = tied.length === 1 ? tied[0] : null;
     records.push({
-      icon: "fa-bolt",
-      label: "Más carreras del equipo",
-      value: `${most} C`,
+      icon,
+      label,
+      value: `${best} ${unit}`,
       detail: solo ? `vs ${solo.opponent}` : `${tied.length} juegos empatados`,
       note: solo ? solo.date : tied.map((g) => g.opponent).join(", "),
       gameId: solo?.id,
     });
   }
+
+  pushTeamRecord({ icon: "fa-bolt", label: "Más carreras del equipo", unit: "C", key: "scoreUs", pick: "max" });
+  pushTeamRecord({ icon: "fa-shield-halved", label: "Menos carreras permitidas", unit: "C", key: "scoreThem", pick: "min" });
 
   return records;
 }
