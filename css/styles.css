@@ -160,11 +160,11 @@ body {
   display: inline-block;
   text-align: center;
   color: var(--accent-text);
-  font-size: var(--text-2xs);
+  font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 4px 10px;
+  padding: 6px 14px;
   border: 1px solid var(--accent);
   border-radius: var(--radius-pill);
   background: var(--surface);
@@ -246,7 +246,7 @@ body {
   }
 
   .season {
-    padding: 4px 8px;
+    padding: 5px 10px;
   }
 
   /* En celular NO se envuelve: dos filas de nav pegada se comerían medio
