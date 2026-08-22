@@ -89,10 +89,13 @@
      canal: rayado invisible. */
   --zebra: rgba(255, 255, 255, 0.03);
 
-  /* Trama diagonal del fondo, tipo raya de uniforme. Estos dos valores son
-     las perillas: subir --pattern-line la hace más marcada, bajar
-     --pattern-gap la hace más densa. */
-  --pattern-line: rgba(255, 255, 255, 0.035);
+  /* Trama diagonal del fondo, tipo raya de uniforme. Es un azul (la misma
+     familia que --pos-pitcher) en vez de blanco: sobre un fondo tan oscuro
+     el blanco sale gris y pesa más. El azul carga casi todo su contraste en
+     el canal del azul, así que se distingue como tono sin aclarar la línea.
+     Estas dos son las perillas: subir --pattern-line la hace más marcada,
+     bajar --pattern-gap la hace más densa. */
+  --pattern-line: rgba(74, 158, 255, 0.05);
   --pattern-gap: 16px;
 }
 
