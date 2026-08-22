@@ -139,11 +139,13 @@ body {
   padding-bottom: 8px;
 }
 
-/* El logo se redujo de 250px: junto con la nav ocupaba el 38% de la pantalla
-   de un celular antes de mostrar un solo dato. */
+/* Venía de 250px, donde junto con la nav ocupaba el 38% de la pantalla de un
+   celular antes de mostrar un solo dato. Se puede crecer con relativa
+   holgura porque la nav quedó pegajosa: esta altura solo se paga en la
+   primera pantalla, no durante todo el scroll. */
 .brand-logo {
-  height: 140px;
-  width: 140px;
+  height: 172px;
+  width: 172px;
   object-fit: contain;
 }
 
@@ -239,8 +241,8 @@ body {
 
 @media (max-width: 640px) {
   .brand-logo {
-    height: 84px;
-    width: 84px;
+    height: 104px;
+    width: 104px;
   }
 
   .season {
