@@ -179,12 +179,6 @@ export function renderJugadorDetalle(container, playerId) {
       </div>
     `;
     container.appendChild(cards);
-    renderGlossary(container, [
-      { label: "ERA", full: "Efectividad" },
-      { label: "Record", full: "Juegos ganados-perdidos" },
-      { label: "Ponches", full: "Bateadores ponchados" },
-      { label: "Entradas", full: "Entradas lanzadas (IP)" },
-    ]);
   }
 
   if (fieldingSeason) {
