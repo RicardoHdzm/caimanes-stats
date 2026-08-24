@@ -1,6 +1,6 @@
 import { GAMES, SCHEDULE } from "../data.js";
 import { gameResult } from "../stats.js";
-import { heading, renderSortableTable } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary } from "../ui.js";
 
 const RESULT_BADGE = {
   W: '<span class="badge badge-win"><i class="fa-solid fa-check"></i> W</span>',
@@ -41,9 +41,10 @@ export function renderJuegos(container) {
       id: g.id,
       date: g.date,
       opponent: g.opponent,
-      // No es una sede: en esta liga no hay local/visitante, solo quién
-      // batea al final de cada entrada.
-      close: g.weCloseBatting == null ? "?" : g.weCloseBatting ? "Nosotros" : "El rival",
+      // No es una sede: en esta liga no hay local/visitante, solo en qué
+      // parte de la entrada bateamos. Cerrar bateando = batear en la parte
+      // baja; si cierra el rival, nosotros bateamos en la alta.
+      close: g.weCloseBatting == null ? "?" : g.weCloseBatting ? "Baja" : "Alta",
       score: known ? `${g.scoreUs} - ${g.scoreThem}` : "Pendiente",
       result: gameResult(g) ?? "",
     };
@@ -52,14 +53,16 @@ export function renderJuegos(container) {
   const tableEl = document.createElement("div");
   container.appendChild(tableEl);
 
+  const resultColumns = [
+    { key: "date", label: "Fecha", sticky: true },
+    { key: "opponent", label: "Rival" },
+    { key: "close", label: "Entrada", full: "Parte de la entrada en que bateamos — baja = cerramos, alta = abrimos" },
+    { key: "score", label: "Marcador" },
+    { key: "result", label: "Resultado", render: (value) => RESULT_BADGE[value] ?? UNKNOWN_BADGE },
+  ];
+
   renderSortableTable(tableEl, {
-    columns: [
-      { key: "date", label: "Fecha", sticky: true },
-      { key: "opponent", label: "Rival" },
-      { key: "close", label: "Cierra bateando" },
-      { key: "score", label: "Marcador" },
-      { key: "result", label: "Resultado", render: (value) => RESULT_BADGE[value] ?? UNKNOWN_BADGE },
-    ],
+    columns: resultColumns,
     rows,
     defaultSort: "date",
     defaultDir: 1,
@@ -67,4 +70,6 @@ export function renderJuegos(container) {
       location.hash = `#/juegos/${row.id}`;
     },
   });
+
+  renderGlossary(container, resultColumns);
 }

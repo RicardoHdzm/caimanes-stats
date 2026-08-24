@@ -26,7 +26,9 @@ function applyStickyOffsets(table, columns) {
 // defaultSort: key por la que ordena al cargar (descendente si numeric)
 // sortable: false deja las columnas fijas (sin click para reordenar), útil para
 // tablas donde el orden importa (ej. line-up de un juego).
-export function renderSortableTable(container, { columns, rows, defaultSort, defaultDir, onRowClick, sortable = true }) {
+// rowClass(row) permite marcar filas concretas (ej. resaltar al equipo propio
+// en la tabla de posiciones). Devuelve una clase o nada.
+export function renderSortableTable(container, { columns, rows, defaultSort, defaultDir, onRowClick, rowClass, sortable = true }) {
   let sortKey = defaultSort ?? columns[0].key;
   let sortDir = defaultDir ?? -1;
 
@@ -104,6 +106,8 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
         tr.classList.add("clickable-row");
         tr.addEventListener("click", () => onRowClick(row));
       }
+      const extra = rowClass?.(row);
+      if (extra) tr.classList.add(extra);
       tbody.appendChild(tr);
     }
     if (rows.length === 0) {

@@ -112,9 +112,14 @@ html {
    anchas. Solo asoma detrás del contenido porque el header, la nav y el
    footer llevan fondo opaco propio — si a alguno se le quita, la trama se
    le cuela. */
+/* Columna de flex + `main` que crece: en las vistas con poco contenido el
+   footer se quedaba a media pantalla. Así siempre baja hasta el fondo del
+   visor, sin dejar de empujarse hacia abajo cuando el contenido es largo. */
 body {
   margin: 0;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   font-family: var(--font-body);
   background:
     repeating-linear-gradient(
@@ -272,6 +277,11 @@ body {
 }
 
 main {
+  /* `flex: 1` es lo que empuja el footer hasta abajo cuando sobra espacio.
+     `width: 100%` hace falta porque en columna el flex mide los ítems por su
+     contenido, y sin él la caja se encogería en las vistas cortas. */
+  flex: 1;
+  width: 100%;
   max-width: 1150px;
   margin: 0 auto;
   padding: 28px 24px 48px;
@@ -828,6 +838,22 @@ main h3::before {
   bottom: 0;
   width: 1px;
   background: var(--border);
+}
+
+/* Nuestra fila en la tabla de posiciones: hay 18 equipos y sin esto hay que
+   ir leyendo nombre por nombre para encontrarnos. */
+.stats-table tbody tr.standings-us td {
+  background-color: rgba(226, 32, 47, 0.1);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stats-table tbody tr.standings-us td.sticky-col {
+  background-color: #2a1b1f;
+}
+
+.stats-table tbody tr.standings-us td.sticky-col-first {
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .stats-table td.empty {

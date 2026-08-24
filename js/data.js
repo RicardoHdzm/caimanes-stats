@@ -11,8 +11,8 @@ export const TEAM = {
   seasonsInLeague: 4, // temporadas jugando en esta liga
   seasonsTotal: 8, // temporadas del equipo en total
   gamesInSeason: 10, // juegos de temporada regular, sin contar playoffs
-  leaguePosition: null, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
-  leagueTeams: null, // total de equipos en la liga
+  leaguePosition: 5, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
+  leagueTeams: 18, // total de equipos en la liga
 };
 
 // Roster del equipo.
@@ -428,3 +428,37 @@ export const GAMES = [
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
    { id: "s1", date: "2026-08-27", time: "21:00", opponent: "Rockin Roll" },
 ];
+
+// Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
+// calcula desde GAMES, porque ahí solo están nuestros juegos y aquí van los
+// 18 equipos. Hay que actualizarla a mano cada vez que la liga la publique.
+//   pos: lugar en la tabla (lo decide la liga, con sus propios criterios de
+//        desempate, por eso se guarda y no se recalcula)
+//   JJ: juegos jugados · JG: ganados · JE: empatados · JP: perdidos
+//   CF: carreras a favor · CC: carreras en contra
+//   us: true solo en nuestra fila, para resaltarla. Es una bandera explícita
+//       y no una comparación de nombres, porque la liga nos escribe
+//       "Caimanes" y en TEAM.name somos "Caimanes de Villas".
+export const STANDINGS = {
+  updated: "2026-08-20", // fecha de corte de esta tabla
+  teams: [
+    { pos: 1, team: "Ni Parientes Somos", JJ: 6, JG: 6, JE: 0, JP: 0, CF: 46, CC: 34 },
+    { pos: 2, team: "Parkers", JJ: 6, JG: 5, JE: 0, JP: 1, CF: 97, CC: 59 },
+    { pos: 3, team: "Jolinos", JJ: 7, JG: 5, JE: 0, JP: 2, CF: 68, CC: 64 },
+    { pos: 4, team: "Los Camarones", JJ: 6, JG: 4, JE: 0, JP: 2, CF: 68, CC: 45 },
+    { pos: 5, team: "Caimanes", JJ: 7, JG: 4, JE: 0, JP: 3, CF: 105, CC: 81, us: true },
+    { pos: 6, team: "Caguamigos", JJ: 4, JG: 3, JE: 0, JP: 1, CF: 42, CC: 27 },
+    { pos: 7, team: "Padres de Sandiego", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 65, CC: 53 },
+    { pos: 8, team: "Gallos", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 71, CC: 83 },
+    { pos: 9, team: "D Backs", JJ: 4, JG: 2, JE: 0, JP: 2, CF: 33, CC: 47 },
+    { pos: 10, team: "Rockin Roll", JJ: 6, JG: 2, JE: 0, JP: 4, CF: 60, CC: 65 },
+    { pos: 11, team: "Bronx", JJ: 6, JG: 2, JE: 0, JP: 4, CF: 52, CC: 92 },
+    { pos: 12, team: "Soja Sushi", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 30, CC: 41 },
+    { pos: 13, team: "Bandidos", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 17, CC: 43 },
+    { pos: 14, team: "Primos", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 47, CC: 45 },
+    { pos: 15, team: "Tamagochis", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 43, CC: 51 },
+    { pos: 16, team: "Sox", JJ: 5, JG: 1, JE: 0, JP: 4, CF: 39, CC: 53 },
+    { pos: 17, team: "Muñekos", JJ: 6, JG: 1, JE: 0, JP: 5, CF: 62, CC: 84 },
+    { pos: 18, team: "Pichichi Blue Jeys", JJ: 7, JG: 0, JE: 0, JP: 7, CF: 36, CC: 99 },
+  ],
+};
