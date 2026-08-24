@@ -61,25 +61,6 @@ function render() {
 window.addEventListener("hashchange", render);
 render();
 
-// La nav se desliza en horizontal cuando no caben todas las pestañas (sobre
-// todo en celular), pero le quitamos la scrollbar nativa por fea — sin
-// scrollbar no queda ninguna pista de que hay más. Este difuminado en el
-// borde es esa pista: solo aparece del lado donde de verdad hay pestañas
-// ocultas, y desaparece al llegar al final de ese lado.
-function updateTabsFade() {
-  const maxScroll = tabs.scrollWidth - tabs.clientWidth;
-  tabs.classList.toggle("tabs-fade-left", tabs.scrollLeft > 4);
-  tabs.classList.toggle("tabs-fade-right", tabs.scrollLeft < maxScroll - 4);
-}
-
-tabs.addEventListener("scroll", updateTabsFade, { passive: true });
-window.addEventListener("resize", updateTabsFade);
-updateTabsFade();
-// Barlow Condensed carga async (font-display: swap) y puede angostar el
-// texto de las pestañas al llegar — se recalcula por si eso cambia si hace
-// falta el difuminado.
-document.fonts?.ready.then(updateTabsFade);
-
 // Service worker: deja abrir la página sin señal (en el campo casi nunca hay
 // datos). Si falla el registro la app sigue funcionando normal, solo pierde
 // el modo offline — por eso el catch silencioso.
