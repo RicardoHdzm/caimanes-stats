@@ -2,7 +2,7 @@ import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
 
-// Asistencias mínimas para tener derecho a jugar playoffs en esta liga.
+// Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
 
 export function renderRoster(container) {
@@ -30,7 +30,7 @@ export function renderRoster(container) {
     },
     {
       key: "gamesPlayed",
-      label: "Asistencias",
+      label: "Apariciones",
       full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs`,
       numeric: true,
       render: (value) => {
