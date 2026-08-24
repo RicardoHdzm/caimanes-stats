@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Generador de alineación — Caimanes de Villas</title>
+<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
+  </div>
+</header>
+
+<main id="lineup-app" class="admin-main">
+  <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
+
+  <section class="admin-section">
+    <h2>Generador de alineación</h2>
+    <p class="subtitle">
+      Marca quiénes van a estar en el juego y genera la alineación sugerida
+      — el orden al bat y las 9 posiciones — calculada solo con ese grupo, a
+      partir de sus stats de temporada y las posiciones que tienen
+      registradas en el roster. No considera condición física, lesiones ni
+      criterio del cuerpo técnico: es un punto de partida, no la decisión
+      final.
+    </p>
+
+    <div class="attendee-controls">
+      <button type="button" id="select-all-btn"><i class="fa-solid fa-check-double"></i> Todos</button>
+      <button type="button" id="select-none-btn"><i class="fa-solid fa-xmark"></i> Ninguno</button>
+      <span class="attendee-count" id="attendee-count"></span>
+    </div>
+
+    <div class="attendee-grid" id="attendee-list"></div>
+
+    <button type="button" id="generate-btn" class="generate-btn">
+      <i class="fa-solid fa-baseball-bat-ball"></i> Generar alineación
+    </button>
+  </section>
+
+  <section class="admin-section" id="lineup-result">
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="season-row">
+    <span class="season">Herramienta local — no guarda nada, solo sugiere</span>
+  </div>
+  La alineación se recalcula cada vez que le das clic al botón; no se guarda en ningún lado.
+</footer>
+
+<script type="module" src="js/lineup-tool.js"></script>
+</body>
+</html>
