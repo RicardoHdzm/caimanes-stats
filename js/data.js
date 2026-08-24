@@ -471,5 +471,10 @@ export const STANDINGS = {
 // sitio sigue funcionando offline normal).
 // El primero de la lista es el que sale primero: agrega los nuevos arriba.
 export const INSTAGRAM_POSTS = [
-  // "https://www.instagram.com/p/XXXXXXXXXXX/",
+  "https://www.instagram.com/p/DcSjvwfgbcR/",
+  "https://www.instagram.com/p/DbXRg_dgYk7/",
+  "https://www.instagram.com/p/DbFhq9xqbuA/",
+  "https://www.instagram.com/p/DaqdgsOxG4I/",
+  "https://www.instagram.com/p/DX9mFzhRWF3/",
+  "https://www.instagram.com/p/DWIhIm7ipC-/",
 ];
