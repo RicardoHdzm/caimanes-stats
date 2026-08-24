@@ -140,7 +140,9 @@ body {
 
 .topbar-inner {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   padding-bottom: 8px;
 }
 
