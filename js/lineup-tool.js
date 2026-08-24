@@ -5,7 +5,7 @@ const listEl = document.getElementById("attendee-list");
 const countEl = document.getElementById("attendee-count");
 const resultEl = document.getElementById("lineup-result");
 
-const roster = [...PLAYERS].sort((a, b) => (a.number ?? 999) - (b.number ?? 999));
+const roster = [...PLAYERS].sort((a, b) => a.name.localeCompare(b.name, "es"));
 const entries = []; // { player, checkbox, select }
 
 function updateCount() {
