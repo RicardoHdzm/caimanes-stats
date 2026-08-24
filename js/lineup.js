@@ -314,4 +314,35 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     `;
   }).join("");
   container.appendChild(defenseGrid);
+
+  // Banca: del roster candidato, quien no quedó en el campo ni bateando
+  // (ni titular, ni JD, ni JC, ni el pitcher). Antes desaparecían del
+  // resultado sin más — así queda claro quién sigue disponible para entrar.
+  const playingIds = new Set([...order.map((r) => r.playerId), assignment.P?.playerId].filter(Boolean));
+  const bench = roster
+    .filter((p) => !playingIds.has(p.id))
+    .map((p) => statsById.get(p.id) ?? emptyStats(p.id))
+    .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+
+  if (bench.length > 0) {
+    const benchHeading = document.createElement("h3");
+    benchHeading.textContent = "Banca";
+    container.appendChild(benchHeading);
+
+    const benchGrid = document.createElement("div");
+    benchGrid.className = "bench-grid";
+    benchGrid.innerHTML = bench
+      .map((row) => {
+        const pos = primaryPosition(roster.find((p) => p.id === row.playerId));
+        return `
+          <div class="card">
+            ${pos ? `<div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>` : ""}
+            <span class="card-value" style="font-size: 1.1rem;">${row.name}</span>
+            <span class="card-label">OPS ${row.OPS}</span>
+          </div>
+        `;
+      })
+      .join("");
+    container.appendChild(benchGrid);
+  }
 }

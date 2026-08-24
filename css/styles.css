@@ -1335,6 +1335,14 @@ main h3::before {
   gap: 14px;
 }
 
+/* Cantidad variable de jugadores en banca (0 a N), a diferencia de las 9
+   posiciones fijas de .grid-3 — necesita columnas que se ajusten solas. */
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
 .record-card {
   display: flex;
   align-items: flex-start;
