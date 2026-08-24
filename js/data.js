@@ -437,8 +437,9 @@ export const GAMES = [
 //   JJ: juegos jugados · JG: ganados · JE: empatados · JP: perdidos
 //   CF: carreras a favor · CC: carreras en contra
 //   us: true solo en nuestra fila, para resaltarla. Es una bandera explícita
-//       y no una comparación de nombres, porque la liga nos escribe
-//       "Caimanes" y en TEAM.name somos "Caimanes de Villas".
+//       y no una comparación contra TEAM.name a propósito: la liga escribe
+//       los nombres a su manera y un cambio de su lado dejaría de marcarnos
+//       sin que nada avise.
 export const STANDINGS = {
   updated: "2026-08-20", // fecha de corte de esta tabla
   teams: [
@@ -446,7 +447,7 @@ export const STANDINGS = {
     { pos: 2, team: "Parkers", JJ: 6, JG: 5, JE: 0, JP: 1, CF: 97, CC: 59 },
     { pos: 3, team: "Jolinos", JJ: 7, JG: 5, JE: 0, JP: 2, CF: 68, CC: 64 },
     { pos: 4, team: "Los Camarones", JJ: 6, JG: 4, JE: 0, JP: 2, CF: 68, CC: 45 },
-    { pos: 5, team: "Caimanes", JJ: 7, JG: 4, JE: 0, JP: 3, CF: 105, CC: 81, us: true },
+    { pos: 5, team: "Caimanes de Villas", JJ: 7, JG: 4, JE: 0, JP: 3, CF: 105, CC: 81, us: true },
     { pos: 6, team: "Caguamigos", JJ: 4, JG: 3, JE: 0, JP: 1, CF: 42, CC: 27 },
     { pos: 7, team: "Padres de Sandiego", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 65, CC: 53 },
     { pos: 8, team: "Gallos", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 71, CC: 83 },
