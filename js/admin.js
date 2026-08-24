@@ -198,8 +198,18 @@ scoreKnownSelect.addEventListener("change", () => {
   resultField.hidden = known;
 });
 
+// El siguiente ID sale del número MÁS ALTO que ya existe, no de cuántos
+// juegos hay. Con el conteo, un juego borrado o un ID fuera de secuencia
+// hacía que se sugiriera uno ya ocupado — así fue como aparecieron los
+// huecos (g-1, g0, g1, g2, g5…) en la numeración vieja.
+function nextGameId() {
+  const numeros = GAMES.map((g) => Number(String(g.id).replace(/^g/, ""))).filter(Number.isFinite);
+  const max = numeros.length > 0 ? Math.max(...numeros) : 0;
+  return `g${max + 1}`;
+}
+
 function resetGameForm() {
-  gameIdInput.value = `g${GAMES.length + 1}`;
+  gameIdInput.value = nextGameId();
   gameForm.querySelector('[name="date"]').value = "";
   gameForm.querySelector('[name="opponent"]').value = "";
   gameForm.querySelector('[name="weCloseBatting"]').value = "unknown";

@@ -94,7 +94,7 @@ export const PLAYERS = [
 //
 // export const GAMES = [
 //   {
-//     id: "g1",
+//     id: "g8", // el siguiente consecutivo (hay 7 juegos: g1…g7)
 //     date: "2026-03-01",
 //     opponent: "Nombre del rival",
 //     weCloseBatting: true,
@@ -118,7 +118,7 @@ export const PLAYERS = [
 // ];
 export const GAMES = [
   {
-    id: "g-1",
+    id: "g1",
     date: "2026-06-12",
     opponent: "BNG Agroproductos",
     weCloseBatting: null,
@@ -150,7 +150,7 @@ export const GAMES = [
     ],
   },
   {
-    id: "g0",
+    id: "g2",
     date: "2026-06-25",
     opponent: "Muñekos",
     weCloseBatting: false,
@@ -195,7 +195,7 @@ export const GAMES = [
     mvp: "p12",
   },
   {
-    id: "g1",
+    id: "g3",
     date: "2026-07-10",
     opponent: "Bronx",
     weCloseBatting: false,
@@ -245,7 +245,7 @@ export const GAMES = [
     mvp: "p10",
   },
   {
-    id: "g2",
+    id: "g4",
     date: "2026-07-21",
     opponent: "Los Pichichis",
     weCloseBatting: true,
@@ -421,5 +421,7 @@ export const GAMES = [
 
 // Próximos juegos (todavía sin jugar, sin marcador).
  export const SCHEDULE = [
+   // `time` es opcional: si no lo pones, solo se muestra la fecha.
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
+   { id: "s1", date: "2026-08-27", time: "21:00", opponent: "Rockin Roll" },
 ];
