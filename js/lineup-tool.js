@@ -1,17 +1,59 @@
 import { PLAYERS } from "./data.js";
-import { renderPositionBadge } from "./ui.js";
-import { primaryPosition, renderLineupResult } from "./lineup.js";
+import { DEFENSE_POSITIONS, registeredFieldPositions, renderLineupResult } from "./lineup.js";
 
 const listEl = document.getElementById("attendee-list");
 const countEl = document.getElementById("attendee-count");
 const resultEl = document.getElementById("lineup-result");
 
 const roster = [...PLAYERS].sort((a, b) => (a.number ?? 999) - (b.number ?? 999));
-const checkboxes = [];
+const entries = []; // { player, checkbox, select }
 
 function updateCount() {
-  const n = checkboxes.filter((c) => c.checked).length;
+  const n = entries.filter((e) => e.checkbox.checked).length;
   countEl.textContent = `${n} de ${roster.length} seleccionados`;
+}
+
+// El selector de posición: primero sus posiciones registradas en el roster
+// (lo más probable), luego el resto por si hoy juega en otro lado, y al
+// final "sin posición" para dejarle la decisión al algoritmo.
+function buildPositionSelect(player) {
+  const select = document.createElement("select");
+  select.className = "attendee-position";
+
+  const registered = registeredFieldPositions(player);
+  const others = DEFENSE_POSITIONS.filter((pos) => !registered.includes(pos));
+
+  if (registered.length > 0) {
+    const group = document.createElement("optgroup");
+    group.label = "Registradas";
+    for (const pos of registered) {
+      const opt = document.createElement("option");
+      opt.value = pos;
+      opt.textContent = pos;
+      group.appendChild(opt);
+    }
+    select.appendChild(group);
+  }
+
+  const otherGroup = document.createElement("optgroup");
+  otherGroup.label = "Otras";
+  for (const pos of others) {
+    const opt = document.createElement("option");
+    opt.value = pos;
+    opt.textContent = pos;
+    otherGroup.appendChild(opt);
+  }
+  select.appendChild(otherGroup);
+
+  const none = document.createElement("option");
+  none.value = "";
+  none.textContent = "Sin posición";
+  select.appendChild(none);
+
+  // Por default, su posición principal registrada — o "sin posición" si no
+  // tiene ninguna de las 9 de campo registrada.
+  select.value = registered[0] ?? "";
+  return select;
 }
 
 // Arranca con todos marcados: lo normal es que casi todo el equipo asista y
@@ -19,51 +61,55 @@ function updateCount() {
 for (const player of roster) {
   const row = document.createElement("label");
   row.className = "attendee-row checked";
-
-  const pos = primaryPosition(player);
   row.innerHTML = `
     <span class="attendee-name">
       <span class="num">#${player.number ?? "-"}</span>
       <span class="name">${player.name}</span>
     </span>
-    <span class="attendee-badges">${pos ? renderPositionBadge(pos) : ""}</span>
   `;
+
+  const select = buildPositionSelect(player);
+  row.appendChild(select);
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
-  checkbox.value = player.id;
   checkbox.checked = true;
   checkbox.addEventListener("change", () => {
     row.classList.toggle("checked", checkbox.checked);
+    select.disabled = !checkbox.checked;
     updateCount();
   });
   row.prepend(checkbox);
 
   listEl.appendChild(row);
-  checkboxes.push(checkbox);
+  entries.push({ player, checkbox, select });
 }
 
 updateCount();
 
 document.getElementById("select-all-btn").addEventListener("click", () => {
-  for (const c of checkboxes) {
-    c.checked = true;
-    c.closest(".attendee-row").classList.add("checked");
+  for (const e of entries) {
+    e.checkbox.checked = true;
+    e.select.disabled = false;
+    e.checkbox.closest(".attendee-row").classList.add("checked");
   }
   updateCount();
 });
 
 document.getElementById("select-none-btn").addEventListener("click", () => {
-  for (const c of checkboxes) {
-    c.checked = false;
-    c.closest(".attendee-row").classList.remove("checked");
+  for (const e of entries) {
+    e.checkbox.checked = false;
+    e.select.disabled = true;
+    e.checkbox.closest(".attendee-row").classList.remove("checked");
   }
   updateCount();
 });
 
 document.getElementById("generate-btn").addEventListener("click", () => {
-  const attendingIds = new Set(checkboxes.filter((c) => c.checked).map((c) => c.value));
-  const attendees = roster.filter((p) => attendingIds.has(p.id));
-  renderLineupResult(resultEl, attendees);
+  const attending = entries.filter((e) => e.checkbox.checked);
+  const attendees = attending.map((e) => e.player);
+  const gamePositionById = new Map(attending.map((e) => [e.player.id, e.select.value || null]));
+
+  renderLineupResult(resultEl, attendees, gamePositionById);
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
 });

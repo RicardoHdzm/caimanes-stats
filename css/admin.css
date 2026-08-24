@@ -310,11 +310,24 @@
   text-overflow: ellipsis;
 }
 
-.attendee-badges {
+/* Posición elegida para ESTE juego (no toca el registro del roster). Se
+   deshabilita cuando el jugador no asiste — su posición no importa si no
+   viene. */
+.attendee-position {
   margin-left: auto;
   flex-shrink: 0;
+  max-width: 118px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
 }
 
-.attendee-badges .pos-badge {
-  margin: 0;
+.attendee-position:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

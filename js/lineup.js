@@ -23,6 +23,13 @@ export function primaryPosition(player) {
   return positionsOf(player.position)[0] ?? null;
 }
 
+// Las posiciones de campo (de las 9) que el jugador tiene registradas en el
+// roster. Filtra códigos que no son posición de campo (DH, UTIL, JC, JD) —
+// esos no cuentan como elegibles para un lugar defensivo.
+export function registeredFieldPositions(player) {
+  return positionsOf(player.position).filter((pos) => DEFENSE_POSITIONS.includes(pos));
+}
+
 // Asigna las 9 posiciones en dos pasadas, usando solo candidatos de `roster`
 // (todo el equipo, o el subconjunto que asiste a un juego):
 // 1) cada jugador va a su posición principal si está libre (mejor OPS decide
@@ -69,6 +76,55 @@ export function assignDefense(roster, statsById) {
   return assignment;
 }
 
+// Variante de assignDefense para lineup.html: en vez de derivar la posición
+// del roster, cada jugador ya trae una posición elegida para ESTE juego
+// (`gamePositionById`) — su principal por default, pero el usuario puede
+// cambiarla a cualquier otra o dejarla en null ("sin posición", que decida
+// el algoritmo). Al ser una sola posición explícita por jugador, no hay
+// pasada de "posición secundaria": si dos coinciden en la misma posición,
+// el que pierde no se reacomoda solo, pasa a la banca (a menos que el
+// usuario le haya puesto otra posición a mano).
+//
+// Las posiciones que quedan vacías se llenan con quienes se dejaron en "sin
+// posición", del mejor OPS hacia abajo. Esto es bateo, no fildeo — es el
+// único dato que hay; no es una evaluación defensiva real, solo evita dejar
+// la posición vacía si hay alguien disponible.
+export function assignDefenseByChoice(roster, gamePositionById, statsById) {
+  const used = new Set();
+  const assignment = {};
+
+  function statsFor(p) {
+    return statsById.get(p.id) ?? emptyStats(p.id);
+  }
+
+  for (const pos of DEFENSE_POSITIONS) {
+    const candidates = roster
+      .filter((p) => gamePositionById.get(p.id) === pos && !used.has(p.id))
+      .map(statsFor)
+      .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+    if (candidates.length > 0) {
+      assignment[pos] = candidates[0];
+      used.add(candidates[0].playerId);
+    }
+  }
+
+  const flexible = roster
+    .filter((p) => !gamePositionById.get(p.id) && !used.has(p.id))
+    .map(statsFor)
+    .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+
+  for (const pos of DEFENSE_POSITIONS) {
+    if (assignment[pos]) continue;
+    const next = flexible.shift();
+    if (next) {
+      assignment[pos] = next;
+      used.add(next.playerId);
+    }
+  }
+
+  return assignment;
+}
+
 // Heurística clásica simplificada: el 4to bat (cleanup) se reserva primero
 // para el líder de home runs, sin importar su OBP. Luego 1-2 mejor OBP
 // (table-setters) y 3 mejor OPS (mejor bateador) salen del resto del grupo;
@@ -100,13 +156,13 @@ export function battingOrder(rows) {
   return order;
 }
 
-// Arma la alineación completa (defensa + orden al bat) a partir de un
-// roster candidato. El pitcher no batea en esta liga: el mejor bateador de
-// banca disponible (un JD, Jugador Designado) toma su turno, y el siguiente
-// mejor de banca entra como JC (Jugador de Cortesía) — ninguno de los dos
-// juega campo. Sin banca, el pitcher batea por su cuenta.
-export function buildLineup(roster, statsById) {
-  const assignment = assignDefense(roster, statsById);
+// A partir de una asignación defensiva YA HECHA (por assignDefense o por
+// assignDefenseByChoice), arma el resto: banca y orden al bat. El pitcher no
+// batea en esta liga: el mejor bateador de banca disponible (un JD, Jugador
+// Designado) toma su turno, y el siguiente mejor de banca entra como JC
+// (Jugador de Cortesía) — ninguno de los dos juega campo. Sin banca, el
+// pitcher batea por su cuenta.
+export function buildLineupFromAssignment(roster, statsById, assignment) {
   const usedIds = new Set(Object.values(assignment).filter(Boolean).map((r) => r.playerId));
 
   function bestBenchPlayer() {
@@ -152,10 +208,23 @@ export function buildLineup(roster, statsById) {
   return { assignment, order, batterLabel, pitcherBats };
 }
 
+// Arma la alineación completa (defensa + orden al bat) derivando la defensa
+// de las posiciones registradas en el roster — lo que usa la pestaña
+// Alineación con todo el equipo, sin elección manual por jugador.
+export function buildLineup(roster, statsById) {
+  return buildLineupFromAssignment(roster, statsById, assignDefense(roster, statsById));
+}
+
 // Pinta las dos secciones (orden al bat + posiciones sugeridas) dentro de
 // `container` a partir de un roster candidato. `container` se limpia
 // primero — se puede volver a llamar para regenerar con otro roster.
-export function renderLineupResult(container, roster) {
+//
+// `gamePositionById` es opcional: un Map playerId -> posición elegida para
+// este juego (o null/"" para "sin posición"). Si se omite, la defensa se
+// deriva de las posiciones registradas en el roster (lo que usa la pestaña
+// Alineación); si se da, cada jugador va a la posición que se le eligió a
+// mano (lo que usa lineup.html).
+export function renderLineupResult(container, roster, gamePositionById = null) {
   container.innerHTML = "";
 
   if (roster.length === 0) {
@@ -167,7 +236,10 @@ export function renderLineupResult(container, roster) {
   }
 
   const statsById = new Map(battingTotals(GAMES).map((r) => [r.playerId, r]));
-  const { assignment, order, batterLabel, pitcherBats } = buildLineup(roster, statsById);
+  const assignment = gamePositionById
+    ? assignDefenseByChoice(roster, gamePositionById, statsById)
+    : assignDefense(roster, statsById);
+  const { order, batterLabel, pitcherBats } = buildLineupFromAssignment(roster, statsById, assignment);
 
   const orderHeading = document.createElement("h3");
   orderHeading.textContent = "Orden al bat sugerido";
