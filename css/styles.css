@@ -236,6 +236,53 @@ body {
   overflow-x: auto;
 }
 
+/* Pista de que la nav se desliza: un chevron que rebota suave sobre un
+   difuminado corto, pegado al borde derecho. `position: absolute` para que
+   NO se mueva con el scroll (si fuera un hijo normal del flex, se iría de
+   vista junto con las pestañas). `pointer-events: none` para no tapar el tap
+   sobre la pestaña que queda debajo. Oculto por default — main.js prende
+   `.tabs-has-more` solo cuando de verdad hay algo escondido a la derecha. */
+.tabs-scroll-hint {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  pointer-events: none;
+  background: linear-gradient(to left, var(--bg) 45%, transparent);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tabs.tabs-has-more .tabs-scroll-hint {
+  opacity: 1;
+}
+
+.tabs-scroll-hint i {
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  animation: tabs-scroll-hint-nudge 1.4s ease-in-out infinite;
+}
+
+@keyframes tabs-scroll-hint-nudge {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabs-scroll-hint i {
+    animation: none;
+  }
+}
+
 .tabs a {
   font-family: var(--font-display);
   display: flex;

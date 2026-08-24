@@ -67,6 +67,11 @@
     <a href="#/calendario" data-route="calendario">Calendario</a>
     <a href="#/standing" data-route="standing">Standing</a>
     <a href="#/alineacion" data-route="alineacion">Alineación</a>
+    <!-- Pista de que la nav se desliza en horizontal (le quitamos la
+         scrollbar nativa por fea, así que sin esto no había ninguna señal).
+         main.js la muestra solo cuando de verdad hay pestañas ocultas a la
+         derecha, y la esconde al llegar al final. -->
+    <span class="tabs-scroll-hint" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
   </nav>
 
   <main id="app"></main>

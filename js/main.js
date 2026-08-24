@@ -61,6 +61,24 @@ function render() {
 window.addEventListener("hashchange", render);
 render();
 
+// Prende la flecha que indica que la nav se desliza (ver .tabs-scroll-hint
+// en index.html/styles.css) solo cuando de verdad hay pestañas ocultas a la
+// derecha, y la apaga al llegar al final. Nunca hace falta una flecha hacia
+// la izquierda: el scroll siempre arranca en 0, con la primera pestaña ya
+// visible, así que no hay nada escondido de ese lado al inicio.
+function updateTabsHint() {
+  const maxScroll = tabs.scrollWidth - tabs.clientWidth;
+  tabs.classList.toggle("tabs-has-more", tabs.scrollLeft < maxScroll - 4);
+}
+
+tabs.addEventListener("scroll", updateTabsHint, { passive: true });
+window.addEventListener("resize", updateTabsHint);
+updateTabsHint();
+// Barlow Condensed carga async (font-display: swap) y puede angostar el
+// texto de las pestañas al llegar — se recalcula por si eso cambia si hace
+// falta la flecha.
+document.fonts?.ready.then(updateTabsHint);
+
 // Service worker: deja abrir la página sin señal (en el campo casi nunca hay
 // datos). Si falla el registro la app sigue funcionando normal, solo pierde
 // el modo offline — por eso el catch silencioso.
