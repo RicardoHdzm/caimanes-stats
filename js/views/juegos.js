@@ -41,7 +41,9 @@ export function renderJuegos(container) {
       id: g.id,
       date: g.date,
       opponent: g.opponent,
-      close: g.weCloseBatting == null ? "?" : g.weCloseBatting ? "Local" : "Visitante",
+      // No es una sede: en esta liga no hay local/visitante, solo quién
+      // batea al final de cada entrada.
+      close: g.weCloseBatting == null ? "?" : g.weCloseBatting ? "Nosotros" : "El rival",
       score: known ? `${g.scoreUs} - ${g.scoreThem}` : "Pendiente",
       result: gameResult(g) ?? "",
     };
@@ -54,7 +56,7 @@ export function renderJuegos(container) {
     columns: [
       { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
-      { key: "close", label: "Sede" },
+      { key: "close", label: "Cierra bateando" },
       { key: "score", label: "Marcador" },
       { key: "result", label: "Resultado", render: (value) => RESULT_BADGE[value] ?? UNKNOWN_BADGE },
     ],

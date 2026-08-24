@@ -58,9 +58,12 @@ export const PLAYERS = [
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se
 // referencia al jugador con playerId (usa los id de arriba, ej. "p1").
 // Si un jugador no participó en algo (ej. no pitcheó ese juego), simplemente
-// no aparece en ese arreglo. En esta liga no hay local/visitante oficial, así
-// que se toma como Local a quien cierra bateando (weCloseBatting: true si
-// nosotros cerramos bateando = Local; false si cierra el rival = Visitante).
+// no aparece en ese arreglo.
+//
+// `weCloseBatting` NO es una sede: en esta liga no hay local ni visitante,
+// todos juegan en el mismo campo. Es solo quién batea al final de cada
+// entrada — true si cerramos nosotros, false si cierra el rival, null si
+// todavía no se sabe.
 //
 // Cada línea de `batting` es también el line-up: `order` es el turno al bat
 // (1, 2, 3...) y `position` la posición que jugó ese jugador ESE juego (puede
