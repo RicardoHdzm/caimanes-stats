@@ -236,6 +236,40 @@ body {
   overflow-x: auto;
 }
 
+/* Pista de que la nav se puede deslizar: un difuminado en el borde, solo del
+   lado donde de verdad hay pestañas ocultas (main.js pone/quita las clases
+   según el scroll). `pointer-events: none` para que no tape el tap sobre la
+   pestaña que queda justo debajo del difuminado. */
+.tabs::before,
+.tabs::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.tabs::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), transparent);
+}
+
+.tabs::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), transparent);
+}
+
+.tabs.tabs-fade-left::before {
+  opacity: 1;
+}
+
+.tabs.tabs-fade-right::after {
+  opacity: 1;
+}
+
 .tabs a {
   font-family: var(--font-display);
   display: flex;
