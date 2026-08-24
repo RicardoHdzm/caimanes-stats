@@ -1224,6 +1224,53 @@ main h3::before {
   }
 }
 
+/* ---- feed de Instagram ---- */
+
+/* Los embeds de Instagram son un iframe propio de instagram.com: siempre
+   traen fondo blanco y no se pueden restylear por dentro (cross-origin), así
+   que no hay forma de que combinen con el tema oscuro. Se centran en una
+   grilla pareja para que al menos el alrededor se vea ordenado. */
+.instagram-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(326px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.instagram-feed iframe,
+.instagram-feed blockquote {
+  max-width: 100%;
+}
+
+/* Respaldo mientras embed.js no ha procesado el blockquote (carga lenta) o
+   nunca lo hace (sin internet): un link plano con el mismo aire del resto
+   del sitio, en vez de la tarjeta en blanco de Instagram sin cargar. */
+.instagram-fallback-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 326px;
+  max-width: 540px;
+  padding: 32px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.instagram-fallback-link:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.instagram-fallback-link i {
+  font-size: 1.2rem;
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {

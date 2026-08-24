@@ -1,4 +1,4 @@
-import { GAMES, SCHEDULE, TEAM } from "../data.js";
+import { GAMES, SCHEDULE, TEAM, INSTAGRAM_POSTS } from "../data.js";
 import {
   teamRecord,
   battingTotals,
@@ -12,6 +12,7 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading } from "../ui.js";
+import { renderInstagramFeed } from "../instagram.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -247,5 +248,13 @@ export function renderResumen(container) {
     }
 
     container.appendChild(recordsRow);
+  }
+
+  // ---- Instagram ----
+  if (INSTAGRAM_POSTS.length > 0) {
+    const igHeading = document.createElement("h3");
+    igHeading.textContent = "Instagram";
+    container.appendChild(igHeading);
+    renderInstagramFeed(container, INSTAGRAM_POSTS);
   }
 }

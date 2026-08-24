@@ -112,6 +112,19 @@
       <button type="button" class="copy-btn" data-target="game-code"><i class="fa-solid fa-copy"></i> Copiar</button>
     </div>
   </section>
+
+  <section class="admin-section">
+    <h2>Agregar publicación de Instagram</h2>
+    <p class="subtitle">Pega el link del post y copia el código en <code>INSTAGRAM_POSTS</code> dentro de <code>js/data.js</code> — agrégalo hasta arriba del arreglo para que salga primero.</p>
+    <form id="instagram-form" class="admin-form">
+      <label>Link del post<input type="url" name="url" placeholder="https://www.instagram.com/p/XXXXXXXXXXX/" required /></label>
+      <button type="submit"><i class="fa-solid fa-code"></i> Generar código</button>
+    </form>
+    <div class="code-output" id="instagram-output" hidden>
+      <pre><code id="instagram-code"></code></pre>
+      <button type="button" class="copy-btn" data-target="instagram-code"><i class="fa-solid fa-copy"></i> Copiar</button>
+    </div>
+  </section>
 </main>
 
 <footer class="footer">
