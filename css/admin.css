@@ -215,3 +215,106 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* ---- checklist de asistentes (lineup.html) ---- */
+
+.attendee-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.attendee-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendee-controls button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.attendee-count {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.attendee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.attendee-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.attendee-row:hover {
+  border-color: var(--accent);
+}
+
+/* Marcado = asiste al juego; usa el verde de victorias del resto del sitio
+   para que se lea como "sí, cuenta" sin inventar un color nuevo. */
+.attendee-row.checked {
+  border-color: var(--win);
+  background: rgba(63, 181, 111, 0.1);
+}
+
+.attendee-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--win);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.attendee-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.attendee-name .num {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+}
+
+.attendee-name .name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attendee-badges {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.attendee-badges .pos-badge {
+  margin: 0;
+}
