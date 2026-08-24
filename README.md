@@ -31,10 +31,6 @@ a GitHub para que se reflejen en la página publicada.
 - **`STANDINGS`**: la tabla de posiciones de la liga, se copia tal cual la
   publican (no se calcula sola). Actualízala a mano cada vez que la liga
   saque una nueva.
-- **`INSTAGRAM_POSTS`**: arreglo de links a posts de Instagram, el más nuevo
-  hasta arriba. Se muestran en el Resumen con el embed oficial de Instagram
-  — a diferencia del resto del sitio, **esta sección necesita internet**
-  para verse (sin señal se ve un link de texto en vez de la tarjeta).
 
 Las entradas pitcheadas (`IP`) usan la notación estándar de béisbol/softbol:
 `.1` = 1 out, `.2` = 2 outs (ej. `4.2` = 4 entradas completas + 2 outs).

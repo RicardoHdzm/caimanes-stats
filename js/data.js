@@ -463,18 +463,3 @@ export const STANDINGS = {
     { pos: 18, team: "Pichichi Blue Jeys", JJ: 7, JG: 0, JE: 0, JP: 7, CF: 36, CC: 99 },
   ],
 };
-
-// Últimas publicaciones de Instagram que se muestran en el Resumen. Solo el
-// link del post — Instagram trae el resto (foto, texto, likes) él solo al
-// momento de mostrarlo, así que ESA sección necesita internet; sin señal se
-// ve solo un link de texto en vez de la tarjeta con imagen (el resto del
-// sitio sigue funcionando offline normal).
-// El primero de la lista es el que sale primero: agrega los nuevos arriba.
-export const INSTAGRAM_POSTS = [
-  "https://www.instagram.com/p/DcSjvwfgbcR/",
-  "https://www.instagram.com/p/DbXRg_dgYk7/",
-  "https://www.instagram.com/p/DbFhq9xqbuA/",
-  "https://www.instagram.com/p/DaqdgsOxG4I/",
-  "https://www.instagram.com/p/DX9mFzhRWF3/",
-  "https://www.instagram.com/p/DWIhIm7ipC-/",
-];

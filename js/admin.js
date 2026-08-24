@@ -335,18 +335,6 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   gameOutput.hidden = false;
 });
 
-// ---- Agregar publicación de Instagram ----
-const instagramForm = document.getElementById("instagram-form");
-const instagramOutput = document.getElementById("instagram-output");
-const instagramCode = document.getElementById("instagram-code");
-
-instagramForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const url = new FormData(instagramForm).get("url").trim();
-  instagramCode.textContent = `  ${JSON.stringify(url)},`;
-  instagramOutput.hidden = false;
-});
-
 for (const btn of document.querySelectorAll(".copy-btn")) {
   btn.addEventListener("click", () => {
     const target = document.getElementById(btn.dataset.target);
