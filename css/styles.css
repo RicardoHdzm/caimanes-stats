@@ -132,7 +132,10 @@ body {
   color: var(--text);
 }
 
+/* `position: relative` es lo que ancla al ícono de Instagram (position:
+   absolute) a ESTA caja y no a la página completa. */
 .topbar {
+  position: relative;
   padding: 18px 0px 0;
   border-bottom: 1px solid var(--border);
   background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 55%);
@@ -140,9 +143,7 @@ body {
 
 .topbar-inner {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  justify-content: center;
   padding-bottom: 8px;
 }
 
@@ -177,12 +178,17 @@ body {
   background: var(--surface);
 }
 
+/* Ancla a la esquina superior derecha del header (ver `position: relative`
+   en .topbar) en vez de ir en el flujo normal junto al logo. */
 .social-link {
+  position: absolute;
+  top: 16px;
+  right: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -197,7 +203,20 @@ body {
 }
 
 .social-link i {
-  font-size: var(--text-lg);
+  font-size: var(--text-2xl);
+}
+
+@media (max-width: 640px) {
+  .social-link {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .social-link i {
+    font-size: var(--text-xl);
+  }
 }
 
 /* Se queda pegada arriba al hacer scroll, así el sitio no obliga a volver
