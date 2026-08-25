@@ -56,11 +56,10 @@ function buildPositionSelect(player) {
   return select;
 }
 
-// Arranca con todos marcados: lo normal es que casi todo el equipo asista y
-// solo haya que destildar a quien falte, en vez de marcar uno por uno.
+// Arranca con todos desmarcados: hay que marcar a mano a quien sí va.
 for (const player of roster) {
   const row = document.createElement("label");
-  row.className = "attendee-row checked";
+  row.className = "attendee-row";
   row.innerHTML = `
     <span class="attendee-name">
       <span class="num">#${player.number ?? "-"}</span>
@@ -69,11 +68,12 @@ for (const player of roster) {
   `;
 
   const select = buildPositionSelect(player);
+  select.disabled = true;
   row.appendChild(select);
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
-  checkbox.checked = true;
+  checkbox.checked = false;
   checkbox.addEventListener("change", () => {
     row.classList.toggle("checked", checkbox.checked);
     select.disabled = !checkbox.checked;
