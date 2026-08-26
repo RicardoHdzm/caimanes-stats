@@ -274,14 +274,16 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     RBI: row.RBI,
   }));
 
-  // El pitcher no batea, pero se muestra al final como referencia de quién
-  // ocupa esa posición defensiva.
+  // El pitcher no batea (batea el JD en su lugar), pero se muestra al final
+  // como referencia de quién ocupa esa posición defensiva — con una nota
+  // aparte para que no se lea como un turno al bat más.
   if (!pitcherBats && assignment.P) {
     const pitcherStats = statsById.get(assignment.P.playerId) ?? emptyStats(assignment.P.playerId);
     orderRows.push({
       slot: orderRows.length + 1,
       slotDisplay: "P",
       name: pitcherStats.name,
+      note: "No batea — batea el JD en su lugar",
       position: "P",
       AVG: pitcherStats.AVG,
       OBP: pitcherStats.OBP,
@@ -294,7 +296,12 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
 
   const orderColumns = [
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
-    { key: "name", label: "Jugador", sticky: true },
+    {
+      key: "name",
+      label: "Jugador",
+      sticky: true,
+      render: (v, row) => (row.note ? `${v}<div class="lineup-note">${row.note}</div>` : v),
+    },
     { key: "position", label: "Pos", full: "Posición", render: (v) => renderPositionBadge(v) },
     { key: "AVG", label: "AVG", full: "Promedio", numeric: true },
     { key: "OBP", label: "OBP", full: "Porcentaje de embasado", numeric: true },
