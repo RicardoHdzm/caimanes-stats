@@ -45,6 +45,22 @@ function buildPositionSelect(player) {
   }
   select.appendChild(otherGroup);
 
+  // JD/JC son bateadores de banca, no posiciones de campo: por default el
+  // algoritmo elige solo al mejor bate libre para cada uno, pero aquí se
+  // puede reservar a alguien en particular a propósito.
+  const benchGroup = document.createElement("optgroup");
+  benchGroup.label = "Banca";
+  for (const [value, label] of [
+    ["JD", "JD — Jugador Designado"],
+    ["JC", "JC — Jugador de Cortesía"],
+  ]) {
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = label;
+    benchGroup.appendChild(opt);
+  }
+  select.appendChild(benchGroup);
+
   const none = document.createElement("option");
   none.value = "";
   none.textContent = "Sin posición";

@@ -158,18 +158,34 @@ export function battingOrder(rows) {
 
 // A partir de una asignación defensiva YA HECHA (por assignDefense o por
 // assignDefenseByChoice), arma el resto: banca y orden al bat. El pitcher no
-// batea en esta liga: el mejor bateador de banca disponible (un JD, Jugador
-// Designado) toma su turno, y el siguiente mejor de banca entra como JC
-// (Jugador de Cortesía) — ninguno de los dos juega campo. Sin banca, el
-// pitcher batea por su cuenta.
-export function buildLineupFromAssignment(roster, statsById, assignment) {
+// batea en esta liga: alguien de banca toma su turno como JD (Jugador
+// Designado), y otro más puede entrar como JC (Jugador de Cortesía) —
+// ninguno de los dos juega campo. Sin banca, el pitcher batea por su cuenta.
+//
+// `gamePositionById` es opcional: si viene (desde lineup.html), un jugador
+// puede haber elegido "JD" o "JC" a propósito para este juego — ese elige
+// primero, mejor OPS gana empates. Si nadie lo eligió a propósito (o viene
+// de la pestaña Alineación, que no tiene ese selector), se rellena con el
+// mejor bate que siga libre, como siempre.
+export function buildLineupFromAssignment(roster, statsById, assignment, gamePositionById = null) {
   const usedIds = new Set(Object.values(assignment).filter(Boolean).map((r) => r.playerId));
 
-  function bestBenchPlayer() {
+  function statsFor(p) {
+    return statsById.get(p.id) ?? emptyStats(p.id);
+  }
+
+  function pickBenchRole(role) {
+    if (gamePositionById) {
+      const explicit = roster
+        .filter((p) => gamePositionById.get(p.id) === role && !usedIds.has(p.id))
+        .map(statsFor)
+        .sort((a, b) => Number(b.OPS) - Number(a.OPS))[0];
+      if (explicit) return explicit;
+    }
     return (
       roster
         .filter((p) => !usedIds.has(p.id))
-        .map((p) => statsById.get(p.id) ?? emptyStats(p.id))
+        .map(statsFor)
         .sort((a, b) => Number(b.OPS) - Number(a.OPS))[0] ?? null
     );
   }
@@ -185,7 +201,7 @@ export function buildLineupFromAssignment(roster, statsById, assignment) {
     }
   }
 
-  const jd = bestBenchPlayer();
+  const jd = pickBenchRole("JD");
   let pitcherBats = false;
   if (jd) {
     usedIds.add(jd.playerId);
@@ -197,7 +213,7 @@ export function buildLineupFromAssignment(roster, statsById, assignment) {
     pitcherBats = true;
   }
 
-  const jc = bestBenchPlayer();
+  const jc = pickBenchRole("JC");
   if (jc) {
     usedIds.add(jc.playerId);
     starters.push(jc);
@@ -239,7 +255,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   const assignment = gamePositionById
     ? assignDefenseByChoice(roster, gamePositionById, statsById)
     : assignDefense(roster, statsById);
-  const { order, batterLabel, pitcherBats } = buildLineupFromAssignment(roster, statsById, assignment);
+  const { order, batterLabel, pitcherBats } = buildLineupFromAssignment(roster, statsById, assignment, gamePositionById);
 
   const orderHeading = document.createElement("h3");
   orderHeading.textContent = "Orden al bat sugerido";
