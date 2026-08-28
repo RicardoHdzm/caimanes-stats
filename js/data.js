@@ -425,8 +425,8 @@ export const GAMES = [
     date: "2026-08-27",
     opponent: "Rockin' Roll",
     weCloseBatting: false,
-    scoreUs: 17,
-    scoreThem: 2,
+    scoreUs: 2,
+    scoreThem: 17,
     batting: [
       { playerId: "p6", order: 1, position: "C", AB: 2, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
       { playerId: "p10", order: 2, position: "LF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
