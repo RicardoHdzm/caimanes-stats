@@ -420,7 +420,8 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/4013545158944159",
     mvp: "p19",
   },
-    {
+    // Reemplaza el bloque completo del juego "g8" en GAMES por esto:
+  {
     id: "g8",
     date: "2026-08-27",
     opponent: "Rockin' Roll",
@@ -438,7 +439,7 @@ export const GAMES = [
       { playerId: "p13", order: 8, position: "RF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
       { playerId: "p17", order: 9, position: "JD", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
       { playerId: "p11", order: 10, position: "JC", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
-      { playerId: "p12", order: 4, position: "1B", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p12", order: 4, position: "1B", AB: 1, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
     ],
     pitching: [
       { playerId: "p14", IP: 3, H: 19, R: 13, ER: 0, BB: 1, SO: 0, HR: 2, decision: "L" },
