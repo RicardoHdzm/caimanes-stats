@@ -420,6 +420,47 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/4013545158944159",
     mvp: "p19",
   },
+    {
+    id: "g8",
+    date: "2026-08-27",
+    opponent: "Rockin' Roll",
+    weCloseBatting: false,
+    scoreUs: 17,
+    scoreThem: 2,
+    batting: [
+      { playerId: "p6", order: 1, position: "C", AB: 2, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p10", order: 2, position: "LF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p5", order: 3, position: "SS", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p9", order: 4, position: "1B", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p3", order: 5, position: "2B", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p4", order: 6, position: "CF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p15", order: 7, position: "3B", AB: 1, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 1, SO: 0, SB: 0 },
+      { playerId: "p13", order: 8, position: "RF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p17", order: 9, position: "JD", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p11", order: 10, position: "JC", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p12", order: 4, position: "1B", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+    ],
+    pitching: [
+      { playerId: "p14", IP: 3, H: 19, R: 13, ER: 0, BB: 1, SO: 0, HR: 2, decision: "L" },
+      { playerId: "p16", IP: 1, H: 5, R: 4, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+    ],
+    fielding: [
+      { playerId: "p14", PO: 0, A: 0, E: 0 },
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p9", PO: 0, A: 0, E: 1 },
+      { playerId: "p3", PO: 4, A: 0, E: 0 },
+      { playerId: "p15", PO: 0, A: 1, E: 3 },
+      { playerId: "p5", PO: 2, A: 0, E: 0 },
+      { playerId: "p10", PO: 1, A: 0, E: 2 },
+      { playerId: "p4", PO: 1, A: 0, E: 0 },
+      { playerId: "p13", PO: 0, A: 0, E: 0 },
+      { playerId: "p12", PO: 0, A: 0, E: 0 },
+    ],
+    substitutions: [
+      { inning: 4, type: "bateo", playerOut: "p9", playerIn: "p12", position: "1B" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/2716295835456307/",
+  },
 ];
 
 // Próximos juegos (todavía sin jugar, sin marcador).
