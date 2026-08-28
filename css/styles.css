@@ -709,7 +709,7 @@ main h3::before {
    sola y le impondría el tamaño grande en itálicas del líder. */
 .leader-card .leader-note {
   margin: 10px 0 0;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: 500;
   font-style: normal;
   line-height: 1.6;
