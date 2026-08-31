@@ -468,7 +468,7 @@ export const GAMES = [
  export const SCHEDULE = [
    // `time` es opcional: si no lo pones, solo se muestra la fecha.
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
-   { id: "s1", date: "2026-08-27", time: "21:00", opponent: "Rockin Roll" },
+   { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
 ];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
