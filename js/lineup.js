@@ -1,6 +1,6 @@
 // Motor de alineación: arma las 9 posiciones defensivas y el orden al bat a
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
-// "Alineación" (con todo el equipo) y la herramienta lineup.html (con solo
+// "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
 import { GAMES } from "./data.js";
 import { battingTotals, playerName } from "./stats.js";
@@ -76,7 +76,7 @@ export function assignDefense(roster, statsById) {
   return assignment;
 }
 
-// Variante de assignDefense para lineup.html: en vez de derivar la posición
+// Variante de assignDefense para lineup/: en vez de derivar la posición
 // del roster, cada jugador ya trae una posición elegida para ESTE juego
 // (`gamePositionById`) — su principal por default, pero el usuario puede
 // cambiarla a cualquier otra o dejarla en null ("sin posición", que decida
@@ -162,7 +162,7 @@ export function battingOrder(rows) {
 // Designado), y otro más puede entrar como JC (Jugador de Cortesía) —
 // ninguno de los dos juega campo. Sin banca, el pitcher batea por su cuenta.
 //
-// `gamePositionById` es opcional: si viene (desde lineup.html), un jugador
+// `gamePositionById` es opcional: si viene (desde lineup/), un jugador
 // puede haber elegido "JD" o "JC" a propósito para este juego — ese elige
 // primero, mejor OPS gana empates. Si nadie lo eligió a propósito (o viene
 // de la pestaña Alineación, que no tiene ese selector), se rellena con el
@@ -239,7 +239,7 @@ export function buildLineup(roster, statsById) {
 // este juego (o null/"" para "sin posición"). Si se omite, la defensa se
 // deriva de las posiciones registradas en el roster (lo que usa la pestaña
 // Alineación); si se da, cada jugador va a la posición que se le eligió a
-// mano (lo que usa lineup.html).
+// mano (lo que usa lineup/).
 export function renderLineupResult(container, roster, gamePositionById = null) {
   container.innerHTML = "";
 

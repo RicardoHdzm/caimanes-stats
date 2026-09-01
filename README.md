@@ -13,7 +13,7 @@ de código listo para pegar en `data.js` (no guarda nada por sí sola, solo
 arma el texto). Después de pegar el código, sube (commit + push) los cambios
 a GitHub para que se reflejen en la página publicada.
 
-Otra herramienta local, [`lineup.html`](lineup.html), sugiere la alineación
+Otra herramienta local, [`lineup/`](lineup/index.html), sugiere la alineación
 (orden al bat + las 9 posiciones) a partir de quién marques como asistente a
 un juego — usa el mismo cálculo que la pestaña Alineación del sitio (stats
 de temporada + posiciones del roster), pero solo con los jugadores presentes
@@ -63,11 +63,11 @@ los edites a mano.
 ```
 index.html          shell de la app
 admin.html            herramienta local: genera el código para pegar en data.js
-lineup.html             herramienta local: sugiere alineación según quién asiste
+lineup/index.html       herramienta local: sugiere alineación según quién asiste (se abre como /lineup)
 manifest.webmanifest      metadatos del PWA (nombre, iconos, colores)
 sw.js                       service worker: hace que la página abra sin señal
 css/styles.css               estilos
-css/admin.css                 estilos de admin.html y lineup.html
+css/admin.css                 estilos de admin.html y lineup/
 js/data.js                     roster y juegos (lo editas tú cada semana)
 js/stats.js                     cálculo de promedios, totales y récords
 js/ui.js                         tabla ordenable reutilizable
@@ -75,7 +75,7 @@ js/charts.js                      gráficas en SVG (tendencia de bateo)
 js/lineup.js                       motor de alineación (defensa + orden al bat)
 js/main.js                          router de las pestañas
 js/admin.js                          lógica de admin.html
-js/lineup-tool.js                     lógica de lineup.html
+js/lineup-tool.js                     lógica de lineup/index.html
 js/views/                              una vista por pestaña (comparar.js va dentro de alineacion.js)
 assets/logo.png                         logo del equipo
 assets/thumbnail.png                     preview al compartir el link (1200x630)

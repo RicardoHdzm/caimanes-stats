@@ -24,7 +24,13 @@ while ($listener.IsListening) {
   try {
     $path = $request.Url.AbsolutePath
     if ($path -eq "/") { $path = "/index.html" }
-    $filePath = Join-Path $Root ($path.TrimStart("/"))
+    $filePath = Join-Path $Root ($path.TrimEnd("/").TrimStart("/"))
+    # Como en GitHub Pages / Vercel: una carpeta sin archivo exacto (ej.
+    # /lineup o /lineup/) sirve su index.html — así las URLs sin extensión
+    # se prueban igual en local que en producción.
+    if (-not (Test-Path $filePath -PathType Leaf) -and (Test-Path $filePath -PathType Container)) {
+      $filePath = Join-Path $filePath "index.html"
+    }
     if (Test-Path $filePath -PathType Leaf) {
       $ext = [System.IO.Path]::GetExtension($filePath)
       $contentType = $mime[$ext]
