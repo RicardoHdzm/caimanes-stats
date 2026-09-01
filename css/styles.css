@@ -1534,17 +1534,6 @@ main h3::before {
   gap: 12px;
 }
 
-/* Nota bajo el nombre del pitcher en el orden al bat cuando hay JD: sus
-   números de esa fila son referencia (por si acaso), no un turno real. */
-.lineup-note {
-  margin-top: 2px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  font-style: italic;
-  color: var(--muted);
-  white-space: normal;
-}
-
 .record-card {
   display: flex;
   align-items: flex-start;
