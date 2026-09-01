@@ -9,7 +9,7 @@ export function renderAlineacion(container, compareLeft, compareRight) {
   heading(
     container,
     "Sugerencia de alineación",
-    "Calculada solo con stats de bateo y las posiciones registradas en el roster — no considera condición física, lesiones ni criterio del cuerpo técnico. Para armarla solo con quienes asisten a un juego en particular, usa /lineup."
+    "Calculada solo con stats de bateo y las posiciones registradas en el roster."
   );
 
   const resultEl = document.createElement("div");
