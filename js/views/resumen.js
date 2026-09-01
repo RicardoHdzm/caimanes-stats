@@ -50,7 +50,7 @@ export function renderResumen(container) {
 
   const rec = teamRecord(GAMES);
   const cards = document.createElement("div");
-  cards.className = "cards";
+  cards.className = "cards tab-carousel";
   cards.innerHTML = `
     <div class="card">
       <i class="fa-solid fa-trophy card-icon"></i>
@@ -143,7 +143,7 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders grid-4 team-stats-row";
+  teamRow.className = "leaders grid-4 team-stats-row tab-carousel";
   teamRow.innerHTML = `
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
@@ -178,7 +178,7 @@ export function renderResumen(container) {
   container.appendChild(leadersHeading);
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-4";
+  leadersRow.className = "leaders grid-4 tab-carousel";
   leadersRow.innerHTML =
     leaderCardHtml(
       "fa-baseball-bat-ball",
@@ -219,7 +219,7 @@ export function renderResumen(container) {
     container.appendChild(recordsHeading);
 
     const recordsRow = document.createElement("div");
-    recordsRow.className = "records-grid";
+    recordsRow.className = "records-grid tab-carousel";
     recordsRow.innerHTML = records
       .map(
         (r) => `

@@ -265,6 +265,13 @@ body {
   box-shadow: 0 2px 12px var(--accent-glow);
 }
 
+/* Barra de pestañas de abajo y su panel "Más": ocultas por default (esto es
+   lo que se ve en escritorio, donde la nav de arriba de siempre sigue
+   siendo la real). El media query de abajo las prende solo en celular. */
+.bottom-tabs {
+  display: none;
+}
+
 @media (max-width: 640px) {
   .brand-logo {
     height: 104px;
@@ -294,6 +301,104 @@ body {
   .tabs a {
     padding: 7px 12px;
     font-size: var(--text-sm);
+  }
+}
+
+@media (max-width: 640px) {
+  /* La barra de abajo reemplaza a la de arriba en celular — las dos juntas
+     serían redundantes y se comerían pantalla por partida doble. */
+  .tabs {
+    display: none;
+  }
+
+  /* Espacio para que la barra fija no tape lo último del contenido ni el
+     pie de página — el alto real de .bottom-tabs más un colchón. */
+  main {
+    padding-bottom: 88px;
+  }
+
+  .footer {
+    margin-bottom: 68px;
+  }
+
+  .bottom-tabs {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottom-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 2px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .bottom-tab i {
+    font-size: 18px;
+  }
+
+  .bottom-tab.active {
+    color: var(--accent-text);
+  }
+
+  /* El panel "Más" arranca oculto vía el atributo `hidden` del HTML — solo
+     hace falta describir cómo se ve cuando JS se lo quita. Va ANTES que
+     .bottom-tabs en el DOM para apilarse encima sin z-index especial. */
+  .more-sheet:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    z-index: 39;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    box-shadow: var(--shadow-raised);
+  }
+
+  .more-sheet a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .more-sheet a:hover,
+  .more-sheet a.active {
+    background: var(--surface-alt);
+    color: var(--accent-text);
+  }
+
+  .more-sheet a i {
+    width: 18px;
+    text-align: center;
+    color: var(--muted);
   }
 }
 
@@ -630,6 +735,40 @@ main h3::before {
   .grid-3,
   .grid-4 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Carrusel horizontal para las filas de tarjetas de Resumen (récord,
+     stats de equipo, líderes, récords de temporada) — reemplaza la grilla
+     de 2 columnas de arriba solo donde la vista agrega `tab-carousel` al
+     contenedor. Compuesto con la clase base (`.cards.tab-carousel`, no
+     `.tab-carousel` suelto) para ganarle por especificidad a esa grilla sin
+     depender de en qué orden queden declaradas las reglas. Cada tarjeta al
+     82% del ancho dice "hay más" con solo asomar el borde de la siguiente
+     — nada de JS de scroll, que ya se intentó antes en esta sesión y costó
+     más de lo que valía verificar. */
+  .cards.tab-carousel,
+  .leaders.tab-carousel,
+  .records-grid.tab-carousel {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 10px;
+    padding-bottom: 2px;
+  }
+
+  .cards.tab-carousel::-webkit-scrollbar,
+  .leaders.tab-carousel::-webkit-scrollbar,
+  .records-grid.tab-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cards.tab-carousel > *,
+  .leaders.tab-carousel > *,
+  .records-grid.tab-carousel > * {
+    scroll-snap-align: start;
+    flex: 0 0 82%;
   }
 }
 

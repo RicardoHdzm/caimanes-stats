@@ -79,6 +79,14 @@
     Caimanes de Villas © - <span id="footer-year"></span> - Diseñado por JRHM.STUDIO
   </footer>
 
+  <!-- Solo se ven en celular (ver @media en styles.css); la nav de arriba
+       sigue siendo la real en escritorio. Vacíos a propósito: js/main.js
+       los arma desde BOTTOM_TABS/MORE_TABS, igual que #app se llena por
+       código. #more-sheet va ANTES que la barra en el DOM para quedar
+       apilado encima de ella sin necesitar z-index especial. -->
+  <div id="more-sheet" class="more-sheet" hidden></div>
+  <nav id="bottom-tabs" class="bottom-tabs"></nav>
+
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
