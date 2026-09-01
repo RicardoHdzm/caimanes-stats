@@ -1058,6 +1058,58 @@ main h3::before {
   color: var(--tie);
 }
 
+/* Chips de filtro rápido por posición en Roster — mismo código de color que
+   los pos-badge de abajo, pero como control clicable en vez de solo
+   indicador. */
+.pos-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+
+.pos-filter-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.pos-filter-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.pos-filter-chip[data-group="P"].active {
+  background: var(--pos-pitcher);
+  border-color: var(--pos-pitcher);
+  color: var(--bg);
+}
+
+.pos-filter-chip[data-group="C"].active {
+  background: var(--pos-catcher);
+  border-color: var(--pos-catcher);
+  color: var(--bg);
+}
+
+.pos-filter-chip[data-group="IF"].active {
+  background: var(--pos-infield);
+  border-color: var(--pos-infield);
+  color: var(--bg);
+}
+
+.pos-filter-chip[data-group="OF"].active {
+  background: var(--pos-outfield);
+  border-color: var(--pos-outfield);
+  color: var(--bg);
+}
+
 .pos-badge {
   display: inline-flex;
   align-items: center;

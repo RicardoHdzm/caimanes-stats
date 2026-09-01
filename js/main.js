@@ -34,11 +34,13 @@ const BOTTOM_TABS = [
   { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
 ];
 
+// Calendario primero: es lo que más se consulta entre semana. Las 3 tablas
+// de stats detalladas (consulta más ocasional) y Alineación van al final.
 const MORE_TABS = [
+  { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "bateo", route: "#/bateo", label: "Bateo", icon: "fa-baseball-bat-ball" },
   { tab: "pitcheo", route: "#/pitcheo", label: "Pitcheo", icon: "fa-baseball" },
   { tab: "fildeo", route: "#/fildeo", label: "Fildeo", icon: "fa-shield" },
-  { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
 ];
 

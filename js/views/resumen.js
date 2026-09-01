@@ -78,6 +78,19 @@ export function renderResumen(container) {
   const bottomRow = document.createElement("div");
   bottomRow.className = "leaders section-gap";
 
+  // El próximo juego va primero: es lo que más se consulta entre semana, y
+  // en celular esta fila es un carrusel — lo importante debe estar a un
+  // deslizazo de distancia, no al final.
+  for (const g of SCHEDULE) {
+    const next = document.createElement("div");
+    next.className = "leader-card";
+    next.innerHTML = `
+      <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
+      <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
+    `;
+    bottomRow.appendChild(next);
+  }
+
   const streak = currentStreak(GAMES);
   if (streak) {
     const STREAK_LABEL = { W: "victoria", L: "derrota", T: "empate" };
@@ -109,16 +122,6 @@ export function renderResumen(container) {
       </div>
     `;
     bottomRow.appendChild(form);
-  }
-
-  for (const g of SCHEDULE) {
-    const next = document.createElement("div");
-    next.className = "leader-card";
-    next.innerHTML = `
-      <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
-      <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
-    `;
-    bottomRow.appendChild(next);
   }
 
   const gamesPlayedCard = document.createElement("div");
