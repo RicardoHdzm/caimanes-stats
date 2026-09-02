@@ -484,7 +484,7 @@ export const GAMES = [
       { playerId: "p1", order: 1, position: "SS", AB: 2, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
     ],
     pitching: [
-      { playerId: "p16", IP: 7, H: 26, R: 17, ER: 0, BB: 1, SO: 0, HR: 0, decision: "" },
+      { playerId: "p16", IP: 7, H: 26, R: 17, ER: 0, BB: 1, SO: 0, HR: 0, decision: "W" },
     ],
     fielding: [
       { playerId: "p16", PO: 0, A: 0, E: 0 },
@@ -502,6 +502,7 @@ export const GAMES = [
     ],
     substitutions: [
       { inning: 2, type: "bateo", playerOut: "p7", playerIn: "p13", position: "RF" },
+      { inning: 5, type: "bateo", playerOut: "p18", playerIn: "p1", position: "SS" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
   },
