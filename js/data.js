@@ -462,7 +462,8 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/2716295835456307/",
   },
-      {
+        // Reemplaza el bloque completo del juego "g9" en GAMES por esto:
+  {
     id: "g9",
     date: "2026-09-01",
     opponent: "Los Primos",
@@ -505,6 +506,7 @@ export const GAMES = [
       { inning: 4, type: "bateo", playerOut: "p18", playerIn: "p1", position: "SS" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
+    mvp: "p6",
   },
 ];
 
