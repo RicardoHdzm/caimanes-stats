@@ -400,7 +400,7 @@ export const GAMES = [
     ],
     pitching: [
       { playerId: "p14", IP: 5, H: 15, R: 9, ER: 0, BB: 0, SO: 1, HR: 1, decision: "" },
-      { playerId: "p16", IP: 2, H: 3, R: 0, ER: 0, BB: 0, SO: 1, HR: 0, decision: "" },
+      { playerId: "p16", IP: 2, H: 3, R: 0, ER: 0, BB: 0, SO: 1, HR: 0, decision: "W" },
     ],
     fielding: [
       { playerId: "p14", PO: 0, A: 0, E: 0 },
