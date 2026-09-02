@@ -38,10 +38,12 @@ export function playerName(playerId) {
 }
 
 // Apariciones al plato (AB + BB) mínimas por juego del equipo para entrar a
-// los líderes de promedio — la misma regla que usan las ligas grandes. Sin un
-// mínimo, quien jugó un solo juego de 2-2 encabeza la tabla por encima de
-// quien lleva toda la temporada bateando.
-export const PA_PER_GAME_TO_QUALIFY = 2.7;
+// los líderes de promedio. Sin un mínimo, quien jugó un solo juego de 2-2
+// encabeza la tabla por encima de quien lleva toda la temporada bateando.
+// La regla real de las ligas grandes es 3.1 por juego, pero es para partidos
+// de 9 entradas — aquí se juega a 7, así que se escala por esa proporción:
+// 3.1 × (7/9) ≈ 2.4.
+export const PA_PER_GAME_TO_QUALIFY = 2.4;
 
 export function minPlateAppearances(games = GAMES) {
   return Math.ceil(games.length * PA_PER_GAME_TO_QUALIFY);
