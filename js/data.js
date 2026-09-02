@@ -466,7 +466,7 @@ export const GAMES = [
   {
     id: "g9",
     date: "2026-09-01",
-    opponent: "Los Primos",
+    opponent: "Los Primo",
     weCloseBatting: false,
     scoreUs: 19,
     scoreThem: 17,
