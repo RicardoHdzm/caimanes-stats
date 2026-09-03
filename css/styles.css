@@ -1685,6 +1685,54 @@ main h3::before {
   margin-top: 10px;
 }
 
+/* RSVP en la tarjeta "Próximo juego" (Resumen) — conteo público arriba,
+   botones Sí/No abajo (solo con cuenta vinculada a un jugador). */
+.rsvp-tally {
+  margin-top: 8px !important;
+  font-size: var(--text-sm);
+}
+
+.rsvp-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.rsvp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.rsvp-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.rsvp-yes.active {
+  background: rgba(63, 181, 111, 0.15);
+  border-color: var(--win);
+  color: var(--win);
+}
+
+.rsvp-no.active {
+  background: rgba(226, 32, 47, 0.12);
+  border-color: var(--loss);
+  color: var(--loss);
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
