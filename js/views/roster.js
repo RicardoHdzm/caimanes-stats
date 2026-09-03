@@ -1,8 +1,8 @@
 import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
-import { getSession, isCoach } from "../auth.js";
-import { getDuesMap, setDuesPaid, getAllPositionOverrides } from "../db.js";
+import { getSession } from "../auth.js";
+import { getDuesMap, getAllPositionOverrides } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -23,17 +23,15 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. Para el
-// coach es además un botón clicable (mismo ícono, toggle); para cualquier
-// otro jugador con sesión es de solo lectura. `duesMap` llega por closure
-// porque se llena aparte, async — ver comentario en renderRoster.
+// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. Siempre
+// de solo lectura aquí, incluso para el coach — marcarla solo se puede
+// desde admin.html, para no tener el mismo control de escritura repetido
+// en dos pantallas.
 function renderDuesCell(playerId, duesMap) {
   const paid = duesMap.get(playerId) ?? false;
-  const icon = paid
+  return paid
     ? '<i class="fa-solid fa-circle-check dues-icon dues-icon-paid"></i>'
     : '<i class="fa-solid fa-circle-xmark dues-icon dues-icon-unpaid"></i>';
-  if (!isCoach()) return icon;
-  return `<button type="button" class="dues-toggle-btn" data-player="${playerId}" data-paid="${paid}">${icon}</button>`;
 }
 
 export function renderRoster(container) {
@@ -78,15 +76,15 @@ export function renderRoster(container) {
     },
   ];
 
-  // La columna de pago solo se agrega con sesión iniciada — sin cuenta, el
-  // roster se ve exactamente igual que siempre. OJO: se usa getSession()
-  // (¿hay cuenta?), no getCurrentPlayerId() (¿a qué jugador corresponde esa
-  // cuenta?) — alguien puede tener cuenta antes de que el coach termine de
-  // vincularla en player_whitelist, y aun así debe poder ver esto (y si es
-  // el coach, editarlo) sin depender de ese paso. `duesMap` arranca vacío y
-  // se llena aparte (abajo) porque viene de una consulta a Supabase, no de
-  // data.js; el `render` la lee por closure, así que cuando llegue el dato
-  // real solo hace falta volver a llamar draw() para que se refleje.
+  // La columna de inscripción solo se agrega con sesión iniciada — sin
+  // cuenta, el roster se ve exactamente igual que siempre. OJO: se usa
+  // getSession() (¿hay cuenta?), no getCurrentPlayerId() (¿a qué jugador
+  // corresponde esa cuenta?) — alguien puede tener cuenta antes de que el
+  // coach termine de vincularla en player_whitelist, y aun así debe poder
+  // verla. `duesMap` arranca vacío y se llena aparte (abajo) porque viene
+  // de una consulta a Supabase, no de data.js; el `render` la lee por
+  // closure, así que cuando llegue el dato real solo hace falta volver a
+  // llamar draw() para que se refleje.
   let duesMap = new Map();
   const loggedIn = !!getSession();
   if (loggedIn) {
@@ -127,36 +125,6 @@ export function renderRoster(container) {
     draw();
   });
 
-  // Delegado en tableEl (nunca se reemplaza, solo sus hijos) para que siga
-  // funcionando después de que renderSortableTable vuelva a dibujar la
-  // tabla al ordenar por otra columna — un listener puesto directo en cada
-  // botón se perdería en cuanto eso pase. Va en fase de captura (el `true`
-  // final) para poder frenar el evento ANTES de que llegue al onRowClick de
-  // la fila (ver ui.js) — si no, un clic en el ícono también navegaría al
-  // perfil del jugador.
-  if (loggedIn) {
-    tableEl.addEventListener(
-      "click",
-      async (e) => {
-        const btn = e.target.closest(".dues-toggle-btn");
-        if (!btn) return;
-        e.stopPropagation();
-        const playerId = btn.dataset.player;
-        const next = btn.dataset.paid !== "true";
-        btn.disabled = true;
-        try {
-          await setDuesPaid(playerId, next);
-          duesMap.set(playerId, next);
-        } catch {
-          // se queda como estaba, draw() vuelve a pintar el valor real
-        } finally {
-          draw();
-        }
-      },
-      true
-    );
-  }
-
   draw();
 
   if (loggedIn) {
@@ -166,10 +134,11 @@ export function renderRoster(container) {
     });
   }
 
-  // Posiciones personalizadas: lectura pública (a diferencia de "Pagó", no
-  // depende de sesión). Reemplazan `row.position` de quien haya editado la
-  // suya — la columna Pos y el filtro rápido de arriba usan ese mismo campo,
-  // así que ambos quedan al día con un solo draw().
+  // Posiciones personalizadas: lectura pública (a diferencia de
+  // "Inscripción", no depende de sesión). Reemplazan `row.position` de
+  // quien haya editado la suya — la columna Pos y el filtro rápido de
+  // arriba usan ese mismo campo, así que ambos quedan al día con un solo
+  // draw().
   getAllPositionOverrides().then((overrides) => {
     if (overrides.size === 0) return;
     for (const row of rows) {
