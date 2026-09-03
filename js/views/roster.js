@@ -2,7 +2,7 @@ import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
-import { getDuesMap, getAllPositionOverrides } from "../db.js";
+import { getDuesMap, getAllPositionOverrides, getAvatarUrl } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -54,11 +54,22 @@ export function renderRoster(container) {
   ).join("");
   container.appendChild(filterRow);
 
+  // Foto de perfil personalizada (Storage, ver js/db.js) — Map playerId ->
+  // URL firmada, vacío hasta que resuelva (abajo, solo con sesión: el
+  // bucket es privado). Sin sesión, o mientras no llega, se sigue viendo
+  // el avatar de siempre (foto de data.js o iniciales) — mismo criterio
+  // que ya usa el perfil individual en js/views/jugador.js, aquí aplicado
+  // a los 20 jugadores del roster de una vez.
+  let avatarMap = new Map();
+
   const columns = [
     {
       key: "photo",
       label: "",
-      render: (_value, row) => renderAvatar(row, 32),
+      render: (_value, row) =>
+        avatarMap.has(row.id)
+          ? `<img class="avatar" src="${avatarMap.get(row.id)}" alt="${row.name}" style="width:32px;height:32px;font-size:12.8px;">`
+          : renderAvatar(row, 32),
     },
     { key: "number", label: "#", full: "Número", numeric: true },
     { key: "name", label: "Nombre" },
@@ -137,6 +148,16 @@ export function renderRoster(container) {
   if (loggedIn) {
     getDuesMap().then((map) => {
       duesMap = map;
+      draw();
+    });
+
+    // Una consulta por jugador (createSignedUrl no tiene versión "todos de
+    // una vez" como las tablas normales, ver js/db.js) — 20 peticiones en
+    // paralelo no pesa nada, y la enorme mayoría regresa null (solo quien
+    // subió foto tiene algo que traer). Se pinta con lo que haya llegado
+    // en cuanto todas resuelven, no una por una, para no repintar 20 veces.
+    Promise.all(rows.map((row) => getAvatarUrl(row.id).then((url) => [row.id, url]))).then((entries) => {
+      avatarMap = new Map(entries.filter(([, url]) => url));
       draw();
     });
   }
