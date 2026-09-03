@@ -37,6 +37,7 @@ const APP_SHELL = [
   "./js/views/standing.js",
   "./js/views/alineacion.js",
   "./js/views/comparar.js",
+  "./js/views/comments.js",
   "./assets/logo.png",
   "./assets/fonts/barlow-condensed-600.woff2",
   "./assets/fonts/barlow-condensed-700.woff2",
