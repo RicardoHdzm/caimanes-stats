@@ -1323,12 +1323,9 @@ main h3::before {
   font-weight: 400;
 }
 
-/* Checkbox de "Pagó" en Roster — solo lo ve/usa el coach (ver isCoach() en
-   js/auth.js); el resto de jugadores con sesión ven el Sí/No de solo
-   lectura en .stat-green/.stat-red de arriba, sin este control. */
-/* Columna "Inscripción" en Roster — un ícono, no checkbox+texto. Para el
-   coach, el mismo ícono va dentro de un botón (.dues-toggle-btn) que
-   alterna el estado; para cualquier otro, es de solo lectura. */
+/* Columna "Inscripción" en Roster — un ícono, siempre de solo lectura
+   (incluso para el coach: marcarla solo se puede desde admin.html, ver
+   js/admin-dues.js). */
 .dues-icon {
   font-size: 1.3rem;
 }
@@ -1339,14 +1336,6 @@ main h3::before {
 
 .dues-icon-unpaid {
   color: var(--accent-text);
-}
-
-.dues-toggle-btn {
-  background: none;
-  border: none;
-  padding: 0;
-  line-height: 1;
-  cursor: pointer;
 }
 
 .badge {
