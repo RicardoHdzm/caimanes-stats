@@ -99,7 +99,6 @@ export function renderJugadorDetalle(container, playerId) {
     <div class="game-hero-meta" style="margin-top: 12px;">
       <span id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
     </div>
-    <div id="position-edit-slot"></div>
     <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
     ${
       mvpCount > 0
@@ -107,7 +106,7 @@ export function renderJugadorDetalle(container, playerId) {
         : ""
     }
     <div id="walkup-display">${renderWalkup(player.walkup)}</div>
-    <div id="walkup-edit-slot"></div>
+    <div id="profile-edit-slot"></div>
   `;
   container.appendChild(hero);
 
@@ -129,45 +128,75 @@ export function renderJugadorDetalle(container, playerId) {
     });
   }
 
-  // ---- Posiciones registradas: editables solo en tu propio perfil ----
+  // ---- Posiciones registradas y canción de entrada: valores de arranque ----
   //
-  // Igual patrón que la canción de entrada: `player.position` (data.js) es
-  // el valor de arranque, sin esperar a nadie; si el jugador ya las
-  // personalizó, la fila en player_positions la reemplaza en cuanto llega.
-  // A diferencia de la canción, esto SÍ alimenta más cosas — Roster y el
+  // `player.position`/`player.walkup` (data.js) se pintan primero, sin
+  // esperar a nadie; si el jugador ya los personalizó, las filas en
+  // player_positions/player_walkups los reemplazan en cuanto llegan
+  // (progresivo, no bloquean el primer pintado). Las posiciones, a
+  // diferencia de la canción, SÍ alimentan más cosas — Roster y el
   // generador de alineación mezclan player_positions sobre PLAYERS antes de
   // usar la posición (ver js/views/roster.js, js/views/alineacion.js y
   // js/lineup-tool.js).
   let currentPosition = player.position ?? "";
   const positionDisplay = hero.querySelector("#position-display");
-
   getPositionOverride(player.id).then((override) => {
     if (!override) return;
     currentPosition = override;
     positionDisplay.innerHTML = renderPositionBadges(override);
   });
 
+  let currentWalkup = player.walkup ?? null;
+  const walkupDisplay = hero.querySelector("#walkup-display");
+  getWalkupOverride(player.id).then((override) => {
+    if (!override) return;
+    currentWalkup = override;
+    walkupDisplay.innerHTML = renderWalkup(override);
+  });
+
+  // ---- Editar perfil: un solo botón, un solo panel ----
+  //
+  // Posiciones, canción de entrada y contraseña vivían cada una detrás de
+  // su propio botón — se juntan en un solo "Editar perfil" para no llenar
+  // el perfil de botones repetidos. Cada sección conserva su propio botón
+  // de guardar (son 3 escrituras independientes a Supabase, no una sola),
+  // solo el mostrar/ocultar se comparte. "Salir" no es edición, se queda
+  // aparte y siempre visible.
   if (getCurrentPlayerId() === player.id) {
-    const positionSlot = hero.querySelector("#position-edit-slot");
-    positionSlot.innerHTML = `
-      <button type="button" class="walkup-edit-btn" id="position-edit-toggle">
-        <i class="fa-solid fa-pen"></i> Editar mis posiciones
+    const slot = hero.querySelector("#profile-edit-slot");
+    slot.innerHTML = `
+      <button type="button" class="walkup-edit-btn" id="profile-edit-toggle">
+        <i class="fa-solid fa-pen"></i> Editar perfil
       </button>
-      <div id="position-edit-form" class="walkup-edit-form auth-form" hidden>
+      <button type="button" class="auth-signout" id="account-signout-btn">Salir</button>
+      <div id="profile-edit-panel" class="walkup-edit-form auth-form" hidden>
+        <p class="profile-edit-heading">Posiciones</p>
         <p class="auth-hint">Elige hasta 3, en el orden que prefieras.</p>
         <div class="pos-filter-row" id="position-picker">
           ${DEFENSE_POSITIONS.map((pos) => `<button type="button" class="pos-filter-chip" data-pos="${pos}">${pos}</button>`).join("")}
         </div>
         <p class="auth-error" id="position-error" hidden></p>
         <button type="button" class="auth-submit" id="position-save-btn">Guardar posiciones</button>
+
+        <p class="profile-edit-heading">Canción de entrada</p>
+        <label>Título<input type="text" id="walkup-title-input" maxlength="120"></label>
+        <label>Artista<input type="text" id="walkup-artist-input" maxlength="120"></label>
+        <label>Link (Spotify, YouTube...)<input type="url" id="walkup-url-input" maxlength="500"></label>
+        <p class="auth-error" id="walkup-error" hidden></p>
+        <button type="button" class="auth-submit" id="walkup-save-btn">Guardar canción</button>
+
+        <p class="profile-edit-heading">Contraseña</p>
+        <label>Nueva contraseña<input type="password" id="password-input" minlength="6" autocomplete="new-password"></label>
+        <p class="auth-error" id="password-error" hidden></p>
+        <p class="auth-ok" id="password-ok" hidden>Contraseña actualizada.</p>
+        <button type="button" class="auth-submit" id="password-save-btn">Cambiar contraseña</button>
       </div>
     `;
 
-    const posToggle = positionSlot.querySelector("#position-edit-toggle");
-    const posForm = positionSlot.querySelector("#position-edit-form");
-    const posPicker = positionSlot.querySelector("#position-picker");
-    const posError = positionSlot.querySelector("#position-error");
-    const posSaveBtn = positionSlot.querySelector("#position-save-btn");
+    // --- Posiciones ---
+    const posPicker = slot.querySelector("#position-picker");
+    const posError = slot.querySelector("#position-error");
+    const posSaveBtn = slot.querySelector("#position-save-btn");
     let selectedPositions = [];
 
     function syncPicker() {
@@ -175,13 +204,6 @@ export function renderJugadorDetalle(container, playerId) {
         chip.classList.toggle("active", selectedPositions.includes(chip.dataset.pos));
       }
     }
-
-    posToggle.addEventListener("click", () => {
-      selectedPositions = currentPosition ? currentPosition.split("/").filter(Boolean) : [];
-      syncPicker();
-      posError.hidden = true;
-      posForm.hidden = !posForm.hidden;
-    });
 
     posPicker.addEventListener("click", (e) => {
       const chip = e.target.closest(".pos-filter-chip");
@@ -212,7 +234,7 @@ export function renderJugadorDetalle(container, playerId) {
         await setPosition(player.id, joined);
         currentPosition = joined;
         positionDisplay.innerHTML = renderPositionBadges(joined);
-        posForm.hidden = true;
+        posError.hidden = true;
       } catch {
         posError.textContent = "No se pudo guardar — intenta de nuevo.";
         posError.hidden = false;
@@ -220,106 +242,85 @@ export function renderJugadorDetalle(container, playerId) {
         posSaveBtn.disabled = false;
       }
     });
-  }
 
-  // ---- Canción de entrada: editable solo en tu propio perfil ----
-  //
-  // `player.walkup` (data.js) sigue siendo el valor de arranque — se pinta
-  // arriba sin esperar a nadie. Si el jugador ya la personalizó, la fila en
-  // player_walkups la reemplaza en cuanto llega (progresivo: no bloquea el
-  // primer pintado con una consulta a Supabase). `currentWalkup` guarda cuál
-  // de las dos es la vigente, para que el formulario de edición arranque con
-  // el valor correcto sin importar cuál de las dos ya llegó.
-  let currentWalkup = player.walkup ?? null;
-  const walkupDisplay = hero.querySelector("#walkup-display");
+    // --- Canción de entrada ---
+    const walkupTitleInput = slot.querySelector("#walkup-title-input");
+    const walkupArtistInput = slot.querySelector("#walkup-artist-input");
+    const walkupUrlInput = slot.querySelector("#walkup-url-input");
+    const walkupError = slot.querySelector("#walkup-error");
+    const walkupSaveBtn = slot.querySelector("#walkup-save-btn");
 
-  getWalkupOverride(player.id).then((override) => {
-    if (!override) return;
-    currentWalkup = override;
-    walkupDisplay.innerHTML = renderWalkup(override);
-  });
-
-  if (getCurrentPlayerId() === player.id) {
-    const slot = hero.querySelector("#walkup-edit-slot");
-    slot.innerHTML = `
-      <button type="button" class="walkup-edit-btn" id="walkup-edit-toggle">
-        <i class="fa-solid fa-pen"></i> Editar mi canción de entrada
-      </button>
-      <form id="walkup-edit-form" class="walkup-edit-form auth-form" hidden>
-        <label>Título<input type="text" name="title" maxlength="120" required></label>
-        <label>Artista<input type="text" name="artist" maxlength="120"></label>
-        <label>Link (Spotify, YouTube...)<input type="url" name="url" maxlength="500"></label>
-        <p class="auth-error" id="walkup-error" hidden></p>
-        <button type="submit" class="auth-submit">Guardar</button>
-      </form>
-    `;
-
-    const toggle = slot.querySelector("#walkup-edit-toggle");
-    const form = slot.querySelector("#walkup-edit-form");
-    const errorEl = slot.querySelector("#walkup-error");
-
-    toggle.addEventListener("click", () => {
-      form.title.value = currentWalkup?.title ?? "";
-      form.artist.value = currentWalkup?.artist ?? "";
-      form.url.value = currentWalkup?.url ?? "";
-      errorEl.hidden = true;
-      form.hidden = !form.hidden;
-    });
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errorEl.hidden = true;
-      const { title, artist, url } = Object.fromEntries(new FormData(form));
-      const saved = { title: title.trim(), artist: artist.trim() || null, url: url.trim() || null };
+    walkupSaveBtn.addEventListener("click", async () => {
+      walkupError.hidden = true;
+      const saved = {
+        title: walkupTitleInput.value.trim(),
+        artist: walkupArtistInput.value.trim() || null,
+        url: walkupUrlInput.value.trim() || null,
+      };
+      if (!saved.title) {
+        walkupError.textContent = "Ponle un título a tu canción.";
+        walkupError.hidden = false;
+        return;
+      }
+      walkupSaveBtn.disabled = true;
       try {
         await setWalkup(player.id, saved);
         currentWalkup = saved;
         walkupDisplay.innerHTML = renderWalkup(saved);
-        form.hidden = true;
       } catch {
-        errorEl.textContent = "No se pudo guardar — intenta de nuevo.";
-        errorEl.hidden = false;
+        walkupError.textContent = "No se pudo guardar — intenta de nuevo.";
+        walkupError.hidden = false;
+      } finally {
+        walkupSaveBtn.disabled = false;
       }
     });
 
-    // ---- Mi cuenta: cambiar contraseña y salir ----
-    //
-    // Vive aquí (tu propio perfil) y no en el botón del header — ese botón
-    // ahora es un link directo a esta página, así no hace falta buscarte en
-    // Roster para llegar. Ver js/auth.js: loggedInMarkup().
-    const accountPanel = document.createElement("div");
-    accountPanel.className = "walkup-edit-form account-panel";
-    accountPanel.innerHTML = `
-      <h4>Mi cuenta</h4>
-      <form id="account-password-form" class="auth-form">
-        <label>Nueva contraseña<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
-        <p class="auth-error" id="account-error" hidden></p>
-        <p class="auth-ok" id="account-ok" hidden>Contraseña actualizada.</p>
-        <button type="submit" class="auth-submit">Cambiar contraseña</button>
-      </form>
-      <button type="button" class="auth-signout" id="account-signout-btn">Salir</button>
-    `;
-    hero.appendChild(accountPanel);
+    // --- Contraseña ---
+    const passwordInput = slot.querySelector("#password-input");
+    const passwordError = slot.querySelector("#password-error");
+    const passwordOk = slot.querySelector("#password-ok");
+    const passwordSaveBtn = slot.querySelector("#password-save-btn");
 
-    const passwordForm = accountPanel.querySelector("#account-password-form");
-    const passwordError = accountPanel.querySelector("#account-error");
-    const passwordOk = accountPanel.querySelector("#account-ok");
-    passwordForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    passwordSaveBtn.addEventListener("click", async () => {
       passwordError.hidden = true;
       passwordOk.hidden = true;
-      const { password } = Object.fromEntries(new FormData(passwordForm));
+      if (passwordInput.value.length < 6) {
+        passwordError.textContent = "Mínimo 6 caracteres.";
+        passwordError.hidden = false;
+        return;
+      }
+      passwordSaveBtn.disabled = true;
       try {
-        await changePassword(password);
+        await changePassword(passwordInput.value);
         passwordOk.hidden = false;
-        passwordForm.reset();
+        passwordInput.value = "";
       } catch {
         passwordError.textContent = "No se pudo cambiar — intenta de nuevo.";
         passwordError.hidden = false;
+      } finally {
+        passwordSaveBtn.disabled = false;
       }
     });
 
-    accountPanel.querySelector("#account-signout-btn").addEventListener("click", () => signOut());
+    // --- Salir (siempre visible, no forma parte del panel colapsable) ---
+    slot.querySelector("#account-signout-btn").addEventListener("click", () => signOut());
+
+    // --- Un solo interruptor para las 3 secciones de arriba ---
+    const toggle = slot.querySelector("#profile-edit-toggle");
+    const panel = slot.querySelector("#profile-edit-panel");
+    toggle.addEventListener("click", () => {
+      selectedPositions = currentPosition ? currentPosition.split("/").filter(Boolean) : [];
+      syncPicker();
+      posError.hidden = true;
+      walkupTitleInput.value = currentWalkup?.title ?? "";
+      walkupArtistInput.value = currentWalkup?.artist ?? "";
+      walkupUrlInput.value = currentWalkup?.url ?? "";
+      walkupError.hidden = true;
+      passwordInput.value = "";
+      passwordError.hidden = true;
+      passwordOk.hidden = true;
+      panel.hidden = !panel.hidden;
+    });
   }
 
   const battingSeason = battingTotals(GAMES).find((r) => r.playerId === player.id);
