@@ -9,7 +9,6 @@ import {
   getPositionOverride,
   setPosition,
   getDuesForPlayer,
-  getRsvps,
   getAvatarUrl,
   uploadAvatar,
 } from "../db.js";
