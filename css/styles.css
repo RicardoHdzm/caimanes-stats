@@ -913,6 +913,35 @@ main h3::before {
   letter-spacing: 0.03em;
 }
 
+/* Insignias de logros del perfil (ver renderAchievements en
+   js/views/jugador.js) — chips neutros, no compiten en color con
+   MVP/Debut (dorado/rojo) porque no son "el evento del momento", son datos
+   de fondo del jugador. */
+.achievements-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.achievement-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.achievement-chip i {
+  color: var(--accent-text);
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;

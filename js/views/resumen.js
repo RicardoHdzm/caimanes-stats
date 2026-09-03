@@ -1,4 +1,4 @@
-import { GAMES, SCHEDULE, TEAM } from "../data.js";
+import { GAMES, SCHEDULE, TEAM, PLAYERS } from "../data.js";
 import {
   teamRecord,
   battingTotals,
@@ -25,6 +25,14 @@ function formatGameDate(dateStr) {
   const date = new Date(`${dateStr}T00:00:00`);
   const text = date.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// "Fulano, Mengano y Zutano" — mismo formato que ya usa js/stats.js para
+// empates en récords, repetido aquí en chico porque esa versión es privada
+// de ese módulo.
+function joinNames(names) {
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
 }
 
 // Tarjeta de líder con el #1 en grande y el 2do/3er lugar chico debajo.
@@ -327,5 +335,58 @@ export function renderResumen(container) {
     }
 
     container.appendChild(recordsRow);
+  }
+
+  // ---- Salón de la fama ----
+  //
+  // A diferencia de "Líderes"/"Récords" (esta temporada nada más), esto usa
+  // debutSeason — historial de TODAS las temporadas del jugador con el
+  // equipo (ver js/data.js SEASONS). Solo se pinta lo que de verdad aplica:
+  // sin nadie con debutSeason cargado, ninguna de estas tres tarjetas tiene
+  // qué mostrar y la sección entera no aparece.
+  const withDebut = PLAYERS.filter((p) => p.debutSeason);
+  if (withDebut.length > 0) {
+    const famaHeading = document.createElement("h3");
+    famaHeading.textContent = "Salón de la fama";
+    container.appendChild(famaHeading);
+
+    const famaRow = document.createElement("div");
+    famaRow.className = "leaders grid-3 tab-carousel";
+
+    const veteranSorted = [...withDebut].sort((a, b) => a.debutSeason - b.debutSeason);
+    let html = leaderCardHtml(
+      "fa-landmark",
+      "Más veterano",
+      veteranSorted,
+      (p) => `${p.name} — ${TEAM.seasonsTotal - p.debutSeason + 1} temporadas`,
+      (p) => `${p.name} — ${TEAM.seasonsTotal - p.debutSeason + 1} temporadas`
+    );
+
+    const mvpCounts = PLAYERS.map((p) => ({ ...p, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
+      (p) => p.mvpTotal > 0
+    );
+    if (mvpCounts.length > 0) {
+      mvpCounts.sort((a, b) => b.mvpTotal - a.mvpTotal);
+      html += leaderCardHtml(
+        "fa-star",
+        "Más MVPs",
+        mvpCounts,
+        (p) => `${p.name} — ${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"} esta temporada`,
+        (p) => `${p.name} — ${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"}`
+      );
+    }
+
+    const rookies = withDebut.filter((p) => p.debutSeason === TEAM.seasonsTotal);
+    if (rookies.length > 0) {
+      html += `
+        <div class="leader-card">
+          <h3><i class="fa-solid fa-seedling"></i>Rookies de la temporada</h3>
+          <p>${joinNames(rookies.map((p) => p.name))}</p>
+        </div>
+      `;
+    }
+
+    famaRow.innerHTML = html;
+    container.appendChild(famaRow);
   }
 }

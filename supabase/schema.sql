@@ -254,6 +254,31 @@ create policy "announcements_write_coach_only" on public.announcements
 grant select on public.announcements to anon, authenticated;
 grant select, insert, update, delete on public.announcements to authenticated;
 
+-- 9b. Reacciones a los anuncios — mismo patrón que comment_likes (6b): un
+--     "like" por jugador por anuncio (la llave primaria lo garantiza; dar
+--     like de nuevo no acumula, es un interruptor — para quitarlo se borra
+--     la fila, ver unlikeAnnouncement en js/db.js).
+create table if not exists public.announcement_likes (
+  announcement_id bigint not null references public.announcements (id) on delete cascade,
+  player_id text not null,
+  created_at timestamptz not null default now(),
+  primary key (announcement_id, player_id)
+);
+alter table public.announcement_likes enable row level security;
+
+create policy "announcement_likes_public_read" on public.announcement_likes
+  for select using (true);
+
+create policy "announcement_likes_insert_own" on public.announcement_likes
+  for insert to authenticated
+  with check (player_id = public.current_player_id());
+
+create policy "announcement_likes_delete_own" on public.announcement_likes
+  for delete to authenticated
+  using (player_id = public.current_player_id());
+
+grant select, insert, delete on public.announcement_likes to anon, authenticated;
+
 -- 10. Foto de perfil personalizada — bucket de Storage, no una tabla. Cada
 --     jugador tiene como mucho un archivo, en "{player_id}/avatar" (se
 --     sobreescribe al cambiarla). PRIVADO a propósito: sin sesión no se
