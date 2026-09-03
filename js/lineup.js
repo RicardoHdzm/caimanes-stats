@@ -5,6 +5,7 @@
 import { GAMES } from "./data.js";
 import { battingTotals, playerName } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
+import { getCurrentPlayerId } from "./auth.js";
 
 export const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 
@@ -311,6 +312,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     rows: orderRows,
     defaultSort: "slot",
     defaultDir: 1,
+    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
 
   const defenseHeading = document.createElement("h3");
@@ -321,8 +323,9 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   defenseGrid.className = "cards grid-3";
   defenseGrid.innerHTML = DEFENSE_POSITIONS.map((pos) => {
     const row = assignment[pos];
+    const you = row && row.playerId === getCurrentPlayerId() ? " card-you" : "";
     return `
-      <div class="card">
+      <div class="card${you}">
         <div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>
         <span class="card-value" style="font-size: 1.2rem;">${row ? row.name : "Sin jugador"}</span>
         <span class="card-label">${row ? `OPS ${row.OPS}` : "No hay nadie disponible en esta posición"}</span>
@@ -350,8 +353,9 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     benchGrid.innerHTML = bench
       .map((row) => {
         const pos = primaryPosition(roster.find((p) => p.id === row.playerId));
+        const you = row.playerId === getCurrentPlayerId() ? " card-you" : "";
         return `
-          <div class="card">
+          <div class="card${you}">
             ${pos ? `<div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>` : ""}
             <span class="card-value" style="font-size: 1.1rem;">${row.name}</span>
             <span class="card-label">OPS ${row.OPS}</span>

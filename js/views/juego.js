@@ -357,6 +357,7 @@ export function renderJuegoDetalle(container, gameId) {
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
+    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
   renderGlossary(container, fieldingColumns);
 
