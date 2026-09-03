@@ -1,11 +1,19 @@
 import { PLAYERS } from "./data.js";
 import { DEFENSE_POSITIONS, registeredFieldPositions, renderLineupResult } from "./lineup.js";
+import { getAllPositionOverrides } from "./db.js";
 
 const listEl = document.getElementById("attendee-list");
 const countEl = document.getElementById("attendee-count");
 const resultEl = document.getElementById("lineup-result");
 
-const roster = [...PLAYERS].sort((a, b) => a.name.localeCompare(b.name, "es"));
+// Posiciones personalizadas (ver "Editar mis posiciones" en el perfil) se
+// mezclan ANTES de armar la lista de asistentes — top-level await, no hay
+// nada más en esta página compitiendo por pintar primero (a diferencia del
+// SPA, aquí no hay un primer pintado instantáneo que proteger).
+const positionOverrides = await getAllPositionOverrides();
+const roster = PLAYERS.map((p) => (positionOverrides.has(p.id) ? { ...p, position: positionOverrides.get(p.id) } : p)).sort(
+  (a, b) => a.name.localeCompare(b.name, "es")
+);
 const entries = []; // { player, checkbox, select }
 
 function updateCount() {
