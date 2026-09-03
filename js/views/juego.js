@@ -3,6 +3,7 @@ import { playerName, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote } from "../db.js";
+import { renderComments } from "./comments.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
@@ -401,4 +402,6 @@ export function renderJuegoDetalle(container, gameId) {
     });
     renderGlossary(container, subsColumns);
   }
+
+  renderComments(container, { contextType: "game", contextId: game.id });
 }
