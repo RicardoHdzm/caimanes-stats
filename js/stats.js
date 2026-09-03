@@ -155,6 +155,24 @@ export function fieldingTotals(games = GAMES) {
 // Un juego puede no tener marcador todavía (scoreUs/scoreThem null) si ya
 // sabemos si ganamos o perdimos pero no el número exacto; en ese caso se usa
 // el campo `result` ("W"/"L"/"T") y no se suma a carreras a favor/en contra.
+// En qué lugar del equipo va un jugador en una estadística, dentro de una
+// lista ya calculada (battingTotals/pitchingTotals/fieldingTotals). Usado
+// en su propio perfil para mostrarle su posición entre sus compañeros (ver
+// js/views/jugador.js) — nunca en el de alguien más, así cada quien solo ve
+// la suya. `dir` "desc" = más alto es mejor (default, ej. HR); "asc" = más
+// bajo es mejor (ej. ERA, errores). Empates comparten lugar (1, 2, 2, 4...).
+// null si el jugador no está en la lista o si es el único (un "#1 de 1" no
+// dice nada).
+export function rankAmong(list, playerId, key, dir = "desc") {
+  if (list.length <= 1) return null;
+  const mine = list.find((row) => row.playerId === playerId);
+  if (!mine) return null;
+  const myValue = Number(mine[key]);
+  const isBetter = dir === "asc" ? (v) => v < myValue : (v) => v > myValue;
+  const place = list.filter((row) => isBetter(Number(row[key]))).length + 1;
+  return { place, of: list.length };
+}
+
 export function gameResult(g) {
   if (g.scoreUs != null && g.scoreThem != null) {
     if (g.scoreUs > g.scoreThem) return "W";

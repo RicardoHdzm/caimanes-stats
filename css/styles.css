@@ -949,6 +949,7 @@ main h3::before {
 }
 
 .card {
+  position: relative;
   background: linear-gradient(160deg, var(--surface-raised), var(--surface));
   border: 1px solid var(--border);
   border-top: 4px solid var(--accent);
@@ -998,6 +999,22 @@ main h3::before {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Insignia "en qué lugar del equipo vas" en esta estadística — SOLO en tu
+   propio perfil (ver rankBadge en js/views/jugador.js), nadie más la ve en
+   tu tarjeta ni tú en la de alguien más. */
+.card-rank {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent);
+  color: var(--accent-text);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .progress-bar {

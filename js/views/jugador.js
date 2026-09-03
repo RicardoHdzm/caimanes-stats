@@ -1,5 +1,5 @@
 import { PLAYERS, GAMES, SCHEDULE } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
 import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
@@ -450,9 +450,31 @@ export function renderJugadorDetalle(container, playerId) {
     });
   }
 
-  const battingSeason = battingTotals(GAMES).find((r) => r.playerId === player.id);
-  const pitchingSeason = pitchingTotals(GAMES).find((r) => r.playerId === player.id);
-  const fieldingSeason = fieldingTotals(GAMES).find((r) => r.playerId === player.id);
+  const battingList = battingTotals(GAMES);
+  const pitchingList = pitchingTotals(GAMES);
+  const fieldingList = fieldingTotals(GAMES);
+  const battingSeason = battingList.find((r) => r.playerId === player.id);
+  const pitchingSeason = pitchingList.find((r) => r.playerId === player.id);
+  const fieldingSeason = fieldingList.find((r) => r.playerId === player.id);
+
+  // Insignia "en qué lugar del equipo vas" en la esquina de cada tarjeta —
+  // SOLO en tu propio perfil, nunca en el de alguien más (cada quien ve
+  // nomás la suya, como pidió el coach). Rate stats (AVG/OPS/ERA/FPCT) se
+  // rankean solo entre quienes tienen suficientes datos para que cuenten
+  // (mismo filtro `qualified` que ya usa el leaderboard de Resumen para
+  // AVG, y su equivalente para pitcheo/fildeo) — si no, alguien con una
+  // sola entrada perfecta se vería primero.
+  const isOwnProfile = getCurrentPlayerId() === player.id;
+  const qualifiedBatters = battingList.filter((r) => r.qualified);
+  const activePitchers = pitchingList.filter((r) => r.outs > 0);
+  const activeFielders = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
+
+  function rankBadge(list, key, dir) {
+    if (!isOwnProfile) return "";
+    const rank = rankAmong(list, player.id, key, dir);
+    if (!rank) return "";
+    return `<span class="card-rank" title="Tu lugar en el equipo en esta estadística">#${rank.place} de ${rank.of}</span>`;
+  }
 
   if (battingSeason) {
     const h3 = document.createElement("h3");
@@ -462,31 +484,37 @@ export function renderJugadorDetalle(container, playerId) {
     cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
+        ${rankBadge(qualifiedBatters, "AVG", "desc")}
         <i class="fa-solid fa-baseball-bat-ball card-icon"></i>
         <span class="card-value">${battingSeason.AVG}</span>
         <span class="card-label">AVG</span>
       </div>
       <div class="card">
+        ${rankBadge(battingList, "HR", "desc")}
         <i class="fa-solid fa-fire card-icon"></i>
         <span class="card-value">${battingSeason.HR}</span>
         <span class="card-label">Home runs</span>
       </div>
       <div class="card">
+        ${rankBadge(battingList, "R", "desc")}
         <i class="fa-solid fa-bolt card-icon"></i>
         <span class="card-value">${battingSeason.R}</span>
         <span class="card-label">Carreras</span>
       </div>
       <div class="card">
+        ${rankBadge(battingList, "RBI", "desc")}
         <i class="fa-solid fa-tornado card-icon"></i>
         <span class="card-value">${battingSeason.RBI}</span>
         <span class="card-label">Impulsadas</span>
       </div>
       <div class="card">
+        ${rankBadge(battingList, "SB", "desc")}
         <i class="fa-solid fa-person-running card-icon"></i>
         <span class="card-value">${battingSeason.SB}</span>
         <span class="card-label">Bases robadas</span>
       </div>
       <div class="card">
+        ${rankBadge(qualifiedBatters, "OPS", "desc")}
         <i class="fa-solid fa-chart-line card-icon"></i>
         <span class="card-value">${battingSeason.OPS}</span>
         <span class="card-label">OPS</span>
@@ -503,6 +531,7 @@ export function renderJugadorDetalle(container, playerId) {
     cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
+        ${rankBadge(activePitchers, "ERA", "asc")}
         <i class="fa-solid fa-baseball card-icon"></i>
         <span class="card-value">${pitchingSeason.ERA}</span>
         <span class="card-label">ERA</span>
@@ -513,6 +542,7 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-label">Record</span>
       </div>
       <div class="card">
+        ${rankBadge(pitchingList, "SO", "desc")}
         <i class="fa-solid fa-fire card-icon"></i>
         <span class="card-value">${pitchingSeason.SO}</span>
         <span class="card-label">Ponches</span>
@@ -534,21 +564,25 @@ export function renderJugadorDetalle(container, playerId) {
     cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
+        ${rankBadge(activeFielders, "FPCT", "desc")}
         <i class="fa-solid fa-shield card-icon"></i>
         <span class="card-value">${fieldingSeason.FPCT}</span>
         <span class="card-label">FPCT</span>
       </div>
       <div class="card">
+        ${rankBadge(fieldingList, "PO", "desc")}
         <i class="fa-solid fa-mitten card-icon"></i>
         <span class="card-value">${fieldingSeason.PO}</span>
         <span class="card-label">Outs (PO)</span>
       </div>
       <div class="card">
+        ${rankBadge(fieldingList, "A", "desc")}
         <i class="fa-solid fa-arrow-right-arrow-left card-icon"></i>
         <span class="card-value">${fieldingSeason.A}</span>
         <span class="card-label">Asistencias</span>
       </div>
       <div class="card">
+        ${rankBadge(fieldingList, "E", "asc")}
         <i class="fa-solid fa-xmark card-icon"></i>
         <span class="card-value">${fieldingSeason.E}</span>
         <span class="card-label">Errores</span>
