@@ -190,6 +190,15 @@ export function renderPositionBadges(value) {
     .join(" ");
 }
 
+// Abreviatura coloquial de ordinal en español ("2da", "8va") — no es un
+// ordinal lingüístico estricto, es la misma forma corta que ya usa el pie
+// de página para las temporadas ("Liga Valle Alto 4ta Temporada - 8va
+// Temporada"). Cubre 1-10; más allá cae en "va" en vez de tronar.
+const ORDINAL_SUFFIXES = { 1: "ra", 2: "da", 3: "ra", 4: "ta", 5: "ta", 6: "ta", 7: "ma", 8: "va", 9: "na", 10: "ma" };
+export function ordinalTemporada(n) {
+  return `${n}${ORDINAL_SUFFIXES[n] ?? "va"}`;
+}
+
 // Avatar de un jugador: foto si `player.photo` está definido, si no un
 // círculo con sus iniciales. `size` en px (default 40).
 export function renderAvatar(player, size = 40) {

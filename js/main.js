@@ -11,6 +11,7 @@ import { renderAlineacion } from "./views/alineacion.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { initAuth, mountAuthControl } from "./auth.js";
+import { ordinalTemporada } from "./ui.js";
 
 const routes = {
   resumen: renderResumen,
@@ -51,7 +52,7 @@ const bottomTabs = document.getElementById("bottom-tabs");
 const moreSheet = document.getElementById("more-sheet");
 
 document.getElementById("season-label").textContent =
-  `${TEAM.league} ${TEAM.seasonsInLeague}ta Temporada - ${TEAM.seasonsTotal}va Temporada`;
+  `${TEAM.league} ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada - ${ordinalTemporada(TEAM.seasonsTotal)} Temporada`;
 
 document.getElementById("footer-year").textContent = new Date().getFullYear();
 

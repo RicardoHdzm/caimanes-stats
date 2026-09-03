@@ -1,6 +1,15 @@
-import { PLAYERS, GAMES, SCHEDULE } from "../data.js";
+import { PLAYERS, GAMES, SCHEDULE, SEASONS } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
+import {
+  heading,
+  renderSortableTable,
+  renderGlossary,
+  coloredStat,
+  renderPositionBadges,
+  renderAvatar,
+  escapeHtml,
+  ordinalTemporada,
+} from "../ui.js";
 import { renderTrendChart } from "../charts.js";
 import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
 import {
@@ -75,6 +84,15 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// "Debut: 2023 - 2da Temporada - Liga Gaspasa" — solo si el jugador trae
+// `debutSeason` en data.js (opcional, igual que photo/walkup) y ese número
+// cae dentro del historial conocido en SEASONS.
+function renderDebut(debutSeason) {
+  const season = SEASONS[debutSeason - 1];
+  if (!season) return "";
+  return `<div class="game-hero-date">Debut: ${season.year} - ${ordinalTemporada(debutSeason)} Temporada - ${escapeHtml(season.league)}</div>`;
+}
+
 // Comprime la foto de perfil en el navegador antes de subirla — una foto de
 // celular pesa varios MB y aquí se ve nomás a 120px, así que no tiene caso
 // guardar el original. Reescala (si hace falta) a un máximo de 640px por
@@ -129,6 +147,7 @@ export function renderJugadorDetalle(container, playerId) {
       <span id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
     </div>
     <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
+    ${renderDebut(player.debutSeason)}
     ${
       mvpCount > 0
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
