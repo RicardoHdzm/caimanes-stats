@@ -157,8 +157,9 @@ function loggedOutMarkup() {
 
 function loggedInMarkup() {
   // Con jugador ya identificado, el botón muestra tu nombre y despliega un
-  // menú chico (Ir a perfil / Cerrar sesión) — no navega directo, así se
-  // puede cerrar sesión desde cualquier página sin pasar por el perfil.
+  // menú chico (Ir a perfil / Cerrar sesión, y para el coach también Ir al
+  // Admin) — no navega directo, así se puede cerrar sesión desde cualquier
+  // página sin pasar por el perfil.
   if (playerId) {
     const name = PLAYERS.find((p) => p.id === playerId)?.name ?? "Mi cuenta";
     return `
@@ -170,6 +171,13 @@ function loggedInMarkup() {
         <a href="#/jugador/${playerId}" class="auth-panel-link" id="auth-profile-link">
           <i class="fa-solid fa-id-card"></i> Ir a perfil
         </a>
+        ${
+          isCoach()
+            ? `<a href="admin.html" class="auth-panel-link" id="auth-admin-link">
+                 <i class="fa-solid fa-user-shield"></i> Ir al Admin
+               </a>`
+            : ""
+        }
         <button type="button" class="auth-signout" id="auth-signout-btn">Cerrar sesión</button>
       </div>
     `;
