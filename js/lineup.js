@@ -323,9 +323,11 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   defenseGrid.className = "cards grid-3";
   defenseGrid.innerHTML = DEFENSE_POSITIONS.map((pos) => {
     const row = assignment[pos];
-    const you = row && row.playerId === getCurrentPlayerId() ? " card-you" : "";
+    // Sin marca "eres tú" aquí a propósito (a diferencia de Roster/tablas de
+    // stats): estas tarjetas son una PROPUESTA de alineación, no un listado
+    // de jugadores — resaltar la tuya no aporta nada y solo distrae.
     return `
-      <div class="card${you}">
+      <div class="card">
         <div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>
         <span class="card-value" style="font-size: 1.2rem;">${row ? row.name : "Sin jugador"}</span>
         <span class="card-label">${row ? `OPS ${row.OPS}` : "No hay nadie disponible en esta posición"}</span>
@@ -353,9 +355,8 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     benchGrid.innerHTML = bench
       .map((row) => {
         const pos = primaryPosition(roster.find((p) => p.id === row.playerId));
-        const you = row.playerId === getCurrentPlayerId() ? " card-you" : "";
         return `
-          <div class="card${you}">
+          <div class="card">
             ${pos ? `<div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>` : ""}
             <span class="card-value" style="font-size: 1.1rem;">${row.name}</span>
             <span class="card-label">OPS ${row.OPS}</span>
