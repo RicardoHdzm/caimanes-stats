@@ -68,6 +68,35 @@ export async function setRsvp(gameId, status) {
   if (error) throw error;
 }
 
+// ---- Voto de MVP por juego (mvp_votes) ----
+//
+// Lectura pública: cualquiera ve el conteo, con o sin sesión. RLS solo
+// exige "eres un jugador con cuenta" para votar, no "jugaste ESTE juego en
+// particular" — eso lo filtra la UI en js/views/juego.js, comparando contra
+// el line-up real de ese juego. Ver supabase/schema.sql para el porqué.
+
+// Todas las filas de un juego (game_id = id de un GAMES, ej. "g9"). [] si
+// Supabase no está configurado o falla la consulta.
+export async function getMvpVotes(gameId) {
+  const client = getClient();
+  if (!client) return [];
+  const { data, error } = await client.from("mvp_votes").select("voter_player_id, voted_player_id").eq("game_id", gameId);
+  return error || !data ? [] : data;
+}
+
+export async function setMvpVote(gameId, votedPlayerId) {
+  const client = getClient();
+  const voterId = getCurrentPlayerId();
+  if (!client || !voterId) throw new Error("Necesitas una cuenta vinculada a un jugador para votar.");
+  // Sin created_at explícito: en un voto nuevo lo llena el DEFAULT now() de
+  // la tabla; si es un cambio de voto (mismo game_id + voter_player_id), se
+  // queda con la fecha del voto original en vez de reescribirla.
+  const { error } = await client
+    .from("mvp_votes")
+    .upsert({ game_id: gameId, voter_player_id: voterId, voted_player_id: votedPlayerId });
+  if (error) throw error;
+}
+
 // ---- Canción de entrada personalizada (player_walkups) ----
 //
 // Lectura pública (cualquiera ve la canción de cualquiera, con o sin
