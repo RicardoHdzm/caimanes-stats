@@ -156,6 +156,32 @@ create policy "comments_update_own" on public.comments
 
 grant select, insert, update on public.comments to anon, authenticated;
 
+-- 6b. Likes de comentarios. Un like por jugador por comentario (la llave
+--     primaria lo garantiza) — dar like de nuevo no acumula, es un
+--     interruptor: para quitarlo se borra la fila (unlikeComment en
+--     js/db.js). Al editar un comentario (upsert de arriba) el `id` no
+--     cambia, así que estos likes nunca se pierden por editar el texto.
+create table if not exists public.comment_likes (
+  comment_id bigint not null references public.comments (id) on delete cascade,
+  player_id text not null,
+  created_at timestamptz not null default now(),
+  primary key (comment_id, player_id)
+);
+alter table public.comment_likes enable row level security;
+
+create policy "comment_likes_public_read" on public.comment_likes
+  for select using (true);
+
+create policy "comment_likes_insert_own" on public.comment_likes
+  for insert to authenticated
+  with check (player_id = public.current_player_id());
+
+create policy "comment_likes_delete_own" on public.comment_likes
+  for delete to authenticated
+  using (player_id = public.current_player_id());
+
+grant select, insert, delete on public.comment_likes to anon, authenticated;
+
 -- 7. Posiciones registradas, editables por el propio jugador desde su
 --    perfil. Mismo formato que el campo `position` de PLAYERS en data.js
 --    ("SS/LF/CF", hasta 3, separadas por "/") — sin fila para un jugador,
