@@ -2,6 +2,7 @@ import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
 import { getSession } from "../auth.js";
+import { getAvatarUrl } from "../db.js";
 
 // dir: 1 = gana el número más alto, -1 = gana el más bajo (ponches, errores,
 // ERA...). `decimals` marca las stats que se comparan como número con punto
@@ -94,13 +95,32 @@ function comparisonBlock(title, rows, leftStats, rightStats) {
 function playerHeader(player, played) {
   return `
     <div class="compare-player">
-      ${renderAvatar(player, 72)}
+      <span data-avatar="${player.id}">${renderAvatar(player, 72)}</span>
       <span class="compare-name">${player.name}</span>
       <span class="compare-number">#${player.number ?? "-"}</span>
       <span class="compare-positions">${player.position ? renderPositionBadges(player.position) : ""}</span>
       <span class="compare-games">${played} juego${played === 1 ? "" : "s"}</span>
     </div>
   `;
+}
+
+// Reemplaza el avatar de siempre (foto de data.js o iniciales, ya pintado)
+// por la foto personalizada de Storage cuando exista — igual que ya hace
+// el perfil individual y Roster (ver js/views/jugador.js,
+// js/views/roster.js). Solo con sesión: el bucket es privado, y las dos
+// vistas que usan este comparador ya exigen sesión antes de llegar aquí.
+// Se busca por `[data-avatar]` dentro de `root` en vez de por id fijo
+// porque el comparador de Alineación puede tener DOS jugadores a la vez.
+async function hydrateAvatars(root) {
+  if (!getSession()) return;
+  const slots = [...root.querySelectorAll("[data-avatar]")];
+  await Promise.all(
+    slots.map(async (slot) => {
+      const url = await getAvatarUrl(slot.dataset.avatar);
+      if (!url) return;
+      slot.innerHTML = `<img class="avatar" src="${url}" alt="" style="width:72px;height:72px;font-size:28.8px;">`;
+    })
+  );
 }
 
 // Cabezas + los 3 bloques de stats — todo lo que hay debajo del picker (o,
@@ -140,6 +160,7 @@ export function renderLockedComparison(container, meId, otherId) {
   const wrap = document.createElement("div");
   wrap.innerHTML = comparisonBody(meId, otherId);
   container.appendChild(wrap);
+  hydrateAvatars(wrap);
 }
 
 // Se dibuja al final de la vista de Alineación. `leftId`/`rightId` vienen de
@@ -186,6 +207,7 @@ export function renderComparar(container, leftId, rightId) {
       </div>
       ${comparisonBody(left.id, right.id)}
     `;
+    hydrateAvatars(wrap);
 
     const leftSelect = wrap.querySelector("#compare-left");
     const rightSelect = wrap.querySelector("#compare-right");
