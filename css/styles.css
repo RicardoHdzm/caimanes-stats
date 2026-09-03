@@ -266,10 +266,35 @@ body {
   border-color: var(--win);
 }
 
+/* Variante con nombre (jugador ya identificado, ver loggedInMarkup en
+   js/auth.js) — deja de ser un círculo fijo de 48px para poder crecer con
+   el texto del nombre. */
+.auth-btn-named {
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-pill);
+  padding: 8px 16px 8px 12px;
+  gap: 8px;
+}
+
+.auth-btn-named i {
+  font-size: var(--text-lg);
+}
+
+.auth-btn-name {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Ancla a la derecha del botón (no a la izquierda): .auth-slot ahora vive
+   en la esquina derecha del header, así el panel se abre hacia adentro de
+   la pantalla en vez de salirse por el borde. */
 .auth-panel {
   position: absolute;
   top: 56px;
-  left: 0;
+  right: 0;
   z-index: 26;
   width: 240px;
   background: var(--surface);
@@ -277,6 +302,32 @@ body {
   border-radius: var(--radius-md);
   padding: 14px;
   box-shadow: var(--shadow-raised);
+}
+
+/* Item del menú de cuenta ("Ir a perfil") — mismo lenguaje visual que
+   .more-sheet a más abajo (ítem de lista, ícono a la izquierda). */
+.auth-panel-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.auth-panel-link:hover {
+  background: var(--surface-alt);
+  color: var(--accent-text);
+}
+
+.auth-panel-link i {
+  width: 18px;
+  text-align: center;
+  color: var(--muted);
 }
 
 .auth-panel h4 {
@@ -385,7 +436,7 @@ body {
 @media (max-width: 640px) {
   .auth-slot {
     top: 12px;
-    left: 12px;
+    right: 12px;
   }
 
   .auth-btn {
@@ -395,6 +446,18 @@ body {
 
   .auth-btn i {
     font-size: var(--text-xl);
+  }
+
+  .auth-btn-named {
+    width: auto;
+    height: auto;
+    padding: 6px 12px 6px 10px;
+  }
+
+  .auth-btn-name {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .auth-panel {
