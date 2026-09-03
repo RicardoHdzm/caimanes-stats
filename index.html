@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
+       como teléfono/dirección y los subrayan como link tocable — no son
+       links reales, solo texto de stats. -->
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>Caimanes de Villas — Stats</title>
 
   <!-- Preview al compartir el link (WhatsApp, Facebook, X). La imagen y la URL
