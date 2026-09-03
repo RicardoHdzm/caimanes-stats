@@ -2,7 +2,6 @@ import { PLAYERS } from "../data.js";
 import { heading } from "../ui.js";
 import { renderLineupResult } from "../lineup.js";
 import { renderComparar } from "./comparar.js";
-import { renderComments } from "./comments.js";
 import { getAllPositionOverrides } from "../db.js";
 
 // compareLeft/compareRight vienen de #/alineacion/p1/p2 y solo alimentan al
@@ -30,6 +29,4 @@ export function renderAlineacion(container, compareLeft, compareRight) {
   });
 
   renderComparar(container, compareLeft, compareRight);
-
-  renderComments(container, { contextType: "lineup", contextId: "alineacion" });
 }

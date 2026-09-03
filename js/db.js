@@ -201,9 +201,10 @@ export async function setWalkup(playerId, { title, artist, url }) {
 // ---- Comentarios (comments) ----
 //
 // Lectura pública. Escritura: cualquier jugador con cuenta (a diferencia de
-// walkup/posiciones, aquí no hay "dueño" — cualquiera comenta en cualquier
-// juego o en la alineación). Inmutables: no hay update/delete desde el
-// cliente a propósito, ver supabase/schema.sql.
+// walkup/posiciones, aquí no hay "dueño" fijo — cualquiera comenta en
+// cualquier juego). Un comentario por jugador por juego (constraint única
+// en supabase/schema.sql) — upsertComment sirve tanto para el primero como
+// para editarlo después, mismo botón en la UI.
 export async function getComments(contextType, contextId) {
   const client = getClient();
   if (!client) return [];
@@ -216,13 +217,16 @@ export async function getComments(contextType, contextId) {
   return error || !data ? [] : data;
 }
 
-export async function addComment(contextType, contextId, body) {
+export async function upsertComment(contextType, contextId, body) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
   if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para comentar.");
   const { error } = await client
     .from("comments")
-    .insert({ context_type: contextType, context_id: contextId, player_id: playerId, body });
+    .upsert(
+      { context_type: contextType, context_id: contextId, player_id: playerId, body },
+      { onConflict: "context_type,context_id,player_id" }
+    );
   if (error) throw error;
 }
 

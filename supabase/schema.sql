@@ -121,16 +121,20 @@ create policy "votes_delete_own" on public.mvp_votes
 
 grant select, insert, update, delete on public.mvp_votes to anon, authenticated;
 
--- 6. Comentarios, reusados por la página de un juego (context_type='game',
---    context_id = id del juego) y por la de alineación sugerida
---    (context_type='lineup', context_id='alineacion').
+-- 6. Comentarios en el detalle de un juego (context_type='game', context_id
+--    = id del juego). Un comentario por jugador por juego (constraint
+--    única abajo) — el mismo botón sirve para crear el primero y para
+--    editarlo después (upsertComment en js/db.js), no hay uno aparte por
+--    comentario. context_type='lineup' quedó del diseño original (llegó a
+--    tener comentarios en Alineación) pero ya no se usa desde la UI.
 create table if not exists public.comments (
   id bigint generated always as identity primary key,
   context_type text not null check (context_type in ('game', 'lineup')),
   context_id text not null,
   player_id text not null,
   body text not null check (char_length(body) between 1 and 1000),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (context_type, context_id, player_id)
 );
 create index if not exists comments_context_idx
   on public.comments (context_type, context_id, created_at);
@@ -142,10 +146,15 @@ create policy "comments_public_read" on public.comments
 create policy "comments_insert_own" on public.comments
   for insert to authenticated
   with check (player_id = public.current_player_id());
--- Sin políticas de update/delete: los comentarios son inmutables desde el
--- cliente a propósito. Se puede borrar uno desde Table Editor si hace falta.
 
-grant select, insert on public.comments to anon, authenticated;
+create policy "comments_update_own" on public.comments
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+-- Sin política de delete: no se puede borrar desde el cliente a propósito.
+-- Se puede borrar uno desde Table Editor si hace falta.
+
+grant select, insert, update on public.comments to anon, authenticated;
 
 -- 7. Posiciones registradas, editables por el propio jugador desde su
 --    perfil. Mismo formato que el campo `position` de PLAYERS en data.js

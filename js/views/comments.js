@@ -1,17 +1,15 @@
-// Comentarios — reusado desde el final del detalle de un juego
-// (contextType: "game") y de la vista de Alineación (contextType: "lineup",
-// contextId fijo "alineacion"). Lectura pública; comentar requiere cuenta
-// vinculada a un jugador (cualquiera, no solo quien jugó ese juego — a
-// diferencia del voto de MVP, aquí no hay restricción de participación).
+// Comentarios en el detalle de un juego. Lectura pública; comentar requiere
+// cuenta vinculada a un jugador (cualquiera, no solo quien jugó ese juego).
+// Un comentario por jugador por juego — si ya tienes uno, el mismo
+// formulario lo pre-llena y lo edita en vez de crear uno nuevo.
 import { PLAYERS } from "../data.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getComments, addComment } from "../db.js";
+import { getComments, upsertComment } from "../db.js";
 import { escapeHtml } from "../ui.js";
 
 function formatDate(iso) {
   const date = new Date(iso);
-  const text = date.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
-  return text;
+  return date.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
 }
 
 function commentItem(c) {
@@ -36,22 +34,16 @@ export function renderComments(container, { contextType, contextId }) {
   listEl.className = "comments-list";
   container.appendChild(listEl);
 
-  async function refresh() {
-    const comments = await getComments(contextType, contextId);
-    listEl.innerHTML =
-      comments.length > 0
-        ? comments.map(commentItem).join("")
-        : '<p class="subtitle">Sin comentarios todavía.</p>';
-  }
-
   const formSlot = document.createElement("div");
   container.appendChild(formSlot);
 
-  if (getCurrentPlayerId()) {
+  const myId = getCurrentPlayerId();
+
+  function renderForm(existingBody) {
     formSlot.innerHTML = `
       <form class="comment-form">
-        <textarea maxlength="1000" placeholder="Escribe un comentario..." required></textarea>
-        <button type="submit" class="auth-submit">Comentar</button>
+        <textarea maxlength="1000" placeholder="Escribe un comentario..." required>${escapeHtml(existingBody ?? "")}</textarea>
+        <button type="submit" class="auth-submit">${existingBody ? "Guardar cambios" : "Comentar"}</button>
       </form>
     `;
     const form = formSlot.querySelector("form");
@@ -63,8 +55,7 @@ export function renderComments(container, { contextType, contextId }) {
       const btn = form.querySelector("button");
       btn.disabled = true;
       try {
-        await addComment(contextType, contextId, body);
-        textarea.value = "";
+        await upsertComment(contextType, contextId, body);
         await refresh();
       } catch {
         // Silencioso a propósito: un error de red no debe romper la
@@ -73,7 +64,22 @@ export function renderComments(container, { contextType, contextId }) {
         btn.disabled = false;
       }
     });
-  } else {
+  }
+
+  async function refresh() {
+    const comments = await getComments(contextType, contextId);
+    listEl.innerHTML =
+      comments.length > 0
+        ? comments.map(commentItem).join("")
+        : '<p class="subtitle">Sin comentarios todavía.</p>';
+
+    if (myId) {
+      const mine = comments.find((c) => c.player_id === myId);
+      renderForm(mine?.body ?? null);
+    }
+  }
+
+  if (!myId) {
     formSlot.innerHTML = '<p class="auth-hint">Inicia sesión para comentar.</p>';
   }
 
