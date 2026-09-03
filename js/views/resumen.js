@@ -92,8 +92,36 @@ function wireRsvp(cardEl, gameId) {
   refresh();
 }
 
+function formatAnnouncementDate(iso) {
+  return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
+}
+
+function announcementItem(a) {
+  return `
+    <div class="announcement-item">
+      <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
+      <p class="announcement-body">${escapeHtml(a.body)}</p>
+    </div>
+  `;
+}
+
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
+
+  // Anuncios del equipo — solo se pintan si hay alguno (el coach los publica
+  // desde admin.html, ver js/admin-announcements.js). Van antes que todo lo
+  // demás porque son avisos, se quieren ver de inmediato al abrir la app.
+  const announcementsSlot = document.createElement("div");
+  container.appendChild(announcementsSlot);
+  getAnnouncements(3).then((items) => {
+    if (items.length === 0) return;
+    announcementsSlot.innerHTML = `
+      <div class="leader-card announcements-card">
+        <h3><i class="fa-solid fa-bullhorn"></i>Anuncios</h3>
+        <div class="announcements-list">${items.map(announcementItem).join("")}</div>
+      </div>
+    `;
+  });
 
   const rec = teamRecord(GAMES);
   const cards = document.createElement("div");

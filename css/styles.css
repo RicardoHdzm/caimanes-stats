@@ -2360,6 +2360,10 @@ main h3::before {
 
 /* ---- Anuncios del equipo (Resumen) ---- */
 
+.announcements-card {
+  margin-bottom: 20px;
+}
+
 .announcements-list {
   display: flex;
   flex-direction: column;
