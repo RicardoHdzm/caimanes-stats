@@ -147,7 +147,36 @@ create policy "comments_insert_own" on public.comments
 
 grant select, insert on public.comments to anon, authenticated;
 
--- 7. Estado de pago de inscripción. ÚNICA tabla que NO es de lectura
+-- 7. Posiciones registradas, editables por el propio jugador desde su
+--    perfil. Mismo formato que el campo `position` de PLAYERS en data.js
+--    ("SS/LF/CF", hasta 3, separadas por "/") — sin fila para un jugador,
+--    se sigue usando el valor fijo de data.js. Cuando SÍ hay fila, además
+--    de mostrarse en el perfil reemplaza esa posición en Roster y en el
+--    generador de alineación (ver js/views/roster.js, js/views/alineacion.js
+--    y js/lineup-tool.js — todos mezclan esta tabla sobre PLAYERS antes de
+--    usar la posición).
+create table if not exists public.player_positions (
+  player_id text primary key,
+  position text not null check (char_length(position) <= 20),
+  updated_at timestamptz not null default now()
+);
+alter table public.player_positions enable row level security;
+
+create policy "positions_public_read" on public.player_positions
+  for select using (true);
+
+create policy "positions_insert_own" on public.player_positions
+  for insert to authenticated
+  with check (player_id = public.current_player_id());
+
+create policy "positions_update_own" on public.player_positions
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+
+grant select, insert, update on public.player_positions to anon, authenticated;
+
+-- 8. Estado de pago de inscripción. ÚNICA tabla que NO es de lectura
 --    pública: hace falta tener sesión iniciada para verla, y solo la cuenta
 --    del coach puede escribirla. Cambia el correo de abajo si algún día
 --    cambia quién administra el sitio.
