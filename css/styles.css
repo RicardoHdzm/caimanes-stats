@@ -2288,3 +2288,131 @@ main h3::before {
   color: var(--text);
 }
 
+/* ---- Comentarios (juego + alineación) ---- */
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.comment-item {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.comment-author {
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.comment-date {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+
+.comment-body {
+  margin: 0;
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 480px;
+}
+
+.comment-form textarea {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 10px;
+  min-height: 70px;
+  resize: vertical;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.comment-form .auth-submit {
+  align-self: flex-start;
+  padding: 8px 20px;
+}
+
+/* ---- Anuncios del equipo (Resumen) ---- */
+
+.announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.announcement-item {
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+.announcement-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.announcement-date {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.announcement-body {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Foto de perfil personalizada ---- */
+
+.avatar-edit-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.avatar-edit-label:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
