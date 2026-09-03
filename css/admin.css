@@ -294,6 +294,37 @@
   font-size: 0.78rem;
 }
 
+/* ---- Anuncios (admin.html) ---- */
+
+.announcements-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.announcement-admin-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+}
+
+.announcement-admin-row p {
+  margin: 0;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.announcement-admin-row .announcement-date {
+  display: block;
+  margin-bottom: 4px;
+}
+
 /* ---- checklist de asistentes (lineup/) ---- */
 
 .attendee-controls {
