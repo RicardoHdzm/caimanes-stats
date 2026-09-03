@@ -203,8 +203,9 @@ export async function setWalkup(playerId, { title, artist, url }) {
 // Lectura pública. Escritura: cualquier jugador con cuenta (a diferencia de
 // walkup/posiciones, aquí no hay "dueño" fijo — cualquiera comenta en
 // cualquier juego). Un comentario por jugador por juego (constraint única
-// en supabase/schema.sql) — upsertComment sirve tanto para el primero como
-// para editarlo después, mismo botón en la UI.
+// en supabase/schema.sql). No se editan: para "cambiar" un comentario hay
+// que borrarlo y escribir uno nuevo — el dueño puede borrar el suyo, y el
+// coach puede borrar cualquiera (moderación).
 export async function getComments(contextType, contextId) {
   const client = getClient();
   if (!client) return [];
@@ -217,16 +218,20 @@ export async function getComments(contextType, contextId) {
   return error || !data ? [] : data;
 }
 
-export async function upsertComment(contextType, contextId, body) {
+export async function addComment(contextType, contextId, body) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
   if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para comentar.");
   const { error } = await client
     .from("comments")
-    .upsert(
-      { context_type: contextType, context_id: contextId, player_id: playerId, body },
-      { onConflict: "context_type,context_id,player_id" }
-    );
+    .insert({ context_type: contextType, context_id: contextId, player_id: playerId, body });
+  if (error) throw error;
+}
+
+export async function deleteComment(commentId) {
+  const client = getClient();
+  if (!client) throw new Error("Necesitas una cuenta para borrar comentarios.");
+  const { error } = await client.from("comments").delete().eq("id", commentId);
   if (error) throw error;
 }
 
