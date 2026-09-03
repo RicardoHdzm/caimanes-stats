@@ -1,7 +1,7 @@
 import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
-import { getCurrentPlayerId, isCoach } from "../auth.js";
+import { getSession, isCoach } from "../auth.js";
 import { getDuesMap, setDuesPaid } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
@@ -83,12 +83,16 @@ export function renderRoster(container) {
   ];
 
   // La columna de pago solo se agrega con sesión iniciada — sin cuenta, el
-  // roster se ve exactamente igual que siempre. `duesMap` arranca vacío y
+  // roster se ve exactamente igual que siempre. OJO: se usa getSession()
+  // (¿hay cuenta?), no getCurrentPlayerId() (¿a qué jugador corresponde esa
+  // cuenta?) — alguien puede tener cuenta antes de que el coach termine de
+  // vincularla en player_whitelist, y aun así debe poder ver esto (y si es
+  // el coach, editarlo) sin depender de ese paso. `duesMap` arranca vacío y
   // se llena aparte (abajo) porque viene de una consulta a Supabase, no de
   // data.js; el `render` la lee por closure, así que cuando llegue el dato
   // real solo hace falta volver a llamar draw() para que se refleje.
   let duesMap = new Map();
-  const loggedIn = !!getCurrentPlayerId();
+  const loggedIn = !!getSession();
   if (loggedIn) {
     columns.push({
       key: "paid",
