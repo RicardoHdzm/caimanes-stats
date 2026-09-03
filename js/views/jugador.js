@@ -75,6 +75,25 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// Comprime la foto de perfil en el navegador antes de subirla — una foto de
+// celular pesa varios MB y aquí se ve nomás a 120px, así que no tiene caso
+// guardar el original. Reescala (si hace falta) a un máximo de 640px por
+// lado y la reconvierte a JPEG con compresión; cualquier formato de entrada
+// (PNG, WEBP...) sale como JPEG.
+async function compressAvatar(file, maxSize = 640, quality = 0.82) {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, width, height);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("No se pudo procesar la imagen."))), "image/jpeg", quality);
+  });
+}
+
 export function renderJugadorDetalle(container, playerId) {
   const player = PLAYERS.find((p) => p.id === playerId);
 
@@ -278,8 +297,15 @@ export function renderJugadorDetalle(container, playerId) {
       const file = avatarInput.files[0];
       if (!file) return;
       avatarError.hidden = true;
+      let toUpload = file;
       try {
-        await uploadAvatar(player.id, file);
+        toUpload = await compressAvatar(file);
+      } catch {
+        // Si no se pudo comprimir (formato raro, navegador viejo) se sube
+        // tal cual — mejor una foto pesada que ninguna.
+      }
+      try {
+        await uploadAvatar(player.id, toUpload);
         const url = await getAvatarUrl(player.id);
         if (url) {
           avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
