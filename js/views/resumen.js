@@ -13,7 +13,7 @@ import {
 } from "../stats.js";
 import { heading, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getRsvps, setRsvp, getAnnouncements } from "../db.js";
+import { getRsvps, setRsvp, getAnnouncements, getAnnouncementLikes, likeAnnouncement, unlikeAnnouncement } from "../db.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -104,11 +104,16 @@ function formatAnnouncementDate(iso) {
   return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
 }
 
-function announcementItem(a) {
+// canLike = hay sesión vinculada a un jugador. El contador se ve siempre,
+// con o sin cuenta (lectura pública); solo dar/quitar like requiere cuenta.
+function announcementItem(a, likeCount, likedByMe, canLike) {
   return `
     <div class="announcement-item">
       <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
       <p class="announcement-body">${escapeHtml(a.body)}</p>
+      <button type="button" class="announcement-like-btn${likedByMe ? " active" : ""}" data-announcement="${a.id}"${canLike ? "" : " disabled"}>
+        <i class="fa-solid fa-heart"></i> <span class="announcement-like-count">${likeCount}</span>
+      </button>
     </div>
   `;
 }
@@ -121,15 +126,53 @@ export function renderResumen(container) {
   // demás porque son avisos, se quieren ver de inmediato al abrir la app.
   const announcementsSlot = document.createElement("div");
   container.appendChild(announcementsSlot);
-  getAnnouncements(3).then((items) => {
-    if (items.length === 0) return;
+
+  async function refreshAnnouncements() {
+    const items = await getAnnouncements(3);
+    if (items.length === 0) {
+      announcementsSlot.innerHTML = "";
+      return;
+    }
+    const likes = await getAnnouncementLikes(items.map((a) => a.id));
+    const myId = getCurrentPlayerId();
+    const likeCounts = new Map();
+    const likedByMe = new Set();
+    for (const like of likes) {
+      likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
+      if (myId && like.player_id === myId) likedByMe.add(like.announcement_id);
+    }
     announcementsSlot.innerHTML = `
       <div class="leader-card announcements-card">
         <h3><i class="fa-solid fa-bullhorn"></i>Anuncios</h3>
-        <div class="announcements-list">${items.map(announcementItem).join("")}</div>
+        <div class="announcements-list">${items
+          .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
+          .join("")}</div>
       </div>
     `;
+  }
+
+  // Delegado en announcementsSlot (nunca se reemplaza, solo su innerHTML en
+  // cada refresh) — mismo patrón que el like de comentarios en
+  // js/views/comments.js.
+  announcementsSlot.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".announcement-like-btn");
+    if (!btn || btn.disabled) return;
+    const id = Number(btn.dataset.announcement);
+    const alreadyLiked = btn.classList.contains("active");
+    btn.disabled = true;
+    try {
+      if (alreadyLiked) {
+        await unlikeAnnouncement(id);
+      } else {
+        await likeAnnouncement(id);
+      }
+      await refreshAnnouncements();
+    } catch {
+      btn.disabled = false;
+    }
   });
+
+  refreshAnnouncements();
 
   const rec = teamRecord(GAMES);
   const cards = document.createElement("div");

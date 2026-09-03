@@ -326,6 +326,39 @@ export async function deleteAnnouncement(id) {
   if (error) throw error;
 }
 
+// ---- Reacciones a anuncios (announcement_likes) ----
+//
+// Mismo patrón que los likes de comentarios (arriba): lectura pública, un
+// like por jugador por anuncio (interruptor, no acumula).
+export async function getAnnouncementLikes(announcementIds) {
+  const client = getClient();
+  if (!client || announcementIds.length === 0) return [];
+  const { data, error } = await runQuery(() =>
+    client.from("announcement_likes").select("announcement_id, player_id").in("announcement_id", announcementIds)
+  );
+  return error || !data ? [] : data;
+}
+
+export async function likeAnnouncement(announcementId) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para dar like.");
+  const { error } = await client.from("announcement_likes").insert({ announcement_id: announcementId, player_id: playerId });
+  if (error) throw error;
+}
+
+export async function unlikeAnnouncement(announcementId) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
+  const { error } = await client
+    .from("announcement_likes")
+    .delete()
+    .eq("announcement_id", announcementId)
+    .eq("player_id", playerId);
+  if (error) throw error;
+}
+
 // ---- Foto de perfil personalizada (Storage, bucket "avatars") ----
 //
 // A diferencia de todo lo de arriba, esto no es una tabla — cada foto es un

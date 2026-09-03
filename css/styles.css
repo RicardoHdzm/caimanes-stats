@@ -2437,8 +2437,11 @@ main h3::before {
 /* Interruptor de like — el corazón se rellena de rojo (currentColor hereda
    el color del texto, ya en --accent-text cuando está activo) sin
    necesitar dos íconos distintos (fa-regular/fa-solid), que Font Awesome
-   Free no siempre trae ambos. */
-.comment-like-btn {
+   Free no siempre trae ambos. Compartido entre comentarios (js/views/
+   comments.js) y anuncios (js/views/resumen.js) — mismo interruptor, mismo
+   look, dos contextos. */
+.comment-like-btn,
+.announcement-like-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -2454,18 +2457,25 @@ main h3::before {
   transition: color 0.15s, border-color 0.15s;
 }
 
-.comment-like-btn:disabled {
+.comment-like-btn:disabled,
+.announcement-like-btn:disabled {
   cursor: default;
 }
 
-.comment-like-btn:not(:disabled):hover {
+.comment-like-btn:not(:disabled):hover,
+.announcement-like-btn:not(:disabled):hover {
   border-color: var(--accent-text);
   color: var(--accent-text);
 }
 
-.comment-like-btn.active {
+.comment-like-btn.active,
+.announcement-like-btn.active {
   border-color: var(--accent-text);
   color: var(--accent-text);
+}
+
+.announcement-like-btn {
+  margin-top: 6px;
 }
 
 .comment-actions {
