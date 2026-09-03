@@ -14,6 +14,19 @@ let supabase = null;
 let session = null;
 let playerId = null; // se resuelve aparte (rpc a Supabase), no viene en la sesión
 
+// Único correo con permiso de editar player_dues (estado de pago) — debe
+// coincidir EXACTO con el que usa la política "dues_write_coach_only" en
+// supabase/schema.sql. Si algún día cambia quién administra el sitio, hay
+// que actualizar los dos lugares.
+const COACH_EMAIL = "jrhm95@gmail.com";
+
+// Solo decide si mostrar controles de edición (ej. la columna de pagos en
+// Roster) — no es la seguridad real, esa la impone Supabase con RLS
+// comparando el mismo correo del lado del servidor.
+export function isCoach() {
+  return session?.user?.email === COACH_EMAIL;
+}
+
 // Le avisa a js/main.js que algo cambió, para que vuelva a pintar la vista
 // actual con el estado nuevo — mismo patrón que ya usa el router con
 // "hashchange" (ver js/main.js). También repinta el propio botón del

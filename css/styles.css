@@ -1209,6 +1209,24 @@ main h3::before {
   font-weight: 400;
 }
 
+/* Checkbox de "Pagó" en Roster — solo lo ve/usa el coach (ver isCoach() en
+   js/auth.js); el resto de jugadores con sesión ven el Sí/No de solo
+   lectura en .stat-green/.stat-red de arriba, sin este control. */
+.dues-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dues-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--win);
+  cursor: pointer;
+}
+
 .badge {
   display: inline-block;
   padding: 2px 9px;

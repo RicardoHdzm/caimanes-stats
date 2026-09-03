@@ -1,6 +1,8 @@
 import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
+import { getCurrentPlayerId, isCoach } from "../auth.js";
+import { getDuesMap, setDuesPaid } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -19,6 +21,23 @@ const POSITION_GROUPS = [
 
 function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
+}
+
+// Celda de "Pagó": para el coach es un checkbox editable, para cualquier
+// otro jugador con sesión es de solo lectura (Sí/No en color). `duesMap`
+// llega por closure porque se llena aparte, async — ver comentario en
+// renderRoster.
+function renderDuesCell(playerId, duesMap) {
+  const paid = duesMap.get(playerId) ?? false;
+  if (!isCoach()) {
+    return paid ? '<span class="stat-green">Sí</span>' : '<span class="stat-red">No</span>';
+  }
+  return `
+    <label class="dues-toggle">
+      <input type="checkbox" data-player="${playerId}" ${paid ? "checked" : ""}>
+      ${paid ? "Sí" : "No"}
+    </label>
+  `;
 }
 
 export function renderRoster(container) {
@@ -63,10 +82,28 @@ export function renderRoster(container) {
     },
   ];
 
+  // La columna de pago solo se agrega con sesión iniciada — sin cuenta, el
+  // roster se ve exactamente igual que siempre. `duesMap` arranca vacío y
+  // se llena aparte (abajo) porque viene de una consulta a Supabase, no de
+  // data.js; el `render` la lee por closure, así que cuando llegue el dato
+  // real solo hace falta volver a llamar draw() para que se refleje.
+  let duesMap = new Map();
+  const loggedIn = !!getCurrentPlayerId();
+  if (loggedIn) {
+    columns.push({
+      key: "paid",
+      label: "Pagó",
+      full: "Inscripción de temporada pagada",
+      render: (_value, row) => renderDuesCell(row.id, duesMap),
+    });
+  }
+
   const tableEl = document.createElement("div");
   container.appendChild(tableEl);
 
-  function draw(activeGroup) {
+  let activeGroup = "ALL";
+
+  function draw() {
     const group = POSITION_GROUPS.find((g) => g.id === activeGroup) ?? POSITION_GROUPS[0];
     const filtered =
       group.id === "ALL" ? rows : rows.filter((row) => playerPositions(row).some((pos) => group.codes.includes(pos)));
@@ -86,10 +123,40 @@ export function renderRoster(container) {
     const btn = e.target.closest(".pos-filter-chip");
     if (!btn) return;
     for (const chip of filterRow.querySelectorAll(".pos-filter-chip")) chip.classList.toggle("active", chip === btn);
-    draw(btn.dataset.group);
+    activeGroup = btn.dataset.group;
+    draw();
   });
 
-  draw("ALL");
+  // Delegado en tableEl (nunca se reemplaza, solo sus hijos) para que siga
+  // funcionando después de que renderSortableTable vuelva a dibujar la
+  // tabla al ordenar por otra columna — un listener puesto directo en cada
+  // checkbox se perdería en cuanto eso pase.
+  if (loggedIn) {
+    tableEl.addEventListener("change", async (e) => {
+      const input = e.target.closest(".dues-toggle input");
+      if (!input) return;
+      const playerId = input.dataset.player;
+      const next = input.checked;
+      input.disabled = true;
+      try {
+        await setDuesPaid(playerId, next);
+        duesMap.set(playerId, next);
+      } catch {
+        input.checked = !next;
+      } finally {
+        draw();
+      }
+    });
+  }
+
+  draw();
+
+  if (loggedIn) {
+    getDuesMap().then((map) => {
+      duesMap = map;
+      draw();
+    });
+  }
 
   renderGlossary(container, columns);
 }
