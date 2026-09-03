@@ -1710,27 +1710,33 @@ main h3::before {
   text-align: left;
 }
 
-/* Sección "Mi cuenta" (cambiar contraseña + salir) en el propio perfil —
-   reusa el ancho/alineación de .walkup-edit-form, con una línea arriba para
-   separarla del bloque de la canción de entrada. */
-.account-panel {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
+/* "Editar perfil" es un solo botón para las 3 secciones del panel de
+   abajo (posiciones, canción, contraseña) — cada línea divisoria es un
+   .profile-edit-heading, no una tarjeta aparte por sección. */
+#account-signout-btn {
+  width: auto;
+  display: inline-flex;
+  margin-top: 8px;
+  margin-left: 8px;
 }
 
-.account-panel h4 {
-  margin: 0 0 10px;
+.profile-edit-heading {
+  margin: 4px 0 0;
   font-family: var(--font-display);
-  font-size: var(--text-md);
+  font-size: var(--text-sm);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--muted);
   text-align: center;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
 }
 
-.account-panel .auth-signout {
-  margin-top: 10px;
+.profile-edit-heading:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 /* RSVP en la tarjeta "Próximo juego" (Resumen) — conteo público arriba,
