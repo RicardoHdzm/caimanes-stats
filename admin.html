@@ -56,6 +56,21 @@
     </section>
 
     <section class="admin-section">
+      <h2>Temporadas por jugador</h2>
+      <p class="subtitle">
+        Marca en qué temporadas ha estado cada jugador. El debut (la primera marcada) es lo único que hoy se
+        muestra en su perfil — esto no se guarda solo, genera el valor de <code>debutSeason</code> para
+        actualizar a mano en cada jugador dentro de <code>PLAYERS</code> (js/data.js).
+      </p>
+      <div id="seasons-admin-list" class="seasons-admin-list"></div>
+      <button type="button" id="generate-seasons-btn" class="generate-btn"><i class="fa-solid fa-code"></i> Generar código</button>
+      <div class="code-output" id="seasons-output" hidden>
+        <pre><code id="seasons-code"></code></pre>
+        <button type="button" class="copy-btn" data-target="seasons-code"><i class="fa-solid fa-copy"></i> Copiar</button>
+      </div>
+    </section>
+
+    <section class="admin-section">
       <h2>Agregar jugador</h2>
     <p class="subtitle">Llena el formulario y copia el código en <code>PLAYERS</code> dentro de <code>js/data.js</code>.</p>
     <form id="player-form" class="admin-form">

@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES } from "./data.js";
+import { PLAYERS, GAMES, SEASONS } from "./data.js";
 
 // P, C, 1B, 2B, 3B, SS, LF, CF, RF, DH, UTIL, JC (jugador de cortesía,
 // solo batea) y JD (jugador designado, batea y eventualmente entra al campo).
@@ -129,6 +129,52 @@ function lineToCode(fields, values) {
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text);
 }
+
+// ---- Temporadas por jugador ----
+//
+// No escribe nada solo (a diferencia de Estado de pago/Anuncios/RSVP, que sí
+// van a Supabase) — debutSeason vive en data.js como el resto del roster, así
+// que esto solo genera el valor para pegar a mano en cada jugador dentro de
+// PLAYERS, igual que "Agregar jugador"/"Agregar juego" abajo.
+const seasonsList = document.getElementById("seasons-admin-list");
+const seasonsOutput = document.getElementById("seasons-output");
+const seasonsCode = document.getElementById("seasons-code");
+
+function seasonsRowMarkup(player) {
+  const checks = SEASONS.map((_season, i) => {
+    const n = i + 1;
+    // Pre-marcado desde su debut actual hasta la última temporada, asumiendo
+    // que ha seguido activo desde que entró — el coach desmarca a mano si
+    // alguien se ausentó una temporada en medio.
+    const checked = player.debutSeason && n >= player.debutSeason ? "checked" : "";
+    return `<label class="season-check"><input type="checkbox" data-season="${n}" ${checked}>${n}</label>`;
+  }).join("");
+  return `
+    <div class="seasons-admin-row" data-player="${player.id}">
+      <span class="seasons-admin-name">#${player.number ?? "-"} ${player.name}</span>
+      <div class="seasons-admin-checks">${checks}</div>
+    </div>
+  `;
+}
+
+seasonsList.innerHTML = PLAYERS.map(seasonsRowMarkup).join("");
+
+document.getElementById("generate-seasons-btn").addEventListener("click", () => {
+  const lines = [];
+  for (const row of seasonsList.querySelectorAll(".seasons-admin-row")) {
+    const player = PLAYERS.find((p) => p.id === row.dataset.player);
+    const checkedSeasons = [...row.querySelectorAll("input[type=checkbox]:checked")].map((cb) =>
+      Number(cb.dataset.season)
+    );
+    if (checkedSeasons.length === 0) continue; // sin ninguna marcada, no genera línea
+    const debut = Math.min(...checkedSeasons);
+    if (debut === player.debutSeason) continue; // sin cambios, no hace falta pegarlo de nuevo
+    lines.push(`${player.id} (${player.name}): debutSeason: ${debut},`);
+  }
+  seasonsCode.textContent =
+    lines.length > 0 ? lines.join("\n") : "Sin cambios — el debut de todos ya coincide con lo marcado.";
+  seasonsOutput.hidden = false;
+});
 
 // ---- Agregar jugador ----
 const playerForm = document.getElementById("player-form");
