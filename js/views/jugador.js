@@ -2,7 +2,7 @@ import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
-import { getCurrentPlayerId, getSession, changePassword, signOut } from "../auth.js";
+import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
 import { getWalkupOverride, setWalkup, getPositionOverride, setPosition, getDuesForPlayer } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 
@@ -160,15 +160,14 @@ export function renderJugadorDetalle(container, playerId) {
   // su propio botón — se juntan en un solo "Editar perfil" para no llenar
   // el perfil de botones repetidos. Cada sección conserva su propio botón
   // de guardar (son 3 escrituras independientes a Supabase, no una sola),
-  // solo el mostrar/ocultar se comparte. "Salir" no es edición, se queda
-  // aparte y siempre visible.
+  // solo el mostrar/ocultar se comparte. "Salir" ya no vive aquí — está en
+  // el menú del botón de cuenta del header (ver js/auth.js).
   if (getCurrentPlayerId() === player.id) {
     const slot = hero.querySelector("#profile-edit-slot");
     slot.innerHTML = `
       <button type="button" class="walkup-edit-btn" id="profile-edit-toggle">
         <i class="fa-solid fa-pen"></i> Editar perfil
       </button>
-      <button type="button" class="auth-signout" id="account-signout-btn">Salir</button>
       <div id="profile-edit-panel" class="walkup-edit-form auth-form" hidden>
         <p class="profile-edit-heading">Posiciones</p>
         <p class="auth-hint">Elige hasta 3, en el orden que prefieras.</p>
@@ -301,9 +300,6 @@ export function renderJugadorDetalle(container, playerId) {
         passwordSaveBtn.disabled = false;
       }
     });
-
-    // --- Salir (siempre visible, no forma parte del panel colapsable) ---
-    slot.querySelector("#account-signout-btn").addEventListener("click", () => signOut());
 
     // --- Un solo interruptor para las 3 secciones de arriba ---
     const toggle = slot.querySelector("#profile-edit-toggle");
