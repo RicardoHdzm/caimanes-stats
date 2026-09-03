@@ -2,8 +2,8 @@ import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
-import { getCurrentPlayerId, changePassword, signOut } from "../auth.js";
-import { getWalkupOverride, setWalkup, getPositionOverride, setPosition } from "../db.js";
+import { getCurrentPlayerId, getSession, changePassword, signOut } from "../auth.js";
+import { getWalkupOverride, setWalkup, getPositionOverride, setPosition, getDuesForPlayer } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 
 // Icono según de dónde venga el link de la canción de entrada.
@@ -89,6 +89,7 @@ export function renderJugadorDetalle(container, playerId) {
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
+    <div id="dues-badge"></div>
     <div style="margin-bottom: 12px;">${renderAvatar(player, 120)}</div>
     <div class="game-hero-teams">
       <span>#${player.number ?? "-"}</span>
@@ -109,6 +110,24 @@ export function renderJugadorDetalle(container, playerId) {
     <div id="walkup-edit-slot"></div>
   `;
   container.appendChild(hero);
+
+  // ---- Estado de inscripción: solo visible con sesión iniciada ----
+  //
+  // Misma regla que la columna "Pagó" en Roster (ver js/views/roster.js) —
+  // se comprueba getSession() (¿hay cuenta?), no getCurrentPlayerId(), para
+  // que también se vea antes de que el coach termine de vincular la cuenta
+  // en player_whitelist. Sin sesión, el badge ni se pide.
+  if (getSession()) {
+    getDuesForPlayer(player.id).then((paid) => {
+      const badge = hero.querySelector("#dues-badge");
+      if (!badge) return;
+      badge.innerHTML = `
+        <span class="dues-badge-pill ${paid ? "stat-green" : "stat-red"}">
+          Estado de inscripción: ${paid ? "Pagada" : "Sin pagar"}
+        </span>
+      `;
+    });
+  }
 
   // ---- Posiciones registradas: editables solo en tu propio perfil ----
   //
