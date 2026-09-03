@@ -134,7 +134,7 @@ export function renderJugadorDetalle(container, playerId) {
       <button type="button" class="walkup-edit-btn" id="position-edit-toggle">
         <i class="fa-solid fa-pen"></i> Editar mis posiciones
       </button>
-      <div id="position-edit-form" class="walkup-edit-form" hidden>
+      <div id="position-edit-form" class="walkup-edit-form auth-form" hidden>
         <p class="auth-hint">Elige hasta 3, en el orden que prefieras.</p>
         <div class="pos-filter-row" id="position-picker">
           ${DEFENSE_POSITIONS.map((pos) => `<button type="button" class="pos-filter-chip" data-pos="${pos}">${pos}</button>`).join("")}
@@ -226,7 +226,7 @@ export function renderJugadorDetalle(container, playerId) {
       <button type="button" class="walkup-edit-btn" id="walkup-edit-toggle">
         <i class="fa-solid fa-pen"></i> Editar mi canción de entrada
       </button>
-      <form id="walkup-edit-form" class="walkup-edit-form" hidden>
+      <form id="walkup-edit-form" class="walkup-edit-form auth-form" hidden>
         <label>Título<input type="text" name="title" maxlength="120" required></label>
         <label>Artista<input type="text" name="artist" maxlength="120"></label>
         <label>Link (Spotify, YouTube...)<input type="url" name="url" maxlength="500"></label>

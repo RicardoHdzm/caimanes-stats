@@ -107,9 +107,12 @@ día pones dominio propio hay que actualizar esas URLs** (`og:url`,
 
 El sitio en sí sigue siendo estático (sin build, sin servidor propio), pero
 ahora hay una capa opcional de cuentas para que los jugadores puedan
-confirmar asistencia, votar MVP, editar su canción de entrada, comentar y
-ver quién ya pagó su inscripción — todo con [Supabase](https://supabase.com)
-(base de datos + login en un solo servicio gratuito).
+confirmar asistencia, votar MVP, editar su canción de entrada y sus
+posiciones registradas, comentar, y ver quién ya pagó su inscripción — todo
+con [Supabase](https://supabase.com) (base de datos + login en un solo
+servicio gratuito). Las posiciones que edita cada quien en su perfil
+reemplazan las de `data.js` en Roster y en el generador de alineación — no
+son solo informativas.
 
 **Sin configurar, el sitio funciona exactamente igual que antes** — el botón
 de sesión ni siquiera aparece hasta que se complete este paso único:

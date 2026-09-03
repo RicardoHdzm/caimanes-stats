@@ -1,10 +1,16 @@
 import { PLAYERS } from "./data.js";
 import { DEFENSE_POSITIONS, registeredFieldPositions, renderLineupResult } from "./lineup.js";
+import { initAuth } from "./auth.js";
 import { getAllPositionOverrides } from "./db.js";
 
 const listEl = document.getElementById("attendee-list");
 const countEl = document.getElementById("attendee-count");
 const resultEl = document.getElementById("lineup-result");
+
+// Esta página no es parte del router del sitio (ver index.html/js/main.js),
+// así que nadie más llama initAuth() aquí — hace falta antes de leer
+// player_positions, si no getClient() sigue en null.
+await initAuth();
 
 // Posiciones personalizadas (ver "Editar mis posiciones" en el perfil) se
 // mezclan ANTES de armar la lista de asistentes — top-level await, no hay

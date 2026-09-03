@@ -30,6 +30,20 @@ export async function getDuesMap() {
   return new Map(data.map((row) => [row.player_id, row.paid]));
 }
 
+// Estado de un solo jugador (para el badge del perfil, ver
+// js/views/jugador.js) — más liviano que pedir la tabla completa cuando
+// solo hace falta uno. OJO: solo se debe llamar con sesión iniciada — sin
+// ella, RLS esconde la fila igual que si no existiera (sin distinguir
+// "no pagó" de "no la puedo ver"), así que quien llama debe comprobar
+// getSession() antes, igual que ya hace Roster para esta misma tabla.
+export async function getDuesForPlayer(playerId) {
+  const client = getClient();
+  if (!client) return null;
+  const { data, error } = await client.from("player_dues").select("paid").eq("player_id", playerId).maybeSingle();
+  if (error) return null;
+  return data?.paid ?? false;
+}
+
 // Upsert: si el jugador no tenía fila todavía, la crea. Tira si quien llama
 // no es el coach — RLS lo bloquea allá, no aquí.
 export async function setDuesPaid(playerId, paid) {
