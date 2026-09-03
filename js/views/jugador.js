@@ -140,23 +140,20 @@ export function renderJugadorDetalle(container, playerId) {
   //
   // Lo único que este perfil no muestra ya en otro lado es tu RSVP al
   // próximo juego (la inscripción ya tiene su badge arriba a la derecha).
+  // Mismos botones Sí/No que la tarjeta "Próximo juego" de Resumen
+  // (wireRsvp, importado de ahí) — así se puede cambiar la asistencia sin
+  // salir del perfil.
   if (getCurrentPlayerId() === player.id && SCHEDULE.length > 0) {
+    const g = SCHEDULE[0];
     const summaryEl = document.createElement("div");
     summaryEl.className = "leader-card";
-    summaryEl.innerHTML = `<h3><i class="fa-solid fa-clipboard-list"></i>Tu resumen</h3><p>Cargando…</p>`;
+    summaryEl.innerHTML = `
+      <h3><i class="fa-solid fa-clipboard-list"></i>Tu resumen</h3>
+      <p>Próximo juego: ${g.date} vs ${g.opponent}</p>
+      <div class="rsvp-actions"></div>
+    `;
     container.appendChild(summaryEl);
-
-    (async () => {
-      const g = SCHEDULE[0];
-      const rows = await getRsvps(g.id);
-      const mine = rows.find((r) => r.player_id === player.id);
-      const statusText =
-        mine?.status === "yes" ? '<span class="stat-green">Vas</span>' : mine?.status === "no" ? '<span class="stat-red">No vas</span>' : "Sin responder";
-      const p = summaryEl.querySelector("p");
-      if (p) {
-        p.innerHTML = `Próximo juego (${g.date} vs ${g.opponent}): <strong>${statusText}</strong> — <a href="#/resumen">cambiar</a>`;
-      }
-    })();
+    wireRsvp(summaryEl, g.id);
   }
 
   // ---- Estado de inscripción: solo visible con sesión iniciada ----
