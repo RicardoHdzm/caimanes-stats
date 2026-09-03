@@ -1,9 +1,18 @@
-import { PLAYERS, GAMES } from "../data.js";
+import { PLAYERS, GAMES, SCHEDULE } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
 import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
-import { getWalkupOverride, setWalkup, getPositionOverride, setPosition, getDuesForPlayer } from "../db.js";
+import {
+  getWalkupOverride,
+  setWalkup,
+  getPositionOverride,
+  setPosition,
+  getDuesForPlayer,
+  getRsvps,
+  getAvatarUrl,
+  uploadAvatar,
+} from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
 
@@ -91,7 +100,7 @@ export function renderJugadorDetalle(container, playerId) {
   hero.className = "game-hero";
   hero.innerHTML = `
     <div id="dues-badge"></div>
-    <div style="margin-bottom: 12px;">${renderAvatar(player, 120)}</div>
+    <div id="profile-avatar" style="margin-bottom: 12px;">${renderAvatar(player, 120)}</div>
     <div class="game-hero-teams">
       <span>#${player.number ?? "-"}</span>
       <span class="game-hero-vs">·</span>
