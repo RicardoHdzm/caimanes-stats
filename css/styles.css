@@ -2369,6 +2369,12 @@ main h3::before {
   gap: 8px;
 }
 
+/* Separado del like a propósito (empujado al extremo derecho): borrar es
+   irreversible y no debe quedar a un click accidental de distancia. */
+.comment-delete-btn {
+  margin-left: auto;
+}
+
 /* Mismo look que el like, pero se pone rojo hasta el hover — borrar es
    irreversible y no debe verse tan disponible como dar like. */
 .comment-delete-btn {
