@@ -5,6 +5,7 @@ import { renderTrendChart } from "../charts.js";
 import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
 import { getWalkupOverride, setWalkup, getPositionOverride, setPosition, getDuesForPlayer } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
+import { renderLockedComparison } from "./comparar.js";
 
 // Icono según de dónde venga el link de la canción de entrada.
 const WALKUP_PLATFORMS = [
