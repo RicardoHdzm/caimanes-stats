@@ -123,10 +123,11 @@ grant select, insert, update, delete on public.mvp_votes to anon, authenticated;
 
 -- 6. Comentarios en el detalle de un juego (context_type='game', context_id
 --    = id del juego). Un comentario por jugador por juego (constraint
---    única abajo) — el mismo botón sirve para crear el primero y para
---    editarlo después (upsertComment en js/db.js), no hay uno aparte por
---    comentario. context_type='lineup' quedó del diseño original (llegó a
---    tener comentarios en Alineación) pero ya no se usa desde la UI.
+--    única abajo). No se editan: para "cambiar" uno hay que borrarlo y
+--    escribir uno nuevo (addComment en js/db.js) — el dueño puede borrar el
+--    suyo, y el coach puede borrar cualquiera (moderación).
+--    context_type='lineup' quedó del diseño original (llegó a tener
+--    comentarios en Alineación) pero ya no se usa desde la UI.
 create table if not exists public.comments (
   id bigint generated always as identity primary key,
   context_type text not null check (context_type in ('game', 'lineup')),
@@ -147,14 +148,15 @@ create policy "comments_insert_own" on public.comments
   for insert to authenticated
   with check (player_id = public.current_player_id());
 
-create policy "comments_update_own" on public.comments
-  for update to authenticated
-  using (player_id = public.current_player_id())
-  with check (player_id = public.current_player_id());
--- Sin política de delete: no se puede borrar desde el cliente a propósito.
--- Se puede borrar uno desde Table Editor si hace falta.
+create policy "comments_delete_own" on public.comments
+  for delete to authenticated
+  using (player_id = public.current_player_id());
 
-grant select, insert, update on public.comments to anon, authenticated;
+create policy "comments_delete_coach" on public.comments
+  for delete to authenticated
+  using (auth.email() = 'jrhm95@gmail.com');
+
+grant select, insert, delete on public.comments to anon, authenticated;
 
 -- 6b. Likes de comentarios. Un like por jugador por comentario (la llave
 --     primaria lo garantiza) — dar like de nuevo no acumula, es un
