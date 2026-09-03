@@ -1786,6 +1786,15 @@ main h3::before {
   padding: 8px 14px;
 }
 
+/* Votar / Cambiar voto / Quitar voto miden lo mismo — "Cambiar voto" es el
+   texto más ancho de los tres, el resto se centra dentro de ese mismo
+   espacio en vez de quedar más angosto. */
+.vote-form .auth-submit,
+.vote-form .auth-signout {
+  min-width: 140px;
+  text-align: center;
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
