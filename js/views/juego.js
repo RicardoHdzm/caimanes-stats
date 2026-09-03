@@ -1,6 +1,8 @@
 import { GAMES, TEAM } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge } from "../ui.js";
+import { getCurrentPlayerId } from "../auth.js";
+import { getMvpVotes, setMvpVote } from "../db.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
