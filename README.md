@@ -74,12 +74,16 @@ js/ui.js                         tabla ordenable reutilizable
 js/charts.js                      gráficas en SVG (tendencia de bateo)
 js/lineup.js                       motor de alineación (defensa + orden al bat)
 js/main.js                          router de las pestañas
-js/admin.js                          lógica de admin.html
-js/lineup-tool.js                     lógica de lineup/index.html
-js/views/                              una vista por pestaña (comparar.js va dentro de alineacion.js)
-assets/logo.png                         logo del equipo
-assets/thumbnail.png                     preview al compartir el link (1200x630)
-assets/icon-*.png                         iconos del PWA (192, 512 y maskable)
+js/auth.js                           sesión de Supabase + botón de login del header
+js/db.js                              consultas a Supabase (RSVP, votos, walkup, pagos, comentarios)
+js/supabase-config.js                  URL y llave del proyecto (se llenan una vez, ver arriba)
+js/admin.js                             lógica de admin.html
+js/lineup-tool.js                        lógica de lineup/index.html
+js/views/                                 una vista por pestaña (comparar.js va dentro de alineacion.js)
+supabase/schema.sql                        tablas y permisos — se corre una vez en Supabase, no automático
+assets/logo.png                             logo del equipo
+assets/thumbnail.png                         preview al compartir el link (1200x630)
+assets/icon-*.png                             iconos del PWA (192, 512 y maskable)
 ```
 
 ## Instalable y sin señal (PWA)
@@ -99,11 +103,43 @@ absoluto, porque WhatsApp y Facebook no resuelven rutas relativas. **Si algún
 día pones dominio propio hay que actualizar esas URLs** (`og:url`,
 `og:image`, `twitter:image` y `canonical`).
 
+## Cuentas de jugador (Supabase)
+
+El sitio en sí sigue siendo estático (sin build, sin servidor propio), pero
+ahora hay una capa opcional de cuentas para que los jugadores puedan
+confirmar asistencia, votar MVP, editar su canción de entrada, comentar y
+ver quién ya pagó su inscripción — todo con [Supabase](https://supabase.com)
+(base de datos + login en un solo servicio gratuito).
+
+**Sin configurar, el sitio funciona exactamente igual que antes** — el botón
+de sesión ni siquiera aparece hasta que se complete este paso único:
+
+1. Crea una cuenta y un proyecto gratis en supabase.com.
+2. En el SQL Editor de tu proyecto, pega y corre **una sola vez** el
+   contenido de [`supabase/schema.sql`](supabase/schema.sql) — crea todas
+   las tablas y sus reglas de permisos.
+3. En **Project Settings → API**, copia el *Project URL* y la *anon public
+   key* y pégalos en [`js/supabase-config.js`](js/supabase-config.js).
+
+**No hay auto-registro.** Cada cuenta la das de alta tú mismo, dos pasos
+cortos en el panel de Supabase (sin código) por cada jugador nuevo:
+
+- **Authentication → Users → Add user**: su correo + una contraseña
+  temporal — activa "Auto Confirm User" para que funcione de inmediato. El
+  jugador puede cambiar esa contraseña después, desde el propio sitio.
+- **Table Editor → `player_whitelist`**: una fila con ese mismo correo y su
+  `id` de `js/data.js` (ej. `"p15"`) — así la app sabe qué jugador es cada
+  cuenta.
+
+La tabla `player_dues` (quién pagó la inscripción) es la única que no es de
+lectura pública — solo la ven cuentas con sesión iniciada, y solo tu propia
+cuenta (por correo, ver `supabase/schema.sql`) puede editarla.
+
 ## Notas
 
 - No se necesita build ni instalar dependencias: corre directo en el
-  navegador con módulos JS nativos.
-- No hay login ni base de datos todavía — es un sitio de solo lectura para
-  cualquiera que entre al link, y tú controlas los datos editando el código.
-  Si más adelante quieres que los jugadores capturen sus propias stats o
-  necesitas cuentas de usuario, se puede migrar a Supabase más adelante.
+  navegador con módulos JS nativos. El cliente de Supabase se carga por CDN
+  (`js/auth.js`), igual que Font Awesome — no agrega ningún paso de build.
+- El sitio es de solo lectura para cualquiera que entre sin cuenta; tú
+  sigues controlando los datos del roster/juegos editando `js/data.js` y
+  subiendo los cambios por git, como siempre.

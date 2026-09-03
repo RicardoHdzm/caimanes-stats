@@ -219,6 +219,183 @@ body {
   }
 }
 
+/* Esquina opuesta a .social-link — mismo círculo, ancla a la izquierda en
+   vez de a la derecha. Vacío (sin ancho) si Supabase no está configurado:
+   js/auth.js deja innerHTML = "" en ese caso, así este bloque no le roba
+   espacio a nada. */
+.auth-slot {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  /* Por encima de .tabs (z-index: 30, sticky) — el botón vive en .topbar,
+     que precede a la nav en el flujo normal, pero el panel desplegado no
+     debe quedar tapado si algo cambia más adelante en ese orden. */
+  z-index: 32;
+}
+
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.auth-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.auth-btn i {
+  font-size: var(--text-2xl);
+}
+
+/* Con sesión iniciada el ícono se pinta de verde en vez de solo resaltar al
+   pasar el mouse — una señal de estado a simple vista, sin abrir el panel. */
+.auth-btn-in {
+  color: var(--win);
+  border-color: var(--win);
+}
+
+.auth-panel {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  z-index: 26;
+  width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-raised);
+}
+
+.auth-panel h4 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.auth-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.auth-form input {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.auth-submit {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 800;
+  font-size: var(--text-sm);
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 8px 0;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.auth-submit:hover {
+  filter: brightness(1.15);
+}
+
+.auth-error {
+  color: var(--loss);
+  font-size: var(--text-2xs);
+  margin: 0;
+}
+
+.auth-ok {
+  color: var(--win);
+  font-size: var(--text-2xs);
+  margin: 0;
+}
+
+.auth-hint {
+  margin: 10px 0 0;
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  text-align: center;
+}
+
+.auth-signout {
+  margin-top: 10px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 6px 0;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.auth-signout:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .auth-slot {
+    top: 12px;
+    left: 12px;
+  }
+
+  .auth-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .auth-btn i {
+    font-size: var(--text-xl);
+  }
+
+  .auth-panel {
+    top: 48px;
+    width: 220px;
+  }
+}
+
 /* Se queda pegada arriba al hacer scroll, así el sitio no obliga a volver
    hasta el principio para cambiar de pestaña. Necesita fondo opaco propio
    porque el contenido pasa por debajo. */

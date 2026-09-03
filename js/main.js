@@ -10,6 +10,7 @@ import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
+import { initAuth, mountAuthControl } from "./auth.js";
 
 const routes = {
   resumen: renderResumen,
@@ -136,8 +137,17 @@ function render() {
 }
 
 buildBottomTabs();
+mountAuthControl(document.getElementById("auth-slot"));
 window.addEventListener("hashchange", render);
+// Se dispara desde js/auth.js cada vez que cambia la sesión (login, logout,
+// se resuelve el player_id) — la vista actual se repinta con el estado
+// nuevo, mismo tratamiento que un cambio de hash.
+window.addEventListener("caimanes:auth-changed", render);
 render();
+// No se espera a que termine para pintar la primera vez: initAuth() resuelve
+// la sesión de forma async y avisa por "caimanes:auth-changed" cuando esté
+// lista, así la app no se queda en blanco esperando red.
+initAuth();
 
 // Service worker: deja abrir la página sin señal (en el campo casi nunca hay
 // datos). Si falla el registro la app sigue funcionando normal, solo pierde
