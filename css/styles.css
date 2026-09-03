@@ -285,7 +285,11 @@ body {
   color: var(--text);
 }
 
-.auth-form {
+/* :not([hidden]) — igual criterio que .more-sheet más abajo: en
+   walkup-edit-form/position-edit-form el atributo `hidden` vive en el
+   mismo elemento que esta clase, y "display: flex" le ganaría al `display:
+   none` por defecto de `hidden` si no se excluye explícitamente aquí. */
+.auth-form:not([hidden]) {
   display: flex;
   flex-direction: column;
   gap: 10px;
