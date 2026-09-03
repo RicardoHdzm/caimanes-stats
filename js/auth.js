@@ -161,11 +161,11 @@ function loggedInMarkup() {
   // Admin) — no navega directo, así se puede cerrar sesión desde cualquier
   // página sin pasar por el perfil.
   if (playerId) {
-    const name = PLAYERS.find((p) => p.id === playerId)?.name ?? "Mi cuenta";
+    const player = PLAYERS.find((p) => p.id === playerId);
+    const label = player ? `#${player.number ?? "-"} - ${player.name}` : "Mi cuenta";
     return `
       <button type="button" class="auth-btn auth-btn-in auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
-        <i class="fa-solid fa-user-check"></i>
-        <span class="auth-btn-name">${name}</span>
+        <span class="auth-btn-name">${label}</span>
       </button>
       <div class="auth-panel" id="auth-panel" hidden>
         <a href="#/jugador/${playerId}" class="auth-panel-link" id="auth-profile-link">
