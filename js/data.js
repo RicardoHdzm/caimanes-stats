@@ -15,6 +15,22 @@ export const TEAM = {
   leagueTeams: 18, // total de equipos en la liga
 };
 
+// Historial de temporadas del equipo, una entrada por temporada (índice 0 =
+// temporada 1, hasta SEASONS.length = TEAM.seasonsTotal). El equipo ha
+// jugado en 3 ligas distintas a lo largo de su historia. Se usa para
+// mostrar el debut de cada jugador en su perfil — ver PLAYERS[].debutSeason
+// abajo (ej. "Debut: 2023 - 2da Temporada - Liga Gaspasa").
+export const SEASONS = [
+  { year: 2023, league: "Liga Gaspasa" }, // 1
+  { year: 2023, league: "Liga Gaspasa" }, // 2
+  { year: 2024, league: "Liga RCV" }, // 3
+  { year: 2024, league: "Liga RCV" }, // 4
+  { year: 2025, league: "Liga Valle Alto" }, // 5
+  { year: 2025, league: "Liga Valle Alto" }, // 6
+  { year: 2026, league: "Liga Valle Alto" }, // 7
+  { year: 2026, league: "Liga Valle Alto" }, // 8 (actual)
+];
+
 // Roster del equipo.
 // number: número de camiseta (null si aún no lo sabes)
 // position: posición principal — vacío si aún no la sabes. Códigos válidos:
