@@ -109,6 +109,50 @@ export async function deleteMvpVote(gameId) {
   if (error) throw error;
 }
 
+// ---- Posiciones registradas (player_positions) ----
+//
+// Lectura pública. Escritura: solo el propio jugador. Cuando hay fila para
+// un jugador, reemplaza la posición de data.js EN TODOS LADOS (Roster,
+// perfil, generador de alineación) — no es solo informativo. Mismo formato
+// que PLAYERS[].position: hasta 3 códigos separados por "/".
+
+// null si el jugador no ha personalizado sus posiciones (o si Supabase no
+// está configurado) — en ese caso se sigue usando la de data.js.
+export async function getPositionOverride(playerId) {
+  const client = getClient();
+  if (!client) return null;
+  const { data, error } = await client
+    .from("player_positions")
+    .select("position")
+    .eq("player_id", playerId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data.position;
+}
+
+// Todas las posiciones personalizadas de una vez, como Map playerId ->
+// position. Para Roster y el generador de alineación, que necesitan
+// mezclarlas sobre el roster completo en vez de consultar jugador por
+// jugador. Map vacío si Supabase no está configurado o falla la consulta.
+export async function getAllPositionOverrides() {
+  const client = getClient();
+  if (!client) return new Map();
+  const { data, error } = await client.from("player_positions").select("player_id, position");
+  if (error || !data) return new Map();
+  return new Map(data.map((row) => [row.player_id, row.position]));
+}
+
+// Upsert de las posiciones del propio jugador. Tira si quien llama no es
+// ese jugador — RLS lo bloquea allá, no aquí.
+export async function setPosition(playerId, position) {
+  const client = getClient();
+  if (!client) throw new Error("Supabase no está configurado todavía.");
+  const { error } = await client
+    .from("player_positions")
+    .upsert({ player_id: playerId, position, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
 // ---- Canción de entrada personalizada (player_walkups) ----
 //
 // Lectura pública (cualquiera ve la canción de cualquiera, con o sin
