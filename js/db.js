@@ -40,3 +40,34 @@ export async function setDuesPaid(playerId, paid) {
     .upsert({ player_id: playerId, paid, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
+
+// ---- Canción de entrada personalizada (player_walkups) ----
+//
+// Lectura pública (cualquiera ve la canción de cualquiera, con o sin
+// sesión). Escritura: solo el propio jugador — RLS compara contra
+// current_player_id(), no hace falta repetir esa comprobación aquí.
+
+// null si el jugador no ha personalizado su canción (o si Supabase no está
+// configurado) — en ese caso la vista sigue mostrando la de data.js.
+export async function getWalkupOverride(playerId) {
+  const client = getClient();
+  if (!client) return null;
+  const { data, error } = await client
+    .from("player_walkups")
+    .select("title, artist, url")
+    .eq("player_id", playerId)
+    .maybeSingle();
+  if (error || !data) return null;
+  return data;
+}
+
+// Upsert de la canción del propio jugador. Tira si quien llama no es ese
+// jugador — RLS lo bloquea allá, no aquí.
+export async function setWalkup(playerId, { title, artist, url }) {
+  const client = getClient();
+  if (!client) throw new Error("Supabase no está configurado todavía.");
+  const { error } = await client
+    .from("player_walkups")
+    .upsert({ player_id: playerId, title, artist, url, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
