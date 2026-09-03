@@ -130,23 +130,31 @@ export function renderRoster(container) {
   // Delegado en tableEl (nunca se reemplaza, solo sus hijos) para que siga
   // funcionando después de que renderSortableTable vuelva a dibujar la
   // tabla al ordenar por otra columna — un listener puesto directo en cada
-  // checkbox se perdería en cuanto eso pase.
+  // botón se perdería en cuanto eso pase. Va en fase de captura (el `true`
+  // final) para poder frenar el evento ANTES de que llegue al onRowClick de
+  // la fila (ver ui.js) — si no, un clic en el ícono también navegaría al
+  // perfil del jugador.
   if (loggedIn) {
-    tableEl.addEventListener("change", async (e) => {
-      const input = e.target.closest(".dues-toggle input");
-      if (!input) return;
-      const playerId = input.dataset.player;
-      const next = input.checked;
-      input.disabled = true;
-      try {
-        await setDuesPaid(playerId, next);
-        duesMap.set(playerId, next);
-      } catch {
-        input.checked = !next;
-      } finally {
-        draw();
-      }
-    });
+    tableEl.addEventListener(
+      "click",
+      async (e) => {
+        const btn = e.target.closest(".dues-toggle-btn");
+        if (!btn) return;
+        e.stopPropagation();
+        const playerId = btn.dataset.player;
+        const next = btn.dataset.paid !== "true";
+        btn.disabled = true;
+        try {
+          await setDuesPaid(playerId, next);
+          duesMap.set(playerId, next);
+        } catch {
+          // se queda como estaba, draw() vuelve a pintar el valor real
+        } finally {
+          draw();
+        }
+      },
+      true
+    );
   }
 
   draw();
