@@ -1,6 +1,7 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
+import { getSession } from "../auth.js";
 
 // dir: 1 = gana el número más alto, -1 = gana el más bajo (ponches, errores,
 // ERA...). `decimals` marca las stats que se comparan como número con punto
@@ -108,6 +109,17 @@ export function renderComparar(container, leftId, rightId) {
   const h3 = document.createElement("h3");
   h3.textContent = "Comparar jugadores";
   container.appendChild(h3);
+
+  // Solo con cuenta iniciada — a diferencia de RSVP/MVP (públicos para leer,
+  // con cuenta solo para participar), aquí ni el propio comparador se
+  // muestra sin sesión.
+  if (!getSession()) {
+    const p = document.createElement("p");
+    p.className = "subtitle";
+    p.textContent = "Inicia sesión para comparar jugadores.";
+    container.appendChild(p);
+    return;
+  }
 
   if (PLAYERS.length < 2) {
     const p = document.createElement("p");
