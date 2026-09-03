@@ -1,4 +1,4 @@
-import { GAMES, SCHEDULE, TEAM } from "../data.js";
+import { GAMES, SCHEDULE, TEAM, PLAYERS } from "../data.js";
 import {
   teamRecord,
   battingTotals,
@@ -12,6 +12,8 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading } from "../ui.js";
+import { getCurrentPlayerId } from "../auth.js";
+import { getRsvps, setRsvp } from "../db.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
