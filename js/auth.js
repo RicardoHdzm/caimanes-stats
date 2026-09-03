@@ -155,19 +155,23 @@ function loggedOutMarkup() {
 }
 
 function loggedInMarkup() {
-  const name = PLAYERS.find((p) => p.id === playerId)?.name ?? session?.user?.email ?? "Cuenta";
+  // Con jugador ya identificado, el botón es un link directo a tu propio
+  // perfil — un clic y ya, sin tener que buscarte en Roster. Cambiar
+  // contraseña y cerrar sesión viven ahí (ver "Mi cuenta" en
+  // js/views/jugador.js), no en un panel aparte del header.
+  if (playerId) {
+    return `<a href="#/jugador/${playerId}" class="auth-btn auth-btn-in" aria-label="Tu perfil"><i class="fa-solid fa-user-check"></i></a>`;
+  }
+  // Cuenta con sesión pero sin vincular todavía a un jugador (falta la fila
+  // en player_whitelist) — no hay a qué perfil mandarla, así que se queda
+  // con un panel mínimo solo para poder cerrar sesión.
   return `
     <button type="button" class="auth-btn auth-btn-in" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
       <i class="fa-solid fa-user-check"></i>
     </button>
     <div class="auth-panel" id="auth-panel" hidden>
-      <h4>${name}</h4>
-      <form id="auth-password-form" class="auth-form">
-        <label>Nueva contraseña<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
-        <p class="auth-error" id="auth-error" hidden></p>
-        <p class="auth-ok" id="auth-ok" hidden>Contraseña actualizada.</p>
-        <button type="submit" class="auth-submit">Cambiar contraseña</button>
-      </form>
+      <h4>${session?.user?.email ?? "Cuenta"}</h4>
+      <p class="auth-hint">Tu cuenta todavía no está vinculada a un jugador — pídeselo al coach.</p>
       <button type="button" class="auth-signout" id="auth-signout-btn">Salir</button>
     </div>
   `;
@@ -193,24 +197,6 @@ function wireAuthControl() {
       setPanelOpen(false);
     } catch (err) {
       errorEl.textContent = "Correo o contraseña incorrectos.";
-      errorEl.hidden = false;
-    }
-  });
-
-  const passwordForm = containerEl.querySelector("#auth-password-form");
-  passwordForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const errorEl = containerEl.querySelector("#auth-error");
-    const okEl = containerEl.querySelector("#auth-ok");
-    errorEl.hidden = true;
-    okEl.hidden = true;
-    const { password } = Object.fromEntries(new FormData(passwordForm));
-    try {
-      await changePassword(password);
-      okEl.hidden = false;
-      passwordForm.reset();
-    } catch (err) {
-      errorEl.textContent = "No se pudo cambiar — intenta de nuevo.";
       errorEl.hidden = false;
     }
   });
