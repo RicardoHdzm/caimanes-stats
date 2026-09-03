@@ -2,7 +2,7 @@ import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
-import { getCurrentPlayerId } from "../auth.js";
+import { getCurrentPlayerId, changePassword, signOut } from "../auth.js";
 import { getWalkupOverride, setWalkup } from "../db.js";
 
 // Icono según de dónde venga el link de la canción de entrada.
@@ -167,6 +167,45 @@ export function renderJugadorDetalle(container, playerId) {
         errorEl.hidden = false;
       }
     });
+
+    // ---- Mi cuenta: cambiar contraseña y salir ----
+    //
+    // Vive aquí (tu propio perfil) y no en el botón del header — ese botón
+    // ahora es un link directo a esta página, así no hace falta buscarte en
+    // Roster para llegar. Ver js/auth.js: loggedInMarkup().
+    const accountPanel = document.createElement("div");
+    accountPanel.className = "walkup-edit-form account-panel";
+    accountPanel.innerHTML = `
+      <h4>Mi cuenta</h4>
+      <form id="account-password-form" class="auth-form">
+        <label>Nueva contraseña<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+        <p class="auth-error" id="account-error" hidden></p>
+        <p class="auth-ok" id="account-ok" hidden>Contraseña actualizada.</p>
+        <button type="submit" class="auth-submit">Cambiar contraseña</button>
+      </form>
+      <button type="button" class="auth-signout" id="account-signout-btn">Salir</button>
+    `;
+    hero.appendChild(accountPanel);
+
+    const passwordForm = accountPanel.querySelector("#account-password-form");
+    const passwordError = accountPanel.querySelector("#account-error");
+    const passwordOk = accountPanel.querySelector("#account-ok");
+    passwordForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      passwordError.hidden = true;
+      passwordOk.hidden = true;
+      const { password } = Object.fromEntries(new FormData(passwordForm));
+      try {
+        await changePassword(password);
+        passwordOk.hidden = false;
+        passwordForm.reset();
+      } catch {
+        passwordError.textContent = "No se pudo cambiar — intenta de nuevo.";
+        passwordError.hidden = false;
+      }
+    });
+
+    accountPanel.querySelector("#account-signout-btn").addEventListener("click", () => signOut());
   }
 
   const battingSeason = battingTotals(GAMES).find((r) => r.playerId === player.id);
