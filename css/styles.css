@@ -870,11 +870,17 @@ main h3::before {
   margin-top: 10px;
 }
 
+/* display:flex (no inline-flex) + width:fit-content + margin:auto en vez de
+   depender del text-align:center del padre (.game-hero): un inline-flex es
+   una caja de línea, así que dos de estos cabiendo uno junto al otro se
+   quedan en el mismo renglón — con esto cada uno siempre ocupa su propio
+   renglón, uno arriba del otro, aunque haya espacio de sobra a los lados. */
 .mvp-badge {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
+  margin: 10px auto 0;
   padding: 6px 16px;
   border-radius: var(--radius-pill);
   border: 1px solid #f5b942;
@@ -887,13 +893,15 @@ main h3::before {
 }
 
 /* "Debut: ..." en el perfil (ver renderDebut en js/views/jugador.js) —
-   mismo tratamiento de píldora que .mvp-badge, pero en el color de acento
-   del sitio en vez de dorado, para no confundirse con el MVP. */
+   mismo tratamiento de píldora que .mvp-badge (incluyendo mayúsculas y
+   renglón propio), pero en el color de acento del sitio en vez de dorado,
+   para no confundirse con el MVP. */
 .debut-badge {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
   align-items: center;
   gap: 8px;
-  margin-top: 10px;
+  margin: 10px auto 0;
   padding: 6px 16px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--accent);
@@ -901,7 +909,8 @@ main h3::before {
   color: var(--accent-text);
   font-size: var(--text-sm);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .replay-btn {
