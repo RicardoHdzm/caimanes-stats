@@ -13,6 +13,79 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// Voto de MVP del equipo — distinto del `game.mvp` fijo que capturas a mano
+// en data.js (ese sigue siendo "el oficial"; este es el que vota el
+// equipo, se muestran los dos). El conteo es público; el formulario de
+// voto solo aparece si quien tiene sesión apareció en el line-up de ESTE
+// juego (bateo, pitcheo o fildeo) — `participantIds` ya viene filtrado así.
+function renderMvpVote(container, gameId, participantIds) {
+  const heading3 = document.createElement("h3");
+  heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo (votado)';
+  container.appendChild(heading3);
+
+  const tallyEl = document.createElement("div");
+  tallyEl.className = "vote-tally";
+  tallyEl.textContent = "Cargando votos…";
+  container.appendChild(tallyEl);
+
+  const formSlot = document.createElement("div");
+  container.appendChild(formSlot);
+
+  function renderForm(myVote) {
+    const myId = getCurrentPlayerId();
+    if (!myId || !participantIds.has(myId)) {
+      formSlot.innerHTML = "";
+      return;
+    }
+    const options = [...participantIds]
+      .map((id) => `<option value="${id}"${id === myVote ? " selected" : ""}>${playerName(id)}</option>`)
+      .join("");
+    formSlot.innerHTML = `
+      <form class="vote-form">
+        <select name="voted" required>
+          <option value="" disabled${myVote ? "" : " selected"}>Elige a alguien...</option>
+          ${options}
+        </select>
+        <button type="submit" class="auth-submit">${myVote ? "Cambiar voto" : "Votar"}</button>
+      </form>
+    `;
+    const form = formSlot.querySelector(".vote-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const votedId = new FormData(form).get("voted");
+      if (!votedId) return;
+      const btn = form.querySelector("button");
+      btn.disabled = true;
+      try {
+        await setMvpVote(gameId, votedId);
+        await refresh();
+      } catch {
+        // Silencioso a propósito: un error de red no debe romper la
+        // sección, se puede reintentar votando de nuevo.
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  async function refresh() {
+    const rows = await getMvpVotes(gameId);
+    const counts = new Map();
+    for (const r of rows) counts.set(r.voted_player_id, (counts.get(r.voted_player_id) ?? 0) + 1);
+    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    tallyEl.innerHTML =
+      sorted.length > 0
+        ? sorted
+            .map(([id, n]) => `<div class="vote-row"><span>${playerName(id)}</span><span>${n} voto${n === 1 ? "" : "s"}</span></div>`)
+            .join("")
+        : "Nadie ha votado todavía.";
+    const mine = rows.find((r) => r.voter_player_id === getCurrentPlayerId());
+    renderForm(mine?.voted_player_id ?? null);
+  }
+
+  refresh();
+}
+
 export function renderJuegoDetalle(container, gameId) {
   const game = GAMES.find((g) => g.id === gameId);
 
@@ -64,6 +137,17 @@ export function renderJuegoDetalle(container, gameId) {
     }
   `;
   container.appendChild(hero);
+
+  // Sin marcador todavía no hay a quién votar — el line-up ni siquiera
+  // existe hasta que se captura el juego.
+  if (known) {
+    const participantIds = new Set([
+      ...(game.batting ?? []).map((l) => l.playerId),
+      ...(game.pitching ?? []).map((l) => l.playerId),
+      ...(game.fielding ?? []).map((l) => l.playerId),
+    ]);
+    renderMvpVote(container, game.id, participantIds);
+  }
 
   const lineupHeading = document.createElement("h3");
   lineupHeading.textContent = "Line-up y bateo";

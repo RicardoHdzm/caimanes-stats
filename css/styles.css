@@ -1733,6 +1733,50 @@ main h3::before {
   color: var(--loss);
 }
 
+/* Voto de MVP del equipo, en el detalle de un juego jugado. */
+.vote-tally {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.vote-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  font-size: var(--text-sm);
+}
+
+.vote-row:first-child {
+  border-color: #f5b942;
+  color: #f5b942;
+  font-weight: 700;
+}
+
+.vote-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.vote-form select {
+  flex: 1;
+  min-width: 180px;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
