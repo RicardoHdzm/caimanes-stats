@@ -90,7 +90,12 @@ function formatAvg(h, ab) {
 function renderDebut(debutSeason) {
   const season = SEASONS[debutSeason - 1];
   if (!season) return "";
-  return `<div class="game-hero-date">Debut: ${season.year} - ${ordinalTemporada(debutSeason)} Temporada - ${escapeHtml(season.league)}</div>`;
+  return `
+    <div class="debut-badge">
+      <i class="fa-solid fa-medal"></i>
+      Debut: ${season.year} · ${ordinalTemporada(debutSeason)} Temporada · ${escapeHtml(season.league)}
+    </div>
+  `;
 }
 
 // Comprime la foto de perfil en el navegador antes de subirla — una foto de
