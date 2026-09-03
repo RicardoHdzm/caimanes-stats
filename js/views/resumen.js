@@ -47,11 +47,11 @@ function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) 
   `;
 }
 
-// Conteo público (siempre) + botones Sí/No (solo con cuenta vinculada a un
-// jugador) dentro de la tarjeta de "Próximo juego". Se llama una vez por
+// Botones Sí/No (solo con cuenta vinculada a un jugador) dentro de la
+// tarjeta de "Próximo juego" — sin lista de quién ya confirmó, eso vive
+// en admin.html (ver js/admin-rsvp.js), no aquí. Se llama una vez por
 // tarjeta — en la práctica SCHEDULE casi siempre trae 0 o 1 juego.
 function wireRsvp(cardEl, gameId) {
-  const tallyEl = cardEl.querySelector(".rsvp-tally");
   const actionsEl = cardEl.querySelector(".rsvp-actions");
 
   function renderActions(myStatus) {
@@ -85,13 +85,6 @@ function wireRsvp(cardEl, gameId) {
 
   async function refresh() {
     const rows = await getRsvps(gameId);
-    const yesNames = rows
-      .filter((r) => r.status === "yes")
-      .map((r) => PLAYERS.find((p) => p.id === r.player_id)?.name ?? r.player_id);
-    tallyEl.innerHTML =
-      yesNames.length > 0
-        ? `<strong>${yesNames.length} confirmado${yesNames.length === 1 ? "" : "s"}:</strong> <span class="rsvp-names">${yesNames.join(", ")}</span>`
-        : "Nadie ha confirmado todavía.";
     const mine = rows.find((r) => r.player_id === getCurrentPlayerId());
     renderActions(mine?.status ?? null);
   }
