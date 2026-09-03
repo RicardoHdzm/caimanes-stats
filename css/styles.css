@@ -1784,6 +1784,11 @@ main h3::before {
   width: auto;
   margin-top: 0;
   padding: 8px 14px;
+  /* .auth-signout no trae mayúsculas (el "Salir" del header/perfil se ve
+     bien en minúsculas) — aquí sí, para que combine con "Votar"/"Cambiar
+     voto" (.auth-submit), que sí las usan. */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 /* Votar / Cambiar voto / Quitar voto miden lo mismo — "Cambiar voto" es el
