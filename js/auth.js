@@ -8,7 +8,6 @@
 // panel de Supabase (correo + contraseña temporal). Un jugador solo puede
 // iniciar sesión y, ya adentro, cambiar su contraseña.
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIGURED } from "./supabase-config.js";
-import { PLAYERS } from "./data.js";
 
 let supabase = null;
 let session = null;
