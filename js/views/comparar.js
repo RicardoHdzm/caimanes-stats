@@ -103,6 +103,45 @@ function playerHeader(player, played) {
   `;
 }
 
+// Cabezas + los 3 bloques de stats — todo lo que hay debajo del picker (o,
+// en la versión sin picker de renderLockedComparison, todo lo que hay).
+// Compartido para no duplicar esta parte entre las dos vistas.
+function comparisonBody(leftId, rightId) {
+  const left = PLAYERS.find((p) => p.id === leftId);
+  const right = PLAYERS.find((p) => p.id === rightId);
+  if (!left || !right) return "";
+
+  const batting = battingTotals(GAMES);
+  const pitching = pitchingTotals(GAMES);
+  const fielding = fieldingTotals(GAMES);
+  const played = gamesPlayedByPlayer(GAMES);
+  const find = (list, id) => list.find((r) => r.playerId === id) ?? null;
+
+  return `
+    <div class="compare-heads">
+      ${playerHeader(left, played.get(left.id) ?? 0)}
+      ${playerHeader(right, played.get(right.id) ?? 0)}
+    </div>
+    ${comparisonBlock("Bateo", BATTING_ROWS, find(batting, left.id), find(batting, right.id))}
+    ${comparisonBlock("Pitcheo", PITCHING_ROWS, find(pitching, left.id), find(pitching, right.id))}
+    ${comparisonBlock("Fildeo", FIELDING_ROWS, find(fielding, left.id), find(fielding, right.id))}
+  `;
+}
+
+// Comparación fija tú-vs-él, sin selects — al final del perfil de OTRO
+// jugador (nunca el tuyo propio). Misma lógica y estilos que
+// renderComparar, solo que no se puede cambiar a quién comparas: ver
+// js/views/jugador.js.
+export function renderLockedComparison(container, meId, otherId) {
+  const h3 = document.createElement("h3");
+  h3.textContent = "Comparación contigo";
+  container.appendChild(h3);
+
+  const wrap = document.createElement("div");
+  wrap.innerHTML = comparisonBody(meId, otherId);
+  container.appendChild(wrap);
+}
+
 // Se dibuja al final de la vista de Alineación. `leftId`/`rightId` vienen de
 // la URL (#/alineacion/p1/p2) para poder compartir una comparación armada.
 export function renderComparar(container, leftId, rightId) {
