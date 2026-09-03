@@ -8,6 +8,7 @@
 // panel de Supabase (correo + contraseña temporal). Un jugador solo puede
 // iniciar sesión y, ya adentro, cambiar su contraseña.
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIGURED } from "./supabase-config.js";
+import { PLAYERS } from "./data.js";
 
 let supabase = null;
 let session = null;
@@ -154,12 +155,23 @@ function loggedOutMarkup() {
 }
 
 function loggedInMarkup() {
-  // Con jugador ya identificado, el botón es un link directo a tu propio
-  // perfil — un clic y ya, sin tener que buscarte en Roster. Cambiar
-  // contraseña y cerrar sesión viven ahí (ver "Mi cuenta" en
-  // js/views/jugador.js), no en un panel aparte del header.
+  // Con jugador ya identificado, el botón muestra tu nombre y despliega un
+  // menú chico (Ir a perfil / Cerrar sesión) — no navega directo, así se
+  // puede cerrar sesión desde cualquier página sin pasar por el perfil.
   if (playerId) {
-    return `<a href="#/jugador/${playerId}" class="auth-btn auth-btn-in" aria-label="Tu perfil"><i class="fa-solid fa-user-check"></i></a>`;
+    const name = PLAYERS.find((p) => p.id === playerId)?.name ?? "Mi cuenta";
+    return `
+      <button type="button" class="auth-btn auth-btn-in auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
+        <i class="fa-solid fa-user-check"></i>
+        <span class="auth-btn-name">${name}</span>
+      </button>
+      <div class="auth-panel" id="auth-panel" hidden>
+        <a href="#/jugador/${playerId}" class="auth-panel-link" id="auth-profile-link">
+          <i class="fa-solid fa-id-card"></i> Ir a perfil
+        </a>
+        <button type="button" class="auth-signout" id="auth-signout-btn">Cerrar sesión</button>
+      </div>
+    `;
   }
   // Cuenta con sesión pero sin vincular todavía a un jugador (falta la fila
   // en player_whitelist) — no hay a qué perfil mandarla, así que se queda
@@ -204,4 +216,8 @@ function wireAuthControl() {
     await signOut();
     setPanelOpen(false);
   });
+
+  // El link de "Ir a perfil" navega solo (es un <a href>) — esto nomás
+  // cierra el panel para que no se quede abierto sobre la página nueva.
+  containerEl.querySelector("#auth-profile-link")?.addEventListener("click", () => setPanelOpen(false));
 }
