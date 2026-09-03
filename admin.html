@@ -20,19 +20,26 @@
 </header>
 
 <main id="admin-app" class="admin-main">
-  <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
-
-  <section class="admin-section" id="dues-admin-section" hidden>
-    <h2>Estado de pago</h2>
-    <p class="subtitle">Marca quién ya pagó su inscripción de la temporada — se guarda al momento, sin generar ni pegar código.</p>
-    <div class="dues-admin-list" id="dues-admin-list"></div>
-  </section>
-  <p class="subtitle" id="dues-admin-gate">
-    Inicia sesión con la cuenta del coach (arriba a la derecha) para marcar quién pagó su inscripción.
+  <!-- Toda la herramienta (no solo el estado de pago) es solo para la
+       cuenta del coach — ver js/admin-dues.js, que decide cuál de los dos
+       bloques de abajo mostrar según isCoach(). admin.js sigue armando los
+       formularios de adentro igual, estén visibles o no; ocultarlos con
+       `hidden` no rompe nada de su lógica. -->
+  <p class="subtitle" id="admin-gate">
+    Esta herramienta es solo para la cuenta del coach. Inicia sesión arriba a la derecha.
   </p>
 
-  <section class="admin-section">
-    <h2>Agregar jugador</h2>
+  <div id="admin-protected" hidden>
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
+
+    <section class="admin-section">
+      <h2>Estado de pago</h2>
+      <p class="subtitle">Marca quién ya pagó su inscripción de la temporada — se guarda al momento, sin generar ni pegar código.</p>
+      <div class="dues-admin-list" id="dues-admin-list"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Agregar jugador</h2>
     <p class="subtitle">Llena el formulario y copia el código en <code>PLAYERS</code> dentro de <code>js/data.js</code>.</p>
     <form id="player-form" class="admin-form">
       <label>ID (único)<input type="text" name="id" required /></label>
@@ -123,7 +130,8 @@
       <pre><code id="game-code"></code></pre>
       <button type="button" class="copy-btn" data-target="game-code"><i class="fa-solid fa-copy"></i> Copiar</button>
     </div>
-  </section>
+    </section>
+  </div>
 </main>
 
 <footer class="footer">
