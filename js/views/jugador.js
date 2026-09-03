@@ -2,6 +2,8 @@ import { PLAYERS, GAMES } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
+import { getCurrentPlayerId } from "../auth.js";
+import { getWalkupOverride, setWalkup } from "../db.js";
 
 // Icono según de dónde venga el link de la canción de entrada.
 const WALKUP_PLATFORMS = [
@@ -101,9 +103,71 @@ export function renderJugadorDetalle(container, playerId) {
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
         : ""
     }
-    ${renderWalkup(player.walkup)}
+    <div id="walkup-display">${renderWalkup(player.walkup)}</div>
+    <div id="walkup-edit-slot"></div>
   `;
   container.appendChild(hero);
+
+  // ---- Canción de entrada: editable solo en tu propio perfil ----
+  //
+  // `player.walkup` (data.js) sigue siendo el valor de arranque — se pinta
+  // arriba sin esperar a nadie. Si el jugador ya la personalizó, la fila en
+  // player_walkups la reemplaza en cuanto llega (progresivo: no bloquea el
+  // primer pintado con una consulta a Supabase). `currentWalkup` guarda cuál
+  // de las dos es la vigente, para que el formulario de edición arranque con
+  // el valor correcto sin importar cuál de las dos ya llegó.
+  let currentWalkup = player.walkup ?? null;
+  const walkupDisplay = hero.querySelector("#walkup-display");
+
+  getWalkupOverride(player.id).then((override) => {
+    if (!override) return;
+    currentWalkup = override;
+    walkupDisplay.innerHTML = renderWalkup(override);
+  });
+
+  if (getCurrentPlayerId() === player.id) {
+    const slot = hero.querySelector("#walkup-edit-slot");
+    slot.innerHTML = `
+      <button type="button" class="walkup-edit-btn" id="walkup-edit-toggle">
+        <i class="fa-solid fa-pen"></i> Editar mi canción de entrada
+      </button>
+      <form id="walkup-edit-form" class="walkup-edit-form" hidden>
+        <label>Título<input type="text" name="title" maxlength="120" required></label>
+        <label>Artista<input type="text" name="artist" maxlength="120"></label>
+        <label>Link (Spotify, YouTube...)<input type="url" name="url" maxlength="500"></label>
+        <p class="auth-error" id="walkup-error" hidden></p>
+        <button type="submit" class="auth-submit">Guardar</button>
+      </form>
+    `;
+
+    const toggle = slot.querySelector("#walkup-edit-toggle");
+    const form = slot.querySelector("#walkup-edit-form");
+    const errorEl = slot.querySelector("#walkup-error");
+
+    toggle.addEventListener("click", () => {
+      form.title.value = currentWalkup?.title ?? "";
+      form.artist.value = currentWalkup?.artist ?? "";
+      form.url.value = currentWalkup?.url ?? "";
+      errorEl.hidden = true;
+      form.hidden = !form.hidden;
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.hidden = true;
+      const { title, artist, url } = Object.fromEntries(new FormData(form));
+      const saved = { title: title.trim(), artist: artist.trim() || null, url: url.trim() || null };
+      try {
+        await setWalkup(player.id, saved);
+        currentWalkup = saved;
+        walkupDisplay.innerHTML = renderWalkup(saved);
+        form.hidden = true;
+      } catch {
+        errorEl.textContent = "No se pudo guardar — intenta de nuevo.";
+        errorEl.hidden = false;
+      }
+    });
+  }
 
   const battingSeason = battingTotals(GAMES).find((r) => r.playerId === player.id);
   const pitchingSeason = pitchingTotals(GAMES).find((r) => r.playerId === player.id);
