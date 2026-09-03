@@ -90,7 +90,7 @@ function wireRsvp(cardEl, gameId) {
       .map((r) => PLAYERS.find((p) => p.id === r.player_id)?.name ?? r.player_id);
     tallyEl.innerHTML =
       yesNames.length > 0
-        ? `<strong>${yesNames.length} confirmado${yesNames.length === 1 ? "" : "s"}:</strong> ${yesNames.join(", ")}`
+        ? `<strong>${yesNames.length} confirmado${yesNames.length === 1 ? "" : "s"}:</strong> <span class="rsvp-names">${yesNames.join(", ")}</span>`
         : "Nadie ha confirmado todavía.";
     const mine = rows.find((r) => r.player_id === getCurrentPlayerId());
     renderActions(mine?.status ?? null);

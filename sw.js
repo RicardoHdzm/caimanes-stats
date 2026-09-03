@@ -8,7 +8,7 @@
 //
 // Al cambiar cualquier archivo del proyecto sube CACHE_VERSION: eso tira la
 // caché vieja completa y evita mezclas de versiones.
-const CACHE_VERSION = "v29";
+const CACHE_VERSION = "v30";
 const CACHE_NAME = `caimanes-${CACHE_VERSION}`;
 
 // Lo mínimo para que la app arranque estando offline desde cero.

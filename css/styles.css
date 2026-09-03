@@ -1830,6 +1830,14 @@ main h3::before {
   font-size: var(--text-sm);
 }
 
+/* Los nombres de quienes confirmaron van más chico que el "N confirmados:"
+   en negrita — la lista puede crecer bastante (hasta 20) y no debe competir
+   visualmente con el resto de la tarjeta. */
+.rsvp-names {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
 .rsvp-actions {
   display: flex;
   gap: 8px;
