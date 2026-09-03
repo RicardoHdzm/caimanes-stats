@@ -230,6 +230,38 @@ export async function upsertComment(contextType, contextId, body) {
   if (error) throw error;
 }
 
+// ---- Likes de comentarios (comment_likes) ----
+//
+// Lectura pública (el conteo se ve con o sin sesión). Dar/quitar like
+// requiere cuenta — un like por jugador por comentario (la llave primaria
+// lo garantiza; dar like de nuevo no acumula, es un interruptor).
+
+// Todos los likes de un conjunto de comentarios de una sola consulta — para
+// no pedirlos uno por uno al pintar la lista completa. [] si no hay
+// comentarios que consultar o si Supabase no está configurado.
+export async function getCommentLikes(commentIds) {
+  const client = getClient();
+  if (!client || commentIds.length === 0) return [];
+  const { data, error } = await client.from("comment_likes").select("comment_id, player_id").in("comment_id", commentIds);
+  return error || !data ? [] : data;
+}
+
+export async function likeComment(commentId) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para dar like.");
+  const { error } = await client.from("comment_likes").insert({ comment_id: commentId, player_id: playerId });
+  if (error) throw error;
+}
+
+export async function unlikeComment(commentId) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
+  const { error } = await client.from("comment_likes").delete().eq("comment_id", commentId).eq("player_id", playerId);
+  if (error) throw error;
+}
+
 // ---- Anuncios del equipo (announcements) ----
 //
 // Lectura pública. Escritura: solo la cuenta del coach — mismo patrón que

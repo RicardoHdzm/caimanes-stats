@@ -2323,10 +2323,44 @@ main h3::before {
 }
 
 .comment-body {
-  margin: 0;
+  margin: 0 0 8px;
   font-size: var(--text-sm);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+/* Interruptor de like — el corazón se rellena de rojo (currentColor hereda
+   el color del texto, ya en --accent-text cuando está activo) sin
+   necesitar dos íconos distintos (fa-regular/fa-solid), que Font Awesome
+   Free no siempre trae ambos. */
+.comment-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.comment-like-btn:disabled {
+  cursor: default;
+}
+
+.comment-like-btn:not(:disabled):hover {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+}
+
+.comment-like-btn.active {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
 }
 
 .comment-form {
