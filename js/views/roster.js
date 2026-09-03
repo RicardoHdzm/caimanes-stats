@@ -23,21 +23,17 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Celda de "Pagó": para el coach es un checkbox editable, para cualquier
-// otro jugador con sesión es de solo lectura (Sí/No en color). `duesMap`
-// llega por closure porque se llena aparte, async — ver comentario en
-// renderRoster.
+// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. Para el
+// coach es además un botón clicable (mismo ícono, toggle); para cualquier
+// otro jugador con sesión es de solo lectura. `duesMap` llega por closure
+// porque se llena aparte, async — ver comentario en renderRoster.
 function renderDuesCell(playerId, duesMap) {
   const paid = duesMap.get(playerId) ?? false;
-  if (!isCoach()) {
-    return paid ? '<span class="stat-green">Sí</span>' : '<span class="stat-red">No</span>';
-  }
-  return `
-    <label class="dues-toggle">
-      <input type="checkbox" data-player="${playerId}" ${paid ? "checked" : ""}>
-      ${paid ? "Sí" : "No"}
-    </label>
-  `;
+  const icon = paid
+    ? '<i class="fa-solid fa-circle-check dues-icon dues-icon-paid"></i>'
+    : '<i class="fa-solid fa-circle-xmark dues-icon dues-icon-unpaid"></i>';
+  if (!isCoach()) return icon;
+  return `<button type="button" class="dues-toggle-btn" data-player="${playerId}" data-paid="${paid}">${icon}</button>`;
 }
 
 export function renderRoster(container) {
@@ -96,7 +92,7 @@ export function renderRoster(container) {
   if (loggedIn) {
     columns.push({
       key: "paid",
-      label: "Pagó",
+      label: "Inscripción",
       full: "Inscripción de temporada pagada",
       render: (_value, row) => renderDuesCell(row.id, duesMap),
     });
