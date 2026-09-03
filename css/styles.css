@@ -446,6 +446,9 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    /* Aire antes del borde de abajo del header — sin esto el botón queda
+       pegado al filo. */
+    padding-bottom: 16px;
   }
 
   .auth-btn {
@@ -463,11 +466,9 @@ body {
     padding: 6px 12px 6px 10px;
   }
 
-  .auth-btn-name {
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+  /* Ya no hace falta truncar el nombre: el botón se centra debajo del logo
+     (ver .auth-slot arriba), no comparte esquina con nada — le sobra
+     ancho para mostrarse completo. */
 
   /* .auth-slot ya no envuelve justo al botón (es un bloque centrado de
      ancho completo, ver arriba) — sin esto, el "right: 0" de .auth-panel
