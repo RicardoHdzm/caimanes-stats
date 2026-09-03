@@ -7,7 +7,7 @@
 // Se va llenando fase por fase según el plan (RSVP, walkup, MVP, comentarios,
 // pagos); por ahora solo expone el cliente para que las próximas fases lo
 // reusen sin volver a importarlo cada una por su cuenta.
-import { getClient } from "./auth.js";
+import { getClient, getCurrentPlayerId } from "./auth.js";
 
 export { getClient };
 
@@ -38,6 +38,33 @@ export async function setDuesPaid(playerId, paid) {
   const { error } = await client
     .from("player_dues")
     .upsert({ player_id: playerId, paid, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+// ---- RSVP a un juego programado (game_rsvps) ----
+//
+// Lectura pública: cualquiera ve quién confirmó, con o sin sesión. Solo el
+// propio jugador puede confirmar/declinar por sí mismo — RLS lo exige del
+// lado del servidor, aquí solo se manda el player_id porque Postgres no lo
+// deduce solo (el upsert lo necesita en la fila).
+
+// Todas las filas de un juego (game_id = id de un SCHEDULE, ej. "s1"). []
+// si Supabase no está configurado o falla la consulta — la tarjeta de
+// "Próximo juego" simplemente no muestra tally en ese caso.
+export async function getRsvps(gameId) {
+  const client = getClient();
+  if (!client) return [];
+  const { data, error } = await client.from("game_rsvps").select("player_id, status").eq("game_id", gameId);
+  return error || !data ? [] : data;
+}
+
+export async function setRsvp(gameId, status) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para confirmar asistencia.");
+  const { error } = await client
+    .from("game_rsvps")
+    .upsert({ game_id: gameId, player_id: playerId, status, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
 
