@@ -51,7 +51,7 @@ function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) 
 // tarjeta de "Próximo juego" — sin lista de quién ya confirmó, eso vive
 // en admin.html (ver js/admin-rsvp.js), no aquí. Se llama una vez por
 // tarjeta — en la práctica SCHEDULE casi siempre trae 0 o 1 juego.
-function wireRsvp(cardEl, gameId) {
+export function wireRsvp(cardEl, gameId) {
   const actionsEl = cardEl.querySelector(".rsvp-actions");
 
   function renderActions(myStatus) {

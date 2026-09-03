@@ -764,9 +764,15 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
+  /* En la esquina se encima con la foto de perfil en pantallas angostas —
+     aquí se saca del position:absolute y se pone en flujo normal, arriba
+     de la foto (ver #profile-avatar en js/views/jugador.js, justo después
+     en el HTML). */
   #dues-badge {
-    top: 10px;
-    right: 10px;
+    position: static;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
   }
 
   .dues-badge-pill {
@@ -1932,9 +1938,12 @@ main h3::before {
   width: auto;
   margin-top: 0;
   padding: 8px 14px;
-  /* .auth-signout no trae mayúsculas (el "Salir" del header/perfil se ve
-     bien en minúsculas) — aquí sí, para que combine con "Votar"/"Cambiar
-     voto" (.auth-submit), que sí las usan. */
+  /* .auth-signout normalmente usa la fuente de cuerpo y sin mayúsculas
+     (el "Salir" del header/perfil se ve bien así) — aquí junto a
+     "Votar"/"Cambiar voto" (.auth-submit) debe verse igual de sólido, así
+     que toma su misma fuente y peso. */
+  font-family: var(--font-display);
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
