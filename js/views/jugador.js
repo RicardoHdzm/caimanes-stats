@@ -120,6 +120,44 @@ export function renderJugadorDetalle(container, playerId) {
   `;
   container.appendChild(hero);
 
+  // ---- Foto de perfil personalizada: lectura con sesión, edición propia ----
+  //
+  // El avatar de siempre (foto de data.js o iniciales) ya se pintó arriba,
+  // sin esperar a nadie. Si hay sesión Y el jugador tiene una foto propia en
+  // Storage, la reemplaza — sin sesión ni se pide (getAvatarUrl regresa null
+  // de inmediato), así que quien no tiene cuenta ve exactamente lo de
+  // siempre. Ver supabase/schema.sql: el bucket "avatars" es privado.
+  const avatarWrap = hero.querySelector("#profile-avatar");
+  if (getSession()) {
+    getAvatarUrl(player.id).then((url) => {
+      if (!url || !avatarWrap) return;
+      avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+    });
+  }
+
+  // ---- Tu resumen: solo en tu propio perfil ----
+  //
+  // Lo único que este perfil no muestra ya en otro lado es tu RSVP al
+  // próximo juego (la inscripción ya tiene su badge arriba a la derecha).
+  if (getCurrentPlayerId() === player.id && SCHEDULE.length > 0) {
+    const summaryEl = document.createElement("div");
+    summaryEl.className = "leader-card";
+    summaryEl.innerHTML = `<h3><i class="fa-solid fa-clipboard-list"></i>Tu resumen</h3><p>Cargando…</p>`;
+    container.appendChild(summaryEl);
+
+    (async () => {
+      const g = SCHEDULE[0];
+      const rows = await getRsvps(g.id);
+      const mine = rows.find((r) => r.player_id === player.id);
+      const statusText =
+        mine?.status === "yes" ? '<span class="stat-green">Vas</span>' : mine?.status === "no" ? '<span class="stat-red">No vas</span>' : "Sin responder";
+      const p = summaryEl.querySelector("p");
+      if (p) {
+        p.innerHTML = `Próximo juego (${g.date} vs ${g.opponent}): <strong>${statusText}</strong> — <a href="#/resumen">cambiar</a>`;
+      }
+    })();
+  }
+
   // ---- Estado de inscripción: solo visible con sesión iniciada ----
   //
   // Misma regla que la columna "Pagó" en Roster (ver js/views/roster.js) —
