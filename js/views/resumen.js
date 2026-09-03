@@ -134,7 +134,6 @@ export function renderResumen(container) {
     next.innerHTML = `
       <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
       <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
-      <p class="rsvp-tally">Cargando asistencia…</p>
       <div class="rsvp-actions"></div>
     `;
     bottomRow.appendChild(next);
