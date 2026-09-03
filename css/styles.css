@@ -1307,6 +1307,30 @@ main h3::before {
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
+/* Tu propia fila en cualquier tabla donde aparezcas (Roster, Bateo,
+   Pitcheo, Fildeo, el line-up de un juego, la alineación sugerida) — mismo
+   tratamiento que .standings-us de arriba, pero en verde para no
+   confundirse con ese otro significado ("nuestro equipo" vs. "tú"). */
+.stats-table tbody tr.row-you td {
+  background-color: rgba(63, 181, 111, 0.12);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stats-table tbody tr.row-you td.sticky-col {
+  background-color: #16241c;
+}
+
+.stats-table tbody tr.row-you td.sticky-col-first {
+  box-shadow: inset 3px 0 0 var(--win);
+}
+
+/* Misma idea para tarjetas (posiciones sugeridas / banca en el generador
+   de alineación) — cambia el filo de color de arriba de .card. */
+.card.card-you {
+  border-top-color: var(--win);
+}
+
 .stats-table td.empty {
   text-align: center;
   color: var(--muted);

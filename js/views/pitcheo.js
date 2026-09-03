@@ -1,5 +1,6 @@
 import { pitchingTotals } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
+import { getCurrentPlayerId } from "../auth.js";
 
 export function renderPitcheo(container) {
   heading(container, "Estadísticas de pitcheo");
@@ -32,6 +33,7 @@ export function renderPitcheo(container) {
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
+    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
 
   renderGlossary(container, columns);

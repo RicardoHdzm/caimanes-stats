@@ -1,7 +1,7 @@
 import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
-import { getSession } from "../auth.js";
+import { getSession, getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, getAllPositionOverrides } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
@@ -114,6 +114,7 @@ export function renderRoster(container) {
       onRowClick: (row) => {
         location.hash = `#/jugador/${row.id}`;
       },
+      rowClass: (row) => (row.id === getCurrentPlayerId() ? "row-you" : ""),
     });
   }
 

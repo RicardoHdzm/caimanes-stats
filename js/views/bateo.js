@@ -1,5 +1,6 @@
 import { battingTotals } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
+import { getCurrentPlayerId } from "../auth.js";
 
 export function renderBateo(container) {
   heading(container, "Estadísticas de bateo");
@@ -34,6 +35,7 @@ export function renderBateo(container) {
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
+    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
 
   renderGlossary(container, columns);

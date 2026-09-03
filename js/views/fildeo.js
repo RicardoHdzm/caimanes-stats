@@ -1,5 +1,6 @@
 import { fieldingTotals } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary } from "../ui.js";
+import { getCurrentPlayerId } from "../auth.js";
 
 export function renderFildeo(container) {
   heading(container, "Estadísticas de fildeo");
@@ -23,6 +24,7 @@ export function renderFildeo(container) {
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
     },
+    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
 
   renderGlossary(container, columns);
