@@ -168,13 +168,6 @@ export function renderComparar(container, leftId, rightId) {
     return;
   }
 
-  const batting = battingTotals(GAMES);
-  const pitching = pitchingTotals(GAMES);
-  const fielding = fieldingTotals(GAMES);
-  const played = gamesPlayedByPlayer(GAMES);
-
-  const find = (list, id) => list.find((r) => r.playerId === id) ?? null;
-
   const wrap = document.createElement("div");
   container.appendChild(wrap);
 
@@ -191,13 +184,7 @@ export function renderComparar(container, leftId, rightId) {
         <span class="compare-vs">VS</span>
         ${playerSelect("compare-right", right.id)}
       </div>
-      <div class="compare-heads">
-        ${playerHeader(left, played.get(left.id) ?? 0)}
-        ${playerHeader(right, played.get(right.id) ?? 0)}
-      </div>
-      ${comparisonBlock("Bateo", BATTING_ROWS, find(batting, left.id), find(batting, right.id))}
-      ${comparisonBlock("Pitcheo", PITCHING_ROWS, find(pitching, left.id), find(pitching, right.id))}
-      ${comparisonBlock("Fildeo", FIELDING_ROWS, find(fielding, left.id), find(fielding, right.id))}
+      ${comparisonBody(left.id, right.id)}
     `;
 
     const leftSelect = wrap.querySelector("#compare-left");
