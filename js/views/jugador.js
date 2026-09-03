@@ -92,7 +92,7 @@ function renderDebut(debutSeason) {
   if (!season) return "";
   return `
     <div class="debut-badge">
-      <i class="fa-solid fa-medal"></i>
+      <i class="fa-solid fa-baseball"></i>
       Debut: ${season.year} · ${ordinalTemporada(debutSeason)} Temporada · ${escapeHtml(season.league)}
     </div>
   `;
