@@ -497,7 +497,7 @@ export const GAMES = [
       { playerId: "p10", PO: 5, A: 2, E: 1 },
       { playerId: "p5", PO: 5, A: 0, E: 1 },
       { playerId: "p7", PO: 1, A: 0, E: 0 },
-      { playerId: "p13", PO: 1, A: 1, E: 0 },
+      { playerId: "p13", PO: 2, A: 0, E: 0 },
       { playerId: "p1", PO: 2, A: 0, E: 1 },
       { playerId: "p9", PO: 0, A: 0, E: 1 },
     ],
