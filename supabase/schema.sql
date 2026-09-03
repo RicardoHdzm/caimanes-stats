@@ -196,3 +196,45 @@ create policy "dues_write_coach_only" on public.player_dues
   with check (auth.email() = 'jrhm95@gmail.com');
 
 grant select, insert, update on public.player_dues to authenticated;
+
+-- 9. Anuncios del equipo. Lectura pública, escritura solo del coach — mismo
+--    patrón que player_dues arriba.
+create table if not exists public.announcements (
+  id bigint generated always as identity primary key,
+  body text not null check (char_length(body) between 1 and 1000),
+  created_at timestamptz not null default now()
+);
+alter table public.announcements enable row level security;
+
+create policy "announcements_public_read" on public.announcements
+  for select using (true);
+
+create policy "announcements_write_coach_only" on public.announcements
+  for all to authenticated
+  using (auth.email() = 'jrhm95@gmail.com')
+  with check (auth.email() = 'jrhm95@gmail.com');
+
+grant select on public.announcements to anon, authenticated;
+grant select, insert, update, delete on public.announcements to authenticated;
+
+-- 10. Foto de perfil personalizada — bucket de Storage, no una tabla. Cada
+--     jugador tiene como mucho un archivo, en "{player_id}/avatar" (se
+--     sobreescribe al cambiarla). PRIVADO a propósito: sin sesión no se
+--     puede ni leer, así que sin cuenta se sigue viendo el avatar de
+--     siempre (foto de data.js o iniciales) — ver getAvatarUrl() en
+--     js/db.js, que sin sesión regresa null igual que si no existiera.
+insert into storage.buckets (id, name, public)
+  values ('avatars', 'avatars', false)
+  on conflict (id) do nothing;
+
+create policy "avatars_read_authenticated" on storage.objects
+  for select to authenticated
+  using (bucket_id = 'avatars');
+
+create policy "avatars_insert_own" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = public.current_player_id());
+
+create policy "avatars_update_own" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = public.current_player_id());

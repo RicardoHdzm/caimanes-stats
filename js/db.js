@@ -197,3 +197,94 @@ export async function setWalkup(playerId, { title, artist, url }) {
     .upsert({ player_id: playerId, title, artist, url, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
+
+// ---- Comentarios (comments) ----
+//
+// Lectura pública. Escritura: cualquier jugador con cuenta (a diferencia de
+// walkup/posiciones, aquí no hay "dueño" — cualquiera comenta en cualquier
+// juego o en la alineación). Inmutables: no hay update/delete desde el
+// cliente a propósito, ver supabase/schema.sql.
+export async function getComments(contextType, contextId) {
+  const client = getClient();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("comments")
+    .select("id, player_id, body, created_at")
+    .eq("context_type", contextType)
+    .eq("context_id", contextId)
+    .order("created_at", { ascending: true });
+  return error || !data ? [] : data;
+}
+
+export async function addComment(contextType, contextId, body) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para comentar.");
+  const { error } = await client
+    .from("comments")
+    .insert({ context_type: contextType, context_id: contextId, player_id: playerId, body });
+  if (error) throw error;
+}
+
+// ---- Anuncios del equipo (announcements) ----
+//
+// Lectura pública. Escritura: solo la cuenta del coach — mismo patrón que
+// player_dues (RLS lo exige del lado del servidor, no aquí).
+export async function getAnnouncements(limit = 3) {
+  const client = getClient();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("announcements")
+    .select("id, body, created_at")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return error || !data ? [] : data;
+}
+
+export async function postAnnouncement(body) {
+  const client = getClient();
+  if (!client) throw new Error("Supabase no está configurado todavía.");
+  const { error } = await client.from("announcements").insert({ body });
+  if (error) throw error;
+}
+
+export async function deleteAnnouncement(id) {
+  const client = getClient();
+  if (!client) throw new Error("Supabase no está configurado todavía.");
+  const { error } = await client.from("announcements").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---- Foto de perfil personalizada (Storage, bucket "avatars") ----
+//
+// A diferencia de todo lo de arriba, esto no es una tabla — cada foto es un
+// archivo en Storage, guardado como "{playerId}/avatar" (se sobreescribe
+// cada vez que la cambian, no hace falta borrar la anterior). El bucket es
+// PRIVADO — a propósito, para que solo se pueda ver con sesión iniciada
+// (ver política "avatars_read_authenticated" en supabase/schema.sql):
+// getPublicUrl() no serviría aquí porque esa URL no respeta esa política;
+// hace falta una URL firmada, que sí la respeta.
+
+// null si Supabase no está configurado, no hay sesión (RLS la rechaza
+// igual que si no existiera), o el jugador no ha subido foto propia —
+// en cualquiera de esos casos, la vista sigue mostrando el avatar de
+// siempre (foto de data.js o iniciales).
+export async function getAvatarUrl(playerId) {
+  const client = getClient();
+  if (!client) return null;
+  const { data, error } = await client.storage.from("avatars").createSignedUrl(`${playerId}/avatar`, 3600);
+  if (error || !data) return null;
+  return data.signedUrl;
+}
+
+// Tira si quien llama no es ese jugador — RLS lo bloquea allá (la política
+// de Storage compara el primer segmento de la ruta contra
+// current_player_id()), no aquí.
+export async function uploadAvatar(playerId, file) {
+  const client = getClient();
+  if (!client) throw new Error("Supabase no está configurado todavía.");
+  const { error } = await client.storage
+    .from("avatars")
+    .upload(`${playerId}/avatar`, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+}
