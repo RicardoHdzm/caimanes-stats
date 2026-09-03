@@ -1631,6 +1631,37 @@ main h3::before {
   }
 }
 
+/* Botón + formulario para editar la propia canción de entrada — solo se
+   pinta en tu propio perfil (ver js/views/jugador.js). Reusa .auth-form/
+   .auth-submit/.auth-error de arriba para no repetir estilos de input. */
+.walkup-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.walkup-edit-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.walkup-edit-form {
+  max-width: 320px;
+  margin: 14px auto 0;
+  text-align: left;
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
