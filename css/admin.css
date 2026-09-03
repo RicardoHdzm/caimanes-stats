@@ -259,6 +259,52 @@
   cursor: pointer;
 }
 
+/* ---- Temporadas por jugador (admin.html, solo cuenta del coach) ---- */
+
+.seasons-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.seasons-admin-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  font-size: 0.85rem;
+}
+
+.seasons-admin-name {
+  flex: 1 1 180px;
+  font-weight: 700;
+}
+
+.seasons-admin-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.season-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.season-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* ---- "Próximo juego" en admin.html: quién confirmó / no / no responde ---- */
 
 .rsvp-admin-game {
