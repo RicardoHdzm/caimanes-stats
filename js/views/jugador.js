@@ -3,7 +3,8 @@ import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } fr
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadges, renderAvatar, escapeHtml } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
 import { getCurrentPlayerId, changePassword, signOut } from "../auth.js";
-import { getWalkupOverride, setWalkup } from "../db.js";
+import { getWalkupOverride, setWalkup, getPositionOverride, setPosition } from "../db.js";
+import { DEFENSE_POSITIONS } from "../lineup.js";
 
 // Icono según de dónde venga el link de la canción de entrada.
 const WALKUP_PLATFORMS = [
@@ -95,8 +96,9 @@ export function renderJugadorDetalle(container, playerId) {
       <span class="game-hero-opponent">${player.name}</span>
     </div>
     <div class="game-hero-meta" style="margin-top: 12px;">
-      ${player.position ? renderPositionBadges(player.position) : ""}
+      <span id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
     </div>
+    <div id="position-edit-slot"></div>
     <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
     ${
       mvpCount > 0
@@ -107,6 +109,99 @@ export function renderJugadorDetalle(container, playerId) {
     <div id="walkup-edit-slot"></div>
   `;
   container.appendChild(hero);
+
+  // ---- Posiciones registradas: editables solo en tu propio perfil ----
+  //
+  // Igual patrón que la canción de entrada: `player.position` (data.js) es
+  // el valor de arranque, sin esperar a nadie; si el jugador ya las
+  // personalizó, la fila en player_positions la reemplaza en cuanto llega.
+  // A diferencia de la canción, esto SÍ alimenta más cosas — Roster y el
+  // generador de alineación mezclan player_positions sobre PLAYERS antes de
+  // usar la posición (ver js/views/roster.js, js/views/alineacion.js y
+  // js/lineup-tool.js).
+  let currentPosition = player.position ?? "";
+  const positionDisplay = hero.querySelector("#position-display");
+
+  getPositionOverride(player.id).then((override) => {
+    if (!override) return;
+    currentPosition = override;
+    positionDisplay.innerHTML = renderPositionBadges(override);
+  });
+
+  if (getCurrentPlayerId() === player.id) {
+    const positionSlot = hero.querySelector("#position-edit-slot");
+    positionSlot.innerHTML = `
+      <button type="button" class="walkup-edit-btn" id="position-edit-toggle">
+        <i class="fa-solid fa-pen"></i> Editar mis posiciones
+      </button>
+      <div id="position-edit-form" class="walkup-edit-form" hidden>
+        <p class="auth-hint">Elige hasta 3, en el orden que prefieras.</p>
+        <div class="pos-filter-row" id="position-picker">
+          ${DEFENSE_POSITIONS.map((pos) => `<button type="button" class="pos-filter-chip" data-pos="${pos}">${pos}</button>`).join("")}
+        </div>
+        <p class="auth-error" id="position-error" hidden></p>
+        <button type="button" class="auth-submit" id="position-save-btn">Guardar posiciones</button>
+      </div>
+    `;
+
+    const posToggle = positionSlot.querySelector("#position-edit-toggle");
+    const posForm = positionSlot.querySelector("#position-edit-form");
+    const posPicker = positionSlot.querySelector("#position-picker");
+    const posError = positionSlot.querySelector("#position-error");
+    const posSaveBtn = positionSlot.querySelector("#position-save-btn");
+    let selectedPositions = [];
+
+    function syncPicker() {
+      for (const chip of posPicker.querySelectorAll(".pos-filter-chip")) {
+        chip.classList.toggle("active", selectedPositions.includes(chip.dataset.pos));
+      }
+    }
+
+    posToggle.addEventListener("click", () => {
+      selectedPositions = currentPosition ? currentPosition.split("/").filter(Boolean) : [];
+      syncPicker();
+      posError.hidden = true;
+      posForm.hidden = !posForm.hidden;
+    });
+
+    posPicker.addEventListener("click", (e) => {
+      const chip = e.target.closest(".pos-filter-chip");
+      if (!chip) return;
+      const pos = chip.dataset.pos;
+      if (selectedPositions.includes(pos)) {
+        selectedPositions = selectedPositions.filter((p) => p !== pos);
+      } else if (selectedPositions.length >= 3) {
+        posError.textContent = "Máximo 3 posiciones — quita una para agregar otra.";
+        posError.hidden = false;
+        return;
+      } else {
+        selectedPositions.push(pos);
+      }
+      posError.hidden = true;
+      syncPicker();
+    });
+
+    posSaveBtn.addEventListener("click", async () => {
+      if (selectedPositions.length === 0) {
+        posError.textContent = "Elige al menos una posición.";
+        posError.hidden = false;
+        return;
+      }
+      posSaveBtn.disabled = true;
+      const joined = selectedPositions.join("/");
+      try {
+        await setPosition(player.id, joined);
+        currentPosition = joined;
+        positionDisplay.innerHTML = renderPositionBadges(joined);
+        posForm.hidden = true;
+      } catch {
+        posError.textContent = "No se pudo guardar — intenta de nuevo.";
+        posError.hidden = false;
+      } finally {
+        posSaveBtn.disabled = false;
+      }
+    });
+  }
 
   // ---- Canción de entrada: editable solo en tu propio perfil ----
   //

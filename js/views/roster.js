@@ -2,7 +2,7 @@ import { PLAYERS, GAMES, TEAM } from "../data.js";
 import { gamesPlayedByPlayer } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges, renderAvatar } from "../ui.js";
 import { getSession, isCoach } from "../auth.js";
-import { getDuesMap, setDuesPaid } from "../db.js";
+import { getDuesMap, setDuesPaid, getAllPositionOverrides } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -161,6 +161,18 @@ export function renderRoster(container) {
       draw();
     });
   }
+
+  // Posiciones personalizadas: lectura pública (a diferencia de "Pagó", no
+  // depende de sesión). Reemplazan `row.position` de quien haya editado la
+  // suya — la columna Pos y el filtro rápido de arriba usan ese mismo campo,
+  // así que ambos quedan al día con un solo draw().
+  getAllPositionOverrides().then((overrides) => {
+    if (overrides.size === 0) return;
+    for (const row of rows) {
+      if (overrides.has(row.id)) row.position = overrides.get(row.id);
+    }
+    draw();
+  });
 
   renderGlossary(container, columns);
 }
