@@ -138,8 +138,9 @@ function setPanelOpen(open) {
 
 function loggedOutMarkup() {
   return `
-    <button type="button" class="auth-btn" id="auth-toggle" aria-expanded="false" aria-label="Iniciar sesión">
+    <button type="button" class="auth-btn auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Iniciar sesión">
       <i class="fa-solid fa-right-to-bracket"></i>
+      <span class="auth-btn-name">Iniciar sesión</span>
     </button>
     <div class="auth-panel" id="auth-panel" hidden>
       <h4>Iniciar sesión</h4>
@@ -177,8 +178,9 @@ function loggedInMarkup() {
   // en player_whitelist) — no hay a qué perfil mandarla, así que se queda
   // con un panel mínimo solo para poder cerrar sesión.
   return `
-    <button type="button" class="auth-btn auth-btn-in" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
+    <button type="button" class="auth-btn auth-btn-in auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
       <i class="fa-solid fa-user-check"></i>
+      <span class="auth-btn-name">Mi cuenta</span>
     </button>
     <div class="auth-panel" id="auth-panel" hidden>
       <h4>${session?.user?.email ?? "Cuenta"}</h4>

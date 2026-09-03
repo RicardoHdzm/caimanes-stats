@@ -11,6 +11,9 @@
 </head>
 <body>
 <header class="topbar">
+  <!-- Solo para reconocer la cuenta del coach — el resto de esta página
+       sigue siendo pública y funciona igual sin sesión, como siempre. -->
+  <div id="auth-slot" class="auth-slot"></div>
   <div class="topbar-inner">
     <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
   </div>
@@ -18,6 +21,15 @@
 
 <main id="admin-app" class="admin-main">
   <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
+
+  <section class="admin-section" id="dues-admin-section" hidden>
+    <h2>Estado de pago</h2>
+    <p class="subtitle">Marca quién ya pagó su inscripción de la temporada — se guarda al momento, sin generar ni pegar código.</p>
+    <div class="dues-admin-list" id="dues-admin-list"></div>
+  </section>
+  <p class="subtitle" id="dues-admin-gate">
+    Inicia sesión con la cuenta del coach (arriba a la derecha) para marcar quién pagó su inscripción.
+  </p>
 
   <section class="admin-section">
     <h2>Agregar jugador</h2>
@@ -121,6 +133,7 @@
   Herramienta local — no guarda nada, solo genera el código para pegar en <code>js/data.js</code>
 </footer>
 
+<script type="module" src="js/admin-dues.js"></script>
 <script type="module" src="js/admin.js"></script>
 </body>
 </html>

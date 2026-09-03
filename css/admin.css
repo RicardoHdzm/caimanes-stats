@@ -216,6 +216,47 @@
   color: var(--accent);
 }
 
+/* ---- estado de pago (admin.html, solo cuenta del coach) ---- */
+
+.dues-admin-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dues-admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.dues-admin-row:hover {
+  border-color: var(--accent);
+}
+
+/* Marcado = ya pagó — mismo verde de "asiste" en el checklist de lineup,
+   para que "esta fila está en regla" se lea igual en toda la herramienta. */
+.dues-admin-row.paid {
+  border-color: var(--win);
+  background: rgba(63, 181, 111, 0.1);
+}
+
+.dues-admin-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--win);
+  cursor: pointer;
+}
+
 /* ---- checklist de asistentes (lineup/) ---- */
 
 .attendee-controls {
