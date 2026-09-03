@@ -257,6 +257,41 @@
   cursor: pointer;
 }
 
+/* ---- "Próximo juego" en admin.html: quién confirmó / no / no responde ---- */
+
+.rsvp-admin-game {
+  margin-top: 12px;
+}
+
+.rsvp-admin-game h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+
+.rsvp-admin-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.rsvp-admin-col h4 {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.rsvp-admin-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 0 6px 6px 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-alt);
+  font-size: 0.78rem;
+}
+
 /* ---- checklist de asistentes (lineup/) ---- */
 
 .attendee-controls {
