@@ -1,4 +1,4 @@
-import { GAMES, SCHEDULE, TEAM, PLAYERS } from "../data.js";
+import { GAMES, SCHEDULE, TEAM } from "../data.js";
 import {
   teamRecord,
   battingTotals,
