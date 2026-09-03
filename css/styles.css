@@ -1309,26 +1309,30 @@ main h3::before {
 
 /* Tu propia fila en cualquier tabla donde aparezcas (Roster, Bateo,
    Pitcheo, Fildeo, el line-up de un juego, la alineación sugerida) — mismo
-   tratamiento que .standings-us de arriba, pero en verde para no
-   confundirse con ese otro significado ("nuestro equipo" vs. "tú"). */
+   tratamiento (y mismo rojo) que .standings-us de arriba; nunca aparecen
+   juntas en una misma tabla (esa es de equipos, esta de jugadores), así
+   que no hay ambigüedad de cuál "tú" es cuál. */
 .stats-table tbody tr.row-you td {
-  background-color: rgba(63, 181, 111, 0.12);
+  background-color: rgba(226, 32, 47, 0.1);
   font-weight: 700;
   color: var(--text);
 }
 
 .stats-table tbody tr.row-you td.sticky-col {
-  background-color: #16241c;
+  background-color: #2a1b1f;
 }
 
 .stats-table tbody tr.row-you td.sticky-col-first {
-  box-shadow: inset 3px 0 0 var(--win);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 /* Misma idea para tarjetas (posiciones sugeridas / banca en el generador
-   de alineación) — cambia el filo de color de arriba de .card. */
+   de alineación). El filo de arriba de .card ya es rojo por default, así
+   que ahí no alcanza para distinguirse — se agrega un aro completo más un
+   tinte de fondo, mismo rojo que .row-you de arriba. */
 .card.card-you {
-  border-top-color: var(--win);
+  background: linear-gradient(160deg, rgba(226, 32, 47, 0.14), var(--surface));
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
 }
 
 .stats-table td.empty {
