@@ -152,12 +152,12 @@ export function renderJugadorDetalle(container, playerId) {
       <span id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
     </div>
     <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
-    ${renderDebut(player.debutSeason)}
     ${
       mvpCount > 0
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
         : ""
     }
+    ${renderDebut(player.debutSeason)}
     <div id="walkup-display">${renderWalkup(player.walkup)}</div>
     <div id="profile-edit-slot"></div>
   `;
