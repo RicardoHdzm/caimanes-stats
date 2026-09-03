@@ -115,6 +115,13 @@ export function renderCalendario(container) {
         });
       } else if (event?.type === "scheduled") {
         inner += `<span class="cal-dot cal-scheduled"></span><span class="cal-opponent">${event.game.opponent}</span>`;
+        // El RSVP vive en Resumen (ver js/views/resumen.js), no aquí — evita
+        // inventar una segunda pantalla de detalle solo para confirmar
+        // asistencia.
+        cell.classList.add("cal-clickable");
+        cell.addEventListener("click", () => {
+          location.hash = "#/resumen";
+        });
       }
       cell.innerHTML = inner;
       grid.appendChild(cell);

@@ -47,6 +47,58 @@ function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) 
   `;
 }
 
+// Conteo público (siempre) + botones Sí/No (solo con cuenta vinculada a un
+// jugador) dentro de la tarjeta de "Próximo juego". Se llama una vez por
+// tarjeta — en la práctica SCHEDULE casi siempre trae 0 o 1 juego.
+function wireRsvp(cardEl, gameId) {
+  const tallyEl = cardEl.querySelector(".rsvp-tally");
+  const actionsEl = cardEl.querySelector(".rsvp-actions");
+
+  function renderActions(myStatus) {
+    if (!getCurrentPlayerId()) {
+      actionsEl.innerHTML = `<p class="auth-hint">Inicia sesión para confirmar tu asistencia.</p>`;
+      return;
+    }
+    actionsEl.innerHTML = `
+      <button type="button" class="rsvp-btn rsvp-yes${myStatus === "yes" ? " active" : ""}" data-status="yes">
+        <i class="fa-solid fa-check"></i> Voy
+      </button>
+      <button type="button" class="rsvp-btn rsvp-no${myStatus === "no" ? " active" : ""}" data-status="no">
+        <i class="fa-solid fa-xmark"></i> No voy
+      </button>
+    `;
+    for (const btn of actionsEl.querySelectorAll(".rsvp-btn")) {
+      btn.addEventListener("click", async () => {
+        for (const b of actionsEl.querySelectorAll(".rsvp-btn")) b.disabled = true;
+        try {
+          await setRsvp(gameId, btn.dataset.status);
+          await refresh();
+        } catch {
+          // Silencioso a propósito: un error de red no debe romper la
+          // tarjeta, el jugador simplemente puede volver a intentar.
+        } finally {
+          for (const b of actionsEl.querySelectorAll(".rsvp-btn")) b.disabled = false;
+        }
+      });
+    }
+  }
+
+  async function refresh() {
+    const rows = await getRsvps(gameId);
+    const yesNames = rows
+      .filter((r) => r.status === "yes")
+      .map((r) => PLAYERS.find((p) => p.id === r.player_id)?.name ?? r.player_id);
+    tallyEl.innerHTML =
+      yesNames.length > 0
+        ? `<strong>${yesNames.length} confirmado${yesNames.length === 1 ? "" : "s"}:</strong> ${yesNames.join(", ")}`
+        : "Nadie ha confirmado todavía.";
+    const mine = rows.find((r) => r.player_id === getCurrentPlayerId());
+    renderActions(mine?.status ?? null);
+  }
+
+  refresh();
+}
+
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
@@ -89,8 +141,11 @@ export function renderResumen(container) {
     next.innerHTML = `
       <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
       <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
+      <p class="rsvp-tally">Cargando asistencia…</p>
+      <div class="rsvp-actions"></div>
     `;
     bottomRow.appendChild(next);
+    wireRsvp(next, g.id);
   }
 
   const streak = currentStreak(GAMES);
