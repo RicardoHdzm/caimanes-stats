@@ -886,6 +886,24 @@ main h3::before {
   letter-spacing: 0.03em;
 }
 
+/* "Debut: ..." en el perfil (ver renderDebut en js/views/jugador.js) —
+   mismo tratamiento de píldora que .mvp-badge, pero en el color de acento
+   del sitio en vez de dorado, para no confundirse con el MVP. */
+.debut-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent);
+  background: rgba(226, 32, 47, 0.12);
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;
