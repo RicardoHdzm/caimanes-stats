@@ -2,7 +2,7 @@ import { GAMES, TEAM } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getMvpVotes, setMvpVote } from "../db.js";
+import { getMvpVotes, setMvpVote, deleteMvpVote } from "../db.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
@@ -47,6 +47,7 @@ function renderMvpVote(container, gameId, participantIds) {
           ${options}
         </select>
         <button type="submit" class="auth-submit">${myVote ? "Cambiar voto" : "Votar"}</button>
+        ${myVote ? '<button type="button" class="auth-signout" id="vote-remove-btn">Quitar voto</button>' : ""}
       </form>
     `;
     const form = formSlot.querySelector(".vote-form");
@@ -54,7 +55,7 @@ function renderMvpVote(container, gameId, participantIds) {
       e.preventDefault();
       const votedId = new FormData(form).get("voted");
       if (!votedId) return;
-      const btn = form.querySelector("button");
+      const btn = form.querySelector("button[type=submit]");
       btn.disabled = true;
       try {
         await setMvpVote(gameId, votedId);
@@ -64,6 +65,17 @@ function renderMvpVote(container, gameId, participantIds) {
         // sección, se puede reintentar votando de nuevo.
       } finally {
         btn.disabled = false;
+      }
+    });
+
+    form.querySelector("#vote-remove-btn")?.addEventListener("click", async () => {
+      const removeBtn = form.querySelector("#vote-remove-btn");
+      removeBtn.disabled = true;
+      try {
+        await deleteMvpVote(gameId);
+        await refresh();
+      } catch {
+        removeBtn.disabled = false;
       }
     });
   }

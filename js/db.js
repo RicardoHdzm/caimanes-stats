@@ -97,6 +97,18 @@ export async function setMvpVote(gameId, votedPlayerId) {
   if (error) throw error;
 }
 
+export async function deleteMvpVote(gameId) {
+  const client = getClient();
+  const voterId = getCurrentPlayerId();
+  if (!client || !voterId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar tu voto.");
+  const { error } = await client
+    .from("mvp_votes")
+    .delete()
+    .eq("game_id", gameId)
+    .eq("voter_player_id", voterId);
+  if (error) throw error;
+}
+
 // ---- Canción de entrada personalizada (player_walkups) ----
 //
 // Lectura pública (cualquiera ve la canción de cualquiera, con o sin

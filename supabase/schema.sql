@@ -115,7 +115,11 @@ create policy "votes_update_own" on public.mvp_votes
   using (voter_player_id = public.current_player_id())
   with check (voter_player_id = public.current_player_id());
 
-grant select, insert, update on public.mvp_votes to anon, authenticated;
+create policy "votes_delete_own" on public.mvp_votes
+  for delete to authenticated
+  using (voter_player_id = public.current_player_id());
+
+grant select, insert, update, delete on public.mvp_votes to anon, authenticated;
 
 -- 6. Comentarios, reusados por la página de un juego (context_type='game',
 --    context_id = id del juego) y por la de alineación sugerida

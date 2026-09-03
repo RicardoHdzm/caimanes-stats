@@ -1777,6 +1777,15 @@ main h3::before {
   color: var(--text);
 }
 
+/* .auth-signout trae width: 100%/margin-top pensados para un panel
+   apilado en columna (login del header, cuenta del perfil) — aquí va en
+   línea junto al botón de votar, así que se anulan esos dos. */
+.vote-form .auth-signout {
+  width: auto;
+  margin-top: 0;
+  padding: 8px 14px;
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
