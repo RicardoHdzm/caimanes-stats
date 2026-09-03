@@ -1823,20 +1823,9 @@ main h3::before {
   margin-top: 0;
 }
 
-/* RSVP en la tarjeta "Próximo juego" (Resumen) — conteo público arriba,
-   botones Sí/No abajo (solo con cuenta vinculada a un jugador). */
-.rsvp-tally {
-  margin-top: 8px !important;
-  font-size: var(--text-sm);
-}
-
-/* Los nombres de quienes confirmaron van más chico que el "N confirmados:"
-   en negrita — la lista puede crecer bastante (hasta 20) y no debe competir
-   visualmente con el resto de la tarjeta. */
-.rsvp-names {
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
+/* RSVP en la tarjeta "Próximo juego" (Resumen) — solo los botones Sí/No
+   (con cuenta vinculada a un jugador); quién ya confirmó se ve en
+   admin.html (js/admin-rsvp.js), no aquí. */
 
 .rsvp-actions {
   display: flex;
