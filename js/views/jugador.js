@@ -616,4 +616,16 @@ export function renderJugadorDetalle(container, playerId) {
     p.textContent = "Todavía no tiene stats capturadas esta temporada.";
     container.appendChild(p);
   }
+
+  // ---- Comparación contigo: solo con sesión y viendo a OTRO jugador ----
+  //
+  // Misma lógica y estilos que el comparador de Alineación (ver
+  // js/views/comparar.js), pero sin selects — aquí siempre es tú contra
+  // quien sea que esté viendo el perfil, hasta abajo de la página.
+  const myId = getCurrentPlayerId();
+  if (myId && myId !== player.id) {
+    const compareEl = document.createElement("div");
+    container.appendChild(compareEl);
+    renderLockedComparison(compareEl, myId, player.id);
+  }
 }
