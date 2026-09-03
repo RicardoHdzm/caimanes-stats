@@ -1,15 +1,16 @@
-// Sección de "Estado de pago" en admin.html — aparte de js/admin.js (que
-// solo genera código para pegar en data.js y nunca habla con Supabase)
-// porque esto sí necesita sesión y escribe directo en player_dues. Se
-// muestra nada más si quien inició sesión es la cuenta del coach
-// (isCoach() en js/auth.js) — el resto de admin.html sigue siendo público
-// y funciona igual sin login, como siempre.
+// Controla el acceso a admin.html completo (no solo el estado de pago) —
+// solo la cuenta del coach puede ver/usar los formularios de adentro. Es un
+// candado de UI, no de seguridad real: admin.js nunca escribe en Supabase
+// (solo genera texto para pegar a mano en data.js), así que no hay nada que
+// proteger ahí más que el orden — lo único que sí escribe (player_dues) ya
+// está protegido de verdad por RLS del lado del servidor (ver
+// supabase/schema.sql), pase lo que pase aquí.
 import { PLAYERS } from "./data.js";
 import { initAuth, mountAuthControl, isCoach } from "./auth.js";
 import { getDuesMap, setDuesPaid } from "./db.js";
 
-const section = document.getElementById("dues-admin-section");
-const gate = document.getElementById("dues-admin-gate");
+const gate = document.getElementById("admin-gate");
+const protectedEl = document.getElementById("admin-protected");
 const listEl = document.getElementById("dues-admin-list");
 
 function rowMarkup(player, paid) {
@@ -23,12 +24,12 @@ function rowMarkup(player, paid) {
 
 async function render() {
   if (!isCoach()) {
-    section.hidden = true;
+    protectedEl.hidden = true;
     gate.hidden = false;
     return;
   }
   gate.hidden = true;
-  section.hidden = false;
+  protectedEl.hidden = false;
 
   const duesMap = await getDuesMap();
   listEl.innerHTML = PLAYERS.map((p) => rowMarkup(p, duesMap.get(p.id) ?? false)).join("");
