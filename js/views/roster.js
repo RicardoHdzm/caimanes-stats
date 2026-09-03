@@ -26,8 +26,12 @@ function playerPositions(player) {
 // Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. Siempre
 // de solo lectura aquí, incluso para el coach — marcarla solo se puede
 // desde admin.html, para no tener el mismo control de escritura repetido
-// en dos pantallas.
+// en dos pantallas. `duesMap` null = todavía no se sabe (no ha llegado la
+// respuesta, o la consulta falló incluso tras reintentar en
+// getDuesMap/js/db.js) — se pinta neutral, NUNCA rojo, para no verse como
+// "no pagó" cuando en realidad no se pudo comprobar.
 function renderDuesCell(playerId, duesMap) {
+  if (!duesMap) return '<i class="fa-solid fa-circle-question dues-icon dues-icon-unknown"></i>';
   const paid = duesMap.get(playerId) ?? false;
   return paid
     ? '<i class="fa-solid fa-circle-check dues-icon dues-icon-paid"></i>'
@@ -85,7 +89,9 @@ export function renderRoster(container) {
   // de una consulta a Supabase, no de data.js; el `render` la lee por
   // closure, así que cuando llegue el dato real solo hace falta volver a
   // llamar draw() para que se refleje.
-  let duesMap = new Map();
+  // null hasta que getDuesMap() resuelva (abajo) — mientras tanto la celda
+  // se pinta neutral, no roja (ver renderDuesCell).
+  let duesMap = null;
   const loggedIn = !!getSession();
   if (loggedIn) {
     columns.push({

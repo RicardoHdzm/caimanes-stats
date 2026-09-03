@@ -53,15 +53,20 @@
     >
       <i class="fa-brands fa-instagram"></i>
     </a>
-    <!-- Esquina opuesta al de Instagram. Vacío a propósito: js/auth.js lo
-         llena (botón + panel de login/cambiar contraseña/salir) y lo deja
-         vacío del todo si Supabase no está configurado todavía. -->
-    <div id="auth-slot" class="auth-slot"></div>
     <div class="topbar-inner">
       <a href="#/resumen" aria-label="Ir a Resumen">
         <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
       </a>
     </div>
+    <!-- Esquina opuesta al de Instagram en escritorio (.auth-slot es
+         position:absolute ahí, así que el orden en el DOM no importa). En
+         móvil pasa a position:relative y queda en flujo normal — por eso
+         va DESPUÉS de topbar-inner: así aparece debajo del logo, no antes
+         (ver @media max-width:640px en css/styles.css). Vacío a propósito:
+         js/auth.js lo llena (botón + panel de login/cambiar
+         contraseña/salir) y lo deja vacío del todo si Supabase no está
+         configurado todavía. -->
+    <div id="auth-slot" class="auth-slot"></div>
   </header>
 
   <!-- La nav va FUERA del header a propósito: `position: sticky` solo pega

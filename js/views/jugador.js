@@ -184,6 +184,11 @@ export function renderJugadorDetalle(container, playerId) {
     getDuesForPlayer(player.id).then((paid) => {
       const badge = hero.querySelector("#dues-badge");
       if (!badge) return;
+      // `paid` sale null si no se pudo verificar (hipo de red incluso tras
+      // reintentar, ver runQuery en js/db.js) — mostrarlo en rojo ahí se
+      // vería como "no ha pagado" cuando en realidad no se sabe, así que se
+      // deja el badge vacío en vez de arriesgar un falso "sin pagar".
+      if (paid === null) return;
       badge.innerHTML = `
         <span class="dues-badge-pill ${paid ? "stat-green" : "stat-red"}">
           Estado de inscripción: ${paid ? "Pagada" : "Sin pagar"}

@@ -11,6 +11,25 @@ import { getClient, getCurrentPlayerId } from "./auth.js";
 
 export { getClient };
 
+// Reintenta una consulta de lectura una vez tras una pausa corta antes de
+// rendirse. En el campo la señal es intermitente (ver sw.js) — sin esto, un
+// solo hipo de red se ve exactamente igual que "no hay comentarios/anuncios"
+// o "no ha pagado", sin forma de distinguirlo, y solo se arregla con un
+// refresh manual. `queryFn` es una función que regresa `{ data, error }`
+// (la forma que usa el cliente de Supabase en cada consulta); un reintento
+// es barato y resuelve la enorme mayoría de esos casos sin bloquear el
+// primer pintado (sigue siendo asíncrono). Solo para lecturas — las
+// escrituras (insert/upsert) no se reintentan aquí, podrían duplicar algo
+// si la primera sí llegó a pasar y solo se perdió la respuesta.
+async function runQuery(queryFn) {
+  let result = await queryFn();
+  if (result.error) {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    result = await queryFn();
+  }
+  return result;
+}
+
 // ---- Estado de pago de inscripción (player_dues) ----
 //
 // Lectura: cualquiera con sesión iniciada (RLS lo bloquea a un visitante
@@ -20,13 +39,17 @@ export { getClient };
 // el control en la UI).
 
 // Devuelve un Map playerId -> boolean. Si Supabase no está configurado, no
-// hay sesión, o la tabla no es visible (anónimo), regresa un Map vacío en
-// vez de tronar — el roster simplemente no muestra la columna en ese caso.
+// hay sesión, o la tabla no es visible (anónimo), regresa un Map vacío —
+// eso sí es "sin datos" real. Pero si SÍ hay cliente y la consulta truena
+// incluso tras reintentar, regresa `null` en vez de un Map vacío: quien
+// llama debe pintarlo como "no se pudo verificar", nunca como "nadie pagó"
+// (un Map vacío ahí se leería como todos en rojo).
 export async function getDuesMap() {
   const client = getClient();
   if (!client) return new Map();
-  const { data, error } = await client.from("player_dues").select("player_id, paid");
-  if (error || !data) return new Map();
+  const { data, error } = await runQuery(() => client.from("player_dues").select("player_id, paid"));
+  if (error) return null;
+  if (!data) return new Map();
   return new Map(data.map((row) => [row.player_id, row.paid]));
 }
 
@@ -36,10 +59,17 @@ export async function getDuesMap() {
 // ella, RLS esconde la fila igual que si no existiera (sin distinguir
 // "no pagó" de "no la puedo ver"), así que quien llama debe comprobar
 // getSession() antes, igual que ya hace Roster para esta misma tabla.
+//
+// Regresa `null` — no `false` — si no se pudo verificar (sin cliente o la
+// consulta falló incluso tras reintentar): a quien llama le toca no pintar
+// eso como "no ha pagado", o un hipo de red se vería igual que sí pagó/no
+// pagó cuando en realidad no se sabe.
 export async function getDuesForPlayer(playerId) {
   const client = getClient();
   if (!client) return null;
-  const { data, error } = await client.from("player_dues").select("paid").eq("player_id", playerId).maybeSingle();
+  const { data, error } = await runQuery(() =>
+    client.from("player_dues").select("paid").eq("player_id", playerId).maybeSingle()
+  );
   if (error) return null;
   return data?.paid ?? false;
 }
@@ -68,7 +98,7 @@ export async function setDuesPaid(playerId, paid) {
 export async function getRsvps(gameId) {
   const client = getClient();
   if (!client) return [];
-  const { data, error } = await client.from("game_rsvps").select("player_id, status").eq("game_id", gameId);
+  const { data, error } = await runQuery(() => client.from("game_rsvps").select("player_id, status").eq("game_id", gameId));
   return error || !data ? [] : data;
 }
 
@@ -94,7 +124,9 @@ export async function setRsvp(gameId, status) {
 export async function getMvpVotes(gameId) {
   const client = getClient();
   if (!client) return [];
-  const { data, error } = await client.from("mvp_votes").select("voter_player_id, voted_player_id").eq("game_id", gameId);
+  const { data, error } = await runQuery(() =>
+    client.from("mvp_votes").select("voter_player_id, voted_player_id").eq("game_id", gameId)
+  );
   return error || !data ? [] : data;
 }
 
@@ -135,11 +167,9 @@ export async function deleteMvpVote(gameId) {
 export async function getPositionOverride(playerId) {
   const client = getClient();
   if (!client) return null;
-  const { data, error } = await client
-    .from("player_positions")
-    .select("position")
-    .eq("player_id", playerId)
-    .maybeSingle();
+  const { data, error } = await runQuery(() =>
+    client.from("player_positions").select("position").eq("player_id", playerId).maybeSingle()
+  );
   if (error || !data) return null;
   return data.position;
 }
@@ -151,7 +181,7 @@ export async function getPositionOverride(playerId) {
 export async function getAllPositionOverrides() {
   const client = getClient();
   if (!client) return new Map();
-  const { data, error } = await client.from("player_positions").select("player_id, position");
+  const { data, error } = await runQuery(() => client.from("player_positions").select("player_id, position"));
   if (error || !data) return new Map();
   return new Map(data.map((row) => [row.player_id, row.position]));
 }
@@ -178,11 +208,9 @@ export async function setPosition(playerId, position) {
 export async function getWalkupOverride(playerId) {
   const client = getClient();
   if (!client) return null;
-  const { data, error } = await client
-    .from("player_walkups")
-    .select("title, artist, url")
-    .eq("player_id", playerId)
-    .maybeSingle();
+  const { data, error } = await runQuery(() =>
+    client.from("player_walkups").select("title, artist, url").eq("player_id", playerId).maybeSingle()
+  );
   if (error || !data) return null;
   return data;
 }
@@ -209,12 +237,14 @@ export async function setWalkup(playerId, { title, artist, url }) {
 export async function getComments(contextType, contextId) {
   const client = getClient();
   if (!client) return [];
-  const { data, error } = await client
-    .from("comments")
-    .select("id, player_id, body, created_at")
-    .eq("context_type", contextType)
-    .eq("context_id", contextId)
-    .order("created_at", { ascending: true });
+  const { data, error } = await runQuery(() =>
+    client
+      .from("comments")
+      .select("id, player_id, body, created_at")
+      .eq("context_type", contextType)
+      .eq("context_id", contextId)
+      .order("created_at", { ascending: true })
+  );
   return error || !data ? [] : data;
 }
 
@@ -247,7 +277,9 @@ export async function deleteComment(commentId) {
 export async function getCommentLikes(commentIds) {
   const client = getClient();
   if (!client || commentIds.length === 0) return [];
-  const { data, error } = await client.from("comment_likes").select("comment_id, player_id").in("comment_id", commentIds);
+  const { data, error } = await runQuery(() =>
+    client.from("comment_likes").select("comment_id, player_id").in("comment_id", commentIds)
+  );
   return error || !data ? [] : data;
 }
 
@@ -274,11 +306,9 @@ export async function unlikeComment(commentId) {
 export async function getAnnouncements(limit = 3) {
   const client = getClient();
   if (!client) return [];
-  const { data, error } = await client
-    .from("announcements")
-    .select("id, body, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const { data, error } = await runQuery(() =>
+    client.from("announcements").select("id, body, created_at").order("created_at", { ascending: false }).limit(limit)
+  );
   return error || !data ? [] : data;
 }
 

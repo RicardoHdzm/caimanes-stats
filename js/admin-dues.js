@@ -32,6 +32,14 @@ async function render() {
   protectedEl.hidden = false;
 
   const duesMap = await getDuesMap();
+  // null = la consulta falló incluso tras reintentar (ver getDuesMap en
+  // js/db.js) — se avisa en vez de pintar todo como "sin pagar", que aquí
+  // además es editable (marcar mal por un hipo de red sería peor que solo
+  // mostrarlo mal).
+  if (!duesMap) {
+    listEl.innerHTML = `<p class="auth-error">No se pudo cargar el estado de pago — recarga la página.</p>`;
+    return;
+  }
   listEl.innerHTML = PLAYERS.map((p) => rowMarkup(p, duesMap.get(p.id) ?? false)).join("");
 }
 

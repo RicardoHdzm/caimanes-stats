@@ -434,9 +434,18 @@ body {
 }
 
 @media (max-width: 640px) {
+  /* En la esquina se encima con el logo grande en pantallas angostas — aquí
+     se saca del position:absolute y se pone en flujo normal, debajo del
+     logo (mismo criterio que el badge de inscripción del perfil). Se deja
+     position:relative (no static) para que .auth-panel — position:absolute,
+     pensado para anclarse a este botón — no salte a anclarse a .topbar. */
   .auth-slot {
-    top: 12px;
-    right: 12px;
+    position: relative;
+    top: auto;
+    right: auto;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
   }
 
   .auth-btn {
@@ -460,8 +469,15 @@ body {
     text-overflow: ellipsis;
   }
 
+  /* .auth-slot ya no envuelve justo al botón (es un bloque centrado de
+     ancho completo, ver arriba) — sin esto, el "right: 0" de .auth-panel
+     (pensado para pegarse al borde del botón) se iría al borde de la
+     pantalla. Centrado bajo el botón en su lugar. */
   .auth-panel {
     top: 48px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
     width: 220px;
   }
 }
@@ -1370,6 +1386,12 @@ main h3::before {
 
 .dues-icon-unpaid {
   color: var(--accent-text);
+}
+
+/* Ni verde ni rojo: todavía no se sabe (cargando, o la consulta falló
+   incluso tras reintentar) — ver renderDuesCell en js/views/roster.js. */
+.dues-icon-unknown {
+  color: var(--muted);
 }
 
 .badge {
