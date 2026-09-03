@@ -11,9 +11,9 @@ import {
   minPlateAppearances,
   seasonRecords,
 } from "../stats.js";
-import { heading } from "../ui.js";
+import { heading, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getRsvps, setRsvp } from "../db.js";
+import { getRsvps, setRsvp, getAnnouncements } from "../db.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },

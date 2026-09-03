@@ -216,7 +216,17 @@ export function renderJugadorDetalle(container, playerId) {
       <button type="button" class="walkup-edit-btn" id="profile-edit-toggle">
         <i class="fa-solid fa-pen"></i> Editar perfil
       </button>
+      <button type="button" class="walkup-edit-btn" id="share-profile-btn">
+        <i class="fa-solid fa-share-nodes"></i> Compartir mi perfil
+      </button>
       <div id="profile-edit-panel" class="walkup-edit-form auth-form" hidden>
+        <p class="profile-edit-heading">Foto de perfil</p>
+        <label class="avatar-edit-label">
+          <i class="fa-solid fa-camera"></i> Subir foto
+          <input type="file" accept="image/*" id="avatar-input" hidden>
+        </label>
+        <p class="auth-error" id="avatar-error" hidden></p>
+
         <p class="profile-edit-heading">Posiciones</p>
         <p class="auth-hint">Elige hasta 3, en el orden que prefieras.</p>
         <div class="pos-filter-row" id="position-picker">
@@ -239,6 +249,51 @@ export function renderJugadorDetalle(container, playerId) {
         <button type="button" class="auth-submit" id="password-save-btn">Cambiar contraseña</button>
       </div>
     `;
+
+    // --- Compartir mi perfil ---
+    const shareBtn = slot.querySelector("#share-profile-btn");
+    shareBtn.addEventListener("click", async () => {
+      const url = `${location.origin}${location.pathname}#/jugador/${player.id}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: `${player.name} — Caimanes de Villas`, url });
+        } catch {
+          // El usuario canceló el share nativo — no es un error real.
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        const original = shareBtn.innerHTML;
+        shareBtn.innerHTML = '<i class="fa-solid fa-check"></i> Link copiado';
+        setTimeout(() => {
+          shareBtn.innerHTML = original;
+        }, 1800);
+      } catch {
+        // Sin Web Share ni Clipboard disponible no hay mucho más que hacer.
+      }
+    });
+
+    // --- Foto de perfil ---
+    const avatarInput = slot.querySelector("#avatar-input");
+    const avatarError = slot.querySelector("#avatar-error");
+    avatarInput.addEventListener("change", async () => {
+      const file = avatarInput.files[0];
+      if (!file) return;
+      avatarError.hidden = true;
+      try {
+        await uploadAvatar(player.id, file);
+        const url = await getAvatarUrl(player.id);
+        if (url) {
+          avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+        }
+      } catch {
+        avatarError.textContent = "No se pudo subir la foto — intenta de nuevo.";
+        avatarError.hidden = false;
+      } finally {
+        avatarInput.value = "";
+      }
+    });
 
     // --- Posiciones ---
     const posPicker = slot.querySelector("#position-picker");
