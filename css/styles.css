@@ -1378,12 +1378,9 @@ main h3::before {
   }
 }
 
-/* Icono blanco/plateado sobre acento rojo (a propósito, al revés del color
-   del borde — ver .team-stats-row/.leader-card--hero-white/.record-label i
-   más abajo, que son acento blanco con icono rojo). */
 .card-icon::before,
 .leader-card h3 i::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -3290,6 +3287,7 @@ main h3::before {
 
 .announcement-title {
   margin: 2px 0 0;
+  font-size: var(--text-lg);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
