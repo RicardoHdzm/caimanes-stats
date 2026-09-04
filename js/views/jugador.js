@@ -172,7 +172,7 @@ function renderAchievements(player) {
       chips.push({ icon: "fa-solid fa-beer-mug-empty", label: `Expendio · ${myBatting.SO} ponches`, kind: "leader" });
     }
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
-      chips.push({ icon: "fa-solid fa-baseball-bat-ball", label: `Bateador de ${myBatting.AVG}`, kind: "avg300" });
+      chips.push({ icon: "fa-solid fa-baseball-bat-ball", label: `Bateador de ${myBatting.AVG}`, kind: "threshold" });
     }
   }
 
