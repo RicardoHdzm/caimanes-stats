@@ -214,7 +214,7 @@ function renderAchievements(player) {
   // streak.current) — reconoce el logro aunque ya no siga activo.
   if (streak && streak.longest > 5) {
     chips.push({
-      icon: "fa-solid fa-chart-line",
+      icon: "fa-solid fa-award",
       label: "Hit Record",
       kind: "streak",
       desc: `Su racha más larga de la temporada fue de ${streak.longest} juegos seguidos con hit.`,
