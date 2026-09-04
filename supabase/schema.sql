@@ -235,9 +235,11 @@ create policy "dues_write_coach_only" on public.player_dues
 grant select, insert, update on public.player_dues to authenticated;
 
 -- 9. Anuncios del equipo. Lectura pública, escritura solo del coach — mismo
---    patrón que player_dues arriba.
+--    patrón que player_dues arriba. `title` es opcional (anuncios viejos
+--    no lo tienen) — ver postAnnouncement()/getAnnouncements() en js/db.js.
 create table if not exists public.announcements (
   id bigint generated always as identity primary key,
+  title text check (char_length(title) <= 120),
   body text not null check (char_length(body) between 1 and 1000),
   created_at timestamptz not null default now()
 );

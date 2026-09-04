@@ -205,6 +205,7 @@ function announcementItem(a, likeCount, likedByMe, canLike) {
   return `
     <div class="announcement-item">
       <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
+      ${a.title ? `<p class="announcement-title">${escapeHtml(a.title)}</p>` : ""}
       <p class="announcement-body">${escapeHtml(a.body)}</p>
       <button type="button" class="announcement-like-btn${likedByMe ? " active" : ""}" data-announcement="${a.id}"${canLike ? "" : " disabled"}>
         <i class="fa-solid fa-heart"></i> <span class="announcement-like-count">${likeCount}</span>

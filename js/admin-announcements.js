@@ -14,10 +14,11 @@ function formatDate(iso) {
 // Solo lectura aquí (el coach no necesita darle like a su propio anuncio) —
 // el conteo es nomás para que vea qué tanto "pegó" cada aviso.
 function rowMarkup(a, likeCount) {
+  const titleHtml = a.title ? `<strong>${a.title.replace(/</g, "&lt;")}</strong><br>` : "";
   return `
     <div class="announcement-admin-row" data-id="${a.id}">
       <p>
-        <span class="announcement-date">${formatDate(a.created_at)}</span>${a.body.replace(/</g, "&lt;")}
+        <span class="announcement-date">${formatDate(a.created_at)}</span>${titleHtml}${a.body.replace(/</g, "&lt;")}
         <span class="announcement-admin-likes"><i class="fa-solid fa-heart"></i> ${likeCount}</span>
       </p>
       <button type="button" class="remove-row-btn" title="Borrar"><i class="fa-solid fa-trash"></i></button>
@@ -40,12 +41,14 @@ async function render() {
 
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const body = new FormData(form).get("body")?.toString().trim();
+  const data = new FormData(form);
+  const title = data.get("title")?.toString().trim();
+  const body = data.get("body")?.toString().trim();
   if (!body) return;
   const btn = form.querySelector("button");
   btn.disabled = true;
   try {
-    await postAnnouncement(body);
+    await postAnnouncement(title, body);
     form.reset();
     await render();
   } catch {

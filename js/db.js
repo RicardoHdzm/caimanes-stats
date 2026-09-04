@@ -339,15 +339,17 @@ export async function getAnnouncements(limit = 3) {
   const client = getClient();
   if (!client) return [];
   const { data, error } = await runQuery(() =>
-    client.from("announcements").select("id, body, created_at").order("created_at", { ascending: false }).limit(limit)
+    client.from("announcements").select("id, title, body, created_at").order("created_at", { ascending: false }).limit(limit)
   );
   return error || !data ? [] : data;
 }
 
-export async function postAnnouncement(body) {
+// `title` es opcional (columna nullable, ver supabase/schema.sql) — un
+// anuncio viejo o publicado sin título simplemente no trae uno.
+export async function postAnnouncement(title, body) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client.from("announcements").insert({ body });
+  const { error } = await client.from("announcements").insert({ title: title || null, body });
   if (error) throw error;
 }
 
