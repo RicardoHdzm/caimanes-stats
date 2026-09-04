@@ -2090,15 +2090,15 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
-  /* Las tarjetas del carrusel de Resumen van al 82% del ancho de la
-     pantalla (ver .tab-carousel) — ahí "Voy"/"No voy" ya no caben uno
-     junto al otro con su ancho de contenido y se apilan en dos filas,
-     pegados al borde de la tarjeta. flex:1 los reparte a la mitad del
-     espacio disponible en vez de por su contenido, así siempre quedan en
-     un solo renglón. */
+  /* A petición: "Voy" y "No voy" van uno debajo del otro, cada uno
+     ocupando su propio renglón completo — no lado a lado. */
+  .rsvp-actions {
+    flex-direction: column;
+  }
+
   .rsvp-btn {
-    flex: 1;
-    padding: 8px 10px;
+    width: 100%;
+    padding: 10px 10px;
   }
 }
 
