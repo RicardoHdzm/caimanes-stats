@@ -2745,9 +2745,10 @@ main h3::before {
   gap: 14px;
   background: var(--surface);
   border: 1px solid var(--border);
-  /* Mismos colores que las tarjetas de "Stats de equipo": filo blanco arriba
-     en vez del rojo de acento. */
-  border-top: 4px solid #fff;
+  /* El fondo de estas tarjetas es blanco/plateado (ver .record-hero más
+     abajo), así que el borde va rojo — invertido a propósito, mismo
+     criterio que .leader-card--hero-white. */
+  border-top: 4px solid var(--accent);
   border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: var(--shadow-card);
