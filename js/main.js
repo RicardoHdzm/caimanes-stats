@@ -46,7 +46,10 @@ const MORE_TABS = [
   { tab: "pitcheo", route: "#/pitcheo", label: "Pitcheo", icon: "fa-baseball" },
   { tab: "fildeo", route: "#/fildeo", label: "Fildeo", icon: "fa-shield" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
-  { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
+  // Playlist: oculta por el momento (a petición) — la ruta en `routes`
+  // sigue activa, solo no aparece en el menú "Más" del celular. Descomentar
+  // regresa el botón.
+  // { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
 
 const app = document.getElementById("app");
