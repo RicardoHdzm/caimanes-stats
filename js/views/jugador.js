@@ -286,7 +286,7 @@ export function renderJugadorDetalle(container, playerId) {
   const achievementsHtml = renderAchievements(player);
   if (achievementsHtml) {
     const achievementsCard = document.createElement("div");
-    achievementsCard.className = "leader-card achievements-card-player";
+    achievementsCard.className = "leader-card player-standalone-card";
     achievementsCard.innerHTML = `<h3><i class="fa-solid fa-trophy"></i>Logros</h3>${achievementsHtml}`;
     container.appendChild(achievementsCard);
   }
@@ -316,7 +316,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (getCurrentPlayerId() === player.id && SCHEDULE.length > 0) {
     const g = SCHEDULE[0];
     const summaryEl = document.createElement("div");
-    summaryEl.className = "leader-card";
+    summaryEl.className = "leader-card player-standalone-card";
     summaryEl.innerHTML = `
       <h3><i class="fa-solid fa-clipboard-list"></i>Tu resumen</h3>
       <p>Próximo juego: ${g.date} vs ${g.opponent}</p>

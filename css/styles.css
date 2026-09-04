@@ -1217,6 +1217,14 @@ main h3::before {
   transition: transform 0.15s;
 }
 
+/* .leader-card normalmente vive dentro de un contenedor con `gap` (ver
+   .leaders más abajo), que separa una tarjeta de la siguiente — pero en el
+   perfil (Logros, Tu resumen) van sueltas, una tras otra directo en el
+   contenedor, así que sin esto quedan con los bordes pegados. */
+.player-standalone-card {
+  margin-bottom: 16px;
+}
+
 .leader-card:hover {
   transform: translateY(-2px);
 }
