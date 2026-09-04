@@ -406,31 +406,36 @@ export function renderJugadorDetalle(container, playerId) {
   container.appendChild(hero);
 
   // Tarjeta aparte (no dentro de .game-hero) — solo si hay algo que
-  // mostrar, para no dejar un encabezado "Logros" vacío.
-  const achievementsHtml = renderAchievements(player);
+  // mostrar, para no dejar un encabezado "Logros" vacío. `achievementChips`
+  // se queda vivo (no solo el HTML ya armado) porque addAchievementMedal()
+  // de abajo sigue agregándole cosas después del primer pintado, y cada vez
+  // hay que reordenar y volver a pintar la tarjeta completa — no solo pegar
+  // la nueva al final — para que las de la misma categoría sigan juntas.
+  const achievementChips = renderAchievements(player);
   let achievementsCard = null;
-  if (achievementsHtml) {
+  if (achievementChips.length > 0) {
     achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card";
-    achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3>${achievementsHtml}`;
+    achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>`;
     container.appendChild(achievementsCard);
   }
 
-  // Logros "profile" (foto y walkup personalizados, ver más abajo): a
-  // diferencia de los de renderAchievements(), dependen de una respuesta de
-  // Supabase, así que se agregan en cuanto contesta, sin bloquear el primer
-  // pintado. Si nadie más calificó para la tarjeta (achievementsCard sigue
-  // null), se crea aquí mismo, justo después de .game-hero — para que quede
-  // en el mismo lugar de siempre, no importa qué tanto se haya pintado ya
-  // debajo para cuando esto responda.
+  // Logros "profile"/"social" (foto, walkup y like a un anuncio, ver más
+  // abajo): a diferencia de los de renderAchievements(), dependen de una
+  // respuesta de Supabase, así que se agregan en cuanto contesta, sin
+  // bloquear el primer pintado. Si nadie más calificó para la tarjeta
+  // (achievementsCard sigue null), se crea aquí mismo, justo después de
+  // .game-hero — para que quede en el mismo lugar de siempre, no importa
+  // qué tanto se haya pintado ya debajo para cuando esto responda.
   function addAchievementMedal(chip) {
+    achievementChips.push(chip);
     if (!achievementsCard) {
       achievementsCard = document.createElement("div");
       achievementsCard.className = "leader-card player-standalone-card";
       achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid"></div>`;
       hero.after(achievementsCard);
     }
-    achievementsCard.querySelector(".achievements-grid").insertAdjacentHTML("beforeend", achievementMedalHtml(chip));
+    achievementsCard.querySelector(".achievements-grid").innerHTML = sortedAchievementsHtml(achievementChips);
   }
 
   // ---- Foto de perfil personalizada: lectura pública, edición propia ----
