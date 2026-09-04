@@ -727,6 +727,14 @@ body {
   transition: color 0.15s, background 0.15s, border-color 0.15s;
 }
 
+/* Sin esto, [hidden] no alcanza a ganarle a "display: flex" de arriba (misma
+   especificidad que compite, y la de flex está declarada después) — la
+   pestaña "Mi Perfil" (#nav-mi-perfil en index.html) se seguiría viendo sin
+   sesión iniciada aunque JS le ponga el atributo `hidden`. */
+.tabs a[hidden] {
+  display: none;
+}
+
 .tabs a:hover {
   color: var(--text);
   border-color: var(--border);
