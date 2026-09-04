@@ -133,21 +133,21 @@ function copyToClipboard(text) {
 // ---- Temporadas por jugador ----
 //
 // No escribe nada solo (a diferencia de Estado de pago/Anuncios/RSVP, que sí
-// van a Supabase) — debutSeason vive en data.js como el resto del roster, así
+// van a Supabase) — `seasons` vive en data.js como el resto del roster, así
 // que esto solo genera el valor para pegar a mano en cada jugador dentro de
-// PLAYERS, igual que "Agregar jugador"/"Agregar juego" abajo.
+// PLAYERS, igual que "Agregar jugador"/"Agregar juego" abajo. Cada casilla
+// es una temporada real (pueden quedar huecos en medio — alguien se pudo
+// haber ausentado una temporada y regresado), no solo "desde cuándo": el
+// código generado es la lista completa de las marcadas, no un debut solo.
 const seasonsList = document.getElementById("seasons-admin-list");
 const seasonsOutput = document.getElementById("seasons-output");
 const seasonsCode = document.getElementById("seasons-code");
 
 function seasonsRowMarkup(player) {
+  const mine = new Set(player.seasons ?? []);
   const checks = SEASONS.map((_season, i) => {
     const n = i + 1;
-    // Pre-marcado desde su debut actual hasta la última temporada, asumiendo
-    // que ha seguido activo desde que entró — el coach desmarca a mano si
-    // alguien se ausentó una temporada en medio.
-    const checked = player.debutSeason && n >= player.debutSeason ? "checked" : "";
-    return `<label class="season-check"><input type="checkbox" data-season="${n}" ${checked}>${n}</label>`;
+    return `<label class="season-check"><input type="checkbox" data-season="${n}" ${mine.has(n) ? "checked" : ""}>${n}</label>`;
   }).join("");
   return `
     <div class="seasons-admin-row" data-player="${player.id}">
@@ -159,23 +159,29 @@ function seasonsRowMarkup(player) {
 
 seasonsList.innerHTML = PLAYERS.map(seasonsRowMarkup).join("");
 
+// "Mismo arreglo, en el mismo orden" — compara sin que el orden de los
+// checkboxes (siempre ascendente aquí) pueda dar un falso "cambió".
+function sameSeasons(a, b) {
+  const arrA = a ?? [];
+  const arrB = b ?? [];
+  return arrA.length === arrB.length && arrA.every((v, i) => v === arrB[i]);
+}
+
 document.getElementById("generate-seasons-btn").addEventListener("click", () => {
-  // Antes solo generaba la línea de un jugador si el debut (la temporada
-  // MÁS CHICA marcada) cambiaba — pero desmarcar/marcar cualquier otra
-  // casilla que no sea esa no mueve el mínimo, así que esa edición no
-  // generaba nada y se sentía como que el botón no hacía caso. Ahora
-  // siempre se lista a todos los que tengan al menos una marcada, hayan
-  // cambiado o no, para que el resultado sea predecible.
+  // Siempre lista a todos los que tengan al menos una marcada, hayan
+  // cambiado o no, para que el resultado sea predecible — antes, cuando
+  // esto solo generaba un "debutSeason" (la más chica marcada), marcar o
+  // desmarcar cualquier otra casilla no movía ese número y esa edición no
+  // generaba nada, se sentía como que el botón no hacía caso.
   const lines = [];
   for (const row of seasonsList.querySelectorAll(".seasons-admin-row")) {
     const player = PLAYERS.find((p) => p.id === row.dataset.player);
     const checkedSeasons = [...row.querySelectorAll("input[type=checkbox]:checked")].map((cb) =>
       Number(cb.dataset.season)
     );
-    if (checkedSeasons.length === 0) continue; // sin ninguna marcada, no hay debut que generar
-    const debut = Math.min(...checkedSeasons);
-    const changed = debut !== player.debutSeason ? "  // antes: " + (player.debutSeason ?? "sin definir") : "";
-    lines.push(`${player.id} (${player.name}): debutSeason: ${debut},${changed}`);
+    if (checkedSeasons.length === 0) continue; // sin ninguna marcada, no hay nada que generar
+    const changed = !sameSeasons(checkedSeasons, player.seasons) ? "  // antes: " + JSON.stringify(player.seasons ?? []) : "";
+    lines.push(`${player.id} (${player.name}): seasons: [${checkedSeasons.join(", ")}],${changed}`);
   }
   seasonsCode.textContent = lines.length > 0 ? lines.join("\n") : "Marca al menos una temporada por jugador.";
   seasonsOutput.hidden = false;

@@ -383,12 +383,13 @@ export function renderResumen(container) {
   // ---- Salón de la fama ----
   //
   // A diferencia de "Líderes"/"Récords" (esta temporada nada más), esto usa
-  // debutSeason — historial de TODAS las temporadas del jugador con el
-  // equipo (ver js/data.js SEASONS). Solo se pinta lo que de verdad aplica:
-  // sin nadie con debutSeason cargado, ninguna de estas tres tarjetas tiene
-  // qué mostrar y la sección entera no aparece.
-  const withDebut = PLAYERS.filter((p) => p.debutSeason);
-  if (withDebut.length > 0) {
+  // `seasons` — la lista de TODAS las temporadas que el jugador ha estado
+  // en el equipo (ver js/data.js SEASONS), no solo cuándo debutó — alguien
+  // pudo haberse ausentado una temporada y regresado después. Solo se
+  // pinta lo que de verdad aplica: sin nadie con `seasons` cargado, ninguna
+  // de estas tres tarjetas tiene qué mostrar y la sección entera no aparece.
+  const withSeasons = PLAYERS.filter((p) => p.seasons?.length > 0);
+  if (withSeasons.length > 0) {
     const famaHeading = document.createElement("h3");
     famaHeading.textContent = "Salón de la fama";
     container.appendChild(famaHeading);
@@ -396,13 +397,16 @@ export function renderResumen(container) {
     const famaRow = document.createElement("div");
     famaRow.className = "leaders grid-3 tab-carousel";
 
-    const veteranSorted = [...withDebut].sort((a, b) => a.debutSeason - b.debutSeason);
+    // "Más veterano" por temporadas acumuladas (seasons.length), no por
+    // debut: con ausencias de por medio, quien debutó primero no siempre
+    // es quien más temporadas lleva jugadas.
+    const veteranSorted = [...withSeasons].sort((a, b) => b.seasons.length - a.seasons.length);
     let html = leaderCardHtml(
       "fa-landmark",
       "Más veterano",
       veteranSorted,
-      (p) => `${p.name} — ${TEAM.seasonsTotal - p.debutSeason + 1} temporadas`,
-      (p) => `${p.name} — ${TEAM.seasonsTotal - p.debutSeason + 1} temporadas`
+      (p) => `${p.name} — ${p.seasons.length} temporadas`,
+      (p) => `${p.name} — ${p.seasons.length} temporadas`
     );
 
     const mvpCounts = PLAYERS.map((p) => ({ ...p, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
@@ -419,7 +423,10 @@ export function renderResumen(container) {
       );
     }
 
-    const rookies = withDebut.filter((p) => p.debutSeason === TEAM.seasonsTotal);
+    // Rookies = su única temporada registrada es la actual (si tuviera una
+    // anterior y faltara la actual, no seguiría activo; ese caso no cuenta
+    // como rookie, cuenta como que ya no está).
+    const rookies = withSeasons.filter((p) => p.seasons.length === 1 && p.seasons[0] === TEAM.seasonsTotal);
     if (rookies.length > 0) {
       html += `
         <div class="leader-card">
