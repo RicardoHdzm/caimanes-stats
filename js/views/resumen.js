@@ -124,7 +124,7 @@ function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
             const rp = playerFor(p);
             return `
               <div class="leader-runner-row">
-                ${renderAvatar(rp, 26)}
+                ${avatarSlot(rp, 26)}
                 <span class="leader-runner-name">${escapeHtml(p.name)}</span>
                 <span class="leader-runner-value">${valueOf(p)}</span>
               </div>
@@ -144,7 +144,7 @@ function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
           <span class="leader-hero-name">${escapeHtml(first.name)}</span>
           ${detailOf ? `<span class="leader-hero-detail">${detailOf(first)}</span>` : ""}
         </div>
-        <div class="leader-hero-avatar">${renderAvatar(heroPlayer, 72)}</div>
+        <div class="leader-hero-avatar">${avatarSlot(heroPlayer, 72)}</div>
       </div>
       ${runnersHtml}
       ${noteHtml}
@@ -448,6 +448,7 @@ export function renderResumen(container) {
       detailOf: (p) => `${p.SO} ponches`,
     });
   container.appendChild(leadersRow);
+  hydrateAvatars(leadersRow);
 
   // ---- Récords de temporada ----
   const records = seasonRecords(GAMES);
@@ -471,14 +472,14 @@ export function renderResumen(container) {
         // queda sin nada, porque ahí de verdad no hay jugador que mostrar.
         let visualHtml = "";
         if (r.playerId) {
-          visualHtml = `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>`;
+          visualHtml = `<div class="record-hero-avatar">${avatarSlot(playerFor(r), 72)}</div>`;
         } else if (r.playerIds?.length > 1) {
           const MAX_SHOWN = 4;
           const shown = r.playerIds.slice(0, MAX_SHOWN);
           const extra = r.playerIds.length - shown.length;
           visualHtml = `
             <div class="record-hero-avatar-group">
-              ${shown.map((id) => renderAvatar(playerFor({ id }), 40)).join("")}
+              ${shown.map((id) => avatarSlot(playerFor({ id }), 40)).join("")}
               ${extra > 0 ? `<span class="avatar-more">+${extra}</span>` : ""}
             </div>
           `;
@@ -492,7 +493,7 @@ export function renderResumen(container) {
                     <div class="leader-runner-row">
                       ${
                         ru.playerId
-                          ? renderAvatar(playerFor(ru), 26)
+                          ? avatarSlot(playerFor(ru), 26)
                           : `<span class="record-runner-icon"><i class="fa-solid ${r.icon}"></i></span>`
                       }
                       <span class="leader-runner-name">${escapeHtml(ru.name)}</span>
@@ -532,5 +533,6 @@ export function renderResumen(container) {
     }
 
     container.appendChild(recordsRow);
+    hydrateAvatars(recordsRow);
   }
 }
