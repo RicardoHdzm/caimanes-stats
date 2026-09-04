@@ -205,11 +205,20 @@ export function renderJugadorDetalle(container, playerId) {
         : ""
     }
     ${renderDebut(player.seasons)}
-    ${renderAchievements(player)}
     <div id="walkup-display">${renderWalkup(player.walkup)}</div>
     <div id="profile-edit-slot"></div>
   `;
   container.appendChild(hero);
+
+  // Tarjeta aparte (no dentro de .game-hero) — solo si hay algo que
+  // mostrar, para no dejar un encabezado "Logros" vacío.
+  const achievementsHtml = renderAchievements(player);
+  if (achievementsHtml) {
+    const achievementsCard = document.createElement("div");
+    achievementsCard.className = "leader-card achievements-card-player";
+    achievementsCard.innerHTML = `<h3><i class="fa-solid fa-trophy"></i>Logros</h3>${achievementsHtml}`;
+    container.appendChild(achievementsCard);
+  }
 
   // ---- Foto de perfil personalizada: lectura con sesión, edición propia ----
   //
