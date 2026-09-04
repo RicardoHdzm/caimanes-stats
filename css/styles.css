@@ -351,12 +351,22 @@ body {
   .theme-switch-icon {
     width: 24px;
     height: 24px;
+  }
+
+  .theme-switch-thumb {
+    left: 29px; /* oscuro (default): junto a la luna */
+  }
+
+  .theme-switch-icon--sun {
+    left: 3px;
+  }
+
+  .theme-switch-icon--moon {
     left: 29px;
   }
 
-  :root[data-theme="light"] .theme-switch-thumb,
-  .theme-switch-icon--sun {
-    left: 3px;
+  :root[data-theme="light"] .theme-switch-thumb {
+    left: 3px; /* claro: junto al sol */
   }
 }
 
