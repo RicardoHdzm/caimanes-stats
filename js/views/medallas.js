@@ -62,7 +62,7 @@ const CATALOG = [
   // ---- Umbral fijo ----
   { kind: "threshold", icon: "fa-solid fa-meteor", name: "All-Star", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "All-Star" },
   { kind: "threshold", icon: "fa-solid fa-gem", name: "Diamond", how: "OPS de 1.000 o más esta temporada.", match: (l) => l === "Diamond" },
-  { kind: "threshold", icon: "fa-solid fa-circle-notch", name: "Cycle", how: "Conectó sencillo, doble, triple y jonrón en el mismo juego.", match: (l) => l === "Cycle" },
+  { kind: "threshold", icon: "fa-solid fa-hurricane", name: "Cycle", how: "Conectó sencillo, doble, triple y jonrón en el mismo juego.", match: (l) => l === "Cycle" },
   // ---- Participación ----
   { kind: "participation", icon: "fa-solid fa-calendar-check", name: "It's a date!", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "It's a date!" },
   { kind: "participation", icon: "fa-solid fa-hand", name: "High Five!", how: "Asistió a más de 5 juegos esta temporada.", match: (l) => l === "High Five!" },

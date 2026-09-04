@@ -360,7 +360,7 @@ export function renderAchievements(player) {
     });
     if (hitCycle) {
       chips.push({
-        icon: "fa-solid fa-circle-notch",
+        icon: "fa-solid fa-hurricane",
         label: "Cycle",
         kind: "threshold",
         desc: "Conectó sencillo, doble, triple y jonrón en el mismo juego.",
