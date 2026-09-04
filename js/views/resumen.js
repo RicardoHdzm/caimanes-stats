@@ -39,6 +39,31 @@ function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
 }
 
+// Armazón "hero" para tarjetas de un solo valor, sin 2do/3er lugar (Próximo
+// juego, Racha actual, Racha reciente, Juegos jugados, Stats de equipo):
+// mismo encabezado a color que teamLeaderCardHtml, pero con una insignia
+// del icono a la derecha en vez de una foto — no hay a quién retratar, es
+// un dato del equipo o de la fecha, no de un jugador. `mainHtml` va junto
+// al título (el valor grande, un párrafo, lo que sea); `bodyHtml`
+// (opcional) es contenido extra debajo del encabezado, fuera del degradado
+// — barra de progreso, chips de racha, botones de RSVP.
+function heroCardInnerHtml(icon, title, mainHtml, bodyHtml = "") {
+  return `
+    <div class="leader-hero">
+      <div class="leader-hero-main">
+        <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+        ${mainHtml}
+      </div>
+      <div class="leader-hero-avatar"><span class="icon-badge"><i class="fa-solid ${icon}"></i></span></div>
+    </div>
+    ${bodyHtml ? `<div class="leader-hero-body">${bodyHtml}</div>` : ""}
+  `;
+}
+
+function heroCardShell(icon, title, mainHtml, bodyHtml = "") {
+  return `<div class="leader-card leader-card--hero">${heroCardInnerHtml(icon, title, mainHtml, bodyHtml)}</div>`;
+}
+
 function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
   const [first, second, third] = list;
   if (!first) {
