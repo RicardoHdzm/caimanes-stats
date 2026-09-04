@@ -64,6 +64,7 @@ const CATALOG = [
   // ---- Participación ----
   { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Nerd", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Nerd" },
   { kind: "participation", icon: "fa-solid fa-hand", name: "Cumplidor", how: "Asistió a más de 5 juegos esta temporada.", match: (l) => l === "Cumplidor" },
+  { kind: "participation", icon: "fa-solid fa-cat", name: "Nocturno", how: "Asistió a más de la mitad de los juegos a las 9:00pm de la temporada.", match: (l) => l === "Nocturno" },
   { kind: "participation", icon: "fa-solid fa-shuffle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
   { kind: "participation", icon: "fa-solid fa-crown", name: "Comodín total", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Comodín total" },
   // ---- Social ----
