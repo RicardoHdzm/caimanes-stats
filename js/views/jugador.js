@@ -408,6 +408,14 @@ export function renderAchievements(player) {
       label: "Killer",
       desc: (value) => `Outs realizados (PO) esta temporada (${value}).`,
     });
+    // "Butterhands" — mismo chiste que Bartender (arriba): el que más
+    // errores comete "gana" el podio, con el mismo sistema oro/plata/bronce
+    // que cualquier otra estadística. Ícono de jabón porque se le resbala.
+    addPodium(fieldingList, "E", {
+      icon: "fa-solid fa-soap",
+      label: "Butterhands",
+      desc: (value) => `Errores cometidos esta temporada (${value}).`,
+    });
   }
 
   // Más MVPs de la temporada — mismo cálculo que usaba "Salón de la fama"

@@ -55,6 +55,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-dumbbell", name: "Iron Arm", how: "Top 3 del equipo en entradas lanzadas (IP) esta temporada.", match: (l) => l === "Iron Arm" },
   { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Golden / Silver / Bronze Glove", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.endsWith(" Glove") },
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Killer", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Killer" },
+  { kind: "gold", icon: "fa-solid fa-soap", name: "Butterhands", how: "Top 3 del equipo en errores cometidos esta temporada.", match: (l) => l === "Butterhands" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-chess-knight", name: "Triple Threat", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Threat" },
   { kind: "gold", icon: "fa-solid fa-crow", name: "Eagle Eye", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Eagle Eye" },
