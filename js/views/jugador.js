@@ -729,7 +729,7 @@ export function renderJugadorDetalle(container, playerId) {
       if (paid === null) return;
       badge.innerHTML = `
         <span class="dues-badge-pill ${paid ? "stat-green" : "stat-red"}">
-          Estado de inscripción: ${paid ? "Pagada" : "Sin pagar"}
+          Inscripción: ${paid ? "Pagada" : "Sin pagar"}
         </span>
       `;
       addAchievementMedal(
