@@ -337,12 +337,7 @@ function renderAchievements(player) {
     });
   }
 
-  if (chips.length === 0) return "";
-  return `
-    <div class="achievements-grid">
-      ${chips.map(achievementMedalHtml).join("")}
-    </div>
-  `;
+  return chips;
 }
 
 // Comprime la foto de perfil en el navegador antes de subirla — una foto de
