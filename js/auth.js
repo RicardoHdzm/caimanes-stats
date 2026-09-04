@@ -47,17 +47,42 @@ async function resolvePlayerId() {
   playerId = error ? null : data ?? null;
 }
 
-// Se llama una sola vez desde js/main.js al arrancar la app. Si Supabase
-// todavía no está configurado (Fase 0 del plan sin terminar), no intenta
-// conectarse — evita un error de red confuso antes de tener proyecto.
-export async function initAuth() {
-  if (!SUPABASE_CONFIGURED) return;
+// Carga el cliente de Supabase por CDN y resuelve la sesión guardada — la
+// parte que puede fallar por un hipo de red, separada de initAuth() de abajo
+// para poder reintentarla entera si hace falta.
+async function bootAuth() {
   const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.45.4");
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const { data } = await supabase.auth.getSession();
   session = data.session;
   await resolvePlayerId();
+}
+
+// Se llama una sola vez desde js/main.js al arrancar la app. Si Supabase
+// todavía no está configurado (Fase 0 del plan sin terminar), no intenta
+// conectarse — evita un error de red confuso antes de tener proyecto.
+//
+// Reintenta una vez tras un hipo de red — mismo criterio que runQuery/
+// runMutation en js/db.js, pero aquí hace más falta todavía: esto es lo
+// primero que corre al abrir la página, así que si truena y no se
+// reintenta, TODO lo que depende de Supabase (avatares, anuncios, RSVP,
+// comentarios...) se queda sin datos hasta que alguien recargue la página a
+// mano ("a veces no carga hasta que actualizo"). Si el segundo intento
+// también falla, se rinde en silencio — sin red no hay nada más que hacer,
+// pero al menos ya no depende de la mala suerte de un solo intento.
+export async function initAuth() {
+  if (!SUPABASE_CONFIGURED) return;
+  try {
+    await bootAuth();
+  } catch {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      await bootAuth();
+    } catch {
+      return;
+    }
+  }
   notifyChange();
 
   supabase.auth.onAuthStateChange(async (_event, newSession) => {
