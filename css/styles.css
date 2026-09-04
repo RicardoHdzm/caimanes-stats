@@ -1160,6 +1160,63 @@ main h3::before {
   box-shadow: 0 0 12px rgba(74, 158, 255, 0.35);
 }
 
+/* Estado de inscripción — mismo verde/rojo que ya usa el badge "Estado de
+   inscripción" (.stat-green/.stat-red) junto a estas medallas. */
+.achievement-medal--dues-paid .achievement-medal-icon {
+  border: 2px solid var(--win);
+  background: rgba(63, 181, 111, 0.15);
+  color: var(--win);
+  box-shadow: 0 0 12px rgba(63, 181, 111, 0.35);
+}
+
+.achievement-medal--dues-unpaid .achievement-medal-icon {
+  border: 2px solid var(--loss);
+  background: rgba(226, 32, 47, 0.15);
+  color: var(--loss);
+  box-shadow: 0 0 12px rgba(226, 32, 47, 0.35);
+}
+
+/* Explica cada logro al pasar el mouse (o al enfocarlo con teclado, ver
+   tabindex en achievementMedalHtml() en js/views/jugador.js) — sin esto,
+   una medalla es solo un icono y una palabra suelta, sin decir cómo se
+   ganó. */
+.achievement-medal {
+  position: relative;
+}
+
+.achievement-medal[data-tooltip]:hover::after,
+.achievement-medal[data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  width: max-content;
+  max-width: 170px;
+  text-align: center;
+  line-height: 1.4;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.achievement-medal:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;
