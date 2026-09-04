@@ -129,7 +129,7 @@ function rowHtml(entry, index, labels) {
   return `
     <tr data-row="${index}">
       <td>
-        <div class="achievement-medal achievement-medal--${entry.kind}" style="width:auto;">
+        <div class="achievement-medal achievement-medal--${entry.kind}">
           <div class="achievement-medal-icon"><i class="${entry.icon}"></i></div>
         </div>
       </td>

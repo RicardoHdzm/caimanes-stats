@@ -1917,6 +1917,22 @@ main h3::before {
   font-weight: 400;
 }
 
+/* Guía de medallas (js/views/medallas.js): "Cargando…" / "Todavía no" /
+   "Requiere sesión" en la columna de estado. */
+.medalla-status-pending {
+  color: var(--muted);
+}
+
+/* La columna de icono no necesita ancho de texto — el resto sí se pueden
+   quebrar en celular en vez de forzar scroll horizontal enorme. */
+.medallas-table td:first-child {
+  width: 1%;
+}
+
+.medallas-table .achievement-medal {
+  width: auto;
+}
+
 /* Columna "Inscripción" en Roster — un ícono, siempre de solo lectura
    (incluso para el coach: marcarla solo se puede desde admin.html, ver
    js/admin-dues.js). */
