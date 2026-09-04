@@ -65,6 +65,21 @@ function renderDebut(seasons) {
 //                             que no salen de aquí: los agrega
 //                             addAchievementMedal() más abajo, en cuanto
 //                             getAvatarUrl()/getWalkupOverride() contestan.
+//   dues          (rojo/verde) — estado de inscripción (ver más abajo,
+//                             junto al badge "Estado de inscripción") —
+//                             solo se agrega con sesión iniciada, mismo
+//                             criterio que ese badge.
+// `desc` es la explicación que se ve al pasar el mouse (ver
+// achievementMedalHtml() justo abajo) — cada logro debe traer uno.
+function achievementMedalHtml(c) {
+  return `
+    <div class="achievement-medal achievement-medal--${c.kind}" data-tooltip="${escapeHtml(c.desc)}" tabindex="0">
+      <div class="achievement-medal-icon"><i class="${c.icon}"></i></div>
+      <span class="achievement-medal-label">${escapeHtml(c.label)}</span>
+    </div>
+  `;
+}
+
 function renderAchievements(player) {
   const chips = [];
   const seasons = player.seasons ?? [];
