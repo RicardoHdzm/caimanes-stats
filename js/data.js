@@ -70,12 +70,12 @@ export const PLAYERS = [
   { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
   { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [3, 4, 5, 6, 7, 8] },
   { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
-  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 3, 4, 5, 6, 7, 8] },
   { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
   { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
-  { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8] },
+  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 8] },
+  { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8] },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
 ];
 
