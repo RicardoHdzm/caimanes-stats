@@ -2820,7 +2820,7 @@ main h3::before {
   justify-content: space-between;
   gap: 14px;
   padding: 16px 16px 14px;
-  background: linear-gradient(160deg, rgba(30, 64, 175, 0.35) 0%, transparent 65%), var(--surface);
+  background: linear-gradient(160deg, rgba(0, 0, 0, 0.35) 0%, transparent 65%), var(--surface);
 }
 
 /* Rojo, mismo estilo que el resto de tarjetas hero de Resumen. */
