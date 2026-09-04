@@ -195,6 +195,38 @@ function renderAchievements(player) {
         desc: `Promedio de bateo (AVG) de .300 o más esta temporada (${myBatting.AVG}).`,
       });
     }
+    if (myBatting["2B"] > 0 && rankAmong(battingList, player.id, "2B", "desc")?.place === 1) {
+      chips.push({
+        icon: "fa-solid fa-2",
+        label: "Double Trouble",
+        kind: "leader",
+        desc: `Más dobles del equipo esta temporada (${myBatting["2B"]}).`,
+      });
+    }
+    if (myBatting["3B"] > 0 && rankAmong(battingList, player.id, "3B", "desc")?.place === 1) {
+      chips.push({
+        icon: "fa-solid fa-3",
+        label: "Triple Kill",
+        kind: "leader",
+        desc: `Más triples del equipo esta temporada (${myBatting["3B"]}).`,
+      });
+    }
+    if (Number(myBatting.OBP) > 0 && rankAmong(qualifiedBatters, player.id, "OBP", "desc")?.place === 1) {
+      chips.push({
+        icon: "fa-solid fa-eye",
+        label: "Ojo de águila",
+        kind: "leader",
+        desc: `Mejor porcentaje de embasado (OBP) del equipo esta temporada (${myBatting.OBP}).`,
+      });
+    }
+    if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
+      chips.push({
+        icon: "fa-solid fa-gem",
+        label: "Fuera de serie",
+        kind: "threshold",
+        desc: `OPS de 1.000 o más esta temporada (${myBatting.OPS}).`,
+      });
+    }
   }
 
   if (myPitching && myPitching.outs > 0) {
@@ -214,6 +246,14 @@ function renderAchievements(player) {
       label: "Guante de oro",
       kind: "leader",
       desc: "Fildeo perfecto: cero errores en el campo esta temporada.",
+    });
+  }
+  if (myFielding && myFielding.PO > 0 && rankAmong(fieldingList, player.id, "PO", "desc")?.place === 1) {
+    chips.push({
+      icon: "fa-solid fa-broom",
+      label: "Escoba",
+      kind: "leader",
+      desc: `Más outs realizados (PO) del equipo esta temporada (${myFielding.PO}).`,
     });
   }
 
