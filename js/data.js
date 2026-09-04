@@ -18,7 +18,7 @@ export const TEAM = {
 // Historial de temporadas del equipo, una entrada por temporada (índice 0 =
 // temporada 1, hasta SEASONS.length = TEAM.seasonsTotal). El equipo ha
 // jugado en 3 ligas distintas a lo largo de su historia. Se usa para
-// mostrar el debut de cada jugador en su perfil — ver PLAYERS[].debutSeason
+// mostrar el debut de cada jugador en su perfil — ver PLAYERS[].seasons
 // abajo (ej. "Debut: 2023 - 2da Temporada - Liga Gaspasa").
 export const SEASONS = [
   { year: 2023, league: "Liga Gaspasa" }, // 1
@@ -48,31 +48,35 @@ export const SEASONS = [
 // `url` es opcional (Spotify, YouTube, Apple Music o lo que sea); si la pones,
 // el título se vuelve un link con el icono de esa plataforma. Si no tienes la
 // canción de alguien, omite el campo completo y no se muestra nada.
-// debutSeason: opcional, número de temporada (1-8, ver SEASONS arriba) en
-// la que el jugador entró al equipo — se muestra en su perfil como
-// "Debut: 2023 - 2da Temporada - Liga Gaspasa". Si no lo sabes, omite el
-// campo y no se muestra nada (igual que photo/walkup).
+// seasons: opcional, lista de números de temporada (1-8, ver SEASONS
+// arriba) en las que el jugador SÍ estuvo en el equipo — no hace falta que
+// sean consecutivas, un jugador puede haberse ausentado una o varias
+// temporadas y haber regresado después. El debut que se muestra en su
+// perfil ("Debut: 2023 - 2da Temporada - Liga Gaspasa") es la más chica de
+// la lista. Se genera fácil desde admin.html → "Temporadas por jugador"
+// (checkboxes, sin editar esto a mano). Si no lo sabes, omite el campo y no
+// se muestra nada (igual que photo/walkup).
 export const PLAYERS = [
-  { id: "p1", number: 23, name: "Axel Medina", position: "CF/LF/SS", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p2", number: 7, name: "Carlos Baez", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 6 },
-  { id: "p3", number: 21, name: "Omar Ramirez", position: "2B/CF/RF", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p4", number: 33, name: "Carlos Borboa", position: "RF/CF/LF", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p5", number: 44, name: "Christopher Felix", position: "2B/CF/SS", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 7 },
-  { id: "p6", number: 93, name: "Edwyn Pompa", position: "C/LF/CF", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 2 },
-  { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 6 },
-  { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 7 },
-  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 7 },
-  { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 3 },
-  { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 2 },
-  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" }, debutSeason: 1 },
-  { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 2 },
-  { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 1 },
-  { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, debutSeason: 8 },
+  { id: "p1", number: 23, name: "Axel Medina", position: "CF/LF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p2", number: 7, name: "Carlos Baez", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8] },
+  { id: "p3", number: 21, name: "Omar Ramirez", position: "2B/CF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p4", number: 33, name: "Carlos Borboa", position: "RF/CF/LF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p5", number: 44, name: "Christopher Felix", position: "2B/CF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
+  { id: "p6", number: 93, name: "Edwyn Pompa", position: "C/LF/CF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
+  { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8] },
+  { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
+  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
+  { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [3, 4, 5, 6, 7, 8] },
+  { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
+  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
+  { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
 ];
 
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se
