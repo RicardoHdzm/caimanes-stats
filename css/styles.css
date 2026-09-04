@@ -3285,15 +3285,23 @@ main h3::before {
   margin-bottom: 2px;
 }
 
-.announcement-title {
+/* Doble clase (.leader-card .announcement-*) para ganarle en especificidad
+   a `.leader-card p` — sin esto esa regla (pensada para el valor grande de
+   las tarjetas hero) se le imponía a estos párrafos y dejaba título y
+   texto del mismo tamaño. */
+.leader-card .announcement-title {
   margin: 2px 0 0;
   font-size: var(--text-lg);
   font-weight: 700;
+  font-style: normal;
   overflow-wrap: anywhere;
 }
 
-.announcement-body {
+.leader-card .announcement-body {
   margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  font-style: normal;
   overflow-wrap: anywhere;
 }
 
