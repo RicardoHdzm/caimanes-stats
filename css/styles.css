@@ -1473,11 +1473,13 @@ main h3::before {
   color: var(--accent-text);
 }
 
-/* Tarjetas "hero" de Líderes de la temporada (bateo, HR, pitcheo,
-   cervecero): mismo .leader-card de siempre, pero con un encabezado a color
-   (número grande + foto del líder) y una lista más chica de 2do/3er lugar
-   abajo, en vez del <p> simple que usa leaderCardHtml. Solo estas 4
-   tarjetas usan este layout — Salón de la fama y el resto siguen igual. */
+/* Tarjetas "hero": mismo .leader-card de siempre, pero con un encabezado a
+   color (número grande + foto o insignia a la derecha) en vez del <p>
+   simple que usaba leaderCardHtml. La usan Líderes de la temporada (con
+   2do/3er lugar abajo, ver .leader-runners) y el resto de tarjetas de
+   Resumen que muestran un solo valor (Próximo juego, Racha actual, Racha
+   reciente, Juegos jugados, Stats de equipo) sin lista de abajo, ver
+   .leader-hero-body. */
 .leader-card--hero {
   padding: 0;
   overflow: hidden;
@@ -1533,6 +1535,53 @@ main h3::before {
 .leader-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);
+}
+
+/* Insignia circular para cuando no hay foto de jugador que mostrar (récords
+   de equipo, o cualquier tarjeta hero de un solo valor que no es de un
+   jugador en particular — Racha actual, Racha reciente, Juegos jugados,
+   Próximo juego). Rojo por default, igual que el resto de iconos de
+   .leader-card; .team-stats-row la vuelve blanca/plateada más abajo, igual
+   que ya hace con el icono del título. */
+.icon-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: var(--text-3xl);
+}
+
+.icon-badge i::before {
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.record-card--hero .icon-badge i::before,
+.team-stats-row .icon-badge i::before {
+  background: linear-gradient(135deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.team-stats-row .leader-hero {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
+}
+
+/* Contenido extra debajo del encabezado a color que NO es una lista de
+   2do/3er lugar (eso es .leader-runners) — la barra de progreso de "Juegos
+   jugados", los chips de "Racha reciente", los botones de RSVP de "Próximo
+   juego". */
+.leader-hero-body {
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
 }
 
 .leader-runners {
