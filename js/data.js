@@ -89,7 +89,7 @@ export const DUES_PAID = {};
 
 // Ids de jugadores que se lesionaron durante la temporada — a mano, no hay
 // ningún dato de lesiones en GAMES de donde sacarlo solo. Alimenta la
-// medalla "Lesionado" (ver js/views/jugador.js).
+// medalla "Fragile" (ver js/views/jugador.js).
 export const INJURED = ["p1", "p2"];
 
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se

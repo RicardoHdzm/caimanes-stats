@@ -73,7 +73,7 @@ const CATALOG = [
   { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
   { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
   { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Demócrata", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Demócrata", async: true },
-  { kind: "social", icon: "fa-solid fa-camera", name: "1, 2, 3... Flash!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "1, 2, 3... Flash!", async: true },
+  { kind: "social", icon: "fa-solid fa-camera", name: "Selfie!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "Selfie!", async: true },
   { kind: "social", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
   // ---- Estado de inscripción ----
   { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true },
@@ -89,7 +89,7 @@ async function getAsyncLabels(player) {
   const labels = [];
 
   const [avatarUrl, walkup] = await Promise.all([getAvatarUrl(player.id), getWalkupOverride(player.id)]);
-  if (avatarUrl) labels.push("1, 2, 3... Flash!");
+  if (avatarUrl) labels.push("Selfie!");
   if (walkup) labels.push("Greatests Hits");
 
   if (getSession()) {

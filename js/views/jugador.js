@@ -588,7 +588,7 @@ export function renderJugadorDetalle(container, playerId) {
     avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
     addAchievementMedal({
       icon: "fa-solid fa-camera",
-      label: "1, 2, 3... Flash!",
+      label: "Selfie!",
       kind: "social",
       desc: "Subió una foto de perfil personalizada.",
     });
