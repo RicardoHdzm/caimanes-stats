@@ -103,10 +103,10 @@ function renderDebut(seasons) {
 
 // Insignias de logros — hechos chicos calculados de lo que ya hay en
 // data.js/GAMES, sin nada nuevo que mantener a mano. Públicas (no dependen
-// de sesión): son datos de roster, no información privada. Van dentro de
-// la tarjeta principal del perfil, mismo tratamiento de píldora que
-// MVP/Debut (ver .mvp-badge/.debut-badge en css/styles.css) — cada logro
-// con su propio color (`kind`) para distinguirse de un vistazo.
+// de sesión): son datos de roster, no información privada. Van en su
+// propia tarjeta (ver más abajo), varias por renglón — a diferencia de
+// MVP/Debut, que siempre van solos en el suyo — cada logro con su propio
+// color (`kind`) para distinguirse de un vistazo.
 function renderAchievements(player) {
   const chips = [];
   const seasons = player.seasons ?? [];
@@ -137,12 +137,17 @@ function renderAchievements(player) {
     chips.push({ icon: "fa-solid fa-fire", label: `Racha activa: ${streak.current} juegos con hit`, kind: "streak" });
   }
 
-  return chips
-    .map(
-      (c) =>
-        `<div class="achievement-badge achievement-badge--${c.kind}"><i class="${c.icon}"></i>${escapeHtml(c.label)}</div>`
-    )
-    .join("");
+  if (chips.length === 0) return "";
+  return `
+    <div class="achievements-row">
+      ${chips
+        .map(
+          (c) =>
+            `<span class="achievement-badge achievement-badge--${c.kind}"><i class="${c.icon}"></i>${escapeHtml(c.label)}</span>`
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 // Comprime la foto de perfil en el navegador antes de subirla — una foto de
