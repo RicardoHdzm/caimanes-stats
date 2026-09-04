@@ -246,6 +246,27 @@ function bestInGame(games, listKey, valueFn, refine) {
   return { value: best, entries };
 }
 
+// 2do/3er lugar de una métrica por juego, para el mismo tipo de tarjeta que
+// bestInGame arriba pero excluyendo a quien ya es dueño del récord
+// (`excludeIds`). Un jugador aparece una sola vez, con su mejor marca en un
+// solo juego (si hizo 3 en un juego y 2 en otro, solo cuenta el de 3) —
+// mismo criterio de "un renglón por jugador" que ya usan battingTotals /
+// pitchingTotals para los líderes de temporada.
+function runnersUpInGame(games, listKey, valueFn, excludeIds, limit = 2) {
+  const bestByPlayer = new Map();
+  for (const game of games) {
+    for (const line of game[listKey] ?? []) {
+      const value = valueFn(line);
+      if (value <= 0 || excludeIds.has(line.playerId)) continue;
+      const current = bestByPlayer.get(line.playerId);
+      if (!current || value > current.value) {
+        bestByPlayer.set(line.playerId, { playerId: line.playerId, name: playerName(line.playerId), value });
+      }
+    }
+  }
+  return [...bestByPlayer.values()].sort((a, b) => b.value - a.value).slice(0, limit);
+}
+
 // Todos los que comparten el récord, por nombre: "Fulano, Mengano y Zutano".
 // Nadie se queda en un "y N más" — si empataron, aparecen.
 function namesLabel(entries) {
