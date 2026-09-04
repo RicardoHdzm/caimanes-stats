@@ -2532,7 +2532,7 @@ main h3::before {
 
 .records-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -2596,12 +2596,32 @@ main h3::before {
    degradado de acento y, a la derecha, la foto real del dueño del récord en
    vez del icono genérico — solo cuando hay un único dueño (r.playerId); con
    empate o récord de equipo no hay a quién retratar y se usa una insignia
-   circular con el icono en su lugar. */
+   circular con el icono en su lugar. El 2do/3er lugar (.leader-runners, la
+   misma clase que usan los líderes de temporada) va debajo, fuera del
+   degradado — por eso el padding se mueve de la tarjeta a .record-hero. */
 .record-card--hero {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.record-hero {
+  display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
   background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
   border-top: 4px solid var(--accent);
+  margin: -1px -1px 0;
+  border-top-left-radius: calc(var(--radius-md) - 1px);
+  border-top-right-radius: calc(var(--radius-md) - 1px);
+}
+
+.record-card--hero:not(:has(.leader-runners)) .record-hero {
+  border-bottom-left-radius: calc(var(--radius-md) - 1px);
+  border-bottom-right-radius: calc(var(--radius-md) - 1px);
 }
 
 .record-hero-main {
@@ -2623,6 +2643,20 @@ main h3::before {
 .record-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);
+}
+
+.record-runner-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--accent);
 }
 
 .record-icon-badge {

@@ -401,7 +401,10 @@ export function renderResumen(container) {
     // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
     // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
     // empate o récord de equipo no hay a quién retratar, así que se queda
-    // con una insignia del icono del récord en su lugar.
+    // con una insignia del icono del récord en su lugar. El 2do/3er lugar
+    // (r.runnersUp) va abajo, igual que en Líderes de la temporada — con
+    // avatar si es de un jugador, o la misma insignia si es otro juego (los
+    // récords de equipo no tienen jugador que mostrar).
     const recordsRow = document.createElement("div");
     recordsRow.className = "records-grid tab-carousel";
     recordsRow.innerHTML = records
@@ -409,15 +412,39 @@ export function renderResumen(container) {
         const visualHtml = r.playerId
           ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 56)}</div>`
           : `<div class="record-icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
+        const runnersHtml = r.runnersUp?.length
+          ? `
+            <div class="leader-runners">
+              ${r.runnersUp
+                .map(
+                  (ru) => `
+                    <div class="leader-runner-row">
+                      ${
+                        ru.playerId
+                          ? renderAvatar(playerFor(ru), 26)
+                          : `<span class="record-runner-icon"><i class="fa-solid ${r.icon}"></i></span>`
+                      }
+                      <span class="leader-runner-name">${escapeHtml(ru.name)}</span>
+                      <span class="leader-runner-value">${ru.value}</span>
+                    </div>
+                  `
+                )
+                .join("")}
+            </div>
+          `
+          : "";
         return `
         <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
-          <div class="record-hero-main">
-            <span class="record-label"><i class="fa-solid ${r.icon}"></i> ${r.label}</span>
-            <span class="record-value">${r.value}</span>
-            <span class="record-detail">${r.detail}</span>
-            <span class="record-note">${r.note}</span>
+          <div class="record-hero">
+            <div class="record-hero-main">
+              <span class="record-label"><i class="fa-solid ${r.icon}"></i> ${r.label}</span>
+              <span class="record-value">${r.value}</span>
+              <span class="record-detail">${r.detail}</span>
+              <span class="record-note">${r.note}</span>
+            </div>
+            ${visualHtml}
           </div>
-          ${visualHtml}
+          ${runnersHtml}
         </div>
       `;
       })
