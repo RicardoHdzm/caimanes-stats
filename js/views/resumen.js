@@ -27,6 +27,20 @@ function formatGameDate(dateStr) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+// "Faltan N días" / "¡Es mañana!" / "¡Es hoy!" — por DÍA DE CALENDARIO, no
+// por horas exactas (a las 11pm de la víspera "faltan 0 días" se sentiría
+// raro). null si la fecha ya pasó — no tiene caso un "faltan" en negativo.
+function formatCountdown(dateStr) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(`${dateStr}T00:00:00`);
+  const days = Math.round((target - today) / 86400000);
+  if (days < 0) return null;
+  if (days === 0) return "¡Es hoy!";
+  if (days === 1) return "¡Es mañana!";
+  return `Faltan ${days} días`;
+}
+
 // "Fulano, Mengano y Zutano" — mismo formato que ya usa js/stats.js para
 // empates en récords, repetido aquí en chico porque esa versión es privada
 // de ese módulo.
@@ -210,9 +224,11 @@ export function renderResumen(container) {
   for (const g of SCHEDULE) {
     const next = document.createElement("div");
     next.className = "leader-card";
+    const countdown = formatCountdown(g.date);
     next.innerHTML = `
       <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
       <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
+      ${countdown ? `<span class="countdown-badge">${countdown}</span>` : ""}
       <div class="rsvp-actions"></div>
     `;
     bottomRow.appendChild(next);
