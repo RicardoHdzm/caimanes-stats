@@ -1538,9 +1538,13 @@ main h3::before {
 /* .leader-card normalmente vive dentro de un contenedor con `gap` (ver
    .leaders más abajo), que separa una tarjeta de la siguiente — pero en el
    perfil (Logros, Tu resumen) van sueltas, una tras otra directo en el
-   contenedor, así que sin esto quedan con los bordes pegados. */
+   contenedor, así que sin esto quedan con los bordes pegados. Mismo
+   degradado de acento que .leader-hero (rojo, invertido con borde blanco
+   como el resto de tarjetas rojas) — antes se quedaban con fondo plano. */
 .player-standalone-card {
   margin-bottom: 16px;
+  background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
+  border-top-color: #fff;
 }
 
 .leader-card:hover {
