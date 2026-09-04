@@ -1081,6 +1081,38 @@ main h3::before {
   gap: 18px 14px;
 }
 
+/* Tarjeta del medallero: position:relative para anclar el botón de la guía
+   en la esquina (ver js/views/jugador.js MEDALLERO_HEADER()). */
+.medallero-card {
+  position: relative;
+}
+
+.medallero-guide-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--accent-text);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.medallero-guide-btn:hover {
+  background: var(--accent-glow);
+}
+
+@media (max-width: 640px) {
+  .medallero-guide-btn {
+    position: static;
+    display: inline-block;
+    margin-top: 8px;
+  }
+}
+
 .achievement-medal {
   display: flex;
   flex-direction: column;

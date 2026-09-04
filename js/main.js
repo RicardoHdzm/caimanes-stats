@@ -11,6 +11,7 @@ import { renderAlineacion } from "./views/alineacion.js";
 import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
+import { renderMedallasGuide } from "./views/medallas.js";
 import { initAuth, mountAuthControl } from "./auth.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
