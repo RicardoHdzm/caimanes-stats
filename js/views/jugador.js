@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES, SCHEDULE, SEASONS, TEAM } from "../data.js";
+import { PLAYERS, GAMES, SCHEDULE, SEASONS } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks } from "../stats.js";
 import {
   heading,
@@ -85,15 +85,18 @@ function formatAvg(h, ab) {
 }
 
 // "Debut: 2023 - 2da Temporada - Liga Gaspasa" — solo si el jugador trae
-// `debutSeason` en data.js (opcional, igual que photo/walkup) y ese número
-// cae dentro del historial conocido en SEASONS.
-function renderDebut(debutSeason) {
-  const season = SEASONS[debutSeason - 1];
+// `seasons` en data.js (opcional, igual que photo/walkup). El debut es la
+// más chica de la lista, no necesariamente la primera temporada del
+// equipo: alguien pudo haber entrado después.
+function renderDebut(seasons) {
+  if (!seasons || seasons.length === 0) return "";
+  const debut = Math.min(...seasons);
+  const season = SEASONS[debut - 1];
   if (!season) return "";
   return `
     <div class="debut-badge">
       <i class="fa-solid fa-baseball-bat-ball"></i>
-      Debut: ${season.year} · ${ordinalTemporada(debutSeason)} Temporada · ${escapeHtml(season.league)}
+      Debut: ${season.year} · ${ordinalTemporada(debut)} Temporada · ${escapeHtml(season.league)}
     </div>
   `;
 }
@@ -106,20 +109,24 @@ function renderDebut(debutSeason) {
 // con su propio color (`kind`) para distinguirse de un vistazo.
 function renderAchievements(player) {
   const chips = [];
+  const seasons = player.seasons ?? [];
 
-  if (player.debutSeason === 1) {
-    chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "founder" });
-  }
+  if (seasons.length > 0) {
+    const debut = Math.min(...seasons);
+    if (debut === 1) {
+      chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "founder" });
+    }
 
-  if (player.debutSeason) {
-    const seasons = TEAM.seasonsTotal - player.debutSeason + 1;
+    // seasons.length y no "TEAM.seasonsTotal - debut + 1": esa cuenta
+    // asumía que nunca se ausentó desde su debut, seasons.length ya
+    // descuenta cualquier temporada que se haya saltado.
     chips.push({
       icon: "fa-solid fa-shield-halved",
-      label: `${seasons} temporada${seasons === 1 ? "" : "s"} en el equipo`,
+      label: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} en el equipo`,
       kind: "tenure",
     });
 
-    const leagues = new Set(SEASONS.slice(player.debutSeason - 1).map((s) => s.league));
+    const leagues = new Set(seasons.map((n) => SEASONS[n - 1]?.league).filter(Boolean));
     if (leagues.size > 1) {
       chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas`, kind: "leagues" });
     }
@@ -197,7 +204,7 @@ export function renderJugadorDetalle(container, playerId) {
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
         : ""
     }
-    ${renderDebut(player.debutSeason)}
+    ${renderDebut(player.seasons)}
     ${renderAchievements(player)}
     <div id="walkup-display">${renderWalkup(player.walkup)}</div>
     <div id="profile-edit-slot"></div>
