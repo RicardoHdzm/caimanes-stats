@@ -2732,9 +2732,8 @@ main h3::before {
   gap: 14px;
   background: var(--surface);
   border: 1px solid var(--border);
-  /* El fondo de estas tarjetas es blanco/plateado (ver .record-hero más
-     abajo), así que el borde va rojo — invertido a propósito, mismo
-     criterio que .leader-card--hero-white. */
+  /* Mismo estilo que el resto de tarjetas hero de Resumen: fondo
+     blanco/plateado (ver .record-hero más abajo) con borde e icono rojos. */
   border-top: 4px solid var(--accent);
   border-radius: var(--radius-md);
   padding: 14px 16px;
@@ -2818,8 +2817,7 @@ main h3::before {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
 }
 
-/* Rojo a propósito: los récords son acento blanco (border-top), así que el
-   icono va al revés, igual que .leader-card--hero-white. */
+/* Rojo, mismo estilo que el resto de tarjetas hero de Resumen. */
 .record-label i {
   font-size: var(--text-3xl);
   color: var(--accent);
