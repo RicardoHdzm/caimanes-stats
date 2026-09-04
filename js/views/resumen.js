@@ -286,7 +286,7 @@ export function renderResumen(container) {
     </div>
     <div class="leader-card">
       <h3><i class="fa-solid fa-baseball"></i>Pitcheo de equipo</h3>
-      <p>ERA ${teamPit.ERA} · WHIP ${teamPit.WHIP}</p>
+      <p>WHIP ${teamPit.WHIP} · ${teamPit.SO} K</p>
     </div>
     <div class="leader-card">
       <h3><i class="fa-solid fa-shield"></i>Fildeo de equipo</h3>

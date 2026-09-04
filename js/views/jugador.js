@@ -685,10 +685,10 @@ export function renderJugadorDetalle(container, playerId) {
     cards.className = "cards grid-4";
     cards.innerHTML = `
       <div class="card">
-        ${rankBadge(activePitchers, "ERA", "asc")}
+        ${rankBadge(activePitchers, "WHIP", "asc")}
         <i class="fa-solid fa-baseball card-icon"></i>
-        <span class="card-value">${pitchingSeason.ERA}</span>
-        <span class="card-label">ERA</span>
+        <span class="card-value">${pitchingSeason.WHIP}</span>
+        <span class="card-label">WHIP</span>
       </div>
       <div class="card">
         <i class="fa-solid fa-trophy card-icon"></i>
