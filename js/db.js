@@ -125,9 +125,9 @@ export async function setRsvp(gameId, status) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
   if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para confirmar asistencia.");
-  const { error } = await client
-    .from("game_rsvps")
-    .upsert({ game_id: gameId, player_id: playerId, status, updated_at: new Date().toISOString() });
+  const { error } = await runMutation(() =>
+    client.from("game_rsvps").upsert({ game_id: gameId, player_id: playerId, status, updated_at: new Date().toISOString() })
+  );
   if (error) throw error;
 }
 
@@ -156,9 +156,9 @@ export async function setMvpVote(gameId, votedPlayerId) {
   // Sin created_at explícito: en un voto nuevo lo llena el DEFAULT now() de
   // la tabla; si es un cambio de voto (mismo game_id + voter_player_id), se
   // queda con la fecha del voto original en vez de reescribirla.
-  const { error } = await client
-    .from("mvp_votes")
-    .upsert({ game_id: gameId, voter_player_id: voterId, voted_player_id: votedPlayerId });
+  const { error } = await runMutation(() =>
+    client.from("mvp_votes").upsert({ game_id: gameId, voter_player_id: voterId, voted_player_id: votedPlayerId })
+  );
   if (error) throw error;
 }
 
@@ -166,11 +166,9 @@ export async function deleteMvpVote(gameId) {
   const client = getClient();
   const voterId = getCurrentPlayerId();
   if (!client || !voterId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar tu voto.");
-  const { error } = await client
-    .from("mvp_votes")
-    .delete()
-    .eq("game_id", gameId)
-    .eq("voter_player_id", voterId);
+  const { error } = await runMutation(() =>
+    client.from("mvp_votes").delete().eq("game_id", gameId).eq("voter_player_id", voterId)
+  );
   if (error) throw error;
 }
 
