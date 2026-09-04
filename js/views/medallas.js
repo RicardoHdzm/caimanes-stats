@@ -36,14 +36,14 @@ import { renderAchievements } from "./jugador.js";
 // actualizan solas en cuanto contesta getAsyncLabels() más abajo.
 const CATALOG = [
   // ---- Trayectoria ----
-  { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caiman OG", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caiman OG" },
-  { kind: "trajectory", icon: "fa-solid fa-shield-halved", name: "Veterano", how: "Ha jugado temporadas con el equipo.", match: (l) => l === "Veterano" },
+  { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
+  { kind: "trajectory", icon: "fa-solid fa-hourglass-half", name: "Veterano", how: "Ha jugado temporadas con el equipo.", match: (l) => l === "Veterano" },
   { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Trotamundos", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Trotamundos" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "Caliente", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "Caliente" },
   { kind: "streak", icon: "fa-solid fa-award", name: "Hit Record", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "Hit Record" },
   { kind: "streak", icon: "fa-solid fa-fire-flame-curved", name: "En llamas", how: "Racha activa de 2 o más juegos seguidos con multi-hit (2 o más hits por juego).", match: (l) => l === "En llamas" },
-  { kind: "streak", icon: "fa-solid fa-life-ring", name: "Seguro", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Seguro" },
+  { kind: "streak", icon: "fa-solid fa-lock", name: "Seguro", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Seguro" },
   // ---- Podio del equipo (oro/plata/bronce, según el lugar) ----
   { kind: "gold", icon: "fa-solid fa-medal", name: "Bate de oro / plata / bronce", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.startsWith("Bate de ") },
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Bombardero", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Bombardero" },

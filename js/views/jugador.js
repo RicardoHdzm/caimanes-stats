@@ -194,7 +194,7 @@ export function renderAchievements(player) {
       // temporada del equipo, a petición expresa.
       chips.push({
         icon: "fa-solid fa-egg",
-        label: "Caiman OG",
+        label: "Caimaneggs",
         kind: "trajectory",
         desc: "Estuvo en el equipo desde la primera temporada.",
       });
@@ -204,7 +204,7 @@ export function renderAchievements(player) {
     // asumía que nunca se ausentó desde su debut, seasons.length ya
     // descuenta cualquier temporada que se haya saltado.
     chips.push({
-      icon: "fa-solid fa-shield-halved",
+      icon: "fa-solid fa-hourglass-half",
       label: "Veterano",
       kind: "trajectory",
       desc: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} jugadas con el equipo.`,
@@ -253,7 +253,7 @@ export function renderAchievements(player) {
   const onBaseStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) > 0 || (line.BB ?? 0) > 0);
   if (onBaseStreak >= 2) {
     chips.push({
-      icon: "fa-solid fa-life-ring",
+      icon: "fa-solid fa-lock",
       label: "Seguro",
       kind: "streak",
       desc: `Racha activa de ${onBaseStreak} juegos seguidos embasándose (hit o base por bolas).`,
@@ -558,7 +558,7 @@ export function renderJugadorDetalle(container, playerId) {
       icon: "fa-solid fa-camera",
       label: "Say Cheese",
       kind: "profile",
-      desc: "Subió una foto de perfil personalizada.",
+      desc: "1, 2, 3... Flash!",
     });
   });
 
@@ -705,7 +705,7 @@ export function renderJugadorDetalle(container, playerId) {
       icon: "fa-solid fa-music",
       label: "Soundtrack",
       kind: "profile",
-      desc: "Personalizó su canción de entrada.",
+      desc: "Greatest Hits.",
     });
   });
 
