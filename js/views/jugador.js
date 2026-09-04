@@ -265,7 +265,7 @@ function renderAchievements(player) {
       icon: "fa-solid fa-shuffle",
       label: "Versátil",
       kind: "participation",
-      desc: `Jugó en ${positionsPlayed.size} posiciones distintas esta temporada.`,
+      desc: `Jugó en 3 o más posiciones distintas esta temporada (${positionsPlayed.size}).`,
     });
   }
 
@@ -475,7 +475,7 @@ export function renderJugadorDetalle(container, playerId) {
       icon: "fa-solid fa-music",
       label: "Soundtrack",
       kind: "profile",
-      desc: "Personalizó su walkup song (canción de entrada).",
+      desc: "Personalizó su canción de entrada.",
     });
   });
 
