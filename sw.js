@@ -34,6 +34,7 @@ const APP_SHELL = [
   "./js/views/juegos.js",
   "./js/views/juego.js",
   "./js/views/jugador.js",
+  "./js/views/medallas.js",
   "./js/views/calendario.js",
   "./js/views/standing.js",
   "./js/views/alineacion.js",
