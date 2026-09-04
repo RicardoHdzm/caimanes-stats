@@ -91,7 +91,7 @@ function renderAchievements(player) {
       // temporada del equipo, a petición expresa.
       chips.push({
         icon: "fa-solid fa-egg",
-        label: "Fundador del equipo",
+        label: "Caiman OG",
         kind: "trajectory",
         desc: "Estuvo en el equipo desde la primera temporada.",
       });
@@ -162,8 +162,8 @@ function renderAchievements(player) {
     }
     if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
       chips.push({
-        icon: "fa-solid fa-person-running",
-        label: "Ladrón",
+        icon: "fa-solid fa-user-ninja",
+        label: "Ninja",
         kind: "leader",
         desc: "Más bases robadas del equipo esta temporada.",
       });
@@ -171,14 +171,14 @@ function renderAchievements(player) {
     if (Number(myBatting.RBI) > 0 && rankAmong(battingList, player.id, "RBI", "desc")?.place === 1) {
       chips.push({
         icon: "fa-solid fa-tornado",
-        label: "Impulsador",
+        label: "Tornado",
         kind: "leader",
         desc: "Más carreras impulsadas (RBI) del equipo esta temporada.",
       });
     }
     // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
-    // Mismo SO de bateo, no el de pitcheo (ese es "Ponchador").
+    // Mismo SO de bateo, no el de pitcheo (ese es "Francotirador").
     if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
       chips.push({
         icon: "fa-solid fa-beer-mug-empty",
@@ -200,8 +200,8 @@ function renderAchievements(player) {
   if (myPitching && myPitching.outs > 0) {
     if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
       chips.push({
-        icon: "fa-solid fa-baseball",
-        label: "Ponchador",
+        icon: "fa-solid fa-crosshairs",
+        label: "Francotirador",
         kind: "leader",
         desc: "Más ponches propinados (pitcheo) del equipo esta temporada.",
       });
@@ -238,15 +238,15 @@ function renderAchievements(player) {
   if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
     chips.push({
       icon: "fa-solid fa-calendar-check",
-      label: "Asistencia perfecta",
+      label: "Nerd",
       kind: "participation",
       desc: "Jugó todos los juegos de la temporada.",
     });
   }
   if (gamesPlayedCount > 5) {
     chips.push({
-      icon: "fa-solid fa-trophy",
-      label: "Listo para playoffs",
+      icon: "fa-solid fa-dice-5",
+      label: "Cumplidor",
       kind: "participation",
       desc: `Ya jugó más de 5 juegos esta temporada (${gamesPlayedCount}).`,
     });
@@ -262,8 +262,8 @@ function renderAchievements(player) {
   }
   if (positionsPlayed.size >= 3) {
     chips.push({
-      icon: "fa-solid fa-people-arrows",
-      label: `Multiposición: ${positionsPlayed.size} posiciones distintas`,
+      icon: "fa-solid fa-shuffle",
+      label: `Versátil · ${positionsPlayed.size} posiciones`,
       kind: "participation",
       desc: "Jugó en 3 o más posiciones distintas esta temporada.",
     });
@@ -438,7 +438,7 @@ export function renderJugadorDetalle(container, playerId) {
               desc: "Ya pagó la inscripción de la temporada.",
             }
           : {
-              icon: "fa-solid fa-hand-holding-dollar",
+              icon: "fa-solid fa-poo",
               label: "Moroso",
               kind: "dues-unpaid",
               desc: "Todavía no paga la inscripción de la temporada.",
