@@ -345,6 +345,8 @@ export function renderResumen(container) {
   const minPA = minPlateAppearances(GAMES);
   const batSorted = battingList.filter((p) => p.qualified).sort((a, b) => Number(b.AVG) - Number(a.AVG));
   const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
+  const rbiSorted = [...battingList].sort((a, b) => b.RBI - a.RBI);
+  const sbSorted = [...battingList].sort((a, b) => b.SB - a.SB);
   // WHIP y no ERA: ERA depende de carreras limpias (ER), un dato que nunca
   // se captura en data.js — siempre saldría 0.00 para todos y el "líder"
   // sería un empate sin sentido. WHIP (bases por bolas + hits, por entrada)
@@ -374,6 +376,18 @@ export function renderResumen(container) {
       title: "Líder de home runs",
       list: hrSorted,
       valueOf: (p) => (p.HR > 0 ? `${p.HR} HR` : `${p.HRC} HRC`),
+    }) +
+    teamLeaderCardHtml({
+      icon: "fa-crosshairs",
+      title: "Líder de impulsadas",
+      list: rbiSorted,
+      valueOf: (p) => `${p.RBI} RBI`,
+    }) +
+    teamLeaderCardHtml({
+      icon: "fa-person-running",
+      title: "Líder de robos",
+      list: sbSorted,
+      valueOf: (p) => `${p.SB} SB`,
     }) +
     teamLeaderCardHtml({
       icon: "fa-baseball",
@@ -472,6 +486,7 @@ export function renderResumen(container) {
   // pinta lo que de verdad aplica: sin nadie con `seasons` cargado, ninguna
   // de estas tres tarjetas tiene qué mostrar y la sección entera no aparece.
   const withSeasons = PLAYERS.filter((p) => p.seasons?.length > 0);
+
   if (withSeasons.length > 0) {
     const famaHeading = document.createElement("h3");
     famaHeading.textContent = "Salón de la fama";
