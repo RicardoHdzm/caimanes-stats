@@ -61,11 +61,15 @@ function renderDebut(seasons) {
 // (ver .achievement-badge--* en css/styles.css):
 //   trajectory    (azul marino) — fundador, temporadas en el equipo, ligas jugadas
 //   streak        (naranja/fuego) — racha de hits vigente
+//   ice           (rojo)   — racha SIN hit vigente ("Ice Cold") — es
+//                             negativa, mismo rojo que neg-gold/silver/
+//                             bronze de abajo, no el naranja/fuego bueno de
+//                             streak ni el cian de threshold
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
-//   neg-gold/neg-silver/neg-bronze (pantano/verde bilis/óxido) — mismo
-//                             podio de arriba pero para estadísticas donde
-//                             ser el #1 es un chiste (Bartender,
+//   neg-gold/neg-silver/neg-bronze (rojo) — mismo podio de arriba pero
+//                             para estadísticas donde ser el #1 es un
+//                             chiste (Punch-Out, Wild Thing, Gopher Ball,
 //                             Butterhands) — `negative: true` en addPodium.
 //   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (morado) — asistencia y versatilidad de posiciones
@@ -96,6 +100,7 @@ const KIND_ORDER = [
   "gold",
   "silver",
   "bronze",
+  "ice",
   "neg-gold",
   "neg-silver",
   "neg-bronze",
@@ -161,10 +166,9 @@ function achievementMedalHtml(c) {
 const PODIUM_KIND = { 1: "gold", 2: "silver", 3: "bronze" };
 const PODIUM_METAL = { 1: "Golden", 2: "Silver", 3: "Bronze" };
 // Podio "negativo" — mismo mecanismo de oro/plata/bronce, pero para
-// estadísticas donde ser el #1 es un chiste, no un logro (Bartender,
-// Butterhands...): oro/plata/bronce brillan, esto no debería. Pantano,
-// verde bilis y óxido, a petición expresa — ver .achievement-medal--neg-*
-// en css/styles.css.
+// estadísticas donde ser el #1 es un chiste, no un logro (Punch-Out, Wild
+// Thing, Gopher Ball, Butterhands...): un solo rojo para las tres, a
+// petición expresa — ver .achievement-medal--neg-* en css/styles.css.
 const NEG_PODIUM_KIND = { 1: "neg-gold", 2: "neg-silver", 3: "neg-bronze" };
 
 // Medalla de oro/plata/bronce según el lugar del jugador (1/2/3) en una
@@ -289,13 +293,14 @@ export function renderAchievements(player) {
   }
   // "Ice Cold" — espejo negativo de "On Fire": racha activa SIN hit, en vez
   // de con hit. Mismo activeGameStreak() de arriba, solo invierte la
-  // condición.
+  // condición. `kind` propio ("ice", no "streak") a petición expresa: el
+  // naranja/fuego de las rachas no le queda a algo frío — color hielo aparte.
   const hitlessStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) === 0);
   if (hitlessStreak >= 2) {
     chips.push({
       icon: "fa-solid fa-snowflake",
       label: "Ice Cold",
-      kind: "streak",
+      kind: "ice",
       desc: `Racha activa de ${hitlessStreak} juegos seguidos sin hit.`,
     });
   }
@@ -348,13 +353,24 @@ export function renderAchievements(player) {
     // "Bartender" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza —
     // esa coletilla solo aplica al de oro. Mismo SO de bateo, no el de
-    // pitcheo (ese es "Snipper").
+    // pitcheo (ese es "Snipper"). Cuenta como medalla POSITIVA (oro/plata/
+    // bronce reales) a propósito — es un título divertido, no una burla; a
+    // diferencia de "Punch-Out" justo abajo, que es el mismo dato pero con
+    // el marco negativo.
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
       label: "Bartender",
-      negative: true,
       desc: (value, place) =>
         `Ponches de bateo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
+    });
+    // "Punch-Out" — mismo SO de bateo que Bartender de arriba, pero con el
+    // sistema de podio negativo (pantano/verde bilis/óxido): la versión
+    // "esto no es para presumir" del mismo dato.
+    addPodium(battingList, "SO", {
+      icon: "fa-solid fa-hand-back-fist",
+      label: "Punch-Out",
+      negative: true,
+      desc: (value) => `Ponches de bateo esta temporada (${value}).`,
     });
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({
@@ -421,7 +437,7 @@ export function renderAchievements(player) {
     // "Wild Thing" — mismo chiste que Bartender/Butterhands: el que más
     // bases por bolas otorga "gana" el podio.
     addPodium(pitchingList, "BB", {
-      icon: "fa-solid fa-explosion",
+      icon: "fa-solid fa-gift",
       label: "Wild Thing",
       negative: true,
       desc: (value) => `Bases por bolas otorgadas (pitcheo) esta temporada (${value}).`,
@@ -429,7 +445,7 @@ export function renderAchievements(player) {
     // "Gopher Ball" — término real de beisbol para el lanzamiento que se va
     // de jonrón; el que más le conectan "gana" el podio.
     addPodium(pitchingList, "HR", {
-      icon: "fa-solid fa-baseball",
+      icon: "fa-solid fa-burst",
       label: "Gopher Ball",
       negative: true,
       desc: (value) => `Jonrones permitidos (pitcheo) esta temporada (${value}).`,

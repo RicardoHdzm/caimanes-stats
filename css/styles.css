@@ -1258,6 +1258,17 @@ main h3::before {
   box-shadow: 0 0 12px rgba(255, 87, 34, 0.35);
 }
 
+/* "Ice Cold" — racha SIN hit vigente, o sea negativa como Punch-Out/Wild
+   Thing/Gopher Ball/Butterhands (más abajo) — mismo rojo que esas, para no
+   confundirse con el cian de threshold (All-Star/Cycle) ni con el
+   naranja/fuego de streak (arriba), que son categorías "buenas". */
+.achievement-medal--ice .achievement-medal-icon {
+  border: 2px solid #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.35);
+}
+
 /* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
    según el lugar (1/2/3, ver podiumChip() en js/views/jugador.js). Oro es
    el mismo dorado que .mvp-badge a propósito, es la misma idea de fondo. */
@@ -1283,29 +1294,18 @@ main h3::before {
 }
 
 /* Podio "negativo" — mismo mecanismo que oro/plata/bronce de arriba, pero
-   para estadísticas donde ser el #1 es un chiste, no un logro (Bartender,
-   Butterhands, ver `negative: true` en addPodium() en js/views/jugador.js).
-   Pantano/verde bilis/óxido a propósito: apagados, sin el brillo del
-   oro/plata/bronce real. */
-.achievement-medal--neg-gold .achievement-medal-icon {
-  border: 2px solid #7c5a3d;
-  background: rgba(124, 90, 61, 0.15);
-  color: #7c5a3d;
-  box-shadow: 0 0 12px rgba(124, 90, 61, 0.35);
-}
-
-.achievement-medal--neg-silver .achievement-medal-icon {
-  border: 2px solid #8a9a3f;
-  background: rgba(138, 154, 63, 0.15);
-  color: #8a9a3f;
-  box-shadow: 0 0 12px rgba(138, 154, 63, 0.35);
-}
-
+   para estadísticas donde ser el #1 es un chiste, no un logro (Punch-Out,
+   Wild Thing, Gopher Ball, Butterhands, ver `negative: true` en addPodium()
+   en js/views/jugador.js). Un solo rojo para las tres, a propósito — a
+   diferencia del oro/plata/bronce real, aquí el lugar no importa tanto como
+   "es una de las negativas". */
+.achievement-medal--neg-gold .achievement-medal-icon,
+.achievement-medal--neg-silver .achievement-medal-icon,
 .achievement-medal--neg-bronze .achievement-medal-icon {
-  border: 2px solid #9a4a3a;
-  background: rgba(154, 74, 58, 0.15);
-  color: #9a4a3a;
-  box-shadow: 0 0 12px rgba(154, 74, 58, 0.35);
+  border: 2px solid #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+  box-shadow: 0 0 12px rgba(220, 38, 38, 0.35);
 }
 
 /* Umbral fijo: cruzaste una marca (ej. AVG .300), no depende de ser el #1. */
