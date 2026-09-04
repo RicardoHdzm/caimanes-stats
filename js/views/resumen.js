@@ -378,7 +378,7 @@ export function renderResumen(container) {
       valueOf: (p) => (p.HR > 0 ? `${p.HR} HR` : `${p.HRC} HRC`),
     }) +
     teamLeaderCardHtml({
-      icon: "fa-crosshairs",
+      icon: "fa-tornado",
       title: "Líder de impulsadas",
       list: rbiSorted,
       valueOf: (p) => `${p.RBI} RBI`,
