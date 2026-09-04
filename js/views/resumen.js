@@ -486,7 +486,6 @@ export function renderResumen(container) {
   // pinta lo que de verdad aplica: sin nadie con `seasons` cargado, ninguna
   // de estas tres tarjetas tiene qué mostrar y la sección entera no aparece.
   const withSeasons = PLAYERS.filter((p) => p.seasons?.length > 0);
-
   if (withSeasons.length > 0) {
     const famaHeading = document.createElement("h3");
     famaHeading.textContent = "Salón de la fama";
