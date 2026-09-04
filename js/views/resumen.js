@@ -227,7 +227,7 @@ export function renderResumen(container) {
     const countdown = formatCountdown(g.date);
     next.innerHTML = `
       <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
-      <p>${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
+      <p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
       ${countdown ? `<span class="countdown-badge">${countdown}</span>` : ""}
       <div class="rsvp-actions"></div>
     `;
