@@ -115,13 +115,14 @@
   --row-you-solid: #2a1b1f;
 }
 
-/* ---- Tema claro ----
+/* ---- Tema Sol (claro) ----
    Se activa con [data-theme="light"] en <html> (ver js/theme.js — botón
    junto al ícono de Instagram — y el script inline en <head> de cada
    .html, que lo aplica antes del primer pintado para no parpadear). Solo
    se redefinen los tokens de fondo/superficie/texto — el rojo de acento,
    los colores de posición (--pos-*) y los semánticos (--win/--loss/...) se
-   quedan igual en los dos temas, es la misma identidad visual. */
+   quedan igual que en Luna, es la misma identidad visual. El tercer tema,
+   Eclipse (ver más abajo), es la excepción: ese sí trae su propio rojo. */
 :root[data-theme="light"] {
   --bg: #f4f5f7;
   --surface: #ffffff;
