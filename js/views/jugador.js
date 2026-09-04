@@ -299,7 +299,7 @@ export function renderAchievements(player) {
     // el de pitcheo (ese es "Francotirador").
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
-      label: "Bartender",
+      label: "Mr. Expendio",
       desc: (value, place) =>
         `Ponches de bateo del equipo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
     });
@@ -497,8 +497,8 @@ export function renderJugadorDetalle(container, playerId) {
   let achievementsCard = null;
   if (achievementChips.length > 0) {
     achievementsCard = document.createElement("div");
-    achievementsCard.className = "leader-card player-standalone-card";
-    achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>`;
+    achievementsCard.className = "leader-card player-standalone-card medallero-card";
+    achievementsCard.innerHTML = `${MEDALLERO_HEADER(player.id)}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>`;
     container.appendChild(achievementsCard);
   }
 
@@ -513,8 +513,8 @@ export function renderJugadorDetalle(container, playerId) {
     achievementChips.push(chip);
     if (!achievementsCard) {
       achievementsCard = document.createElement("div");
-      achievementsCard.className = "leader-card player-standalone-card";
-      achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid"></div>`;
+      achievementsCard.className = "leader-card player-standalone-card medallero-card";
+      achievementsCard.innerHTML = `${MEDALLERO_HEADER(player.id)}<div class="achievements-grid"></div>`;
       hero.after(achievementsCard);
     }
     achievementsCard.querySelector(".achievements-grid").innerHTML = sortedAchievementsHtml(achievementChips);
