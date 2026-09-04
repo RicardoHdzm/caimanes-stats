@@ -114,7 +114,7 @@ function renderAchievements(player) {
   if (seasons.length > 0) {
     const debut = Math.min(...seasons);
     if (debut === 1) {
-      chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "founder" });
+      chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "trajectory" });
     }
 
     // seasons.length y no "TEAM.seasonsTotal - debut + 1": esa cuenta
@@ -123,12 +123,12 @@ function renderAchievements(player) {
     chips.push({
       icon: "fa-solid fa-shield-halved",
       label: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} en el equipo`,
-      kind: "tenure",
+      kind: "trajectory",
     });
 
     const leagues = new Set(seasons.map((n) => SEASONS[n - 1]?.league).filter(Boolean));
     if (leagues.size > 1) {
-      chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas`, kind: "leagues" });
+      chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas`, kind: "trajectory" });
     }
   }
 
