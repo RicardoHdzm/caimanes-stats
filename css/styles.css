@@ -162,11 +162,11 @@
    acento (--accent y derivados) y --muted — a diferencia de Sol/Luna, que
    solo tocan fondo/superficie/texto y comparten el mismo rojo. */
 :root[data-theme="eclipse"] {
-  --bg: #121c25;
-  --surface: #1b2830;
-  --surface-alt: #223039;
-  --surface-raised: #283945;
-  --border: #34495a;
+  --bg: #0e161e;
+  --surface: #162026;
+  --surface-alt: #1b262e;
+  --surface-raised: #202e37;
+  --border: #2a3a48;
   --muted: #a3a5a4;
 
   --accent: #bf0f35;
@@ -174,7 +174,7 @@
   --accent-dark: #7d0924;
   --accent-glow: rgba(191, 15, 53, 0.35);
 
-  --bg-glow: #1b2830;
+  --bg-glow: #162026;
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
      --surface y --accent de este tema. */
