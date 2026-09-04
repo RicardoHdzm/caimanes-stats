@@ -102,18 +102,18 @@ function renderAchievements(player) {
     // descuenta cualquier temporada que se haya saltado.
     chips.push({
       icon: "fa-solid fa-shield-halved",
-      label: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} en el equipo`,
+      label: "Veterano",
       kind: "trajectory",
-      desc: "Temporadas totales jugadas con el equipo.",
+      desc: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} jugadas con el equipo.`,
     });
 
     const leagues = new Set(seasons.map((n) => SEASONS[n - 1]?.league).filter(Boolean));
     if (leagues.size > 1) {
       chips.push({
         icon: "fa-solid fa-earth-americas",
-        label: `Ha jugado en ${leagues.size} ligas distintas`,
+        label: "Trotamundos",
         kind: "trajectory",
-        desc: "Ha competido en más de una liga con el equipo.",
+        desc: `Ha jugado en ${leagues.size} ligas distintas con el equipo.`,
       });
     }
   }
@@ -122,9 +122,9 @@ function renderAchievements(player) {
   if (streak?.active && streak.current >= 2) {
     chips.push({
       icon: "fa-solid fa-fire",
-      label: `Racha activa: ${streak.current} juegos con hit`,
+      label: "Caliente",
       kind: "streak",
-      desc: "Tiene al menos un hit en cada uno de sus últimos juegos, y la racha sigue viva.",
+      desc: `Racha activa de ${streak.current} juegos seguidos con hit.`,
     });
   }
 
