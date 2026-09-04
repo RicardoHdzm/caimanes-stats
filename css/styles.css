@@ -1574,11 +1574,11 @@ main h3::before {
    Tu resumen), que se quedan con el rojo normal de arriba. Ver más abajo la
    variante de acento blanco, que es al revés otra vez (icono rojo). */
 .leader-card--hero h3 i {
-  color: #fff;
+  color: var(--accent);
 }
 
 .leader-card--hero h3 i::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
