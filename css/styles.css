@@ -408,11 +408,14 @@ body {
   font-size: var(--text-2xl);
 }
 
-/* Con sesión iniciada el ícono se pinta de verde en vez de solo resaltar al
-   pasar el mouse — una señal de estado a simple vista, sin abrir el panel. */
+/* Con sesión iniciada el botón se pinta de rojo (el acento del sitio) en
+   vez de solo resaltar al pasar el mouse — una señal de estado a simple
+   vista, sin abrir el panel. Antes era verde; se cambió a rojo por pedido
+   expreso, va más acorde con el resto del tema (mismo criterio que
+   .row-you/.card-you). */
 .auth-btn-in {
-  color: var(--win);
-  border-color: var(--win);
+  color: var(--accent-text);
+  border-color: var(--accent);
 }
 
 /* Variante con nombre (jugador ya identificado, ver loggedInMarkup en
