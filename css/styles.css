@@ -2689,14 +2689,23 @@ main h3::before {
   flex-shrink: 0;
 }
 
+/* El margen negativo (el traslape) va en el envoltorio directo (`> *` —
+   puede ser un .avatar-slot o el "+N" de abajo); el anillo va en el círculo
+   de verdad, que puede quedar un nivel más adentro si hydrateAvatars() (ver
+   más arriba en js/views/resumen.js) todavía no reemplazó el avatar-slot
+   por la foto real. */
 .record-hero-avatar-group > * {
-  border: 3px solid var(--surface);
-  box-shadow: var(--shadow-card);
   margin-left: -14px;
 }
 
 .record-hero-avatar-group > *:first-child {
   margin-left: 0;
+}
+
+.record-hero-avatar-group .avatar,
+.record-hero-avatar-group .avatar-more {
+  border: 3px solid var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .avatar-more {
