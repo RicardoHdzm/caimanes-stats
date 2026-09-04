@@ -72,7 +72,14 @@ function renderAchievements(player) {
   if (seasons.length > 0) {
     const debut = Math.min(...seasons);
     if (debut === 1) {
-      chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "trajectory" });
+      // Icono de huevo: "desde el cascarón" — estuvo desde la primerísima
+      // temporada del equipo, a petición expresa.
+      chips.push({
+        icon: "fa-solid fa-egg",
+        label: "Fundador del equipo",
+        kind: "trajectory",
+        desc: "Estuvo en el equipo desde la primera temporada.",
+      });
     }
 
     // seasons.length y no "TEAM.seasonsTotal - debut + 1": esa cuenta
@@ -82,17 +89,28 @@ function renderAchievements(player) {
       icon: "fa-solid fa-shield-halved",
       label: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} en el equipo`,
       kind: "trajectory",
+      desc: "Temporadas totales jugadas con el equipo.",
     });
 
     const leagues = new Set(seasons.map((n) => SEASONS[n - 1]?.league).filter(Boolean));
     if (leagues.size > 1) {
-      chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas`, kind: "trajectory" });
+      chips.push({
+        icon: "fa-solid fa-earth-americas",
+        label: `Ha jugado en ${leagues.size} ligas distintas`,
+        kind: "trajectory",
+        desc: "Ha competido en más de una liga con el equipo.",
+      });
     }
   }
 
   const streak = hitStreaks(GAMES).find((s) => s.playerId === player.id);
   if (streak?.active && streak.current >= 2) {
-    chips.push({ icon: "fa-solid fa-fire", label: `Racha activa: ${streak.current} juegos con hit`, kind: "streak" });
+    chips.push({
+      icon: "fa-solid fa-fire",
+      label: `Racha activa: ${streak.current} juegos con hit`,
+      kind: "streak",
+      desc: "Tiene al menos un hit en cada uno de sus últimos juegos, y la racha sigue viva.",
+    });
   }
 
   // ---- Líderes de la temporada — mismo criterio que las insignias de
@@ -112,42 +130,111 @@ function renderAchievements(player) {
 
   if (myBatting) {
     if (Number(myBatting.AVG) > 0 && rankAmong(qualifiedBatters, player.id, "AVG", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-medal", label: "Bate de oro", kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-medal",
+        label: "Bate de oro",
+        kind: "leader",
+        desc: "Mejor promedio de bateo (AVG) del equipo esta temporada.",
+      });
     }
     if (Number(myBatting.HR) > 0 && rankAmong(battingList, player.id, "HR", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-bomb", label: "Bombardero", kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-bomb",
+        label: "Bombardero",
+        kind: "leader",
+        desc: "Más jonrones del equipo esta temporada.",
+      });
     }
     if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón", kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-person-running",
+        label: "Ladrón",
+        kind: "leader",
+        desc: "Más bases robadas del equipo esta temporada.",
+      });
     }
     if (Number(myBatting.RBI) > 0 && rankAmong(battingList, player.id, "RBI", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-tornado", label: "Impulsador", kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-tornado",
+        label: "Impulsador",
+        kind: "leader",
+        desc: "Más carreras impulsadas (RBI) del equipo esta temporada.",
+      });
     }
     // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
     // Mismo SO de bateo, no el de pitcheo (ese es "Ponchador").
     if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-beer-mug-empty", label: `Expendio · ${myBatting.SO} ponches`, kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-beer-mug-empty",
+        label: `Expendio · ${myBatting.SO} ponches`,
+        kind: "leader",
+        desc: "Más ponches de bateo del equipo esta temporada — le toca poner la cerveza.",
+      });
     }
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
-      chips.push({ icon: "fa-solid fa-baseball-bat-ball", label: `Bateador de ${myBatting.AVG}`, kind: "threshold" });
+      chips.push({
+        icon: "fa-solid fa-baseball-bat-ball",
+        label: `Bateador de ${myBatting.AVG}`,
+        kind: "threshold",
+        desc: "Promedio de bateo (AVG) de .300 o más esta temporada.",
+      });
     }
   }
 
   if (myPitching && myPitching.outs > 0) {
     if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-baseball", label: "Ponchador", kind: "leader" });
+      chips.push({
+        icon: "fa-solid fa-baseball",
+        label: "Ponchador",
+        kind: "leader",
+        desc: "Más ponches propinados (pitcheo) del equipo esta temporada.",
+      });
     }
   }
 
   if (myFielding && myFielding.PO + myFielding.A + myFielding.E > 0 && myFielding.FPCT === "1.000") {
-    chips.push({ icon: "fa-solid fa-hand-fist", label: "Guante de oro · fildeo perfecto", kind: "leader" });
+    chips.push({
+      icon: "fa-solid fa-hand-fist",
+      label: "Guante de oro · fildeo perfecto",
+      kind: "leader",
+      desc: "Cero errores en el campo esta temporada.",
+    });
+  }
+
+  // Más MVPs de la temporada — mismo cálculo que usaba "Salón de la fama"
+  // en Resumen (ver historial de js/views/resumen.js): cuenta cuántos
+  // GAMES.mvp le tocaron a cada jugador y compara contra el resto.
+  const mvpList = PLAYERS.map((p) => ({ playerId: p.id, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
+    (p) => p.mvpTotal > 0
+  );
+  const myMvp = mvpList.find((p) => p.playerId === player.id);
+  if (myMvp && rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place === 1) {
+    chips.push({
+      icon: "fa-solid fa-star",
+      label: `Más MVPs · ${myMvp.mvpTotal}`,
+      kind: "leader",
+      desc: "Más premios MVP del equipo esta temporada.",
+    });
   }
 
   // ---- Asistencia y versatilidad ----
   const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
   if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
-    chips.push({ icon: "fa-solid fa-calendar-check", label: "Asistencia perfecta", kind: "participation" });
+    chips.push({
+      icon: "fa-solid fa-calendar-check",
+      label: "Asistencia perfecta",
+      kind: "participation",
+      desc: "Jugó todos los juegos de la temporada.",
+    });
+  }
+  if (gamesPlayedCount > 5) {
+    chips.push({
+      icon: "fa-solid fa-trophy",
+      label: "Listo para playoffs",
+      kind: "participation",
+      desc: `Ya jugó más de 5 juegos esta temporada (${gamesPlayedCount}).`,
+    });
   }
 
   // Posiciones distintas jugadas esta temporada — vienen del `position` de
@@ -163,22 +250,14 @@ function renderAchievements(player) {
       icon: "fa-solid fa-people-arrows",
       label: `Multiposición: ${positionsPlayed.size} posiciones distintas`,
       kind: "participation",
+      desc: "Jugó en 3 o más posiciones distintas esta temporada.",
     });
   }
 
   if (chips.length === 0) return "";
   return `
     <div class="achievements-grid">
-      ${chips
-        .map(
-          (c) => `
-            <div class="achievement-medal achievement-medal--${c.kind}">
-              <div class="achievement-medal-icon"><i class="${c.icon}"></i></div>
-              <span class="achievement-medal-label">${escapeHtml(c.label)}</span>
-            </div>
-          `
-        )
-        .join("")}
+      ${chips.map(achievementMedalHtml).join("")}
     </div>
   `;
 }
