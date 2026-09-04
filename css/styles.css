@@ -1330,10 +1330,15 @@ main h3::before {
 }
 
 /* Guía de medallas (js/views/medallas.js): el título va notoriamente
-   debajo del botón de volver, no pegado — .back-link solo trae 14px por
-   default. Sin tocar el `display` (sigue inline-flex, del tamaño de su
-   contenido): un botón normal, no de ancho completo. */
+   debajo del botón de volver, no pegado. .back-link normal es
+   inline-flex — comparte renglón con el h2 de al lado (que también es
+   inline-block) si hay espacio horizontal, en vez de forzar el salto de
+   línea. display:flex (a diferencia de inline-flex) SÍ garantiza su propio
+   renglón; width:fit-content evita que ese display de bloque estire el
+   botón a todo lo ancho del contenedor. */
 .back-link--spaced {
+  display: flex;
+  width: fit-content;
   margin-bottom: 32px;
 }
 
@@ -1373,9 +1378,12 @@ main h3::before {
   }
 }
 
+/* Icono blanco/plateado sobre acento rojo (a propósito, al revés del color
+   del borde — ver .team-stats-row/.leader-card--hero-white/.record-label i
+   más abajo, que son acento blanco con icono rojo). */
 .card-icon::before,
 .leader-card h3 i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  background: linear-gradient(135deg, #ffffff, var(--muted));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1548,8 +1556,10 @@ main h3::before {
   content: none;
 }
 
+/* Blanco/plateado a propósito, al revés del acento rojo del borde — ver
+   más abajo la variante de acento blanco, que es al revés (icono rojo). */
 .leader-card h3 i {
-  color: var(--accent);
+  color: #fff;
   font-size: var(--text-3xl);
 }
 
@@ -1560,12 +1570,12 @@ main h3::before {
 
 .team-stats-row .leader-card h3 i,
 .leader-card--hero-white h3 i {
-  color: #fff;
+  color: var(--accent);
 }
 
 .team-stats-row .leader-card h3 i::before,
 .leader-card--hero-white h3 i::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2811,13 +2821,15 @@ main h3::before {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
 }
 
+/* Rojo a propósito: los récords son acento blanco (border-top), así que el
+   icono va al revés, igual que .leader-card--hero-white. */
 .record-label i {
   font-size: var(--text-3xl);
-  color: #fff;
+  color: var(--accent);
 }
 
 .record-label i::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
+  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
