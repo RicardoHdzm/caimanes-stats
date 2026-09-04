@@ -38,7 +38,7 @@ const CATALOG = [
   // ---- Trayectoria ----
   { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
   { kind: "trajectory", icon: "fa-solid fa-anchor", name: "Veterano", how: "Ha jugado más de 4 temporadas con el equipo.", match: (l) => l === "Veterano" },
-  { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Trotamundos", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Trotamundos" },
+  { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Viajero", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Viajero" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "On Fire", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "On Fire" },
   { kind: "streak", icon: "fa-solid fa-bolt", name: "The Streak", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "The Streak" },
@@ -51,6 +51,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-tornado", name: "Tornado", how: "Top 3 del equipo en carreras impulsadas (RBI) esta temporada.", match: (l) => l === "Tornado" },
   { kind: "gold", icon: "fa-solid fa-beer-mug-empty", name: "Bartender", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Bartender" },
   { kind: "gold", icon: "fa-solid fa-crosshairs", name: "Snipper", how: "Top 3 del equipo en ponches propinados (pitcheo) esta temporada.", match: (l) => l === "Snipper" },
+  { kind: "gold", icon: "fa-solid fa-dumbbell", name: "Iron Arm", how: "Top 3 del equipo en entradas lanzadas (IP) esta temporada.", match: (l) => l === "Iron Arm" },
   { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Guante de oro / plata / bronce", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.startsWith("Guante de ") },
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Killer", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Killer" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
@@ -61,6 +62,7 @@ const CATALOG = [
   // ---- Umbral fijo ----
   { kind: "threshold", icon: "fa-solid fa-meteor", name: "Estelar", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "Estelar" },
   { kind: "threshold", icon: "fa-solid fa-gem", name: "Diamante", how: "OPS de 1.000 o más esta temporada.", match: (l) => l === "Diamante" },
+  { kind: "threshold", icon: "fa-solid fa-circle-notch", name: "Cycle", how: "Conectó sencillo, doble, triple y jonrón en el mismo juego.", match: (l) => l === "Cycle" },
   // ---- Participación ----
   { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Inquebrantable", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Inquebrantable" },
   { kind: "participation", icon: "fa-solid fa-hand", name: "Cumplidor", how: "Asistió a más de 5 juegos esta temporada.", match: (l) => l === "Cumplidor" },

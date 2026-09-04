@@ -216,7 +216,7 @@ export function renderAchievements(player) {
     if (leagues.size > 1) {
       chips.push({
         icon: "fa-solid fa-earth-americas",
-        label: "Trotamundos",
+        label: "Viajero",
         kind: "trajectory",
         desc: `Ha jugado en ${leagues.size} ligas distintas con el equipo.`,
       });
@@ -348,6 +348,24 @@ export function renderAchievements(player) {
         desc: `OPS de 1.000 o más esta temporada (${myBatting.OPS}).`,
       });
     }
+    // "Cycle" — sencillo + doble + triple + jonrón en el MISMO juego. `H` es
+    // el total de hits (no solo sencillos), así que el sencillo sale de
+    // restarle 2B/3B/HR+HRC — mismo cálculo que `singles` en stats.js.
+    const hitCycle = GAMES.some((game) => {
+      const line = game.batting?.find((b) => b.playerId === player.id);
+      if (!line) return false;
+      const homers = (line.HR ?? 0) + (line.HRC ?? 0);
+      const singles = (line.H ?? 0) - (line["2B"] ?? 0) - (line["3B"] ?? 0) - homers;
+      return singles >= 1 && (line["2B"] ?? 0) >= 1 && (line["3B"] ?? 0) >= 1 && homers >= 1;
+    });
+    if (hitCycle) {
+      chips.push({
+        icon: "fa-solid fa-circle-notch",
+        label: "Cycle",
+        kind: "threshold",
+        desc: "Conectó sencillo, doble, triple y jonrón en el mismo juego.",
+      });
+    }
   }
 
   if (myPitching && myPitching.outs > 0) {
@@ -355,6 +373,15 @@ export function renderAchievements(player) {
       icon: "fa-solid fa-crosshairs",
       label: "Snipper",
       desc: (value) => `Ponches propinados (pitcheo) esta temporada (${value}).`,
+    });
+    // Volumen de trabajo, no efectividad — IP (formato de béisbol, ver
+    // comentario de arriba de data.js) se compara numérico igual que AVG/OPS
+    // en otras medallas: la parte fraccionaria (.0/.1/.2 outs) siempre es
+    // menor a 1, así que el orden numérico coincide con el orden real.
+    addPodium(pitchingList, "IP", {
+      icon: "fa-solid fa-dumbbell",
+      label: "Iron Arm",
+      desc: (value) => `Entradas lanzadas (IP) esta temporada (${value}).`,
     });
   }
 
