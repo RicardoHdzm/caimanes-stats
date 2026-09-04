@@ -1331,9 +1331,9 @@ main h3::before {
 
 /* Guía de medallas (js/views/medallas.js): el título va notoriamente
    debajo del botón de volver, no pegado — .back-link solo trae 14px por
-   default. */
+   default. Sin tocar el `display` (sigue inline-flex, del tamaño de su
+   contenido): un botón normal, no de ancho completo. */
 .back-link--spaced {
-  display: flex;
   margin-bottom: 32px;
 }
 

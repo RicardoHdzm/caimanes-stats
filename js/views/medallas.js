@@ -161,13 +161,7 @@ export function renderMedallasGuide(container, fromPlayerId) {
   const myId = getCurrentPlayerId();
   const me = PLAYERS.find((p) => p.id === myId);
 
-  heading(
-    container,
-    "Guía de medallas",
-    me
-      ? `Todas las medallas que existen — la columna "¿La tienes?" es la tuya, ${me.name}.`
-      : "Todas las medallas que existen. Inicia sesión para ver cuáles ya tienes."
-  );
+  heading(container, "Guía de medallas", me ? undefined : "Todas las medallas que existen. Inicia sesión para ver cuáles ya tienes.");
 
   // Sin sesión vinculada no hay contra quién comprobar nada: el catálogo se
   // ve completo igual, pero todo en "No" — no hace falta esperar ninguna
