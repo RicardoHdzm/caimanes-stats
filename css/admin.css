@@ -236,27 +236,30 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-alt);
-  cursor: pointer;
   font-size: 0.85rem;
   transition: border-color 0.15s, background-color 0.15s;
 }
 
-.dues-admin-row:hover {
-  border-color: var(--accent);
-}
-
 /* Marcado = ya pagó — mismo verde de "asiste" en el checklist de lineup,
-   para que "esta fila está en regla" se lea igual en toda la herramienta. */
+   para que "esta fila está en regla" se lea igual en toda la herramienta.
+   Ya no es editable (ver js/admin-dues.js) — solo lectura del estado
+   actual, que ahora vive en DUES_PAID (js/data.js). */
 .dues-admin-row.paid {
   border-color: var(--win);
   background: rgba(63, 181, 111, 0.1);
 }
 
-.dues-admin-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--win);
-  cursor: pointer;
+.dues-admin-status {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.dues-admin-row.paid .dues-admin-status {
+  color: var(--win);
+}
+
+.dues-admin-row:not(.paid) .dues-admin-status {
+  color: var(--loss);
 }
 
 /* ---- Temporadas por jugador (admin.html, solo cuenta del coach) ---- */

@@ -23,13 +23,11 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. Siempre
-// de solo lectura aquí, incluso para el coach — marcarla solo se puede
-// desde admin.html, para no tener el mismo control de escritura repetido
-// en dos pantallas. `duesMap` null = todavía no se sabe (no ha llegado la
-// respuesta, o la consulta falló incluso tras reintentar en
-// getDuesMap/js/db.js) — se pinta neutral, NUNCA rojo, para no verse como
-// "no pagó" cuando en realidad no se pudo comprobar.
+// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. El
+// estado sale de DUES_PAID en js/data.js (ver getDuesMap en js/db.js) — ya
+// no de Supabase, así que para cambiarlo hay que editar ese archivo, no
+// esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
+// a haber una fuente que pueda fallar; hoy nunca pasa.
 function renderDuesCell(playerId, duesMap) {
   if (!duesMap) return '<i class="fa-solid fa-circle-question dues-icon dues-icon-unknown"></i>';
   const paid = duesMap.get(playerId) ?? false;

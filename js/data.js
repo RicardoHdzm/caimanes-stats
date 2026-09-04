@@ -79,6 +79,14 @@ export const PLAYERS = [
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
 ];
 
+// Estado de pago de la inscripción de la temporada. Antes vivía en Supabase
+// (tabla player_dues, editable desde admin.html) — ahora se controla aquí
+// directo, a mano, como el resto de este archivo. Por default TODOS
+// cuentan como pagados; para marcar a alguien como pendiente, agrega su id
+// aquí con `false` (ej. "p7": false — no hace falta listar a los que sí
+// pagaron, ya es el default).
+export const DUES_PAID = {};
+
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se
 // referencia al jugador con playerId (usa los id de arriba, ej. "p1").
 // Si un jugador no participó en algo (ej. no pitcheó ese juego), simplemente

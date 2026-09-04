@@ -1241,10 +1241,10 @@ main h3::before {
 /* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. Azul
    marino, a petición expresa. */
 .achievement-medal--trajectory .achievement-medal-icon {
-  border: 2px solid #1e3a8a;
-  background: rgba(30, 58, 138, 0.15);
-  color: #1e3a8a;
-  box-shadow: 0 0 12px rgba(30, 58, 138, 0.35);
+  border: 2px solid #2c4ec9;
+  background: rgba(44, 78, 201, 0.15);
+  color: #2c4ec9;
+  box-shadow: 0 0 12px rgba(44, 78, 201, 0.35);
 }
 
 /* Racha de hits vigente. Naranja — --pos-dh ya no lo usa ninguna otra

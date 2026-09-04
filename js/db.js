@@ -8,6 +8,7 @@
 // pagos); por ahora solo expone el cliente para que las próximas fases lo
 // reusen sin volver a importarlo cada una por su cuenta.
 import { getClient, getCurrentPlayerId } from "./auth.js";
+import { PLAYERS, DUES_PAID } from "./data.js";
 
 export { getClient };
 
@@ -49,59 +50,21 @@ async function runMutation(mutationFn) {
   return result;
 }
 
-// ---- Estado de pago de inscripción (player_dues) ----
+// ---- Estado de pago de inscripción ----
 //
-// Lectura: cualquiera con sesión iniciada (RLS lo bloquea a un visitante
-// anónimo, no hace falta comprobarlo aquí). Escritura: solo la cuenta del
-// coach — este código nunca decide eso, Supabase lo rechaza solo si alguien
-// más lo intenta (ver isCoach() en auth.js para la parte de mostrar/ocultar
-// el control en la UI).
-
-// Devuelve un Map playerId -> boolean. Si Supabase no está configurado, no
-// hay sesión, o la tabla no es visible (anónimo), regresa un Map vacío —
-// eso sí es "sin datos" real. Pero si SÍ hay cliente y la consulta truena
-// incluso tras reintentar, regresa `null` en vez de un Map vacío: quien
-// llama debe pintarlo como "no se pudo verificar", nunca como "nadie pagó"
-// (un Map vacío ahí se leería como todos en rojo).
+// Ya NO vive en Supabase (tabla player_dues) — ahora sale directo de
+// DUES_PAID en js/data.js, a petición expresa ("por ahora marca que todos
+// pagaron correctamente"). Estas dos funciones se quedan async y con la
+// misma forma de siempre (Map / boolean) para que roster.js, jugador.js y
+// medallas.js no tengan que cambiar nada — ya no pueden fallar ni regresar
+// `null` (no hay red de por medio), pero esos casos se dejan intactos en
+// quien llama por si algún día vuelve a haber una fuente que sí falle.
 export async function getDuesMap() {
-  const client = getClient();
-  if (!client) return new Map();
-  const { data, error } = await runQuery(() => client.from("player_dues").select("player_id, paid"));
-  if (error) return null;
-  if (!data) return new Map();
-  return new Map(data.map((row) => [row.player_id, row.paid]));
+  return new Map(PLAYERS.map((p) => [p.id, DUES_PAID[p.id] ?? true]));
 }
 
-// Estado de un solo jugador (para el badge del perfil, ver
-// js/views/jugador.js) — más liviano que pedir la tabla completa cuando
-// solo hace falta uno. OJO: solo se debe llamar con sesión iniciada — sin
-// ella, RLS esconde la fila igual que si no existiera (sin distinguir
-// "no pagó" de "no la puedo ver"), así que quien llama debe comprobar
-// getSession() antes, igual que ya hace Roster para esta misma tabla.
-//
-// Regresa `null` — no `false` — si no se pudo verificar (sin cliente o la
-// consulta falló incluso tras reintentar): a quien llama le toca no pintar
-// eso como "no ha pagado", o un hipo de red se vería igual que sí pagó/no
-// pagó cuando en realidad no se sabe.
 export async function getDuesForPlayer(playerId) {
-  const client = getClient();
-  if (!client) return null;
-  const { data, error } = await runQuery(() =>
-    client.from("player_dues").select("paid").eq("player_id", playerId).maybeSingle()
-  );
-  if (error) return null;
-  return data?.paid ?? false;
-}
-
-// Upsert: si el jugador no tenía fila todavía, la crea. Tira si quien llama
-// no es el coach — RLS lo bloquea allá, no aquí.
-export async function setDuesPaid(playerId, paid) {
-  const client = getClient();
-  if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await runMutation(() =>
-    client.from("player_dues").upsert({ player_id: playerId, paid, updated_at: new Date().toISOString() })
-  );
-  if (error) throw error;
+  return DUES_PAID[playerId] ?? true;
 }
 
 // ---- RSVP a un juego programado (game_rsvps) ----

@@ -213,10 +213,12 @@ create policy "positions_update_own" on public.player_positions
 
 grant select, insert, update on public.player_positions to anon, authenticated;
 
--- 8. Estado de pago de inscripción. ÚNICA tabla que NO es de lectura
---    pública: hace falta tener sesión iniciada para verla, y solo la cuenta
---    del coach puede escribirla. Cambia el correo de abajo si algún día
---    cambia quién administra el sitio.
+-- 8. Estado de pago de inscripción. YA NO LA USA LA APP — el estado ahora
+--    vive directo en DUES_PAID (js/data.js), a petición expresa. Se deja
+--    esta tabla en el esquema por historial nomás; ni js/db.js ni
+--    js/admin-dues.js la consultan ya.
+--    ÚNICA tabla que NO era de lectura pública: hacía falta tener sesión
+--    iniciada para verla, y solo la cuenta del coach podía escribirla.
 create table if not exists public.player_dues (
   player_id text primary key,
   paid boolean not null default false,

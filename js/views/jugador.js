@@ -285,22 +285,22 @@ export function renderAchievements(player) {
     addPodium(qualifiedBatters, "AVG", {
       icon: "fa-solid fa-baseball-bat-ball",
       label: (value, place) => `Bate de ${PODIUM_METAL[place]}`,
-      desc: (value) => `Promedio de bateo (AVG) del equipo esta temporada (${value}).`,
+      desc: (value) => `Promedio de bateo (AVG) esta temporada (${value}).`,
     });
     addPodium(battingList, "HR", {
       icon: "fa-solid fa-bomb",
       label: "Kaboom!",
-      desc: (value) => `Jonrones del equipo esta temporada (${value}).`,
+      desc: (value) => `Jonrones esta temporada (${value}).`,
     });
     addPodium(battingList, "SB", {
       icon: "fa-solid fa-user-ninja",
       label: "Ninja",
-      desc: (value) => `Bases robadas del equipo esta temporada (${value}).`,
+      desc: (value) => `Bases robadas esta temporada (${value}).`,
     });
     addPodium(battingList, "RBI", {
       icon: "fa-solid fa-tornado",
       label: "Tornado",
-      desc: (value) => `Carreras impulsadas (RBI) del equipo esta temporada (${value}).`,
+      desc: (value) => `Carreras impulsadas (RBI) esta temporada (${value}).`,
     });
     // "Bartender" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza —
@@ -310,7 +310,7 @@ export function renderAchievements(player) {
       icon: "fa-solid fa-beer-mug-empty",
       label: "Bartender",
       desc: (value, place) =>
-        `Ponches de bateo del equipo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
+        `Ponches de bateo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
     });
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({
@@ -323,22 +323,22 @@ export function renderAchievements(player) {
     addPodium(battingList, "2B", {
       icon: "fa-solid fa-dice",
       label: "Double Trouble",
-      desc: (value) => `Dobles del equipo esta temporada (${value}).`,
+      desc: (value) => `Dobles esta temporada (${value}).`,
     });
     addPodium(battingList, "3B", {
       icon: "fa-solid fa-chess-knight",
       label: "Triple Threat",
-      desc: (value) => `Triples del equipo esta temporada (${value}).`,
+      desc: (value) => `Triples esta temporada (${value}).`,
     });
     addPodium(battingList, "BB", {
       icon: "fa-solid fa-crow",
       label: "Ojo de águila",
-      desc: (value) => `Bases por bolas (BB) del equipo esta temporada (${value}).`,
+      desc: (value) => `Bases por bolas (BB) esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
       icon: "fa-solid fa-hourglass-half",
       label: "Paciente",
-      desc: (value) => `Mejor relación bases por bolas / ponches del equipo esta temporada (${value.toFixed(2)}).`,
+      desc: (value) => `Mejor relación bases por bolas / ponches esta temporada (${value.toFixed(2)}).`,
     });
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
       chips.push({
@@ -354,7 +354,7 @@ export function renderAchievements(player) {
     addPodium(pitchingList, "SO", {
       icon: "fa-solid fa-crosshairs",
       label: "Snipper",
-      desc: (value) => `Ponches propinados (pitcheo) del equipo esta temporada (${value}).`,
+      desc: (value) => `Ponches propinados (pitcheo) esta temporada (${value}).`,
     });
   }
 
@@ -362,12 +362,12 @@ export function renderAchievements(player) {
     addPodium(fieldersWithPlays, "FPCT", {
       icon: "fa-solid fa-hand-fist",
       label: (value, place) => `Guante de ${PODIUM_METAL[place]}`,
-      desc: (value) => `Porcentaje de fildeo (FPCT) del equipo esta temporada (${value}).`,
+      desc: (value) => `Porcentaje de fildeo (FPCT) esta temporada (${value}).`,
     });
     addPodium(fieldingList, "PO", {
       icon: "fa-solid fa-skull-crossbones",
       label: "Killer",
-      desc: (value) => `Outs realizados (PO) del equipo esta temporada (${value}).`,
+      desc: (value) => `Outs realizados (PO) esta temporada (${value}).`,
     });
   }
 
@@ -380,7 +380,7 @@ export function renderAchievements(player) {
   addPodium(mvpList, "mvpTotal", {
     icon: "fa-solid fa-star",
     label: "Starboy",
-    desc: (value) => `Premios MVP del equipo esta temporada (${value}).`,
+    desc: (value) => `Premios MVP ganados esta temporada (${value}).`,
   });
 
   // ---- Asistencia y versatilidad ----
@@ -646,15 +646,17 @@ export function renderJugadorDetalle(container, playerId) {
   // Misma regla que la columna "Pagó" en Roster (ver js/views/roster.js) —
   // se comprueba getSession() (¿hay cuenta?), no getCurrentPlayerId(), para
   // que también se vea antes de que el coach termine de vincular la cuenta
-  // en player_whitelist. Sin sesión, el badge ni se pide.
+  // en player_whitelist. Sin sesión, el badge ni se pide. El estado en sí ya
+  // no sale de Supabase, sino de DUES_PAID en js/data.js (ver getDuesForPlayer
+  // en js/db.js) — se mantiene el `if (getSession())` porque nada más pidió
+  // cambiar la visibilidad, solo de dónde sale el dato.
   if (getSession()) {
     getDuesForPlayer(player.id).then((paid) => {
       const badge = hero.querySelector("#dues-badge");
       if (!badge) return;
-      // `paid` sale null si no se pudo verificar (hipo de red incluso tras
-      // reintentar, ver runQuery en js/db.js) — mostrarlo en rojo ahí se
-      // vería como "no ha pagado" cuando en realidad no se sabe, así que se
-      // deja el badge vacío en vez de arriesgar un falso "sin pagar".
+      // `paid` ya no puede salir null (no hay red de por medio), pero se
+      // deja el chequeo por si algún día vuelve a haber una fuente que sí
+      // pueda fallar.
       if (paid === null) return;
       badge.innerHTML = `
         <span class="dues-badge-pill ${paid ? "stat-green" : "stat-red"}">
