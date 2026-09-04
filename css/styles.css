@@ -1553,15 +1553,18 @@ main h3::before {
   font-size: var(--text-3xl);
 }
 
-.team-stats-row .leader-card {
+.team-stats-row .leader-card,
+.leader-card--hero-white {
   border-top-color: #fff;
 }
 
-.team-stats-row .leader-card h3 i {
+.team-stats-row .leader-card h3 i,
+.leader-card--hero-white h3 i {
   color: #fff;
 }
 
-.team-stats-row .leader-card h3 i::before {
+.team-stats-row .leader-card h3 i::before,
+.leader-card--hero-white h3 i::before {
   background: linear-gradient(135deg, #ffffff, var(--muted));
   -webkit-background-clip: text;
   background-clip: text;
@@ -1677,7 +1680,8 @@ main h3::before {
   box-shadow: var(--shadow-card);
 }
 
-.team-stats-row .leader-hero {
+.team-stats-row .leader-hero,
+.leader-card--hero-white .leader-hero {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
 }
 

@@ -236,12 +236,14 @@ export function renderResumen(container) {
       likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
       if (myId && like.player_id === myId) likedByMe.add(like.announcement_id);
     }
+    const announcementsList = `<div class="announcements-list">${items
+      .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
+      .join("")}</div>`;
+    // Blanco/plateado, no rojo: es un aviso del coach, no una estadística
+    // de líder — mismo criterio que Récords y Stats de equipo.
     announcementsSlot.innerHTML = `
-      <div class="leader-card announcements-card">
-        <h3><i class="fa-solid fa-bullhorn"></i>Anuncios</h3>
-        <div class="announcements-list">${items
-          .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
-          .join("")}</div>
+      <div class="leader-card leader-card--hero leader-card--hero-white announcements-card">
+        ${heroCardInnerHtml("fa-bullhorn", "Anuncios", "", announcementsList)}
       </div>
     `;
   }
