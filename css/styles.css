@@ -1526,6 +1526,15 @@ main h3::before {
   transition: transform 0.15s;
 }
 
+/* Invertido a propósito: el fondo de las tarjetas "hero" con degradado
+   rojo (ver --accent-glow en .leader-hero) lleva borde blanco/plateado, no
+   rojo — más contraste. Va antes de .leader-card--hero-white más abajo
+   para que esa sí quede en rojo (mismo orden de cascada, misma
+   especificidad de una sola clase). */
+.leader-card--hero {
+  border-top-color: #fff;
+}
+
 /* .leader-card normalmente vive dentro de un contenedor con `gap` (ver
    .leaders más abajo), que separa una tarjeta de la siguiente — pero en el
    perfil (Logros, Tu resumen) van sueltas, una tras otra directo en el
@@ -1565,7 +1574,7 @@ main h3::before {
 
 .team-stats-row .leader-card,
 .leader-card--hero-white {
-  border-top-color: #fff;
+  border-top-color: var(--accent);
 }
 
 .team-stats-row .leader-card h3 i,
@@ -2809,7 +2818,7 @@ main h3::before {
   align-items: stretch;
   padding: 0;
   overflow: hidden;
-  border-top: 4px solid #fff;
+  border-top: 4px solid var(--accent);
 }
 
 .record-hero {
