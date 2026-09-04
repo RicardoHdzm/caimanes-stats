@@ -160,19 +160,24 @@ function seasonsRowMarkup(player) {
 seasonsList.innerHTML = PLAYERS.map(seasonsRowMarkup).join("");
 
 document.getElementById("generate-seasons-btn").addEventListener("click", () => {
+  // Antes solo generaba la línea de un jugador si el debut (la temporada
+  // MÁS CHICA marcada) cambiaba — pero desmarcar/marcar cualquier otra
+  // casilla que no sea esa no mueve el mínimo, así que esa edición no
+  // generaba nada y se sentía como que el botón no hacía caso. Ahora
+  // siempre se lista a todos los que tengan al menos una marcada, hayan
+  // cambiado o no, para que el resultado sea predecible.
   const lines = [];
   for (const row of seasonsList.querySelectorAll(".seasons-admin-row")) {
     const player = PLAYERS.find((p) => p.id === row.dataset.player);
     const checkedSeasons = [...row.querySelectorAll("input[type=checkbox]:checked")].map((cb) =>
       Number(cb.dataset.season)
     );
-    if (checkedSeasons.length === 0) continue; // sin ninguna marcada, no genera línea
+    if (checkedSeasons.length === 0) continue; // sin ninguna marcada, no hay debut que generar
     const debut = Math.min(...checkedSeasons);
-    if (debut === player.debutSeason) continue; // sin cambios, no hace falta pegarlo de nuevo
-    lines.push(`${player.id} (${player.name}): debutSeason: ${debut},`);
+    const changed = debut !== player.debutSeason ? "  // antes: " + (player.debutSeason ?? "sin definir") : "";
+    lines.push(`${player.id} (${player.name}): debutSeason: ${debut},${changed}`);
   }
-  seasonsCode.textContent =
-    lines.length > 0 ? lines.join("\n") : "Sin cambios — el debut de todos ya coincide con lo marcado.";
+  seasonsCode.textContent = lines.length > 0 ? lines.join("\n") : "Marca al menos una temporada por jugador.";
   seasonsOutput.hidden = false;
 });
 
