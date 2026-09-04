@@ -1460,10 +1460,10 @@ main h3::before {
   font-size: var(--text-md);
 }
 
-/* Mismo tamaño y peso que .runner-ups (el 2do y 3er lugar), pero en rojo
-   para que se lea como una advertencia y no como un puesto más de la lista.
-   Va con doble clase porque `.leader-card p` le gana en especificidad a una
-   sola y le impondría el tamaño grande en itálicas del líder. */
+/* En rojo para que se lea como una advertencia y no como un puesto más de
+   la lista. Va con doble clase porque `.leader-card p` le gana en
+   especificidad a una sola y le impondría el tamaño grande en itálicas del
+   líder. */
 .leader-card .leader-note {
   margin: 10px 0 0;
   font-size: var(--text-xs);
@@ -1471,16 +1471,6 @@ main h3::before {
   font-style: normal;
   line-height: 1.6;
   color: var(--accent-text);
-}
-
-.runner-ups {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  font-style: normal;
-  color: var(--muted);
-  line-height: 1.6;
 }
 
 /* Tarjetas "hero" de Líderes de la temporada (bateo, HR, pitcheo,
@@ -2622,6 +2612,53 @@ main h3::before {
 .record-note {
   font-size: var(--text-xs);
   color: var(--muted);
+}
+
+/* Variante "hero" (mismo lenguaje visual que .leader-card--hero): fondo con
+   degradado de acento y, a la derecha, la foto real del dueño del récord en
+   vez del icono genérico — solo cuando hay un único dueño (r.playerId); con
+   empate o récord de equipo no hay a quién retratar y se usa una insignia
+   circular con el icono en su lugar. */
+.record-card--hero {
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
+  border-top: 4px solid var(--accent);
+}
+
+.record-hero-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.record-label i {
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+.record-hero-avatar {
+  flex-shrink: 0;
+}
+
+.record-hero-avatar .avatar {
+  border: 3px solid var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.record-icon-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  font-size: var(--text-2xl);
+  color: var(--accent);
 }
 
 /* ---- comparador ---- */
