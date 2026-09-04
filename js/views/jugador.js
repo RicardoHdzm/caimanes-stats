@@ -313,7 +313,7 @@ function renderAchievements(player) {
       desc: (value) => `Bases por bolas (BB) del equipo esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
-      icon: "fa-solid fa-scale-balanced",
+      icon: "fa-solid fa-bullseye",
       label: "Selectivo",
       desc: (value) => `Mejor relación bases por bolas / ponches del equipo esta temporada (${value.toFixed(2)}).`,
     });
@@ -367,7 +367,7 @@ function renderAchievements(player) {
       icon: "fa-solid fa-calendar-check",
       label: "Nerd",
       kind: "participation",
-      desc: "Jugó todos los juegos de la temporada.",
+      desc: "Asistió a todos los juegos de la temporada.",
     });
   }
   if (gamesPlayedCount > 5) {
@@ -375,7 +375,7 @@ function renderAchievements(player) {
       icon: "fa-solid fa-hand",
       label: "Cumplidor",
       kind: "participation",
-      desc: `Ya jugó más de 5 juegos esta temporada (${gamesPlayedCount}).`,
+      desc: `Ya asistió a más de 5 juegos esta temporada (${gamesPlayedCount}).`,
     });
   }
 
@@ -631,7 +631,7 @@ export function renderJugadorDetalle(container, playerId) {
               desc: "Ya pagó la inscripción de la temporada.",
             }
           : {
-              icon: "fa-solid fa-poo",
+              icon: "fa-solid fa-trash-can",
               label: "Moroso",
               kind: "dues-unpaid",
               desc: "Todavía no paga la inscripción de la temporada.",
