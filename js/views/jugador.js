@@ -176,23 +176,23 @@ function renderAchievements(player) {
         desc: "Más carreras impulsadas (RBI) del equipo esta temporada.",
       });
     }
-    // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
-    // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
-    // Mismo SO de bateo, no el de pitcheo (ese es "Francotirador").
+    // "Mr. Expendio" — el chiste ya existía en el "Líder cervecero" de
+    // Resumen (SO de bateo × 12 botes): quien más se ponchó, "debe" la
+    // cerveza. Mismo SO de bateo, no el de pitcheo (ese es "Francotirador").
     if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
       chips.push({
         icon: "fa-solid fa-beer-mug-empty",
-        label: `Expendio · ${myBatting.SO} ponches`,
+        label: "Mr. Expendio",
         kind: "leader",
-        desc: "Más ponches de bateo del equipo esta temporada — le toca poner la cerveza.",
+        desc: `Más ponches de bateo del equipo esta temporada (${myBatting.SO}) — le toca poner la cerveza.`,
       });
     }
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({
         icon: "fa-solid fa-baseball-bat-ball",
-        label: `Bateador de ${myBatting.AVG}`,
+        label: "Estelar",
         kind: "threshold",
-        desc: "Promedio de bateo (AVG) de .300 o más esta temporada.",
+        desc: `Promedio de bateo (AVG) de .300 o más esta temporada (${myBatting.AVG}).`,
       });
     }
   }
