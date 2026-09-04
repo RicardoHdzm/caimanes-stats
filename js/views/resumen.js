@@ -35,33 +35,12 @@ function joinNames(names) {
   return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
 }
 
-// Tarjeta de líder con el #1 en grande y el 2do/3er lugar chico debajo.
-// `note` es una línea chica al pie (ej. el mínimo de turnos para calificar).
-function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) {
-  const [first, second, third] = sortedList;
-  const mainHtml = first ? `<p>${mainFormat(first)}</p>` : "<p>Sin datos todavía.</p>";
-  const runnersUp = [second, third].filter(Boolean);
-  const runnersHtml = runnersUp.length
-    ? `<ol class="runner-ups" start="2">${runnersUp.map((p) => `<li>${shortFormat(p)}</li>`).join("")}</ol>`
-    : "";
-  const noteHtml = note ? `<p class="leader-note">${note}</p>` : "";
-  return `
-    <div class="leader-card">
-      <h3><i class="fa-solid ${icon}"></i>${title}</h3>
-      ${mainHtml}
-      ${runnersHtml}
-      ${noteHtml}
-    </div>
-  `;
-}
-
-// Versión "hero" de leaderCardHtml — encabezado a color con el número
-// grande + foto del líder, y abajo una lista más chica con
-// avatar+nombre+valor del 2do/3er lugar. La usan "Líderes de la temporada"
-// y "Salón de la fama" (Más veterano, Más MVPs); el resto de tarjetas
-// basadas en .leader-card (récords, stats de equipo, etc.) siguen su propio
-// formato. `list` acepta tanto filas de stats (con `.playerId`, ver
-// stats.js) como jugadores de PLAYERS tal cual (con `.id`, ver
+// Tarjeta de líder con el #1 en grande (encabezado a color + su foto) y el
+// 2do/3er lugar chico debajo (avatar + nombre + valor). La usan "Líderes de
+// la temporada" y "Salón de la fama" (Más veterano, Más MVPs); el resto de
+// tarjetas basadas en .leader-card (récords, stats de equipo, etc.) siguen
+// su propio formato. `list` acepta tanto filas de stats (con `.playerId`,
+// ver stats.js) como jugadores de PLAYERS tal cual (con `.id`, ver
 // withSeasons/mvpCounts más abajo) — playerFor() resuelve cualquiera de los
 // dos contra PLAYERS para sacar la foto real.
 function playerFor(row) {
