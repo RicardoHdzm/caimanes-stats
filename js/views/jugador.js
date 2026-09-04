@@ -293,13 +293,13 @@ export function renderAchievements(player) {
       label: "Tornado",
       desc: (value) => `Carreras impulsadas (RBI) del equipo esta temporada (${value}).`,
     });
-    // "Mr. Expendio" — el chiste ya existía en el "Líder cervecero" de
-    // Resumen (SO de bateo × 12 botes): quien más se ponchó, "debe" la
-    // cerveza — esa coletilla solo aplica al de oro. Mismo SO de bateo, no
-    // el de pitcheo (ese es "Francotirador").
+    // "Bartender" — el chiste ya existía en el "Líder cervecero" de Resumen
+    // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza —
+    // esa coletilla solo aplica al de oro. Mismo SO de bateo, no el de
+    // pitcheo (ese es "Francotirador").
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
-      label: "Mr. Expendio",
+      label: "Bartender",
       desc: (value, place) =>
         `Ponches de bateo del equipo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
     });

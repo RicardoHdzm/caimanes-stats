@@ -1329,6 +1329,14 @@ main h3::before {
   border-color: var(--accent);
 }
 
+/* Guía de medallas (js/views/medallas.js): el título va notoriamente
+   debajo del botón de volver, no pegado — .back-link solo trae 14px por
+   default. */
+.back-link--spaced {
+  display: flex;
+  margin-bottom: 32px;
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

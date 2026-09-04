@@ -73,7 +73,10 @@ function currentRoute() {
   if (first === "jugador" && second) {
     return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
   }
-  if (first === "medallas" && second) {
+  // `second` (id del jugador de origen) es opcional — solo decide a dónde
+  // regresa el botón de "Volver al perfil" (ver js/views/medallas.js); la
+  // guía en sí es la misma lista sin importar de dónde se haya llegado.
+  if (first === "medallas") {
     return { tab: "roster", render: (container) => renderMedallasGuide(container, second) };
   }
   // #/alineacion/p1/p2 — los dos jugadores del comparador que va al final de
