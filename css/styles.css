@@ -27,9 +27,12 @@
 
 :root {
   /* ---- color ---- */
-  /* Gris neutro (R=G=B), no azul marino — antes tenían un ligero tinte
-     azul (el canal azul más alto que rojo/verde en cada uno), a petición
-     expresa se quitó sin cambiar qué tan claro/oscuro es cada nivel. */
+  /* Esto es el tema "Luna" (oscuro, el default — sin atributo en <html>,
+     ver js/theme.js). Gris neutro (R=G=B), no azul marino — antes tenían
+     un ligero tinte azul (el canal azul más alto que rojo/verde en cada
+     uno), a petición expresa se quitó sin cambiar qué tan claro/oscuro es
+     cada nivel. El azul marino clásico sigue disponible como tema aparte,
+     "Eclipse" (ver más abajo, después de "Tema Sol"). */
   --bg: #0d0d0d;
   --surface: #1e1e1e;
   --surface-alt: #262626;
