@@ -1498,6 +1498,7 @@ main h3::before {
 
 .leader-hero-main {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
 }
@@ -1535,40 +1536,6 @@ main h3::before {
 .leader-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);
-}
-
-/* Insignia circular para cuando no hay foto de jugador que mostrar (récords
-   de equipo, o cualquier tarjeta hero de un solo valor que no es de un
-   jugador en particular — Racha actual, Racha reciente, Juegos jugados,
-   Próximo juego). Rojo por default, igual que el resto de iconos de
-   .leader-card; .team-stats-row la vuelve blanca/plateada más abajo, igual
-   que ya hace con el icono del título. */
-.icon-badge {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: var(--surface-alt);
-  border: 1px solid var(--border);
-  font-size: var(--text-3xl);
-}
-
-.icon-badge i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.record-card--hero .icon-badge i::before,
-.team-stats-row .icon-badge i::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .team-stats-row .leader-hero {
@@ -2698,6 +2665,7 @@ main h3::before {
 
 .record-hero-main {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
 }

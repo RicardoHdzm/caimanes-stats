@@ -39,12 +39,13 @@ function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
 }
 
-// Armazón "hero" para tarjetas de un solo valor, sin 2do/3er lugar (Próximo
-// juego, Racha actual, Racha reciente, Juegos jugados, Stats de equipo):
-// mismo encabezado a color que teamLeaderCardHtml, pero con una insignia
-// del icono a la derecha en vez de una foto — no hay a quién retratar, es
-// un dato del equipo o de la fecha, no de un jugador. `mainHtml` va junto
-// al título (el valor grande, un párrafo, lo que sea); `bodyHtml`
+// Armazón "hero" para tarjetas de un solo valor, sin 2do/3er lugar (Récord,
+// Próximo juego, Racha actual, Racha reciente, Juegos jugados, Stats de
+// equipo): mismo encabezado a color que teamLeaderCardHtml, pero sin foto —
+// no hay a quién retratar, es un dato del equipo o de la fecha, no de un
+// jugador. Tampoco repite el icono en una insignia aparte: ya sale una vez
+// en el título, y ponerlo otra vez a la derecha no aporta nada. `mainHtml`
+// va junto al título (el valor grande, un párrafo, lo que sea); `bodyHtml`
 // (opcional) es contenido extra debajo del encabezado, fuera del degradado
 // — barra de progreso, chips de racha, botones de RSVP.
 function heroCardInnerHtml(icon, title, mainHtml, bodyHtml = "") {
@@ -54,7 +55,6 @@ function heroCardInnerHtml(icon, title, mainHtml, bodyHtml = "") {
         <h3><i class="fa-solid ${icon}"></i>${title}</h3>
         ${mainHtml}
       </div>
-      <div class="leader-hero-avatar"><span class="icon-badge"><i class="fa-solid ${icon}"></i></span></div>
     </div>
     ${bodyHtml ? `<div class="leader-hero-body">${bodyHtml}</div>` : ""}
   `;
@@ -235,31 +235,22 @@ export function renderResumen(container) {
 
   refreshAnnouncements();
 
+  // Mismas tarjetas "hero" que el resto de Resumen (ver heroCardShell) en
+  // vez de .card/.card-icon — esas siguen usándose tal cual en otras
+  // páginas (ver js/views/jugador.js, js/lineup.js), así que no se tocan;
+  // aquí nomás se cambia qué markup arma esta fila en particular.
   const rec = teamRecord(GAMES);
   const cards = document.createElement("div");
   cards.className = "cards tab-carousel";
-  cards.innerHTML = `
-    <div class="card">
-      <i class="fa-solid fa-trophy card-icon"></i>
-      <span class="card-value">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</span>
-      <span class="card-label">Récord</span>
-    </div>
-    <div class="card">
-      <i class="fa-solid fa-bolt card-icon"></i>
-      <span class="card-value">${rec.RF}</span>
-      <span class="card-label">Carreras anotadas</span>
-    </div>
-    <div class="card">
-      <i class="fa-solid fa-shield-halved card-icon"></i>
-      <span class="card-value">${rec.RA}</span>
-      <span class="card-label">Carreras permitidas</span>
-    </div>
-    <div class="card">
-      <i class="fa-solid fa-ranking-star card-icon"></i>
-      <span class="card-value">${TEAM.leaguePosition ? `${TEAM.leaguePosition}°` : "—"}</span>
-      <span class="card-label">Posición en la liga${TEAM.leagueTeams ? ` (de ${TEAM.leagueTeams})` : ""}</span>
-    </div>
-  `;
+  cards.innerHTML =
+    heroCardShell("fa-trophy", "Récord", `<span class="leader-hero-value">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</span>`) +
+    heroCardShell("fa-bolt", "Carreras anotadas", `<span class="leader-hero-value">${rec.RF}</span>`) +
+    heroCardShell("fa-shield-halved", "Carreras permitidas", `<span class="leader-hero-value">${rec.RA}</span>`) +
+    heroCardShell(
+      "fa-ranking-star",
+      `Posición en la liga${TEAM.leagueTeams ? ` (de ${TEAM.leagueTeams})` : ""}`,
+      `<span class="leader-hero-value">${TEAM.leaguePosition ? `${TEAM.leaguePosition}°` : "—"}</span>`
+    );
   container.appendChild(cards);
 
   const bottomRow = document.createElement("div");
@@ -431,18 +422,15 @@ export function renderResumen(container) {
 
     // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
     // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
-    // empate o récord de equipo no hay a quién retratar, así que se queda
-    // con una insignia del icono del récord en su lugar. El 2do/3er lugar
-    // (r.runnersUp) va abajo, igual que en Líderes de la temporada — con
-    // avatar si es de un jugador, o la misma insignia si es otro juego (los
-    // récords de equipo no tienen jugador que mostrar).
+    // empate o récord de equipo no hay a quién retratar, y como el icono ya
+    // sale en el título no hace falta repetirlo en una insignia — el texto
+    // ocupa todo el ancho. El 2do/3er lugar (r.runnersUp) va abajo, igual
+    // que en Líderes de la temporada.
     const recordsRow = document.createElement("div");
     recordsRow.className = "records-grid tab-carousel";
     recordsRow.innerHTML = records
       .map((r) => {
-        const visualHtml = r.playerId
-          ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>`
-          : `<div class="icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
+        const visualHtml = r.playerId ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>` : "";
         const runnersHtml = r.runnersUp?.length
           ? `
             <div class="leader-runners">
