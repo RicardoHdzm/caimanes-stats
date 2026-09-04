@@ -1151,6 +1151,15 @@ main h3::before {
   box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
 }
 
+/* Personalizaste tu perfil (foto o walkup song) — ver addAchievementMedal()
+   en js/views/jugador.js. */
+.achievement-medal--profile .achievement-medal-icon {
+  border: 2px solid var(--pos-pitcher);
+  background: rgba(74, 158, 255, 0.15);
+  color: var(--pos-pitcher);
+  box-shadow: 0 0 12px rgba(74, 158, 255, 0.35);
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;
