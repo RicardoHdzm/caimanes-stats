@@ -240,10 +240,8 @@ export function renderResumen(container) {
     const announcementsList = `<div class="announcements-list">${items
       .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
       .join("")}</div>`;
-    // Blanco/plateado, no rojo: es un aviso del coach, no una estadística
-    // de líder — mismo criterio que Récords y Stats de equipo.
     announcementsSlot.innerHTML = `
-      <div class="leader-card leader-card--hero leader-card--hero-white announcements-card">
+      <div class="leader-card leader-card--hero announcements-card">
         ${heroCardInnerHtml("fa-bullhorn", "Anuncios", "", announcementsList)}
       </div>
     `;
