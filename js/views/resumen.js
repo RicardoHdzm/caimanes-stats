@@ -47,15 +47,15 @@ function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
 }
 
-// Igual que renderAvatar(), pero envuelto en un `[data-avatar]` para que
-// hydrateAvatars() (abajo) pueda reemplazarlo por la foto de Storage si
-// existe — mismo patrón que ya usan el perfil individual y el comparador
-// (ver js/views/jugador.js, js/views/comparar.js). Sin esto, un jugador con
-// foto propia subida desde su perfil seguiría viéndose con sus iniciales
-// aquí en Resumen.
+// Igual que renderAvatar(), pero como link a su perfil y envuelto en un
+// `[data-avatar]` para que hydrateAvatars() (abajo) pueda reemplazarlo por
+// la foto de Storage si existe — mismo patrón que ya usan el perfil
+// individual y el comparador (ver js/views/jugador.js,
+// js/views/comparar.js). Sin esto, un jugador con foto propia subida desde
+// su perfil seguiría viéndose con sus iniciales aquí en Resumen.
 function avatarSlot(player, size) {
   const id = player.id ?? player.playerId;
-  return `<span class="avatar-slot" data-avatar="${id}" data-size="${size}">${renderAvatar(player, size)}</span>`;
+  return `<a class="avatar-slot" href="#/jugador/${id}" data-avatar="${id}" data-size="${size}">${renderAvatar(player, size)}</a>`;
 }
 
 // Reemplaza los avatares de siempre (foto de data.js o iniciales, ya
@@ -527,7 +527,12 @@ export function renderResumen(container) {
       const { player, game } = card.dataset;
       if (!player && !game) continue;
       card.classList.add("record-clickable");
-      card.addEventListener("click", () => {
+      card.addEventListener("click", (e) => {
+        // Un avatar de 2do/3er lugar (u otro jugador empatado) es su propio
+        // link a SU perfil — sin esto, este listener lo pisaría y siempre
+        // mandaría al dueño principal del récord, sin importar en qué
+        // avatar se haya hecho clic.
+        if (e.target.closest("a")) return;
         location.hash = player ? `#/jugador/${player}` : `#/juegos/${game}`;
       });
     }
