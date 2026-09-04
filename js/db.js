@@ -366,19 +366,36 @@ export async function unlikeAnnouncement(announcementId) {
 // pública (política "avatars_read_public" en supabase/schema.sql, sin
 // sesión incluida) — cualquiera que abra el sitio ve la foto real. Subir o
 // cambiar la propia sigue exigiendo sesión (políticas "avatars_insert_own"
-// / "avatars_update_own", comparan contra current_player_id()). Se sigue
-// usando createSignedUrl() en vez de getPublicUrl(): si el jugador no ha
-// subido foto, la primera regresa null limpio (la vista sigue mostrando el
-// avatar de siempre) y la segunda regresaría una URL que rompe al cargar.
+// / "avatars_update_own", comparan contra current_player_id()).
+//
+// Se sigue usando createSignedUrl() en vez de getPublicUrl(): el bucket
+// tiene la política RLS "avatars_read_public", pero el bucket EN SÍ sigue
+// registrado como privado (storage.buckets.public = false, ver
+// supabase/schema.sql) — mientras eso no cambie, una getPublicUrl() 400ea
+// al pedir la imagen sin importar la política (confirmado probando contra
+// el proyecto real). Arreglo pendiente del lado de Supabase, no del
+// código: correr
+//   update storage.buckets set public = true where id = 'avatars';
+// una sola vez en el SQL Editor — ahí sí se podría cambiar a
+// getPublicUrl() y la imagen se cachearía entre visitas (hoy no: cada
+// signed URL trae un token nuevo, así que sale distinta cada vez y el
+// navegador nunca la reutiliza — de ahí "tarda en cargar la imagen de
+// perfil"). Mientras tanto, se cachea la signed URL en memoria por el
+// resto de esta carga de página (bien por debajo de su vencimiento de 1h):
+// evita volver a firmar la misma foto cada vez que aparece en más de un
+// lugar (Resumen + Roster + su perfil, por ejemplo) y, dentro de esa misma
+// sesión de navegación, deja que el navegador reuse la imagen ya
+// descargada en vez de pedirla de nuevo.
+const avatarUrlCache = new Map(); // playerId -> { url, expiresAt }
 
-// null si Supabase no está configurado o el jugador no ha subido foto
-// propia — en cualquiera de esos casos, la vista sigue mostrando el avatar
-// de siempre (foto de data.js o iniciales).
 export async function getAvatarUrl(playerId) {
   const client = getClient();
   if (!client) return null;
-  const { data, error } = await client.storage.from("avatars").createSignedUrl(`${playerId}/avatar`, 3600);
+  const cached = avatarUrlCache.get(playerId);
+  if (cached && cached.expiresAt > Date.now()) return cached.url;
+  const { data, error } = await runQuery(() => client.storage.from("avatars").createSignedUrl(`${playerId}/avatar`, 3600));
   if (error || !data) return null;
+  avatarUrlCache.set(playerId, { url: data.signedUrl, expiresAt: Date.now() + 55 * 60 * 1000 });
   return data.signedUrl;
 }
 
@@ -392,4 +409,8 @@ export async function uploadAvatar(playerId, file) {
     client.storage.from("avatars").upload(`${playerId}/avatar`, file, { upsert: true, contentType: file.type })
   );
   if (error) throw error;
+  // Sin esto, getAvatarUrl() seguiría devolviendo la signed URL vieja
+  // cacheada (ver arriba) el resto de esta carga de página — la foto nueva
+  // no se vería hasta recargar.
+  avatarUrlCache.delete(playerId);
 }
