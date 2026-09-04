@@ -245,7 +245,7 @@ function renderAchievements(player) {
   }
   if (gamesPlayedCount > 5) {
     chips.push({
-      icon: "fa-solid fa-dice-5",
+      icon: "fa-solid fa-dice-five",
       label: "Cumplidor",
       kind: "participation",
       desc: `Ya jugó más de 5 juegos esta temporada (${gamesPlayedCount}).`,
