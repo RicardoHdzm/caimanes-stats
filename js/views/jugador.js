@@ -199,7 +199,7 @@ function renderAchievements(player) {
     }
     if (myBatting["2B"] > 0 && rankAmong(battingList, player.id, "2B", "desc")?.place === 1) {
       chips.push({
-        icon: "fa-solid fa-2",
+        icon: "fa-solid fa-dice",
         label: "Double Trouble",
         kind: "leader",
         desc: `Más dobles del equipo esta temporada (${myBatting["2B"]}).`,
@@ -207,7 +207,7 @@ function renderAchievements(player) {
     }
     if (myBatting["3B"] > 0 && rankAmong(battingList, player.id, "3B", "desc")?.place === 1) {
       chips.push({
-        icon: "fa-solid fa-3",
+        icon: "fa-solid fa-skull-crossbones",
         label: "Triple Kill",
         kind: "leader",
         desc: `Más triples del equipo esta temporada (${myBatting["3B"]}).`,
