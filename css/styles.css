@@ -899,6 +899,7 @@ main h3::before {
 .debut-badge {
   display: flex;
   width: fit-content;
+  max-width: 100%;
   align-items: center;
   gap: 8px;
   margin: 10px auto 0;
@@ -909,6 +910,7 @@ main h3::before {
   color: var(--accent-text);
   font-size: var(--text-sm);
   font-weight: 700;
+  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -1904,23 +1906,47 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
-  /* Se aprieta un poco para que el renglón siga cabiendo en un teléfono. */
+  /* A petición expresa: en celular el renglón NUNCA baja a dos líneas — ni
+     aquí ni en el badge de Debut (ver .debut-badge más abajo). Se prioriza
+     achicar la letra sobre truncar: cortar el título/artista a "Th…" se ve
+     peor que verlo completo mini. Con esto solo se recorta con "…" en el
+     caso extremo de una canción con nombre larguísimo (min-width:0 hace
+     falta para que un hijo flex pueda encogerse por debajo de su ancho de
+     contenido — si no, text-overflow nunca hace nada). */
   .walkup {
-    gap: 6px;
-    padding: 10px 14px;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 8px 12px;
   }
 
-  .walkup-label {
-    font-size: var(--text-xs);
+  .walkup-label,
+  .walkup-title,
+  .walkup-artist {
+    font-size: 9.5px;
   }
 
-  .walkup-icon {
-    font-size: var(--text-lg);
+  .walkup-icon,
+  .walkup-sep,
+  .walkup-play {
+    font-size: var(--text-md);
   }
 
   .walkup-title,
   .walkup-artist {
-    font-size: var(--text-md);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* El badge de Debut es texto uppercase largo ("Debut: 2023 · 1ra
+     Temporada · Liga Valle Alto") — se achica lo necesario para que quepa
+     completo en un teléfono angosto sin partirse en dos renglones. */
+  .debut-badge {
+    padding: 5px 10px;
+    gap: 5px;
+    font-size: 9.5px;
+    letter-spacing: 0.01em;
   }
 }
 
