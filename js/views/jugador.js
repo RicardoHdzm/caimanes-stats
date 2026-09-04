@@ -203,12 +203,14 @@ export function renderAchievements(player) {
     // seasons.length y no "TEAM.seasonsTotal - debut + 1": esa cuenta
     // asumía que nunca se ausentó desde su debut, seasons.length ya
     // descuenta cualquier temporada que se haya saltado.
-    chips.push({
-      icon: "fa-solid fa-hat-cowboy",
-      label: "Veterano",
-      kind: "trajectory",
-      desc: `${seasons.length} temporada${seasons.length === 1 ? "" : "s"} jugadas con el equipo.`,
-    });
+    if (seasons.length > 4) {
+      chips.push({
+        icon: "fa-solid fa-anchor",
+        label: "Veterano",
+        kind: "trajectory",
+        desc: `${seasons.length} temporadas jugadas con el equipo.`,
+      });
+    }
 
     const leagues = new Set(seasons.map((n) => SEASONS[n - 1]?.league).filter(Boolean));
     if (leagues.size > 1) {
@@ -364,7 +366,7 @@ export function renderAchievements(player) {
     });
     addPodium(fieldingList, "PO", {
       icon: "fa-solid fa-broom",
-      label: "Escoba",
+      label: "Barrendero",
       desc: (value) => `Outs realizados (PO) del equipo esta temporada (${value}).`,
     });
   }

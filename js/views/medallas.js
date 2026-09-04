@@ -37,7 +37,7 @@ import { renderAchievements } from "./jugador.js";
 const CATALOG = [
   // ---- Trayectoria ----
   { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
-  { kind: "trajectory", icon: "fa-solid fa-hat-cowboy", name: "Veterano", how: "Ha jugado temporadas con el equipo.", match: (l) => l === "Veterano" },
+  { kind: "trajectory", icon: "fa-solid fa-anchor", name: "Veterano", how: "Ha jugado más de 4 temporadas con el equipo.", match: (l) => l === "Veterano" },
   { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Trotamundos", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Trotamundos" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "Caliente", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "Caliente" },
@@ -52,7 +52,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-beer-mug-empty", name: "Bartender", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Bartender" },
   { kind: "gold", icon: "fa-solid fa-crosshairs", name: "Francotirador", how: "Top 3 del equipo en ponches propinados (pitcheo) esta temporada.", match: (l) => l === "Francotirador" },
   { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Guante de oro / plata / bronce", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.startsWith("Guante de ") },
-  { kind: "gold", icon: "fa-solid fa-broom", name: "Escoba", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Escoba" },
+  { kind: "gold", icon: "fa-solid fa-broom", name: "Barrendero", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Barrendero" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Triple Kill", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Kill" },
   { kind: "gold", icon: "fa-solid fa-crow", name: "Ojo de águila", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Ojo de águila" },
