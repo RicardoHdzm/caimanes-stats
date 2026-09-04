@@ -37,22 +37,22 @@ import { renderAchievements } from "./jugador.js";
 const CATALOG = [
   // ---- Trayectoria ----
   { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
-  { kind: "trajectory", icon: "fa-solid fa-anchor", name: "Veterano", how: "Ha jugado más de 4 temporadas con el equipo.", match: (l) => l === "Veterano" },
-  { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Viajero", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Viajero" },
+  { kind: "trajectory", icon: "fa-solid fa-anchor", name: "Veteran", how: "Ha jugado más de 4 temporadas con el equipo.", match: (l) => l === "Veteran" },
+  { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Bon voyage", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Bon voyage" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "On Fire", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "On Fire" },
   { kind: "streak", icon: "fa-solid fa-bolt", name: "The Streak", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "The Streak" },
   { kind: "streak", icon: "fa-solid fa-fire-flame-curved", name: "Too Hot!", how: "Racha activa de 2 o más juegos seguidos con multi-hit (2 o más hits por juego).", match: (l) => l === "Too Hot!" },
   { kind: "streak", icon: "fa-solid fa-magnet", name: "Base Magnet", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Base Magnet" },
   // ---- Podio del equipo (oro/plata/bronce, según el lugar) ----
-  { kind: "gold", icon: "fa-solid fa-baseball-bat-ball", name: "Bate de oro / plata / bronce", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.startsWith("Bate de ") },
+  { kind: "gold", icon: "fa-solid fa-baseball-bat-ball", name: "Golden / Silver / Bronze Bat", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.endsWith(" Bat") },
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Kaboom!", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Kaboom!" },
   { kind: "gold", icon: "fa-solid fa-user-ninja", name: "Ninja", how: "Top 3 del equipo en bases robadas esta temporada.", match: (l) => l === "Ninja" },
   { kind: "gold", icon: "fa-solid fa-tornado", name: "Tornado", how: "Top 3 del equipo en carreras impulsadas (RBI) esta temporada.", match: (l) => l === "Tornado" },
   { kind: "gold", icon: "fa-solid fa-beer-mug-empty", name: "Bartender", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Bartender" },
   { kind: "gold", icon: "fa-solid fa-crosshairs", name: "Snipper", how: "Top 3 del equipo en ponches propinados (pitcheo) esta temporada.", match: (l) => l === "Snipper" },
   { kind: "gold", icon: "fa-solid fa-dumbbell", name: "Iron Arm", how: "Top 3 del equipo en entradas lanzadas (IP) esta temporada.", match: (l) => l === "Iron Arm" },
-  { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Guante de oro / plata / bronce", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.startsWith("Guante de ") },
+  { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Golden / Silver / Bronze Glove", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.endsWith(" Glove") },
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Killer", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Killer" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-chess-knight", name: "Triple Threat", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Threat" },
