@@ -1247,13 +1247,15 @@ main h3::before {
   box-shadow: 0 0 12px rgba(44, 78, 201, 0.35);
 }
 
-/* Racha de hits vigente. Rosa de nuevo — el naranja chocaba visualmente con
-   el bronce del podio. */
+/* Racha de hits vigente. Naranja/rojo fuego bien brillante — a propósito,
+   combina con los íconos de esta categoría (fa-fire, fa-fire-flame-curved).
+   Distinto del dorado/bronce del podio (más abajo) y del rojo puro de
+   dues-unpaid. */
 .achievement-medal--streak .achievement-medal-icon {
-  border: 2px solid var(--pos-special);
-  background: rgba(255, 111, 181, 0.15);
-  color: var(--pos-special);
-  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
+  border: 2px solid #ff5722;
+  background: rgba(255, 87, 34, 0.15);
+  color: #ff5722;
+  box-shadow: 0 0 12px rgba(255, 87, 34, 0.35);
 }
 
 /* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
@@ -1299,13 +1301,14 @@ main h3::before {
 /* Interactuar con el sitio: like a un anuncio, comentar, votar MVP, o
    personalizar tu perfil (foto, walkup song) — antes "profile" tenía su
    propio color, se fusionó aquí porque las dos categorías son la misma
-   idea ("interactuar con el sitio", no "jugar"). Rojo rosado a propósito,
-   distinto del morado de participation (esa sí es sobre jugar). */
+   idea ("interactuar con el sitio", no "jugar"). Rosa — el mismo que tenía
+   streak antes de pasarse a naranja/fuego (arriba), así queda libre para
+   esta categoría sin chocar con nada. */
 .achievement-medal--social .achievement-medal-icon {
-  border: 2px solid #ff4d6d;
-  background: rgba(255, 77, 109, 0.15);
-  color: #ff4d6d;
-  box-shadow: 0 0 12px rgba(255, 77, 109, 0.35);
+  border: 2px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.15);
+  color: var(--pos-special);
+  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
 }
 
 /* Estado de inscripción — mismo verde/rojo que ya usa el badge "Estado de

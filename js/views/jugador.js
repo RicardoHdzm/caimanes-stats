@@ -60,12 +60,12 @@ function renderDebut(seasons) {
 // el logro individual — todos los de una misma categoría comparten color
 // (ver .achievement-badge--* en css/styles.css):
 //   trajectory    (azul marino) — fundador, temporadas en el equipo, ligas jugadas
-//   streak        (rosa)   — racha de hits vigente
+//   streak        (naranja/fuego) — racha de hits vigente
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
 //   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (morado) — asistencia y versatilidad de posiciones
-//   social        (rojo rosado) — interactuar con el sitio: like a un
+//   social        (rosa)   — interactuar con el sitio: like a un
 //                             anuncio, comentar, votar MVP, o personalizar
 //                             tu perfil (foto, walkup song) — no es sobre
 //                             jugar, por eso no comparte color con
@@ -388,7 +388,7 @@ export function renderAchievements(player) {
   if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
     chips.push({
       icon: "fa-solid fa-calendar-check",
-      label: "Desquehacerado",
+      label: "Inquebrantable",
       kind: "participation",
       desc: "Asistió a todos los juegos de la temporada.",
     });

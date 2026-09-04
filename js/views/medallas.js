@@ -62,7 +62,7 @@ const CATALOG = [
   { kind: "threshold", icon: "fa-solid fa-meteor", name: "Estelar", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "Estelar" },
   { kind: "threshold", icon: "fa-solid fa-gem", name: "Diamante", how: "OPS de 1.000 o más esta temporada.", match: (l) => l === "Diamante" },
   // ---- Participación ----
-  { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Desquehacerado", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Desquehacerado" },
+  { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Inquebrantable", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Inquebrantable" },
   { kind: "participation", icon: "fa-solid fa-hand", name: "Cumplidor", how: "Asistió a más de 5 juegos esta temporada.", match: (l) => l === "Cumplidor" },
   { kind: "participation", icon: "fa-solid fa-cat", name: "Nocturno", how: "Asistió a más de la mitad de los juegos a las 9:00pm de la temporada.", match: (l) => l === "Nocturno" },
   { kind: "participation", icon: "fa-solid fa-recycle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
