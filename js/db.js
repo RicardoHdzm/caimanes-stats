@@ -30,6 +30,25 @@ async function runQuery(queryFn) {
   return result;
 }
 
+// Mismo reintento que runQuery, pero para escrituras — solo se usa en las
+// que son upsert/update/delete, nunca en un insert puro (addComment,
+// postAnnouncement, likeComment...): esas si de casualidad sí llegaron a
+// pasar la primera vez y solo se perdió la respuesta, un reintento
+// generaría una fila duplicada o un error de llave repetida. Un
+// upsert/update/delete reintentado con los mismos datos llega exactamente
+// al mismo resultado, así que aquí sí es seguro — y hace falta: "a veces no
+// me deja guardar" (subir foto, guardar posiciones/canción/contraseña) es
+// justo el mismo hipo de señal intermitente que ya resuelve runQuery para
+// las lecturas.
+async function runMutation(mutationFn) {
+  let result = await mutationFn();
+  if (result.error) {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    result = await mutationFn();
+  }
+  return result;
+}
+
 // ---- Estado de pago de inscripción (player_dues) ----
 //
 // Lectura: cualquiera con sesión iniciada (RLS lo bloquea a un visitante
