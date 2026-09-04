@@ -28,13 +28,13 @@ function formatGameDate(dateStr) {
 }
 
 // Tarjeta de líder con el #1 en grande (encabezado a color + su foto) y el
-// 2do/3er lugar chico debajo (avatar + nombre + valor). La usan "Líderes de
-// la temporada" y "Salón de la fama" (Más veterano, Más MVPs); el resto de
-// tarjetas basadas en .leader-card (récords, stats de equipo, etc.) siguen
-// su propio formato. `list` acepta tanto filas de stats (con `.playerId`,
-// ver stats.js) como jugadores de PLAYERS tal cual (con `.id`, ver
-// withSeasons/mvpCounts más abajo) — playerFor() resuelve cualquiera de los
-// dos contra PLAYERS para sacar la foto real.
+// 2do/3er lugar chico debajo (avatar + nombre + valor). La usa "Líderes de
+// la temporada"; el resto de tarjetas basadas en .leader-card (récords,
+// stats de equipo, etc.) siguen su propio formato. `list` trae filas de
+// stats (battingTotals/pitchingTotals, con `.playerId`) — playerFor() las
+// resuelve contra PLAYERS para sacar la foto real. También acepta jugadores
+// de PLAYERS tal cual (con `.id` en vez de `.playerId`), por si se vuelve a
+// necesitar para algo que no sea una fila de stats.
 function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
 }
