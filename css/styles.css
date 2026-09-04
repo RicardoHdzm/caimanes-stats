@@ -1089,8 +1089,11 @@ main h3::before {
 
 /* Más espacio entre "Medallero" y la primera fila de medallas — .leader-card
    h3 (8px) + .achievements-grid (10px) se sentía pegado. Escalado a esta
-   tarjeta nomás, no a .leader-card h3 en general. */
-.medallero-card h3 {
+   tarjeta nomás, no a .leader-card h3 en general. Doble clase (en vez de
+   solo .medallero-card h3) para ganarle en especificidad a `.leader-card
+   h3` de abajo — con la misma especificidad, esa queda después en el
+   archivo y se imponía. */
+.leader-card.medallero-card h3 {
   margin-bottom: 20px;
 }
 
