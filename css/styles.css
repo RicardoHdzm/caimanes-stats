@@ -960,6 +960,32 @@ main h3::before {
   color: var(--win);
 }
 
+/* "Eres el #1 del equipo en esto" — mismo dorado que .mvp-badge a
+   propósito, es la misma idea de fondo. */
+.achievement-badge--leader {
+  border: 1px solid #f5b942;
+  background: rgba(245, 185, 66, 0.12);
+  color: #f5b942;
+}
+
+.achievement-badge--avg300 {
+  border: 1px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.12);
+  color: var(--pos-special);
+}
+
+.achievement-badge--attendance {
+  border: 1px solid var(--win);
+  background: rgba(63, 181, 111, 0.12);
+  color: var(--win);
+}
+
+.achievement-badge--multi {
+  border: 1px solid #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
+}
+
 .replay-btn {
   display: inline-flex;
   align-items: center;

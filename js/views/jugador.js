@@ -137,6 +137,72 @@ function renderAchievements(player) {
     chips.push({ icon: "fa-solid fa-fire", label: `Racha activa: ${streak.current} juegos con hit`, kind: "streak" });
   }
 
+  // ---- Líderes de la temporada — mismo criterio que las insignias de
+  // rango en las tarjetas de stats más abajo en este archivo: las rate
+  // stats (AVG/ERA) solo cuentan entre quienes califican, para que nadie
+  // con una sola jugada perfecta salga "líder". Todas comparten color
+  // (dorado): son la misma idea — "eres el #1 del equipo en esto" — como
+  // MVP.
+  const battingList = battingTotals(GAMES);
+  const pitchingList = pitchingTotals(GAMES);
+  const fieldingList = fieldingTotals(GAMES);
+  const qualifiedBatters = battingList.filter((r) => r.qualified);
+  const activePitchers = pitchingList.filter((r) => r.outs > 0);
+
+  const myBatting = battingList.find((r) => r.playerId === player.id);
+  const myPitching = pitchingList.find((r) => r.playerId === player.id);
+  const myFielding = fieldingList.find((r) => r.playerId === player.id);
+
+  if (myBatting) {
+    if (Number(myBatting.AVG) > 0 && rankAmong(qualifiedBatters, player.id, "AVG", "desc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-medal", label: "Bate de oro · líder de AVG", kind: "leader" });
+    }
+    if (Number(myBatting.HR) > 0 && rankAmong(battingList, player.id, "HR", "desc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-bomb", label: "Rey de los jonrones", kind: "leader" });
+    }
+    if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón de bases", kind: "leader" });
+    }
+    if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
+      chips.push({ icon: "fa-solid fa-baseball-bat-ball", label: `Bateador de ${myBatting.AVG}`, kind: "avg300" });
+    }
+  }
+
+  if (myPitching && myPitching.outs > 0) {
+    if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-baseball", label: "Máquina de ponches", kind: "leader" });
+    }
+    if (Number(myPitching.ERA) === 0 && rankAmong(activePitchers, player.id, "ERA", "asc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-shield", label: "Brazo de acero · ERA 0.00", kind: "leader" });
+    }
+  }
+
+  if (myFielding && myFielding.PO + myFielding.A + myFielding.E > 0 && myFielding.FPCT === "1.000") {
+    chips.push({ icon: "fa-solid fa-hand-fist", label: "Guante de oro · fildeo perfecto", kind: "leader" });
+  }
+
+  // ---- Asistencia y versatilidad ----
+  const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
+  if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
+    chips.push({ icon: "fa-solid fa-calendar-check", label: "Asistencia perfecta", kind: "attendance" });
+  }
+
+  // Posiciones distintas jugadas esta temporada — vienen del `position` de
+  // cada línea de bateo (ver GAMES en data.js), no de fildeo (esas líneas
+  // no traen posición, solo PO/A/E).
+  const positionsPlayed = new Set();
+  for (const game of GAMES) {
+    const line = game.batting?.find((b) => b.playerId === player.id);
+    if (line?.position) positionsPlayed.add(line.position);
+  }
+  if (positionsPlayed.size >= 3) {
+    chips.push({
+      icon: "fa-solid fa-people-arrows",
+      label: `Multiposición: ${positionsPlayed.size} posiciones distintas`,
+      kind: "multi",
+    });
+  }
+
   if (chips.length === 0) return "";
   return `
     <div class="achievements-row">
