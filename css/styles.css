@@ -1087,6 +1087,13 @@ main h3::before {
   position: relative;
 }
 
+/* Más espacio entre "Medallero" y la primera fila de medallas — .leader-card
+   h3 (8px) + .achievements-grid (10px) se sentía pegado. Escalado a esta
+   tarjeta nomás, no a .leader-card h3 en general. */
+.medallero-card h3 {
+  margin-bottom: 20px;
+}
+
 .medallero-guide-btn {
   position: absolute;
   top: 18px;
