@@ -417,7 +417,7 @@ export function renderResumen(container) {
       .map((r) => {
         const visualHtml = r.playerId
           ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>`
-          : `<div class="record-icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
+          : `<div class="icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
         const runnersHtml = r.runnersUp?.length
           ? `
             <div class="leader-runners">
