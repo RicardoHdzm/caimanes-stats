@@ -1106,10 +1106,15 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
+  /* En celular no cabe anclado en la esquina — pasa a flujo normal, debajo
+     de las medallas (el HTML ya lo pone después de .achievements-grid, ver
+     js/views/jugador.js) y centrado, con espacio de sobra arriba para que
+     no se sienta pegado. */
   .medallero-guide-btn {
     position: static;
-    display: inline-block;
-    margin-top: 8px;
+    display: flex;
+    width: fit-content;
+    margin: 20px auto 0;
   }
 }
 

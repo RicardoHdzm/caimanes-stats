@@ -106,15 +106,22 @@ function sortedAchievementsHtml(chips) {
     .join("");
 }
 
-// Encabezado de la tarjeta de medallas: título + botón a la guía completa
-// (ver js/views/medallas.js) — este jugador en específico, para que la guía
-// ya sepa marcar cuáles tiene. .medallero-card (ver css/styles.css) le da
-// position:relative a la tarjeta para poder anclar el botón en la esquina.
-function MEDALLERO_HEADER(playerId) {
-  return `
-    <h3><i class="fa-solid fa-medal"></i>Medallero</h3>
-    <a href="#/medallas/${playerId}" class="medallero-guide-btn">Guía de medallas</a>
-  `;
+// Título de la tarjeta de medallas. El botón de la guía completa (ver
+// MEDALLERO_GUIDE_BTN más abajo) va aparte, DESPUÉS del grid de medallas —
+// en escritorio se ancla en la esquina con position:absolute (no importa
+// dónde quede en el HTML), pero en celular pasa a flujo normal, y ahí sí
+// importa: tiene que quedar debajo de las medallas, no entre el título y
+// el grid.
+function MEDALLERO_HEADER() {
+  return `<h3><i class="fa-solid fa-medal"></i>Medallero</h3>`;
+}
+
+// Botón a la guía completa (ver js/views/medallas.js) — este jugador en
+// específico, para que la guía ya sepa a qué perfil regresar. .medallero-card
+// (ver css/styles.css) le da position:relative a la tarjeta para poder
+// anclarlo en la esquina en escritorio.
+function MEDALLERO_GUIDE_BTN(playerId) {
+  return `<a href="#/medallas/${playerId}" class="medallero-guide-btn">Guía de medallas</a>`;
 }
 
 // Racha ACTIVA (hasta el juego más reciente) de juegos seguidos que cumplen
@@ -498,7 +505,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (achievementChips.length > 0) {
     achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card medallero-card";
-    achievementsCard.innerHTML = `${MEDALLERO_HEADER(player.id)}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>`;
+    achievementsCard.innerHTML = `${MEDALLERO_HEADER()}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>${MEDALLERO_GUIDE_BTN(player.id)}`;
     container.appendChild(achievementsCard);
   }
 
@@ -514,7 +521,7 @@ export function renderJugadorDetalle(container, playerId) {
     if (!achievementsCard) {
       achievementsCard = document.createElement("div");
       achievementsCard.className = "leader-card player-standalone-card medallero-card";
-      achievementsCard.innerHTML = `${MEDALLERO_HEADER(player.id)}<div class="achievements-grid"></div>`;
+      achievementsCard.innerHTML = `${MEDALLERO_HEADER()}<div class="achievements-grid"></div>${MEDALLERO_GUIDE_BTN(player.id)}`;
       hero.after(achievementsCard);
     }
     achievementsCard.querySelector(".achievements-grid").innerHTML = sortedAchievementsHtml(achievementChips);
