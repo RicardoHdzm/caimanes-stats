@@ -1634,18 +1634,17 @@ main h3::before {
   flex-direction: column;
 }
 
-/* Degradado azul oscuro a propósito en TODAS las tarjetas hero de Resumen
+/* Degradado negro a propósito en TODAS las tarjetas hero de Resumen
    (récords, líderes, stats de equipo, etc.) — mismo estilo, descartado el
-   degradado rojo que tenían algunas antes y el blanco/plateado que se veía
-   deslavado. Más oscuro que --pos-pitcher (ese es el azul de posición de
-   pitcher, muy claro para esto). */
+   degradado rojo que tenían algunas antes (el azul que se probó después se
+   veía muy brillante). */
 .leader-hero {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 10px;
   padding: 16px 16px 14px;
-  background: linear-gradient(160deg, rgba(30, 64, 175, 0.35) 0%, transparent 65%), var(--surface);
+  background: linear-gradient(160deg, rgba(0, 0, 0, 0.35) 0%, transparent 65%), var(--surface);
 }
 
 .leader-hero-main {
