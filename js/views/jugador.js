@@ -400,6 +400,22 @@ export function renderAchievements(player) {
     });
   }
 
+  // Juegos a las 9:00pm ("nocturnos") — depende del `time` de cada juego en
+  // data.js (opcional; juegos sin `time` capturado simplemente no cuentan
+  // para ningún lado de esta comparación).
+  const nightGames = GAMES.filter((g) => g.time === "21:00");
+  if (nightGames.length > 0) {
+    const nightGamesPlayed = gamesPlayedByPlayer(nightGames).get(player.id) ?? 0;
+    if (nightGamesPlayed > nightGames.length / 2) {
+      chips.push({
+        icon: "fa-solid fa-cat",
+        label: "Nocturno",
+        kind: "participation",
+        desc: `Asistió a más de la mitad de los juegos a las 9:00pm de la temporada (${nightGamesPlayed} de ${nightGames.length}).`,
+      });
+    }
+  }
+
   // Posiciones distintas jugadas esta temporada — vienen del `position` de
   // cada línea de bateo (ver GAMES en data.js), no de fildeo (esas líneas
   // no traen posición, solo PO/A/E).

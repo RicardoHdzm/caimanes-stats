@@ -123,6 +123,7 @@ export const PLAYERS = [
 //   {
 //     id: "g8", // el siguiente consecutivo (hay 7 juegos: g1…g7)
 //     date: "2026-03-01",
+//     time: "19:00", // opcional, formato 24h — usado por la medalla "Nocturno" (juegos a las 21:00)
 //     opponent: "Nombre del rival",
 //     weCloseBatting: true,
 //     scoreUs: 8,
@@ -147,6 +148,7 @@ export const GAMES = [
   {
     id: "g1",
     date: "2026-06-12",
+    time: "21:00",
     opponent: "BNG Agroproductos",
     weCloseBatting: null,
     result: "L", // marcador todavía no capturado
@@ -179,6 +181,7 @@ export const GAMES = [
   {
     id: "g2",
     date: "2026-06-25",
+    time: "19:00",
     opponent: "Muñekos",
     weCloseBatting: false,
     scoreUs: 16,
@@ -224,6 +227,7 @@ export const GAMES = [
   {
     id: "g3",
     date: "2026-07-10",
+    time: "19:00",
     opponent: "Bronx",
     weCloseBatting: false,
     scoreUs: 27,
@@ -274,6 +278,7 @@ export const GAMES = [
   {
     id: "g4",
     date: "2026-07-21",
+    time: "21:00",
     opponent: "Los Pichichis",
     weCloseBatting: true,
     scoreUs: 17,
@@ -311,6 +316,7 @@ export const GAMES = [
     {
     id: "g5",
     date: "2026-07-28",
+    time: "19:00",
     opponent: "Tamagochis",
     weCloseBatting: true,
     scoreUs: 17,
@@ -360,6 +366,7 @@ export const GAMES = [
   {
     id: "g6",
     date: "2026-08-14",
+    time: "19:00",
     opponent: "Jolinos",
     weCloseBatting: true,
     scoreUs: 13,
@@ -405,6 +412,7 @@ export const GAMES = [
     {
     id: "g7",
     date: "2026-08-20",
+    time: "19:00",
     opponent: "Sox",
     weCloseBatting: true,
     scoreUs: 10,
@@ -448,6 +456,7 @@ export const GAMES = [
   {
     id: "g8",
     date: "2026-08-27",
+    time: "21:00",
     opponent: "Rockin' Roll",
     weCloseBatting: false,
     scoreUs: 2,
@@ -490,6 +499,7 @@ export const GAMES = [
   {
     id: "g9",
     date: "2026-09-01",
+    time: "19:00",
     opponent: "Los Primos",
     weCloseBatting: false,
     scoreUs: 19,
