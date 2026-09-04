@@ -102,6 +102,14 @@
      separado de --surface aunque hoy valga lo mismo, para que el tema
      claro pueda darle su propio tono sin tocar las superficies. */
   --bg-glow: #1a1e23;
+
+  /* Versión SÓLIDA (sin transparencia) de "tu fila" (rgba(226,32,47,0.1) —
+     ver .standings-us/.row-you más abajo) para la columna congelada de una
+     tabla: esa celda necesita fondo opaco propio (tapa lo que scrollea
+     detrás), así que no puede usar la misma rgba translúcida. Aproxima ese
+     mismo rojo-al-10% ya mezclado sobre --surface, para que la celda fija y
+     las que sí se mueven se vean del mismo color. */
+  --row-you-solid: #2a1b1f;
 }
 
 /* ---- Tema claro ----
@@ -133,6 +141,10 @@
 
   --shadow-card: 0 8px 20px -12px rgba(20, 24, 28, 0.18);
   --shadow-raised: 0 12px 28px -14px rgba(20, 24, 28, 0.22);
+
+  /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
+     --surface en este tema (blanco) en vez del de fondo oscuro. */
+  --row-you-solid: #fbe4e6;
 }
 
 * {
@@ -244,13 +256,65 @@ body {
   font-size: var(--text-2xl);
 }
 
-/* Botón de tema (js/theme.js) — mismo círculo que .social-link (hereda esa
-   clase en el HTML), nomás corrido a la derecha para no encimarse con
-   Instagram. Como <button>, sin estilos de <a> que limpiar. */
-.theme-toggle-btn {
+/* Interruptor sol/luna (js/theme.js) — junto a Instagram, misma esquina.
+   El círculo rojo (el "thumb") se desliza al lado activo nomás con CSS: la
+   posición de .theme-switch-thumb y el color de los dos íconos cambian con
+   [data-theme="light"] en <html>, sin que JS toque estilos. */
+.theme-switch {
+  position: absolute;
+  top: 23px;
   left: 76px;
+  display: inline-flex;
+  align-items: center;
+  width: 64px;
+  height: 34px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
   cursor: pointer;
-  font: inherit;
+}
+
+.theme-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 33px; /* oscuro (default): junto a la luna */
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transition: left 0.2s ease;
+}
+
+:root[data-theme="light"] .theme-switch-thumb {
+  left: 3px; /* claro: junto al sol */
+}
+
+.theme-switch-icon {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+/* El ícono del lado activo queda en blanco, sobre el círculo rojo; el
+   inactivo se apaga a --muted (regla base de arriba). */
+.theme-switch-icon--moon {
+  color: #fff;
+}
+
+:root[data-theme="light"] .theme-switch-icon--moon {
+  color: var(--muted);
+}
+
+:root[data-theme="light"] .theme-switch-icon--sun {
+  color: #fff;
 }
 
 @media (max-width: 640px) {
@@ -265,8 +329,21 @@ body {
     font-size: var(--text-xl);
   }
 
-  .theme-toggle-btn {
+  .theme-switch {
+    top: 17px;
     left: 60px;
+    width: 56px;
+    height: 30px;
+  }
+
+  .theme-switch-thumb {
+    width: 24px;
+    height: 24px;
+    left: 29px;
+  }
+
+  :root[data-theme="light"] .theme-switch-thumb {
+    left: 3px;
   }
 }
 
@@ -1510,7 +1587,7 @@ main h3::before {
 }
 
 .stats-table tbody tr.standings-us td.sticky-col {
-  background-color: #2a1b1f;
+  background-color: var(--row-you-solid);
 }
 
 .stats-table tbody tr.standings-us td.sticky-col-first {
@@ -1529,7 +1606,7 @@ main h3::before {
 }
 
 .stats-table tbody tr.row-you td.sticky-col {
-  background-color: #2a1b1f;
+  background-color: var(--row-you-solid);
 }
 
 .stats-table tbody tr.row-you td.sticky-col-first {

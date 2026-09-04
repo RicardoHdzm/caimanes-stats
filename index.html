@@ -63,10 +63,13 @@
     >
       <i class="fa-brands fa-instagram"></i>
     </a>
-    <!-- Junto al de Instagram, mismo tamaño/estilo — ver js/theme.js para la
-         lógica (guardar la elección, cambiar el ícono). -->
-    <button type="button" id="theme-toggle" class="social-link theme-toggle-btn" aria-label="Cambiar a tema claro">
-      <i class="fa-solid fa-sun"></i>
+    <!-- Interruptor sol/luna — el círculo rojo se desliza al lado activo por
+         puro CSS ([data-theme="light"] en <html>, ver css/styles.css); el
+         botón nomás pone y quita ese atributo (ver js/theme.js). -->
+    <button type="button" id="theme-toggle" class="theme-switch" aria-label="Cambiar a tema claro">
+      <span class="theme-switch-thumb"></span>
+      <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
+      <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
     </button>
     <div class="topbar-inner">
       <a href="#/resumen" aria-label="Ir a Resumen">
