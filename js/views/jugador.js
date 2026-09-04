@@ -263,9 +263,9 @@ function renderAchievements(player) {
   if (positionsPlayed.size >= 3) {
     chips.push({
       icon: "fa-solid fa-shuffle",
-      label: `Versátil · ${positionsPlayed.size} posiciones`,
+      label: "Versátil",
       kind: "participation",
-      desc: "Jugó en 3 o más posiciones distintas esta temporada.",
+      desc: `Jugó en ${positionsPlayed.size} posiciones distintas esta temporada.`,
     });
   }
 
