@@ -106,6 +106,24 @@ function sortedAchievementsHtml(chips) {
     .join("");
 }
 
+// Racha ACTIVA (hasta el juego más reciente) de juegos seguidos que cumplen
+// `qualifies(line)` — mismo criterio que hitStreaks() en stats.js (un juego
+// sin turnos al bat no cuenta ni a favor ni en contra, para no castigar a
+// quien no bateó ese día), pero genérica para pedir otra condición además
+// de "tuvo hit" (multi-hit, embasarse con hit o base por bolas, etc.). Se
+// queda local aquí porque, a diferencia de hitStreaks(), nada más la usa
+// esta vista.
+function activeGameStreak(games, playerId, qualifies) {
+  const ordered = [...games].sort((a, b) => a.date.localeCompare(b.date));
+  let current = 0;
+  for (const game of ordered) {
+    const line = game.batting?.find((b) => b.playerId === playerId);
+    if (!line || (line.AB ?? 0) <= 0) continue;
+    current = qualifies(line) ? current + 1 : 0;
+  }
+  return current;
+}
+
 function achievementMedalHtml(c) {
   return `
     <div class="achievement-medal achievement-medal--${c.kind}" data-tooltip="${escapeHtml(c.desc)}" tabindex="0">
@@ -189,6 +207,35 @@ function renderAchievements(player) {
       label: "Caliente",
       kind: "streak",
       desc: `Racha activa de ${streak.current} juegos seguidos con hit.`,
+    });
+  }
+  // "Hit Record" — a diferencia de Caliente, cuenta la racha más larga de
+  // TODA la temporada aunque ya haya terminado (streak.longest, no
+  // streak.current) — reconoce el logro aunque ya no siga activo.
+  if (streak && streak.longest > 5) {
+    chips.push({
+      icon: "fa-solid fa-chart-line",
+      label: "Hit Record",
+      kind: "streak",
+      desc: `Su racha más larga de la temporada fue de ${streak.longest} juegos seguidos con hit.`,
+    });
+  }
+  const multiHitStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) >= 2);
+  if (multiHitStreak >= 2) {
+    chips.push({
+      icon: "fa-solid fa-fire-flame-curved",
+      label: "En llamas",
+      kind: "streak",
+      desc: `Racha activa de ${multiHitStreak} juegos seguidos con multi-hit (2 o más hits).`,
+    });
+  }
+  const onBaseStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) > 0 || (line.BB ?? 0) > 0);
+  if (onBaseStreak >= 2) {
+    chips.push({
+      icon: "fa-solid fa-life-ring",
+      label: "Seguro",
+      kind: "streak",
+      desc: `Racha activa de ${onBaseStreak} juegos seguidos embasándose (hit o base por bolas).`,
     });
   }
 
