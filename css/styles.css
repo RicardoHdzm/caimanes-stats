@@ -1221,12 +1221,14 @@ main h3::before {
   line-height: 1.25;
 }
 
-/* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. */
+/* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. Verde
+   oliva a propósito — distinto del verde de dues-paid/"Rich kid" más abajo
+   (ese es un verde-esmeralda, este es más amarillo/oliva). */
 .achievement-medal--trajectory .achievement-medal-icon {
-  border: 2px solid var(--pos-catcher);
-  background: rgba(168, 85, 247, 0.15);
-  color: var(--pos-catcher);
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+  border: 2px solid #84cc16;
+  background: rgba(132, 204, 22, 0.15);
+  color: #84cc16;
+  box-shadow: 0 0 12px rgba(132, 204, 22, 0.35);
 }
 
 /* Racha de hits vigente. */
@@ -1271,10 +1273,10 @@ main h3::before {
 
 /* Asistencia y versatilidad. */
 .achievement-medal--participation .achievement-medal-icon {
-  border: 2px solid var(--pos-dh);
-  background: rgba(255, 140, 51, 0.15);
-  color: var(--pos-dh);
-  box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
+  border: 2px solid var(--pos-catcher);
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--pos-catcher);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
 }
 
 /* Interacción con el equipo (ej. le dio like a un anuncio) — rojo rosado a
