@@ -254,7 +254,7 @@ export function renderResumen(container) {
   container.appendChild(cards);
 
   const bottomRow = document.createElement("div");
-  bottomRow.className = "leaders section-gap";
+  bottomRow.className = "leaders section-gap tab-carousel";
 
   // El próximo juego va primero: es lo que más se consulta entre semana, y
   // en celular esta fila es un carrusel — lo importante debe estar a un
