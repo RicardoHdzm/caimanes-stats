@@ -60,7 +60,7 @@ function renderDebut(seasons) {
 // el logro individual — todos los de una misma categoría comparten color
 // (ver .achievement-badge--* en css/styles.css):
 //   trajectory    (azul marino) — fundador, temporadas en el equipo, ligas jugadas
-//   streak        (naranja) — racha de hits vigente
+//   streak        (rosa)   — racha de hits vigente
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
 //   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
@@ -336,7 +336,7 @@ export function renderAchievements(player) {
       desc: (value) => `Bases por bolas (BB) esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
-      icon: "fa-solid fa-hourglass-half",
+      icon: "fa-solid fa-scale-balanced",
       label: "Paciente",
       desc: (value) => `Mejor relación bases por bolas / ponches esta temporada (${value.toFixed(2)}).`,
     });

@@ -1247,14 +1247,13 @@ main h3::before {
   box-shadow: 0 0 12px rgba(44, 78, 201, 0.35);
 }
 
-/* Racha de hits vigente. Naranja — --pos-dh ya no lo usa ninguna otra
-   categoría de medalla (participation es morado desde hace rato, ver más
-   abajo), así que no compite con nada. */
+/* Racha de hits vigente. Rosa de nuevo — el naranja chocaba visualmente con
+   el bronce del podio. */
 .achievement-medal--streak .achievement-medal-icon {
-  border: 2px solid var(--pos-dh);
-  background: rgba(255, 140, 51, 0.15);
-  color: var(--pos-dh);
-  box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
+  border: 2px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.15);
+  color: var(--pos-special);
+  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
 }
 
 /* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
@@ -1307,14 +1306,14 @@ main h3::before {
 }
 
 /* Personalizaste tu perfil (foto o walkup song) — ver addAchievementMedal()
-   en js/views/jugador.js. Rosa — --pos-special ya no lo usa ninguna otra
-   categoría (streak es naranja desde hace rato), así que no compite con
-   nada. */
+   en js/views/jugador.js. Rosa, pero un tono distinto al de streak (arriba)
+   y al rojo-rosado de social (abajo) — las tres son "rosa" a simple vista
+   pero no idénticas, para que sigan siendo categorías distinguibles. */
 .achievement-medal--profile .achievement-medal-icon {
-  border: 2px solid var(--pos-special);
-  background: rgba(255, 111, 181, 0.15);
-  color: var(--pos-special);
-  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
+  border: 2px solid #be185d;
+  background: rgba(190, 24, 93, 0.15);
+  color: #be185d;
+  box-shadow: 0 0 12px rgba(190, 24, 93, 0.35);
 }
 
 /* Estado de inscripción — mismo verde/rojo que ya usa el badge "Estado de
