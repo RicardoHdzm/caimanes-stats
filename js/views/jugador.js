@@ -285,7 +285,7 @@ function renderAchievements(player) {
     // el de pitcheo (ese es "Francotirador").
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
-      label: "Mr. Expendio",
+      label: "Bartender",
       desc: (value, place) =>
         `Ponches de bateo del equipo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
     });
