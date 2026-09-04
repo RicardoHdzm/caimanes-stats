@@ -213,12 +213,12 @@ function renderAchievements(player) {
         desc: `Más triples del equipo esta temporada (${myBatting["3B"]}).`,
       });
     }
-    if (Number(myBatting.OBP) > 0 && rankAmong(qualifiedBatters, player.id, "OBP", "desc")?.place === 1) {
+    if (Number(myBatting.BB) > 0 && rankAmong(battingList, player.id, "BB", "desc")?.place === 1) {
       chips.push({
         icon: "fa-solid fa-eye",
         label: "Ojo de águila",
         kind: "leader",
-        desc: `Mejor porcentaje de embasado (OBP) del equipo esta temporada (${myBatting.OBP}).`,
+        desc: `Más bases por bolas (BB) del equipo esta temporada (${myBatting.BB}).`,
       });
     }
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
