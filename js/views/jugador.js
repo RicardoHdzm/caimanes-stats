@@ -470,7 +470,7 @@ export function renderJugadorDetalle(container, playerId) {
     addAchievementMedal({
       icon: "fa-solid fa-heart",
       label: "Fan del equipo",
-      kind: "participation",
+      kind: "social",
       desc: "Le dio like a algún anuncio del equipo.",
     });
   });
