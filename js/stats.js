@@ -310,13 +310,23 @@ export function hitStreaks(games = GAMES) {
 // Récords de la temporada, ya formateados para pintarse como tarjetas.
 // Solo se incluye `playerId`/`gameId` cuando hay un único dueño del récord;
 // con empate la tarjeta no lleva a ningún lado porque no hay a quién apuntar.
+// `runnersUp` trae hasta 2 renglones de 2do/3er lugar ({ playerId?, name,
+// value }) — sin `playerId` en los récords de equipo, donde el 2do/3er
+// lugar es otro juego, no otro jugador.
 export function seasonRecords(games = GAMES) {
   const records = [];
   const gameLabel = (g) => `vs ${g.opponent} · ${g.date}`;
 
-  function pushRecord({ icon, label, unit, best, detailSuffix }) {
+  function pushRecord({ icon, label, unit, listKey, valueFn, refine, detailSuffix }) {
+    const best = bestInGame(games, listKey, valueFn, refine);
     if (!best) return;
     const solo = best.entries.length === 1 ? best.entries[0] : null;
+    const excludeIds = new Set(best.entries.map((e) => e.playerId));
+    const runnersUp = runnersUpInGame(games, listKey, valueFn, excludeIds).map((e) => ({
+      playerId: e.playerId,
+      name: e.name,
+      value: `${e.value} ${unit}`,
+    }));
     records.push({
       icon,
       label,
@@ -324,6 +334,7 @@ export function seasonRecords(games = GAMES) {
       detail: namesLabel(best.entries) + (solo && detailSuffix ? detailSuffix(solo) : ""),
       note: solo ? gameLabel(solo.game) : `${best.entries.length} jugadores empatados`,
       playerId: solo?.playerId,
+      runnersUp,
     });
   }
 
@@ -331,8 +342,10 @@ export function seasonRecords(games = GAMES) {
     icon: "fa-baseball-bat-ball",
     label: "Más hits en un juego",
     unit: "H",
+    listKey: "batting",
+    valueFn: (l) => l.H ?? 0,
     // A mismos hits, gana quien necesitó menos turnos.
-    best: bestInGame(games, "batting", (l) => l.H ?? 0, (e) => e.line.AB ?? 0),
+    refine: (e) => e.line.AB ?? 0,
     detailSuffix: (e) => ` — ${e.line.H} de ${e.line.AB ?? 0}`,
   });
 
@@ -340,15 +353,17 @@ export function seasonRecords(games = GAMES) {
     icon: "fa-tornado",
     label: "Más impulsadas en un juego",
     unit: "RBI",
-    best: bestInGame(games, "batting", (l) => l.RBI ?? 0),
+    listKey: "batting",
+    valueFn: (l) => l.RBI ?? 0,
   });
 
   pushRecord({
     icon: "fa-bomb",
     label: "Más jonrones en un juego",
     unit: "HR",
+    listKey: "batting",
     // Los dos tipos valen lo mismo aquí: cuatro bases es cuatro bases.
-    best: bestInGame(games, "batting", (l) => (l.HR ?? 0) + (l.HRC ?? 0)),
+    valueFn: (l) => (l.HR ?? 0) + (l.HRC ?? 0),
     detailSuffix: (e) => (e.line.HRC ? ` (${e.line.HRC} de campo)` : ""),
   });
 
@@ -356,14 +371,16 @@ export function seasonRecords(games = GAMES) {
     icon: "fa-person-running",
     label: "Más robos en un juego",
     unit: "SB",
-    best: bestInGame(games, "batting", (l) => l.SB ?? 0),
+    listKey: "batting",
+    valueFn: (l) => l.SB ?? 0,
   });
 
   pushRecord({
     icon: "fa-baseball",
     label: "Más ponches en un juego",
     unit: "K",
-    best: bestInGame(games, "pitching", (l) => l.SO ?? 0),
+    listKey: "pitching",
+    valueFn: (l) => l.SO ?? 0,
     detailSuffix: (e) => ` — ${e.line.IP ?? 0} IP`,
   });
 
@@ -373,6 +390,11 @@ export function seasonRecords(games = GAMES) {
     const tied = streaks.filter((s) => s.longest === longest);
     const solo = tied.length === 1 ? tied[0] : null;
     const anyActive = tied.some((s) => s.active);
+    const runnersUp = streaks
+      .filter((s) => s.longest !== longest)
+      .sort((a, b) => b.longest - a.longest)
+      .slice(0, 2)
+      .map((s) => ({ playerId: s.playerId, name: s.name, value: `${s.longest} juego${s.longest === 1 ? "" : "s"}` }));
     records.push({
       icon: "fa-fire",
       label: "Racha de hits más larga",
@@ -384,6 +406,7 @@ export function seasonRecords(games = GAMES) {
           : "Ya terminó"
         : `${tied.length} empatados${anyActive ? ", sigue activa" : ""}`,
       playerId: solo?.playerId,
+      runnersUp,
     });
   }
 
@@ -398,6 +421,12 @@ export function seasonRecords(games = GAMES) {
     const best = pick === "min" ? Math.min(...values) : Math.max(...values);
     const tied = scored.filter((g) => g[key] === best);
     const solo = tied.length === 1 ? tied[0] : null;
+    // Sin jugador que retratar (es un récord de equipo): el 2do/3er lugar
+    // es el siguiente mejor/peor juego, no otro jugador.
+    const rest = scored
+      .filter((g) => g[key] !== best)
+      .sort((a, b) => (pick === "min" ? a[key] - b[key] : b[key] - a[key]));
+    const runnersUp = rest.slice(0, 2).map((g) => ({ name: `vs ${g.opponent}`, value: `${g[key]} ${unit}` }));
     records.push({
       icon,
       label,
@@ -405,6 +434,7 @@ export function seasonRecords(games = GAMES) {
       detail: solo ? `vs ${solo.opponent}` : `${tied.length} juegos empatados`,
       note: solo ? solo.date : tied.map((g) => g.opponent).join(", "),
       gameId: solo?.id,
+      runnersUp,
     });
   }
 
