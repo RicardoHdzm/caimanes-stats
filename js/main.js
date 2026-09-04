@@ -12,7 +12,7 @@ import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
-import { initAuth, mountAuthControl } from "./auth.js";
+import { initAuth, mountAuthControl, getCurrentPlayerId } from "./auth.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
 
@@ -56,6 +56,7 @@ const MORE_TABS = [
 
 const app = document.getElementById("app");
 const tabs = document.getElementById("tabs");
+const miPerfilLink = document.getElementById("nav-mi-perfil");
 const bottomTabs = document.getElementById("bottom-tabs");
 const moreSheet = document.getElementById("more-sheet");
 
@@ -71,7 +72,11 @@ function currentRoute() {
     return { tab: "juegos", render: (container) => renderJuegoDetalle(container, second) };
   }
   if (first === "jugador" && second) {
-    return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
+    // Tu propio perfil resalta la pestaña "Mi Perfil" (ver #nav-mi-perfil
+    // más abajo) en vez de "Roster" — el perfil de cualquier otro jugador
+    // sigue resaltando Roster, de donde normalmente se llega a él.
+    const tab = second === getCurrentPlayerId() ? "mi-perfil" : "roster";
+    return { tab, render: (container) => renderJugadorDetalle(container, second) };
   }
   // `second` (id del jugador de origen) es opcional — solo decide a dónde
   // regresa el botón de "Volver al perfil" (ver js/views/medallas.js); la
@@ -132,6 +137,10 @@ document.addEventListener("click", () => toggleMoreSheet(false));
 const MORE_TAB_IDS = new Set(MORE_TABS.map((t) => t.tab));
 
 function render() {
+  const myId = getCurrentPlayerId();
+  miPerfilLink.hidden = !myId;
+  if (myId) miPerfilLink.href = `#/jugador/${myId}`;
+
   const route = currentRoute();
   toggleMoreSheet(false);
 

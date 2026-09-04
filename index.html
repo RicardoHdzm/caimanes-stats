@@ -95,6 +95,11 @@
        con el logo al hacer scroll. Aquí se queda fija toda la página. -->
   <nav class="tabs" id="tabs">
     <a href="#/resumen" data-route="resumen">Resumen</a>
+    <!-- Solo con sesión iniciada — js/main.js le pone el href (a tu propio
+         perfil) y le quita `hidden` en cuanto conoce tu player_id; hasta
+         entonces (o sin sesión) se queda oculta, mismo trato que
+         #auth-slot. -->
+    <a href="#" data-route="mi-perfil" id="nav-mi-perfil" hidden>Mi Perfil</a>
     <a href="#/roster" data-route="roster">Roster</a>
     <a href="#/bateo" data-route="bateo">Bateo</a>
     <a href="#/pitcheo" data-route="pitcheo">Pitcheo</a>
