@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES, SCHEDULE, SEASONS } from "../data.js";
+import { PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks } from "../stats.js";
 import {
   heading,
@@ -460,6 +460,17 @@ export function renderAchievements(player) {
       label: "Suplente",
       kind: "participation",
       desc: `Entró o salió de cambio en ${substitutionGames.size} juegos de la temporada.`,
+    });
+  }
+
+  // Lesiones — a mano, ver INJURED en js/data.js (no hay ningún dato de
+  // lesiones en GAMES de donde sacarlo solo).
+  if (INJURED.includes(player.id)) {
+    chips.push({
+      icon: "fa-solid fa-wheelchair",
+      label: "Lesionado",
+      kind: "participation",
+      desc: "Se lesionó durante la temporada.",
     });
   }
 

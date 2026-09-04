@@ -68,6 +68,7 @@ const CATALOG = [
   { kind: "participation", icon: "fa-solid fa-recycle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
   { kind: "participation", icon: "fa-solid fa-crown", name: "Rey Caimán", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Rey Caimán" },
   { kind: "participation", icon: "fa-solid fa-up-down", name: "Suplente", how: "Entró o salió de cambio en al menos 2 juegos de la temporada.", match: (l) => l === "Suplente" },
+  { kind: "participation", icon: "fa-solid fa-wheelchair", name: "Lesionado", how: "Se lesionó durante la temporada.", match: (l) => l === "Lesionado" },
   // ---- Social ----
   { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
   { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
