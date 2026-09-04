@@ -72,9 +72,9 @@ const CATALOG = [
   { kind: "participation", icon: "fa-solid fa-up-down", name: "Sub", how: "Entró o salió de cambio en al menos 2 juegos de la temporada.", match: (l) => l === "Sub" },
   { kind: "participation", icon: "fa-solid fa-wheelchair", name: "Fragile", how: "Se lesionó durante la temporada.", match: (l) => l === "Fragile" },
   // ---- Social ----
-  { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
-  { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
-  { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Demócrata", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Demócrata", async: true },
+  { kind: "social", icon: "fa-solid fa-heart", name: "Superfan", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Superfan", async: true },
+  { kind: "social", icon: "fa-solid fa-comment", name: "Let's chat", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Let's chat", async: true },
+  { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Voter", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Voter", async: true },
   { kind: "social", icon: "fa-solid fa-camera", name: "Selfie!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "Selfie!", async: true },
   { kind: "social", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
   // ---- Estado de inscripción ----
