@@ -228,10 +228,10 @@ export function renderAchievements(player) {
   // depende de tener `seasons` capturado.
   if (MANAGERS.includes(player.id)) {
     chips.push({
-      icon: "fa-solid fa-whistle",
+      icon: "fa-solid fa-pencil",
       label: "Manager",
       kind: "trajectory",
-      desc: "Administra el equipo.",
+      desc: "Manager del equipo.",
     });
   }
 
