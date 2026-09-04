@@ -1166,6 +1166,15 @@ main h3::before {
   box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
 }
 
+/* Interacción con el equipo (ej. le dio like a un anuncio) — rojo rosado a
+   propósito, distinto del naranja de participation (esa es sobre jugar). */
+.achievement-medal--social .achievement-medal-icon {
+  border: 2px solid #ff4d6d;
+  background: rgba(255, 77, 109, 0.15);
+  color: #ff4d6d;
+  box-shadow: 0 0 12px rgba(255, 77, 109, 0.35);
+}
+
 /* Personalizaste tu perfil (foto o walkup song) — ver addAchievementMedal()
    en js/views/jugador.js. */
 .achievement-medal--profile .achievement-medal-icon {
