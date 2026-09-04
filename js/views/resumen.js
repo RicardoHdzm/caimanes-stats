@@ -318,14 +318,15 @@ export function renderResumen(container) {
   }
 
   const gamesPlayedCard = document.createElement("div");
-  gamesPlayedCard.className = "leader-card";
-  gamesPlayedCard.innerHTML = `
-    <h3><i class="fa-solid fa-calendar-check"></i>Juegos jugados</h3>
-    <p>${rec.G}/${TEAM.gamesInSeason}</p>
-    <div class="progress-bar">
+  gamesPlayedCard.className = "leader-card leader-card--hero";
+  gamesPlayedCard.innerHTML = heroCardInnerHtml(
+    "fa-calendar-check",
+    "Juegos jugados",
+    `<span class="leader-hero-value">${rec.G}/${TEAM.gamesInSeason}</span>`,
+    `<div class="progress-bar">
       <div class="progress-fill" style="width: ${Math.min(100, (rec.G / TEAM.gamesInSeason) * 100)}%"></div>
-    </div>
-  `;
+    </div>`
+  );
   bottomRow.appendChild(gamesPlayedCard);
 
   if (bottomRow.children.length > 0) container.appendChild(bottomRow);
