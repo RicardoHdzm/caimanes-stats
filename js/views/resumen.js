@@ -55,12 +55,19 @@ function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) 
   `;
 }
 
-// Versión "hero" de leaderCardHtml, solo para las 4 tarjetas de "Líderes de
-// la temporada" (bateo, HR, pitcheo, cervecero) — encabezado a color con el
-// número grande + foto del líder, y abajo una lista más chica con
-// avatar+nombre+valor del 2do/3er lugar. El resto de tarjetas basadas en
-// .leader-card (Salón de la fama, récords, stats de equipo, etc.) siguen
-// usando leaderCardHtml tal cual, sin tocar.
+// Versión "hero" de leaderCardHtml — encabezado a color con el número
+// grande + foto del líder, y abajo una lista más chica con
+// avatar+nombre+valor del 2do/3er lugar. La usan "Líderes de la temporada"
+// y "Salón de la fama" (Más veterano, Más MVPs); el resto de tarjetas
+// basadas en .leader-card (récords, stats de equipo, etc.) siguen su propio
+// formato. `list` acepta tanto filas de stats (con `.playerId`, ver
+// stats.js) como jugadores de PLAYERS tal cual (con `.id`, ver
+// withSeasons/mvpCounts más abajo) — playerFor() resuelve cualquiera de los
+// dos contra PLAYERS para sacar la foto real.
+function playerFor(row) {
+  return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
+}
+
 function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
   const [first, second, third] = list;
   if (!first) {
@@ -75,14 +82,14 @@ function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
       </div>
     `;
   }
-  const heroPlayer = PLAYERS.find((pl) => pl.id === first.playerId) ?? { name: first.name };
+  const heroPlayer = playerFor(first);
   const runnersUp = [second, third].filter(Boolean);
   const runnersHtml = runnersUp.length
     ? `
       <div class="leader-runners">
         ${runnersUp
           .map((p) => {
-            const rp = PLAYERS.find((pl) => pl.id === p.playerId) ?? { name: p.name };
+            const rp = playerFor(p);
             return `
               <div class="leader-runner-row">
                 ${renderAvatar(rp, 26)}
@@ -412,22 +419,29 @@ export function renderResumen(container) {
     recordsHeading.textContent = "Récords de la temporada";
     container.appendChild(recordsHeading);
 
+    // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
+    // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
+    // empate o récord de equipo no hay a quién retratar, así que se queda
+    // con una insignia del icono del récord en su lugar.
     const recordsRow = document.createElement("div");
     recordsRow.className = "records-grid tab-carousel";
     recordsRow.innerHTML = records
-      .map(
-        (r) => `
-        <div class="record-card"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
-          <i class="fa-solid ${r.icon} record-icon"></i>
-          <div class="record-body">
-            <span class="record-label">${r.label}</span>
+      .map((r) => {
+        const visualHtml = r.playerId
+          ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 56)}</div>`
+          : `<div class="record-icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
+        return `
+        <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
+          <div class="record-hero-main">
+            <span class="record-label"><i class="fa-solid ${r.icon}"></i> ${r.label}</span>
             <span class="record-value">${r.value}</span>
             <span class="record-detail">${r.detail}</span>
             <span class="record-note">${r.note}</span>
           </div>
+          ${visualHtml}
         </div>
-      `
-      )
+      `;
+      })
       .join("");
 
     // Cada récord lleva al jugador (o al juego) que lo tiene.
@@ -458,32 +472,31 @@ export function renderResumen(container) {
     container.appendChild(famaHeading);
 
     const famaRow = document.createElement("div");
-    famaRow.className = "leaders grid-3 tab-carousel";
+    famaRow.className = "leaders grid-2 tab-carousel";
 
     // "Más veterano" por temporadas acumuladas (seasons.length), no por
     // debut: con ausencias de por medio, quien debutó primero no siempre
     // es quien más temporadas lleva jugadas.
     const veteranSorted = [...withSeasons].sort((a, b) => b.seasons.length - a.seasons.length);
-    let html = leaderCardHtml(
-      "fa-landmark",
-      "Más veterano",
-      veteranSorted,
-      (p) => `${p.name} — ${p.seasons.length} temporadas`,
-      (p) => `${p.name} — ${p.seasons.length} temporadas`
-    );
+    let html = teamLeaderCardHtml({
+      icon: "fa-landmark",
+      title: "Más veterano",
+      list: veteranSorted,
+      valueOf: (p) => `${p.seasons.length} temporada${p.seasons.length === 1 ? "" : "s"}`,
+    });
 
     const mvpCounts = PLAYERS.map((p) => ({ ...p, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
       (p) => p.mvpTotal > 0
     );
     if (mvpCounts.length > 0) {
       mvpCounts.sort((a, b) => b.mvpTotal - a.mvpTotal);
-      html += leaderCardHtml(
-        "fa-star",
-        "Más MVPs",
-        mvpCounts,
-        (p) => `${p.name} — ${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"} esta temporada`,
-        (p) => `${p.name} — ${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"}`
-      );
+      html += teamLeaderCardHtml({
+        icon: "fa-star",
+        title: "Más MVPs",
+        list: mvpCounts,
+        valueOf: (p) => `${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"}`,
+        detailOf: () => "Esta temporada",
+      });
     }
 
     // Rookies = su única temporada registrada es la actual (si tuviera una
