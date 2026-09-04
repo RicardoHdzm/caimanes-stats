@@ -2567,13 +2567,6 @@ main h3::before {
   transform: translateY(-2px);
 }
 
-.record-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
 .record-label {
   font-size: var(--text-xs);
   font-weight: 700;
