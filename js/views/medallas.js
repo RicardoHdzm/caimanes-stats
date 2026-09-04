@@ -65,8 +65,8 @@ const CATALOG = [
   // ---- Podio negativo (mismo mecanismo, pero ser el #1 es un chiste) ----
   { kind: "ice", icon: "fa-solid fa-snowflake", name: "Ice Cold", how: "Racha activa de 2 o más juegos seguidos sin hit.", match: (l) => l === "Ice Cold" },
   { kind: "neg-gold", icon: "fa-solid fa-hand-back-fist", name: "Punch-Out", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Punch-Out" },
-  { kind: "neg-gold", icon: "fa-solid fa-gift", name: "Wild Thing", how: "Top 3 del equipo en bases por bolas otorgadas (pitcheo) esta temporada.", match: (l) => l === "Wild Thing" },
-  { kind: "neg-gold", icon: "fa-solid fa-burst", name: "Gopher Ball", how: "Top 3 del equipo en jonrones permitidos (pitcheo) esta temporada.", match: (l) => l === "Gopher Ball" },
+  { kind: "neg-gold", icon: "fa-solid fa-gift", name: "Wild Thing", how: "El que más bases por bolas otorga (pitcheo) esta temporada.", match: (l) => l === "Wild Thing" },
+  { kind: "neg-gold", icon: "fa-solid fa-burst", name: "Gopher Ball", how: "Al que más jonrones le conectan (pitcheo) esta temporada.", match: (l) => l === "Gopher Ball" },
   { kind: "neg-gold", icon: "fa-solid fa-soap", name: "Butterhands", how: "Top 3 del equipo en errores cometidos esta temporada.", match: (l) => l === "Butterhands" },
   // ---- Umbral fijo ----
   { kind: "threshold", icon: "fa-solid fa-meteor", name: "All-Star", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "All-Star" },

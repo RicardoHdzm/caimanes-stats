@@ -177,12 +177,15 @@ const NEG_PODIUM_KIND = { 1: "neg-gold", 2: "neg-silver", 3: "neg-bronze" };
 // nombre sin importar el lugar — Kaboom!, Ninja, etc.) o una función
 // `(valor, lugar)` para las que sí cambian de nombre por lugar (Bate/Guante
 // de oro, plata, bronce). `negative: true` usa NEG_PODIUM_KIND en vez de
-// PODIUM_KIND — mismo top 3, otro color (ver arriba).
-function podiumChip(list, playerId, key, { icon, label, desc, negative }) {
+// PODIUM_KIND — mismo top 3, otro color (ver arriba). `maxPlace` (default
+// 3) baja el corte del podio — hace falta para Wild Thing/Gopher Ball: con
+// solo 2 pitchers oficiales, "top 3" los premia a los dos siempre, así que
+// ahí solo cuenta el #1 de verdad (ver addPodium más abajo).
+function podiumChip(list, playerId, key, { icon, label, desc, negative, maxPlace = 3 }) {
   const row = list.find((r) => r.playerId === playerId);
   if (!row || Number(row[key]) <= 0) return null;
   const place = rankAmong(list, playerId, key, "desc")?.place;
-  if (!place || place > 3) return null;
+  if (!place || place > maxPlace) return null;
   return {
     icon,
     label: typeof label === "function" ? label(row[key], place) : label,
@@ -435,19 +438,23 @@ export function renderAchievements(player) {
       desc: (value) => `Ponches propinados (pitcheo) esta temporada (${value}).`,
     });
     // "Wild Thing" — mismo chiste que Bartender/Butterhands: el que más
-    // bases por bolas otorga "gana" el podio.
+    // bases por bolas otorga "gana" el podio. `maxPlace: 1` porque con solo
+    // 2 pitchers oficiales, "top 3" los premiaría a los dos siempre.
     addPodium(pitchingList, "BB", {
       icon: "fa-solid fa-gift",
       label: "Wild Thing",
       negative: true,
+      maxPlace: 1,
       desc: (value) => `Bases por bolas otorgadas (pitcheo) esta temporada (${value}).`,
     });
     // "Gopher Ball" — término real de beisbol para el lanzamiento que se va
-    // de jonrón; el que más le conectan "gana" el podio.
+    // de jonrón; el que más le conectan "gana" el podio. Mismo `maxPlace: 1`
+    // que Wild Thing, por la misma razón.
     addPodium(pitchingList, "HR", {
       icon: "fa-solid fa-burst",
       label: "Gopher Ball",
       negative: true,
+      maxPlace: 1,
       desc: (value) => `Jonrones permitidos (pitcheo) esta temporada (${value}).`,
     });
     // Volumen de trabajo, no efectividad — IP (formato de béisbol, ver
