@@ -916,64 +916,86 @@ main h3::before {
 }
 
 /* Insignias de logros del perfil (ver renderAchievements en
-   js/views/jugador.js) — en su propia tarjeta, varias por renglón (a
-   diferencia de MVP/Debut, que siempre van solos en el suyo). El color va
-   por CATEGORÍA (`kind`), no por logro individual — todos los de una
-   misma categoría comparten uno, para que de un vistazo se distinga qué
-   tipo de logro es cada quien. */
-.achievements-row {
+   js/views/jugador.js) — formato de medalla: un círculo a color con el
+   ícono y el nombre chico debajo, todas del mismo tamaño, en cuadrícula.
+   El color va por CATEGORÍA (`kind`), no por logro individual — todos los
+   de una misma categoría comparten uno, para que de un vistazo se
+   distinga qué tipo de logro es cada quien. */
+.achievements-grid {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: 18px 14px;
 }
 
-.achievement-badge {
-  display: inline-flex;
+.achievement-medal {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  gap: 8px;
+  width: 88px;
+  text-align: center;
+}
+
+.achievement-medal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.achievement-medal-label {
+  font-size: 9.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  line-height: 1.25;
 }
 
 /* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. */
-.achievement-badge--trajectory {
-  border: 1px solid var(--pos-catcher);
-  background: rgba(168, 85, 247, 0.12);
+.achievement-medal--trajectory .achievement-medal-icon {
+  border: 2px solid var(--pos-catcher);
+  background: rgba(168, 85, 247, 0.15);
   color: var(--pos-catcher);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
 }
 
 /* Racha de hits vigente. */
-.achievement-badge--streak {
-  border: 1px solid var(--win);
-  background: rgba(63, 181, 111, 0.12);
+.achievement-medal--streak .achievement-medal-icon {
+  border: 2px solid var(--win);
+  background: rgba(63, 181, 111, 0.15);
   color: var(--win);
+  box-shadow: 0 0 12px rgba(63, 181, 111, 0.35);
 }
 
 /* Líder de la temporada — "eres el #1 del equipo en esto". Mismo dorado
    que .mvp-badge a propósito, es la misma idea de fondo. */
-.achievement-badge--leader {
-  border: 1px solid #f5b942;
-  background: rgba(245, 185, 66, 0.12);
+.achievement-medal--leader .achievement-medal-icon {
+  border: 2px solid #f5b942;
+  background: rgba(245, 185, 66, 0.15);
   color: #f5b942;
+  box-shadow: 0 0 12px rgba(245, 185, 66, 0.35);
 }
 
 /* Umbral fijo: cruzaste una marca (ej. AVG .300), no depende de ser el #1. */
-.achievement-badge--threshold {
-  border: 1px solid var(--pos-special);
-  background: rgba(255, 111, 181, 0.12);
+.achievement-medal--threshold .achievement-medal-icon {
+  border: 2px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.15);
   color: var(--pos-special);
+  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
 }
 
 /* Asistencia y versatilidad. */
-.achievement-badge--participation {
-  border: 1px solid var(--pos-dh);
-  background: rgba(255, 140, 51, 0.12);
+.achievement-medal--participation .achievement-medal-icon {
+  border: 2px solid var(--pos-dh);
+  background: rgba(255, 140, 51, 0.15);
   color: var(--pos-dh);
+  box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
 }
 
 .replay-btn {
