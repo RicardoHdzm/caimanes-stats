@@ -73,6 +73,9 @@ function currentRoute() {
   if (first === "jugador" && second) {
     return { tab: "roster", render: (container) => renderJugadorDetalle(container, second) };
   }
+  if (first === "medallas" && second) {
+    return { tab: "roster", render: (container) => renderMedallasGuide(container, second) };
+  }
   // #/alineacion/p1/p2 — los dos jugadores del comparador que va al final de
   // esa vista viven en la URL para poder compartir la comparación armada.
   if (first === "alineacion") {
