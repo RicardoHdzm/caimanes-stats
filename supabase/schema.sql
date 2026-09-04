@@ -281,16 +281,16 @@ grant select, insert, delete on public.announcement_likes to anon, authenticated
 
 -- 10. Foto de perfil personalizada — bucket de Storage, no una tabla. Cada
 --     jugador tiene como mucho un archivo, en "{player_id}/avatar" (se
---     sobreescribe al cambiarla). PRIVADO a propósito: sin sesión no se
---     puede ni leer, así que sin cuenta se sigue viendo el avatar de
---     siempre (foto de data.js o iniciales) — ver getAvatarUrl() en
---     js/db.js, que sin sesión regresa null igual que si no existiera.
+--     sobreescribe al cambiarla). Lectura PÚBLICA a propósito (cualquiera
+--     que abra el sitio, con o sin cuenta, ve la foto real) — solo subirla
+--     o cambiarla exige sesión y ser ese mismo jugador (políticas de abajo).
+--     Ver getAvatarUrl() en js/db.js.
 insert into storage.buckets (id, name, public)
   values ('avatars', 'avatars', false)
   on conflict (id) do nothing;
 
-create policy "avatars_read_authenticated" on storage.objects
-  for select to authenticated
+create policy "avatars_read_public" on storage.objects
+  for select
   using (bucket_id = 'avatars');
 
 create policy "avatars_insert_own" on storage.objects

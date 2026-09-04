@@ -253,20 +253,18 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(achievementsCard);
   }
 
-  // ---- Foto de perfil personalizada: lectura con sesión, edición propia ----
+  // ---- Foto de perfil personalizada: lectura pública, edición propia ----
   //
   // El avatar de siempre (foto de data.js o iniciales) ya se pintó arriba,
-  // sin esperar a nadie. Si hay sesión Y el jugador tiene una foto propia en
-  // Storage, la reemplaza — sin sesión ni se pide (getAvatarUrl regresa null
-  // de inmediato), así que quien no tiene cuenta ve exactamente lo de
-  // siempre. Ver supabase/schema.sql: el bucket "avatars" es privado.
+  // sin esperar a nadie. Si el jugador tiene una foto propia en Storage, la
+  // reemplaza — con o sin sesión (la lectura es pública, ver
+  // supabase/schema.sql); getAvatarUrl regresa null si no ha subido
+  // ninguna, y esta vista se queda con lo de siempre.
   const avatarWrap = hero.querySelector("#profile-avatar");
-  if (getSession()) {
-    getAvatarUrl(player.id).then((url) => {
-      if (!url || !avatarWrap) return;
-      avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
-    });
-  }
+  getAvatarUrl(player.id).then((url) => {
+    if (!url || !avatarWrap) return;
+    avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+  });
 
   // ---- Tu resumen: solo en tu propio perfil ----
   //

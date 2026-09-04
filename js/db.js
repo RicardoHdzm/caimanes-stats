@@ -393,16 +393,18 @@ export async function unlikeAnnouncement(announcementId) {
 //
 // A diferencia de todo lo de arriba, esto no es una tabla — cada foto es un
 // archivo en Storage, guardado como "{playerId}/avatar" (se sobreescribe
-// cada vez que la cambian, no hace falta borrar la anterior). El bucket es
-// PRIVADO — a propósito, para que solo se pueda ver con sesión iniciada
-// (ver política "avatars_read_authenticated" en supabase/schema.sql):
-// getPublicUrl() no serviría aquí porque esa URL no respeta esa política;
-// hace falta una URL firmada, que sí la respeta.
+// cada vez que la cambian, no hace falta borrar la anterior). La LECTURA es
+// pública (política "avatars_read_public" en supabase/schema.sql, sin
+// sesión incluida) — cualquiera que abra el sitio ve la foto real. Subir o
+// cambiar la propia sigue exigiendo sesión (políticas "avatars_insert_own"
+// / "avatars_update_own", comparan contra current_player_id()). Se sigue
+// usando createSignedUrl() en vez de getPublicUrl(): si el jugador no ha
+// subido foto, la primera regresa null limpio (la vista sigue mostrando el
+// avatar de siempre) y la segunda regresaría una URL que rompe al cargar.
 
-// null si Supabase no está configurado, no hay sesión (RLS la rechaza
-// igual que si no existiera), o el jugador no ha subido foto propia —
-// en cualquiera de esos casos, la vista sigue mostrando el avatar de
-// siempre (foto de data.js o iniciales).
+// null si Supabase no está configurado o el jugador no ha subido foto
+// propia — en cualquiera de esos casos, la vista sigue mostrando el avatar
+// de siempre (foto de data.js o iniciales).
 export async function getAvatarUrl(playerId) {
   const client = getClient();
   if (!client) return null;

@@ -107,12 +107,10 @@ function playerHeader(player, played) {
 // Reemplaza el avatar de siempre (foto de data.js o iniciales, ya pintado)
 // por la foto personalizada de Storage cuando exista — igual que ya hace
 // el perfil individual y Roster (ver js/views/jugador.js,
-// js/views/roster.js). Solo con sesión: el bucket es privado, y las dos
-// vistas que usan este comparador ya exigen sesión antes de llegar aquí.
-// Se busca por `[data-avatar]` dentro de `root` en vez de por id fijo
-// porque el comparador de Alineación puede tener DOS jugadores a la vez.
+// js/views/roster.js). Lectura pública, corre con o sin sesión. Se busca
+// por `[data-avatar]` dentro de `root` en vez de por id fijo porque el
+// comparador de Alineación puede tener DOS jugadores a la vez.
 async function hydrateAvatars(root) {
-  if (!getSession()) return;
   const slots = [...root.querySelectorAll("[data-avatar]")];
   await Promise.all(
     slots.map(async (slot) => {

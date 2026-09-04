@@ -12,7 +12,7 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
-import { getCurrentPlayerId, getSession } from "../auth.js";
+import { getCurrentPlayerId } from "../auth.js";
 import {
   getRsvps,
   setRsvp,
@@ -59,11 +59,9 @@ function avatarSlot(player, size) {
 }
 
 // Reemplaza los avatares de siempre (foto de data.js o iniciales, ya
-// pintados) por la foto personalizada de Storage cuando exista. El bucket
-// es privado (solo con sesión iniciada, ver getAvatarUrl en js/db.js): sin
-// sesión esto no hace nada y la vista se queda con lo que ya pintó.
+// pintados) por la foto personalizada de Storage cuando exista — lectura
+// pública (ver getAvatarUrl en js/db.js), así que corre con o sin sesión.
 async function hydrateAvatars(root) {
-  if (!getSession()) return;
   const slots = [...root.querySelectorAll("[data-avatar]")];
   await Promise.all(
     slots.map(async (slot) => {
