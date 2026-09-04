@@ -63,6 +63,9 @@ function renderDebut(seasons) {
 //                             temporada (ver podiumChip() justo abajo)
 //   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (naranja) — asistencia y versatilidad de posiciones
+//   social        (rojo rosado) — interacción con el equipo (ej. le dio
+//                             like a un anuncio) — no es sobre jugar, por
+//                             eso no comparte color con participation.
 //   profile       (azul)   — personalizaste tu perfil (foto, walkup song) —
 //                             estos dos dependen de Storage/Supabase, así
 //                             que no salen de aquí: los agrega
@@ -74,6 +77,33 @@ function renderDebut(seasons) {
 //                             sesión iniciada (mismo criterio que ese badge).
 // `desc` es la explicación que se ve al pasar el mouse (ver
 // achievementMedalHtml() justo abajo) — cada logro debe traer uno.
+//
+// KIND_ORDER agrupa las medallas por categoría al pintarlas (ver
+// sortedAchievementsHtml() más abajo) — sin esto salen en el orden en que
+// se van evaluando las condiciones de arriba, que no tiene nada que ver con
+// categoría y se ve desordenado. Inscripción (dues-*) siempre al final, a
+// propósito: es la única que no tiene que ver con jugar.
+const KIND_ORDER = [
+  "trajectory",
+  "streak",
+  "gold",
+  "silver",
+  "bronze",
+  "threshold",
+  "participation",
+  "social",
+  "profile",
+  "dues-paid",
+  "dues-unpaid",
+];
+
+function sortedAchievementsHtml(chips) {
+  return [...chips]
+    .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind))
+    .map(achievementMedalHtml)
+    .join("");
+}
+
 function achievementMedalHtml(c) {
   return `
     <div class="achievement-medal achievement-medal--${c.kind}" data-tooltip="${escapeHtml(c.desc)}" tabindex="0">
