@@ -575,14 +575,14 @@ body {
     display: none;
   }
 
-  /* Espacio para que la barra fija no tape lo último del contenido ni el
-     pie de página — el alto real de .bottom-tabs más un colchón. */
-  main {
-    padding-bottom: 88px;
-  }
-
+  /* Espacio para que la barra fija de abajo no tape el pie de página — el
+     alto real de .bottom-tabs (con safe-area incluido) más un colchón. Va
+     SOLO aquí, no también en `main`: el pie de página es lo último del
+     documento, así que ya es la única clearance que hace falta — tenerla
+     en los dos lugares dejaba un tramo de espacio casi vacío al final de
+     cada página (se sentía como "scroll infinito" sin serlo). */
   .footer {
-    margin-bottom: 68px;
+    margin-bottom: 88px;
   }
 
   .bottom-tabs {
