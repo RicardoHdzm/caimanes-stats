@@ -169,7 +169,7 @@ function renderAchievements(player) {
       chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón de bases", kind: "leader" });
     }
     if (Number(myBatting.RBI) > 0 && rankAmong(battingList, player.id, "RBI", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-tornado", label: "Líder de impulsadas", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-tornado", label: "Rey del remolque", kind: "leader" });
     }
     // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
