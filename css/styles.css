@@ -1120,10 +1120,10 @@ main h3::before {
 
 /* Racha de hits vigente. */
 .achievement-medal--streak .achievement-medal-icon {
-  border: 2px solid #22d3ee;
-  background: rgba(34, 211, 238, 0.15);
-  color: #22d3ee;
-  box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
+  border: 2px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.15);
+  color: var(--pos-special);
+  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
 }
 
 /* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
@@ -1152,10 +1152,10 @@ main h3::before {
 
 /* Umbral fijo: cruzaste una marca (ej. AVG .300), no depende de ser el #1. */
 .achievement-medal--threshold .achievement-medal-icon {
-  border: 2px solid var(--pos-special);
-  background: rgba(255, 111, 181, 0.15);
-  color: var(--pos-special);
-  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
+  border: 2px solid #22d3ee;
+  background: rgba(34, 211, 238, 0.15);
+  color: #22d3ee;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
 }
 
 /* Asistencia y versatilidad. */
