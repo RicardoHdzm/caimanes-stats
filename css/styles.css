@@ -2567,21 +2567,6 @@ main h3::before {
   transform: translateY(-2px);
 }
 
-/* El icono usa el mismo degradado blanco→gris que el de stats de equipo. */
-.record-icon {
-  color: #fff;
-  font-size: var(--text-2xl);
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.record-icon::before {
-  background: linear-gradient(135deg, #ffffff, var(--muted));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .record-body {
   display: flex;
   flex-direction: column;
