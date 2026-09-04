@@ -2604,6 +2604,7 @@ main h3::before {
   align-items: stretch;
   padding: 0;
   overflow: hidden;
+  border-top: 4px solid var(--accent);
 }
 
 .record-hero {
@@ -2613,15 +2614,6 @@ main h3::before {
   gap: 14px;
   padding: 14px 16px;
   background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
-  border-top: 4px solid var(--accent);
-  margin: -1px -1px 0;
-  border-top-left-radius: calc(var(--radius-md) - 1px);
-  border-top-right-radius: calc(var(--radius-md) - 1px);
-}
-
-.record-card--hero:not(:has(.leader-runners)) .record-hero {
-  border-bottom-left-radius: calc(var(--radius-md) - 1px);
-  border-bottom-right-radius: calc(var(--radius-md) - 1px);
 }
 
 .record-hero-main {
