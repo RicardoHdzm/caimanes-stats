@@ -265,7 +265,7 @@ export function renderResumen(container) {
     next.innerHTML = heroCardInnerHtml(
       "fa-calendar-day",
       "Próximo juego",
-      `<p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>`,
+      `<p>vs ${g.opponent}</p><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}</p>`,
       `<div class="rsvp-actions"></div>`
     );
     bottomRow.appendChild(next);

@@ -1452,11 +1452,13 @@ main h3::before {
   line-height: 1.4;
 }
 
-/* Fecha/hora/rival del próximo juego — misma tarjeta que las demás, pero
-   con menos texto suelto (dos renglones largos) para que no se vea tan
-   grande como un número de récord. Doble clase para ganarle en
-   especificidad a `.leader-card p` de arriba. */
+/* Rival del próximo juego — a propósito con el tamaño grande normal de
+   `.leader-card p` (arriba), es el dato que más importa de un vistazo. La
+   fecha/hora (.next-game-info) va más chica debajo, mismo criterio que ya
+   tenían las demás tarjetas antes de separarse en dos líneas. Doble clase
+   para ganarle en especificidad a `.leader-card p`. */
 .leader-card p.next-game-info {
+  margin-top: 4px;
   font-size: var(--text-md);
 }
 
@@ -1592,17 +1594,18 @@ main h3::before {
 
 .form-strip {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .badge.form-chip {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-pill);
   padding: 0;
+  font-size: var(--text-md);
   line-height: 1;
 }
 
