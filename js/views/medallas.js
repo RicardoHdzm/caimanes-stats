@@ -1,9 +1,13 @@
 // Guía de medallas: catálogo de TODAS las medallas que existen (icono,
-// nombre, cómo se ganan) más si el jugador de la URL ya la tiene — se llega
-// aquí con el botón "Guía de medallas" del Medallero en el perfil (ver
+// nombre, cómo se ganan) más si TÚ ya la tienes — se llega aquí con el
+// botón "Guía de medallas" del Medallero en el perfil (ver
 // MEDALLERO_HEADER() en js/views/jugador.js). A diferencia del Medallero,
 // que solo pinta lo que YA se ganó, esta vista existe justo para que se
-// pueda ver qué falta por ganar.
+// pueda ver qué falta por ganar. Es la MISMA lista sin importar desde qué
+// perfil se haya abierto — lo único que cambia con el perfil de origen es
+// a dónde regresa el link de "Volver al perfil"; el "¿la tienes?" siempre
+// se calcula contra la sesión iniciada (getCurrentPlayerId()), no contra
+// el jugador de la URL.
 //
 // El catálogo es una lista de texto de mano, separada del cálculo real de
 // cada logro (renderAchievements() en js/views/jugador.js, más las
@@ -15,7 +19,7 @@
 // de generarla sola sin duplicar la lógica de cálculo en sentido inverso.
 import { PLAYERS, GAMES } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
-import { getSession } from "../auth.js";
+import { getCurrentPlayerId, getSession } from "../auth.js";
 import {
   getAvatarUrl,
   getWalkupOverride,
@@ -45,7 +49,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Bombardero", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Bombardero" },
   { kind: "gold", icon: "fa-solid fa-user-ninja", name: "Ninja", how: "Top 3 del equipo en bases robadas esta temporada.", match: (l) => l === "Ninja" },
   { kind: "gold", icon: "fa-solid fa-tornado", name: "Tornado", how: "Top 3 del equipo en carreras impulsadas (RBI) esta temporada.", match: (l) => l === "Tornado" },
-  { kind: "gold", icon: "fa-solid fa-beer-mug-empty", name: "Mr. Expendio", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Mr. Expendio" },
+  { kind: "gold", icon: "fa-solid fa-beer-mug-empty", name: "Bartender", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Bartender" },
   { kind: "gold", icon: "fa-solid fa-crosshairs", name: "Francotirador", how: "Top 3 del equipo en ponches propinados (pitcheo) esta temporada.", match: (l) => l === "Francotirador" },
   { kind: "gold", icon: "fa-solid fa-hand-fist", name: "Guante de oro / plata / bronce", how: "Top 3 del equipo en porcentaje de fildeo (FPCT) esta temporada.", match: (l) => l.startsWith("Guante de ") },
   { kind: "gold", icon: "fa-solid fa-broom", name: "Escoba", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Escoba" },
@@ -70,8 +74,8 @@ const CATALOG = [
   { kind: "profile", icon: "fa-solid fa-camera", name: "Say Cheese", how: "Subió una foto de perfil personalizada.", match: (l) => l === "Say Cheese", async: true },
   { kind: "profile", icon: "fa-solid fa-music", name: "Soundtrack", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Soundtrack", async: true },
   // ---- Estado de inscripción ----
-  { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true, needsSession: true },
-  { kind: "dues-unpaid", icon: "fa-solid fa-trash-can", name: "Moroso", how: "Todavía no paga la inscripción de la temporada.", match: (l) => l === "Moroso", async: true, needsSession: true },
+  { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true },
+  { kind: "dues-unpaid", icon: "fa-solid fa-trash-can", name: "Moroso", how: "Todavía no paga la inscripción de la temporada.", match: (l) => l === "Moroso", async: true },
 ];
 
 // Mismas comprobaciones que las tarjetas "profile"/"social"/"dues" del
@@ -112,17 +116,17 @@ async function getAsyncLabels(player) {
   return labels;
 }
 
+// `labels`: null mientras se espera la respuesta async (fila en "Cargando…"),
+// un array cuando ya se sabe — [] cuenta como "no la tienes", igual que
+// cualquier otro array sin el nombre buscado (por ejemplo, sin sesión
+// iniciada, ver renderMedallasGuide). Sí/No nomás, sin decir en qué lugar
+// (oro/plata/bronce) quedó — eso ya lo dice el Medallero del perfil.
 function statusCellHtml(entry, labels) {
-  if (entry.async && labels === null) {
-    return `<span class="medalla-status-pending">Cargando…</span>`;
-  }
-  if (entry.needsSession && !getSession()) {
-    return `<span class="medalla-status-pending">Requiere sesión</span>`;
-  }
-  const obtained = labels.find((l) => entry.match(l));
+  if (labels === null) return `<span class="medalla-status-pending">Cargando…</span>`;
+  const obtained = labels.some((l) => entry.match(l));
   return obtained
-    ? `<span class="stat-green"><i class="fa-solid fa-check"></i> Sí — ${escapeHtml(obtained)}</span>`
-    : `<span class="medalla-status-pending">Todavía no</span>`;
+    ? `<span class="stat-green"><i class="fa-solid fa-check"></i> Sí</span>`
+    : `<span class="medalla-status-pending">No</span>`;
 }
 
 function rowHtml(entry, index, labels) {
@@ -140,26 +144,35 @@ function rowHtml(entry, index, labels) {
   `;
 }
 
-export function renderMedallasGuide(container, playerId) {
-  const player = PLAYERS.find((p) => p.id === playerId);
+export function renderMedallasGuide(container, fromPlayerId) {
+  // Este id es SOLO para saber a qué perfil regresa el link de arriba — el
+  // catálogo y el "¿la tienes?" de abajo son iguales sin importar desde
+  // dónde se haya llegado (ver comentario del archivo).
+  const fromPlayer = PLAYERS.find((p) => p.id === fromPlayerId);
 
   const back = document.createElement("a");
-  back.href = player ? `#/jugador/${player.id}` : "#/roster";
-  back.className = "back-link";
-  back.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Volver al ${player ? "perfil" : "roster"}`;
+  back.href = fromPlayer ? `#/jugador/${fromPlayer.id}` : "#/roster";
+  back.className = "back-link back-link--spaced";
+  back.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Volver al ${fromPlayer ? "perfil" : "roster"}`;
   container.appendChild(back);
 
-  if (!player) {
-    heading(container, "Jugador no encontrado");
-    return;
-  }
+  // "¿La tienes?" siempre es sobre TU cuenta, no sobre el perfil de origen
+  // — por eso getCurrentPlayerId() y no fromPlayer.
+  const myId = getCurrentPlayerId();
+  const me = PLAYERS.find((p) => p.id === myId);
 
-  heading(container, "Guía de medallas", `Todas las medallas del Medallero y cómo se ganan — vista desde el perfil de ${player.name}.`);
+  heading(
+    container,
+    "Guía de medallas",
+    me
+      ? `Todas las medallas que existen — la columna "¿La tienes?" es la tuya, ${me.name}.`
+      : "Todas las medallas que existen. Inicia sesión para ver cuáles ya tienes."
+  );
 
-  // Las de renderAchievements() ya se saben sin esperar a nadie; las
-  // "async" (foto, walkup, inscripción, sociales) arrancan en "Cargando…" y
-  // se resuelven solas (ver getAsyncLabels arriba).
-  const syncLabels = renderAchievements(player).map((c) => c.label);
+  // Sin sesión vinculada no hay contra quién comprobar nada: el catálogo se
+  // ve completo igual, pero todo en "No" — no hace falta esperar ninguna
+  // respuesta de Supabase.
+  const syncLabels = me ? renderAchievements(me).map((c) => c.label) : [];
 
   const wrap = document.createElement("div");
   wrap.className = "table-wrap section-gap";
@@ -174,13 +187,15 @@ export function renderMedallasGuide(container, playerId) {
         </tr>
       </thead>
       <tbody>
-        ${CATALOG.map((entry, index) => rowHtml(entry, index, entry.async ? null : syncLabels)).join("")}
+        ${CATALOG.map((entry, index) => rowHtml(entry, index, entry.async && me ? null : syncLabels)).join("")}
       </tbody>
     </table>
   `;
   container.appendChild(wrap);
 
-  getAsyncLabels(player).then((asyncLabels) => {
+  if (!me) return;
+
+  getAsyncLabels(me).then((asyncLabels) => {
     const allLabels = [...syncLabels, ...asyncLabels];
     CATALOG.forEach((entry, index) => {
       if (!entry.async) return;
