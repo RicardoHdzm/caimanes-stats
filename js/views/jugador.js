@@ -100,37 +100,42 @@ function renderDebut(debutSeason) {
 
 // Insignias de logros — hechos chicos calculados de lo que ya hay en
 // data.js/GAMES, sin nada nuevo que mantener a mano. Públicas (no dependen
-// de sesión): son datos de roster, no información privada. Si ninguna
-// aplica no se pinta ni el encabezado de la sección.
+// de sesión): son datos de roster, no información privada. Van dentro de
+// la tarjeta principal del perfil, mismo tratamiento de píldora que
+// MVP/Debut (ver .mvp-badge/.debut-badge en css/styles.css) — cada logro
+// con su propio color (`kind`) para distinguirse de un vistazo.
 function renderAchievements(player) {
   const chips = [];
 
   if (player.debutSeason === 1) {
-    chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo" });
+    chips.push({ icon: "fa-solid fa-landmark", label: "Fundador del equipo", kind: "founder" });
   }
 
   if (player.debutSeason) {
     const seasons = TEAM.seasonsTotal - player.debutSeason + 1;
-    chips.push({ icon: "fa-solid fa-shield-halved", label: `${seasons} temporada${seasons === 1 ? "" : "s"} en el equipo` });
+    chips.push({
+      icon: "fa-solid fa-shield-halved",
+      label: `${seasons} temporada${seasons === 1 ? "" : "s"} en el equipo`,
+      kind: "tenure",
+    });
 
     const leagues = new Set(SEASONS.slice(player.debutSeason - 1).map((s) => s.league));
     if (leagues.size > 1) {
-      chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas` });
+      chips.push({ icon: "fa-solid fa-earth-americas", label: `Ha jugado en ${leagues.size} ligas distintas`, kind: "leagues" });
     }
   }
 
   const streak = hitStreaks(GAMES).find((s) => s.playerId === player.id);
   if (streak?.active && streak.current >= 2) {
-    chips.push({ icon: "fa-solid fa-fire", label: `Racha activa: ${streak.current} juegos con hit` });
+    chips.push({ icon: "fa-solid fa-fire", label: `Racha activa: ${streak.current} juegos con hit`, kind: "streak" });
   }
 
-  if (chips.length === 0) return "";
-  return `
-    <h3>Logros</h3>
-    <div class="achievements-row">
-      ${chips.map((c) => `<span class="achievement-chip"><i class="${c.icon}"></i>${escapeHtml(c.label)}</span>`).join("")}
-    </div>
-  `;
+  return chips
+    .map(
+      (c) =>
+        `<div class="achievement-badge achievement-badge--${c.kind}"><i class="${c.icon}"></i>${escapeHtml(c.label)}</div>`
+    )
+    .join("");
 }
 
 // Comprime la foto de perfil en el navegador antes de subirla — una foto de
@@ -193,17 +198,11 @@ export function renderJugadorDetalle(container, playerId) {
         : ""
     }
     ${renderDebut(player.debutSeason)}
+    ${renderAchievements(player)}
     <div id="walkup-display">${renderWalkup(player.walkup)}</div>
     <div id="profile-edit-slot"></div>
   `;
   container.appendChild(hero);
-
-  const achievementsHtml = renderAchievements(player);
-  if (achievementsHtml) {
-    const achievementsEl = document.createElement("div");
-    achievementsEl.innerHTML = achievementsHtml;
-    container.append(...achievementsEl.childNodes);
-  }
 
   // ---- Foto de perfil personalizada: lectura con sesión, edición propia ----
   //
