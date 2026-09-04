@@ -23,6 +23,8 @@ import {
   uploadAvatar,
   getAnnouncements,
   getAnnouncementLikes,
+  getComments,
+  getMvpVotes,
 } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
@@ -199,6 +201,11 @@ function renderAchievements(player) {
   const fieldingList = fieldingTotals(GAMES);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
   const fieldersWithPlays = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
+  // Relación BB/SO — "Selectivo": a diferencia de Ojo de águila (BB en
+  // bruto), esto premia disciplina de verdad, no solo volumen. Se descartan
+  // los que no se han ponchado nunca (SO=0): con SO=0 cualquier BB da una
+  // razón "infinita" que no refleja nada real.
+  const selectiveList = qualifiedBatters.filter((r) => r.SO > 0).map((r) => ({ playerId: r.playerId, ratio: r.BB / r.SO }));
 
   const myBatting = battingList.find((r) => r.playerId === player.id);
   const myPitching = pitchingList.find((r) => r.playerId === player.id);
@@ -257,6 +264,11 @@ function renderAchievements(player) {
       icon: "fa-solid fa-eye",
       label: "Ojo de águila",
       desc: (value) => `Bases por bolas (BB) del equipo esta temporada (${value}).`,
+    });
+    addPodium(selectiveList, "ratio", {
+      icon: "fa-solid fa-scale-balanced",
+      label: "Selectivo",
+      desc: (value) => `Mejor relación bases por bolas / ponches del equipo esta temporada (${value.toFixed(2)}).`,
     });
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
       chips.push({
@@ -334,6 +346,15 @@ function renderAchievements(player) {
       label: "Versátil",
       kind: "participation",
       desc: `Jugó en 3 o más posiciones distintas esta temporada (${positionsPlayed.size}).`,
+    });
+  }
+  // Más exigente que Versátil: las 9 posiciones de campo, no solo 3+.
+  if (positionsPlayed.size === DEFENSE_POSITIONS.length) {
+    chips.push({
+      icon: "fa-solid fa-crown",
+      label: "Comodín total",
+      kind: "participation",
+      desc: `Jugó en las ${DEFENSE_POSITIONS.length} posiciones de campo esta temporada.`,
     });
   }
 
@@ -474,6 +495,42 @@ export function renderJugadorDetalle(container, playerId) {
       desc: "Le dio like a algún anuncio del equipo.",
     });
   });
+
+  // ---- "Comentarista": comentó en al menos 5 juegos de la temporada ----
+  //
+  // Lectura pública. Un comentario por jugador por juego (constraint en
+  // supabase/schema.sql), así que basta con contar en cuántos juegos
+  // distintos aparece su player_id, no cuántos comentarios en total.
+  if (GAMES.length > 0) {
+    Promise.all(GAMES.map((g) => getComments("game", g.id))).then((perGame) => {
+      const gamesCommented = perGame.filter((comments) => comments.some((c) => c.player_id === player.id)).length;
+      if (gamesCommented < 5) return;
+      addAchievementMedal({
+        icon: "fa-solid fa-comment",
+        label: "Comentarista",
+        kind: "social",
+        desc: `Comentó en ${gamesCommented} juegos de la temporada.`,
+      });
+    });
+  }
+
+  // ---- "Buen juez": votó por el MVP en todos los juegos de la temporada ----
+  //
+  // Lectura pública. No exige que haya jugado en cada juego para votar (esa
+  // regla la impone la UI de js/views/juego.js, no la base de datos) — este
+  // logro es sobre participar en la votación, no sobre elegibilidad.
+  if (GAMES.length > 0) {
+    Promise.all(GAMES.map((g) => getMvpVotes(g.id))).then((perGame) => {
+      const votedAll = perGame.every((votes) => votes.some((v) => v.voter_player_id === player.id));
+      if (!votedAll) return;
+      addAchievementMedal({
+        icon: "fa-solid fa-gavel",
+        label: "Buen juez",
+        kind: "social",
+        desc: `Votó por el MVP en los ${GAMES.length} juegos de la temporada.`,
+      });
+    });
+  }
 
   // ---- Tu resumen: solo en tu propio perfil ----
   //
