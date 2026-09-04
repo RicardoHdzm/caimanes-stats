@@ -229,16 +229,17 @@ body {
 /* Ancla a la esquina superior IZQUIERDA del header (ver `position: relative`
    en .topbar) en vez de ir en el flujo normal junto al logo — la derecha es
    de .auth-slot, que puede traer nombre y necesita más espacio para crecer
-   sin chocar con el logo centrado. */
+   sin chocar con el logo centrado. Tamaño chico a propósito, para que se
+   vea del mismo porte que el interruptor de tema de al lado. */
 .social-link {
   position: absolute;
-  top: 16px;
+  top: 22px;
   left: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -253,22 +254,23 @@ body {
 }
 
 .social-link i {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
 }
 
-/* Interruptor sol/luna (js/theme.js) — junto a Instagram, misma esquina.
-   El círculo rojo (el "thumb") se desliza al lado activo nomás con CSS: la
-   posición de .theme-switch-thumb y el color de los dos íconos cambian con
-   [data-theme="light"] en <html>, sin que JS toque estilos. */
+/* Interruptor sol/luna (js/theme.js) — junto a Instagram, misma esquina y
+   centrado a la misma altura (ver .social-link arriba). El círculo rojo (el
+   "thumb") y los dos íconos se desliza/cambian de color al lado activo
+   nomás con CSS: [data-theme="light"] en <html>, sin que JS toque estilos.
+   Tanto el thumb como los íconos son position:absolute con el MISMO
+   tamaño/posición cada uno (3px o 33px) — así el ícono queda exactamente
+   centrado sobre su círculo, en vez de depender de que un reparto flex
+   coincida por casualidad con dónde cae el círculo. */
 .theme-switch {
   position: absolute;
   top: 23px;
-  left: 76px;
-  display: inline-flex;
-  align-items: center;
+  left: 62px;
   width: 64px;
   height: 34px;
-  padding: 3px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   background: var(--surface);
@@ -292,15 +294,24 @@ body {
 }
 
 .theme-switch-icon {
-  position: relative;
-  z-index: 1;
-  flex: 1;
+  position: absolute;
+  top: 3px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--text-sm);
   color: var(--muted);
   transition: color 0.2s ease;
+}
+
+.theme-switch-icon--sun {
+  left: 3px;
+}
+
+.theme-switch-icon--moon {
+  left: 33px;
 }
 
 /* El ícono del lado activo queda en blanco, sobre el círculo rojo; el
@@ -319,30 +330,32 @@ body {
 
 @media (max-width: 640px) {
   .social-link {
-    top: 12px;
+    top: 16px;
     left: 12px;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
   }
 
   .social-link i {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
   }
 
   .theme-switch {
     top: 17px;
-    left: 60px;
+    left: 52px;
     width: 56px;
     height: 30px;
   }
 
-  .theme-switch-thumb {
+  .theme-switch-thumb,
+  .theme-switch-icon {
     width: 24px;
     height: 24px;
     left: 29px;
   }
 
-  :root[data-theme="light"] .theme-switch-thumb {
+  :root[data-theme="light"] .theme-switch-thumb,
+  .theme-switch-icon--sun {
     left: 3px;
   }
 }
