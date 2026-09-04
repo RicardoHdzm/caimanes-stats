@@ -367,15 +367,7 @@ export function renderJugadorDetalle(container, playerId) {
       achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid"></div>`;
       hero.after(achievementsCard);
     }
-    achievementsCard.querySelector(".achievements-grid").insertAdjacentHTML(
-      "beforeend",
-      `
-        <div class="achievement-medal achievement-medal--${chip.kind}">
-          <div class="achievement-medal-icon"><i class="${chip.icon}"></i></div>
-          <span class="achievement-medal-label">${escapeHtml(chip.label)}</span>
-        </div>
-      `
-    );
+    achievementsCard.querySelector(".achievements-grid").insertAdjacentHTML("beforeend", achievementMedalHtml(chip));
   }
 
   // ---- Foto de perfil personalizada: lectura pública, edición propia ----
@@ -389,7 +381,12 @@ export function renderJugadorDetalle(container, playerId) {
   getAvatarUrl(player.id).then((url) => {
     if (!url || !avatarWrap) return;
     avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
-    addAchievementMedal({ icon: "fa-solid fa-camera", label: "Cara conocida", kind: "profile" });
+    addAchievementMedal({
+      icon: "fa-solid fa-camera",
+      label: "Say Cheese",
+      kind: "profile",
+      desc: "Subió una foto de perfil personalizada.",
+    });
   });
 
   // ---- Tu resumen: solo en tu propio perfil ----
