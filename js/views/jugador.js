@@ -65,14 +65,15 @@ function renderDebut(seasons) {
 //                             temporada (ver podiumChip() justo abajo)
 //   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (morado) — asistencia y versatilidad de posiciones
-//   social        (rojo rosado) — interacción con el equipo (ej. le dio
-//                             like a un anuncio) — no es sobre jugar, por
-//                             eso no comparte color con participation.
-//   profile       (rosa)   — personalizaste tu perfil (foto, walkup song) —
-//                             estos dos dependen de Storage/Supabase, así
-//                             que no salen de aquí: los agrega
-//                             addAchievementMedal() más abajo, en cuanto
-//                             getAvatarUrl()/getWalkupOverride() contestan.
+//   social        (rojo rosado) — interactuar con el sitio: like a un
+//                             anuncio, comentar, votar MVP, o personalizar
+//                             tu perfil (foto, walkup song) — no es sobre
+//                             jugar, por eso no comparte color con
+//                             participation. Los dos últimos (foto/walkup)
+//                             dependen de Storage/Supabase, así que no
+//                             salen de aquí: los agrega addAchievementMedal()
+//                             más abajo, en cuanto getAvatarUrl()/
+//                             getWalkupOverride() contestan.
 //   dues-paid     (verde)  — ya pagó la inscripción de la temporada
 //   dues-unpaid   (rojo)   — todavía no la paga — ambos junto al badge
 //                             "Estado de inscripción" más abajo, solo con
@@ -94,7 +95,6 @@ const KIND_ORDER = [
   "threshold",
   "participation",
   "social",
-  "profile",
   "dues-paid",
   "dues-unpaid",
 ];
@@ -444,6 +444,25 @@ export function renderAchievements(player) {
     });
   }
 
+  // Entró o salió por sustitución (bateo o campo, ver `substitutions` en
+  // cada juego de data.js) en al menos 2 juegos distintos — cuenta juegos,
+  // no cambios: varios cambios en el mismo juego solo cuentan una vez.
+  const substitutionGames = new Set();
+  for (const game of GAMES) {
+    const subs = game.substitutions ?? [];
+    if (subs.some((s) => s.playerOut === player.id || s.playerIn === player.id)) {
+      substitutionGames.add(game.id);
+    }
+  }
+  if (substitutionGames.size >= 2) {
+    chips.push({
+      icon: "fa-solid fa-up-down",
+      label: "Suplente",
+      kind: "participation",
+      desc: `Entró o salió de cambio en ${substitutionGames.size} juegos de la temporada.`,
+    });
+  }
+
   return chips;
 }
 
@@ -559,7 +578,7 @@ export function renderJugadorDetalle(container, playerId) {
     addAchievementMedal({
       icon: "fa-solid fa-camera",
       label: "1, 2, 3... Flash!",
-      kind: "profile",
+      kind: "social",
       desc: "Subió una foto de perfil personalizada.",
     });
   });
@@ -708,7 +727,7 @@ export function renderJugadorDetalle(container, playerId) {
     addAchievementMedal({
       icon: "fa-solid fa-music",
       label: "Greatests Hits",
-      kind: "profile",
+      kind: "social",
       desc: "Personalizó su canción de entrada.",
     });
   });

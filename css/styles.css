@@ -1296,24 +1296,16 @@ main h3::before {
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
 }
 
-/* Interacción con el equipo (ej. le dio like a un anuncio) — rojo rosado a
-   propósito, distinto del naranja de participation (esa es sobre jugar). */
+/* Interactuar con el sitio: like a un anuncio, comentar, votar MVP, o
+   personalizar tu perfil (foto, walkup song) — antes "profile" tenía su
+   propio color, se fusionó aquí porque las dos categorías son la misma
+   idea ("interactuar con el sitio", no "jugar"). Rojo rosado a propósito,
+   distinto del morado de participation (esa sí es sobre jugar). */
 .achievement-medal--social .achievement-medal-icon {
   border: 2px solid #ff4d6d;
   background: rgba(255, 77, 109, 0.15);
   color: #ff4d6d;
   box-shadow: 0 0 12px rgba(255, 77, 109, 0.35);
-}
-
-/* Personalizaste tu perfil (foto o walkup song) — ver addAchievementMedal()
-   en js/views/jugador.js. Rosa, pero un tono distinto al de streak (arriba)
-   y al rojo-rosado de social (abajo) — las tres son "rosa" a simple vista
-   pero no idénticas, para que sigan siendo categorías distinguibles. */
-.achievement-medal--profile .achievement-medal-icon {
-  border: 2px solid #be185d;
-  background: rgba(190, 24, 93, 0.15);
-  color: #be185d;
-  box-shadow: 0 0 12px rgba(190, 24, 93, 0.35);
 }
 
 /* Estado de inscripción — mismo verde/rojo que ya usa el badge "Estado de

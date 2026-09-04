@@ -67,19 +67,19 @@ const CATALOG = [
   { kind: "participation", icon: "fa-solid fa-cat", name: "Nocturno", how: "Asistió a más de la mitad de los juegos a las 9:00pm de la temporada.", match: (l) => l === "Nocturno" },
   { kind: "participation", icon: "fa-solid fa-recycle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
   { kind: "participation", icon: "fa-solid fa-crown", name: "Rey Caimán", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Rey Caimán" },
+  { kind: "participation", icon: "fa-solid fa-up-down", name: "Suplente", how: "Entró o salió de cambio en al menos 2 juegos de la temporada.", match: (l) => l === "Suplente" },
   // ---- Social ----
   { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
   { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
   { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Demócrata", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Demócrata", async: true },
-  // ---- Perfil ----
-  { kind: "profile", icon: "fa-solid fa-camera", name: "1, 2, 3... Flash!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "1, 2, 3... Flash!", async: true },
-  { kind: "profile", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
+  { kind: "social", icon: "fa-solid fa-camera", name: "1, 2, 3... Flash!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "1, 2, 3... Flash!", async: true },
+  { kind: "social", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
   // ---- Estado de inscripción ----
   { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true },
   { kind: "dues-unpaid", icon: "fa-solid fa-trash-can", name: "Moroso", how: "Todavía no paga la inscripción de la temporada.", match: (l) => l === "Moroso", async: true },
 ];
 
-// Mismas comprobaciones que las tarjetas "profile"/"social"/"dues" del
+// Mismas comprobaciones que las tarjetas "social"/"dues" del
 // Medallero (ver js/views/jugador.js), repetidas aquí porque ahí viven
 // mezcladas con el pintado progresivo del perfil (llaman a
 // addAchievementMedal() directo) — separar solo la condición sin la parte
