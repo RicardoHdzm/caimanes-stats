@@ -1463,6 +1463,14 @@ main h3::before {
   line-height: 1.4;
 }
 
+/* Fecha/hora/rival del próximo juego — misma tarjeta que las demás, pero
+   con menos texto suelto (dos renglones largos) para que no se vea tan
+   grande como un número de récord. Doble clase para ganarle en
+   especificidad a `.leader-card p` de arriba. */
+.leader-card p.next-game-info {
+  font-size: var(--text-md);
+}
+
 /* Mismo tamaño y peso que .runner-ups (el 2do y 3er lugar), pero en rojo
    para que se lea como una advertencia y no como un puesto más de la lista.
    Va con doble clase porque `.leader-card p` le gana en especificidad a una
