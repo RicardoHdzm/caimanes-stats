@@ -90,6 +90,33 @@ export async function initAuth() {
     await resolvePlayerId();
     notifyChange();
   });
+
+  // El token de sesión expira cada cierto tiempo (típicamente 1 hora) y se
+  // refresca solo con un temporizador interno — pero los navegadores
+  // PAUSAN esos temporizadores cuando la pestaña está en segundo plano
+  // (celular bloqueado, se cambió de app). Al volver, el token ya expiró y
+  // nadie lo refrescó: las consultas protegidas por RLS empiezan a fallar
+  // en silencio, aunque runQuery ya reintente (reintentar con un token
+  // vencido no arregla nada). Esto es justo la causa de "después de un
+  // rato deja de mostrar cosas" que un simple re-render (ver el listener
+  // de "visibilitychange" en js/main.js) no resuelve por sí solo.
+  // startAutoRefresh()/stopAutoRefresh() es la solución que la propia
+  // documentación de Supabase recomienda para este caso — y de paso,
+  // forzar un getSession() fresco al volver detecta si el token ya se
+  // venció o cambió mientras tanto y avisa al resto de la app.
+  document.addEventListener("visibilitychange", () => {
+    if (!supabase) return;
+    if (document.visibilityState === "visible") {
+      supabase.auth.startAutoRefresh();
+      supabase.auth.getSession().then(async ({ data }) => {
+        session = data.session;
+        await resolvePlayerId();
+        notifyChange();
+      });
+    } else {
+      supabase.auth.stopAutoRefresh();
+    }
+  });
 }
 
 export function getSession() {
