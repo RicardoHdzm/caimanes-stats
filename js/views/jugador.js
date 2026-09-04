@@ -60,7 +60,7 @@ function renderDebut(seasons) {
 // el logro individual — todos los de una misma categoría comparten color
 // (ver .achievement-badge--* en css/styles.css):
 //   trajectory    (verde oliva) — fundador, temporadas en el equipo, ligas jugadas
-//   streak        (verde)  — racha de hits vigente
+//   streak        (naranja) — racha de hits vigente
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
 //   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
@@ -289,7 +289,7 @@ export function renderAchievements(player) {
     });
     addPodium(battingList, "HR", {
       icon: "fa-solid fa-bomb",
-      label: "Bombardero",
+      label: "Kaboom!",
       desc: (value) => `Jonrones del equipo esta temporada (${value}).`,
     });
     addPodium(battingList, "SB", {
@@ -305,7 +305,7 @@ export function renderAchievements(player) {
     // "Bartender" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza —
     // esa coletilla solo aplica al de oro. Mismo SO de bateo, no el de
-    // pitcheo (ese es "Francotirador").
+    // pitcheo (ese es "Snipper").
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
       label: "Bartender",
@@ -326,8 +326,8 @@ export function renderAchievements(player) {
       desc: (value) => `Dobles del equipo esta temporada (${value}).`,
     });
     addPodium(battingList, "3B", {
-      icon: "fa-solid fa-skull-crossbones",
-      label: "Triple Kill",
+      icon: "fa-solid fa-chess-knight",
+      label: "Triple Threat",
       desc: (value) => `Triples del equipo esta temporada (${value}).`,
     });
     addPodium(battingList, "BB", {
@@ -343,7 +343,7 @@ export function renderAchievements(player) {
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
       chips.push({
         icon: "fa-solid fa-gem",
-        label: "Fuera de serie",
+        label: "Diamante",
         kind: "threshold",
         desc: `OPS de 1.000 o más esta temporada (${myBatting.OPS}).`,
       });
@@ -353,7 +353,7 @@ export function renderAchievements(player) {
   if (myPitching && myPitching.outs > 0) {
     addPodium(pitchingList, "SO", {
       icon: "fa-solid fa-crosshairs",
-      label: "Francotirador",
+      label: "Snipper",
       desc: (value) => `Ponches propinados (pitcheo) del equipo esta temporada (${value}).`,
     });
   }
@@ -365,8 +365,8 @@ export function renderAchievements(player) {
       desc: (value) => `Porcentaje de fildeo (FPCT) del equipo esta temporada (${value}).`,
     });
     addPodium(fieldingList, "PO", {
-      icon: "fa-solid fa-broom",
-      label: "Barrendero",
+      icon: "fa-solid fa-skull-crossbones",
+      label: "Killer",
       desc: (value) => `Outs realizados (PO) del equipo esta temporada (${value}).`,
     });
   }
@@ -379,7 +379,7 @@ export function renderAchievements(player) {
   );
   addPodium(mvpList, "mvpTotal", {
     icon: "fa-solid fa-star",
-    label: "Estrella",
+    label: "Starboy",
     desc: (value) => `Premios MVP del equipo esta temporada (${value}).`,
   });
 

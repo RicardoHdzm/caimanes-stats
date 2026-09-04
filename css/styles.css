@@ -1238,22 +1238,23 @@ main h3::before {
   line-height: 1.25;
 }
 
-/* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. Verde
-   oliva a propósito — distinto del verde de dues-paid/"Rich kid" más abajo
-   (ese es un verde-esmeralda, este es más amarillo/oliva). */
+/* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. Azul
+   marino, a petición expresa. */
 .achievement-medal--trajectory .achievement-medal-icon {
-  border: 2px solid #84cc16;
-  background: rgba(132, 204, 22, 0.15);
-  color: #84cc16;
-  box-shadow: 0 0 12px rgba(132, 204, 22, 0.35);
+  border: 2px solid #1e3a8a;
+  background: rgba(30, 58, 138, 0.15);
+  color: #1e3a8a;
+  box-shadow: 0 0 12px rgba(30, 58, 138, 0.35);
 }
 
-/* Racha de hits vigente. */
+/* Racha de hits vigente. Naranja — --pos-dh ya no lo usa ninguna otra
+   categoría de medalla (participation es morado desde hace rato, ver más
+   abajo), así que no compite con nada. */
 .achievement-medal--streak .achievement-medal-icon {
-  border: 2px solid var(--pos-special);
-  background: rgba(255, 111, 181, 0.15);
-  color: var(--pos-special);
-  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
+  border: 2px solid var(--pos-dh);
+  background: rgba(255, 140, 51, 0.15);
+  color: var(--pos-dh);
+  box-shadow: 0 0 12px rgba(255, 140, 51, 0.35);
 }
 
 /* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
