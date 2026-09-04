@@ -431,6 +431,24 @@ export function renderJugadorDetalle(container, playerId) {
     });
   });
 
+  // ---- "Fan del equipo": le dio like a algún anuncio ----
+  //
+  // Lectura pública (anuncios y likes), corre con o sin sesión. No hay una
+  // consulta directa "¿este jugador le dio like a algo?", así que se arma
+  // con las mismas dos funciones que ya usa Resumen para los anuncios: se
+  // piden todos (sin límite chico) y se busca su player_id entre los likes.
+  getAnnouncements(1000).then(async (items) => {
+    if (items.length === 0) return;
+    const likes = await getAnnouncementLikes(items.map((a) => a.id));
+    if (!likes.some((l) => l.player_id === player.id)) return;
+    addAchievementMedal({
+      icon: "fa-solid fa-heart",
+      label: "Fan del equipo",
+      kind: "participation",
+      desc: "Le dio like a algún anuncio del equipo.",
+    });
+  });
+
   // ---- Tu resumen: solo en tu propio perfil ----
   //
   // Lo único que este perfil no muestra ya en otro lado es tu RSVP al
