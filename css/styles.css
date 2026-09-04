@@ -1534,6 +1534,14 @@ main h3::before {
   flex-shrink: 0;
 }
 
+/* Envoltorio <a> de un avatar hacia el perfil del jugador (ver avatarSlot()
+   en js/views/resumen.js) — sin subrayado porque no lleva texto, solo la
+   foto/iniciales. */
+.avatar-slot {
+  display: inline-block;
+  text-decoration: none;
+}
+
 .leader-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);

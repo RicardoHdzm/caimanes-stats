@@ -147,7 +147,17 @@ function render() {
 buildBottomTabs();
 initTheme();
 mountAuthControl(document.getElementById("auth-slot"));
-window.addEventListener("hashchange", render);
+// Al cambiar de ruta (clic en un link, botón "atrás") se sube al tope —
+// sin esto, un link a mitad de una página larga (ej. el avatar de un
+// jugador en Resumen) deja la página nueva scrolleada a la mitad, en vez de
+// abrir desde arriba como se espera de cualquier página nueva. No va dentro
+// de render() porque esa misma función también se llama al cambiar la
+// sesión (ver más abajo), y ahí sí se quiere mantener el scroll donde
+// estaba.
+window.addEventListener("hashchange", () => {
+  render();
+  window.scrollTo(0, 0);
+});
 // Se dispara desde js/auth.js cada vez que cambia la sesión (login, logout,
 // se resuelve el player_id) — la vista actual se repinta con el estado
 // nuevo, mismo tratamiento que un cambio de hash.
