@@ -211,9 +211,9 @@ function renderAchievements(player) {
   if (myFielding && myFielding.PO + myFielding.A + myFielding.E > 0 && myFielding.FPCT === "1.000") {
     chips.push({
       icon: "fa-solid fa-hand-fist",
-      label: "Guante de oro · fildeo perfecto",
+      label: "Guante de oro",
       kind: "leader",
-      desc: "Cero errores en el campo esta temporada.",
+      desc: "Fildeo perfecto: cero errores en el campo esta temporada.",
     });
   }
 
@@ -227,9 +227,9 @@ function renderAchievements(player) {
   if (myMvp && rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place === 1) {
     chips.push({
       icon: "fa-solid fa-star",
-      label: `Más MVPs · ${myMvp.mvpTotal}`,
+      label: "Estrella",
       kind: "leader",
-      desc: "Más premios MVP del equipo esta temporada.",
+      desc: `Más premios MVP del equipo esta temporada (${myMvp.mvpTotal}).`,
     });
   }
 
@@ -245,7 +245,7 @@ function renderAchievements(player) {
   }
   if (gamesPlayedCount > 5) {
     chips.push({
-      icon: "fa-solid fa-5",
+      icon: "fa-solid fa-hand",
       label: "Cumplidor",
       kind: "participation",
       desc: `Ya jugó más de 5 juegos esta temporada (${gamesPlayedCount}).`,
