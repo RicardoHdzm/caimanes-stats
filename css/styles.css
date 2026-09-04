@@ -27,11 +27,14 @@
 
 :root {
   /* ---- color ---- */
-  --bg: #0b0d10;
-  --surface: #1a1e23;
-  --surface-alt: #21262c;
-  --surface-raised: #262b31;
-  --border: #2e343b;
+  /* Gris neutro (R=G=B), no azul marino — antes tenían un ligero tinte
+     azul (el canal azul más alto que rojo/verde en cada uno), a petición
+     expresa se quitó sin cambiar qué tan claro/oscuro es cada nivel. */
+  --bg: #0d0d0d;
+  --surface: #1e1e1e;
+  --surface-alt: #262626;
+  --surface-raised: #2b2b2b;
+  --border: #343434;
   --text: #f2f3f4;
   --muted: #8d96a0;
 
@@ -101,7 +104,7 @@
   /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
      separado de --surface aunque hoy valga lo mismo, para que el tema
      claro pueda darle su propio tono sin tocar las superficies. */
-  --bg-glow: #1a1e23;
+  --bg-glow: #1e1e1e;
 
   /* Versión SÓLIDA (sin transparencia) de "tu fila" (rgba(226,32,47,0.1) —
      ver .standings-us/.row-you más abajo) para la columna congelada de una
