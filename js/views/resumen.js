@@ -265,7 +265,7 @@ export function renderResumen(container) {
     next.innerHTML = heroCardInnerHtml(
       "fa-calendar-day",
       "Próximo juego",
-      `<p>vs ${g.opponent}</p><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}</p>`,
+      `<span class="leader-hero-value">vs ${g.opponent}</span><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}</p>`,
       `<div class="rsvp-actions"></div>`
     );
     bottomRow.appendChild(next);
@@ -430,7 +430,23 @@ export function renderResumen(container) {
     recordsRow.className = "records-grid tab-carousel";
     recordsRow.innerHTML = records
       .map((r) => {
-        const visualHtml = r.playerId ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>` : "";
+        // Con un solo dueño, su foto grande; empatados entre jugadores, la
+        // foto de cada uno (chica, en fila) — solo un récord de equipo se
+        // queda sin nada, porque ahí de verdad no hay jugador que mostrar.
+        let visualHtml = "";
+        if (r.playerId) {
+          visualHtml = `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>`;
+        } else if (r.playerIds?.length > 1) {
+          const MAX_SHOWN = 4;
+          const shown = r.playerIds.slice(0, MAX_SHOWN);
+          const extra = r.playerIds.length - shown.length;
+          visualHtml = `
+            <div class="record-hero-avatar-group">
+              ${shown.map((id) => renderAvatar(playerFor({ id }), 40)).join("")}
+              ${extra > 0 ? `<span class="avatar-more">+${extra}</span>` : ""}
+            </div>
+          `;
+        }
         const runnersHtml = r.runnersUp?.length
           ? `
             <div class="leader-runners">

@@ -309,10 +309,13 @@ export function hitStreaks(games = GAMES) {
 
 // Récords de la temporada, ya formateados para pintarse como tarjetas.
 // Solo se incluye `playerId`/`gameId` cuando hay un único dueño del récord;
-// con empate la tarjeta no lleva a ningún lado porque no hay a quién apuntar.
-// `runnersUp` trae hasta 2 renglones de 2do/3er lugar ({ playerId?, name,
-// value }) — sin `playerId` en los récords de equipo, donde el 2do/3er
-// lugar es otro juego, no otro jugador.
+// con empate la tarjeta no lleva a ningún lado porque no hay a quién
+// apuntar, pero `playerIds` sigue trayendo a todos los empatados (sin
+// duplicados) para poder mostrar sus fotos aunque no haya un solo dueño —
+// vacío en los récords de equipo, que no son de ningún jugador en
+// particular. `runnersUp` trae hasta 2 renglones de 2do/3er lugar
+// ({ playerId?, name, value }) — sin `playerId` en los récords de equipo,
+// donde el 2do/3er lugar es otro juego, no otro jugador.
 export function seasonRecords(games = GAMES) {
   const records = [];
   const gameLabel = (g) => `vs ${g.opponent} · ${g.date}`;
@@ -334,6 +337,7 @@ export function seasonRecords(games = GAMES) {
       detail: namesLabel(best.entries) + (solo && detailSuffix ? detailSuffix(solo) : ""),
       note: solo ? gameLabel(solo.game) : `${best.entries.length} jugadores empatados`,
       playerId: solo?.playerId,
+      playerIds: [...excludeIds],
       runnersUp,
     });
   }
@@ -406,6 +410,7 @@ export function seasonRecords(games = GAMES) {
           : "Ya terminó"
         : `${tied.length} empatados${anyActive ? ", sigue activa" : ""}`,
       playerId: solo?.playerId,
+      playerIds: tied.map((s) => s.playerId),
       runnersUp,
     });
   }

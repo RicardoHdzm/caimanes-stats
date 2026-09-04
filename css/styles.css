@@ -1452,11 +1452,10 @@ main h3::before {
   line-height: 1.4;
 }
 
-/* Rival del próximo juego — a propósito con el tamaño grande normal de
-   `.leader-card p` (arriba), es el dato que más importa de un vistazo. La
-   fecha/hora (.next-game-info) va más chica debajo, mismo criterio que ya
-   tenían las demás tarjetas antes de separarse en dos líneas. Doble clase
-   para ganarle en especificidad a `.leader-card p`. */
+/* El rival del próximo juego usa .leader-hero-value (el mismo tamaño
+   gigante del número en Racha actual / Juegos jugados, etc.) porque es el
+   dato que más importa de un vistazo. La fecha/hora va aparte, más chica,
+   debajo. Doble clase para ganarle en especificidad a `.leader-card p`. */
 .leader-card p.next-game-info {
   margin-top: 4px;
   font-size: var(--text-md);
@@ -2680,6 +2679,37 @@ main h3::before {
 .record-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);
+}
+
+/* Récord empatado entre varios jugadores: sus fotos en fila, encimadas
+   (como una firma de "estos son"), en vez de una sola foto grande — no hay
+   un único dueño que destacar. */
+.record-hero-avatar-group {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.record-hero-avatar-group > * {
+  border: 3px solid var(--surface);
+  box-shadow: var(--shadow-card);
+  margin-left: -14px;
+}
+
+.record-hero-avatar-group > *:first-child {
+  margin-left: 0;
+}
+
+.avatar-more {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .record-runner-icon {
