@@ -21,6 +21,8 @@ import {
   getDuesForPlayer,
   getAvatarUrl,
   uploadAvatar,
+  getAnnouncements,
+  getAnnouncementLikes,
 } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
