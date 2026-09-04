@@ -1129,6 +1129,13 @@ main h3::before {
     width: fit-content;
     margin: 20px auto 0;
   }
+
+  /* Icono + "Medallero" centrados en celular (en escritorio se quedan a la
+     izquierda, alineados con el resto de tarjetas). */
+  .leader-card.medallero-card h3 {
+    align-items: center;
+    text-align: center;
+  }
 }
 
 .achievement-medal {
