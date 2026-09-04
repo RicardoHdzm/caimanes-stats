@@ -98,9 +98,9 @@ export async function getDuesForPlayer(playerId) {
 export async function setDuesPaid(playerId, paid) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client
-    .from("player_dues")
-    .upsert({ player_id: playerId, paid, updated_at: new Date().toISOString() });
+  const { error } = await runMutation(() =>
+    client.from("player_dues").upsert({ player_id: playerId, paid, updated_at: new Date().toISOString() })
+  );
   if (error) throw error;
 }
 
