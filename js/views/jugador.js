@@ -157,7 +157,7 @@ const PODIUM_METAL = { 1: "Golden", 2: "Silver", 3: "Bronze" };
 // Medalla de oro/plata/bronce según el lugar del jugador (1/2/3) en una
 // estadística del equipo esta temporada — null si no calificó (su valor es
 // 0) o no quedó en el podio. `label`/`desc` pueden ser un texto fijo (mismo
-// nombre sin importar el lugar — Bombardero, Ninja, etc.) o una función
+// nombre sin importar el lugar — Kaboom!, Ninja, etc.) o una función
 // `(valor, lugar)` para las que sí cambian de nombre por lugar (Bate/Guante
 // de oro, plata, bronce).
 function podiumChip(list, playerId, key, { icon, label, desc }) {

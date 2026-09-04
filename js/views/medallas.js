@@ -103,18 +103,18 @@ async function getAsyncLabels(player) {
   const announcements = await getAnnouncements(1000);
   if (announcements.length > 0) {
     const likes = await getAnnouncementLikes(announcements.map((a) => a.id));
-    if (likes.some((l) => l.player_id === player.id)) labels.push("Fanático");
+    if (likes.some((l) => l.player_id === player.id)) labels.push("Superfan");
   }
 
   if (GAMES.length > 0) {
     const perGameComments = await Promise.all(GAMES.map((g) => getComments("game", g.id)));
     const gamesCommented = perGameComments.filter((comments) => comments.some((c) => c.player_id === player.id)).length;
-    if (gamesCommented >= 5) labels.push("Comentarista");
+    if (gamesCommented >= 5) labels.push("Let's chat");
 
     const perGameVotes = await Promise.all(GAMES.map((g) => getMvpVotes(g.id)));
     const minVotes = Math.ceil(GAMES.length / 2);
     const gamesVoted = perGameVotes.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
-    if (gamesVoted >= minVotes) labels.push("Demócrata");
+    if (gamesVoted >= minVotes) labels.push("Voter");
   }
 
   return labels;
