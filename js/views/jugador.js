@@ -163,6 +163,12 @@ function renderAchievements(player) {
     if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
       chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón de bases", kind: "leader" });
     }
+    // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
+    // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
+    // Mismo SO de bateo, no el de pitcheo (ese es "Máquina de ponches").
+    if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
+      chips.push({ icon: "fa-solid fa-beer-mug-empty", label: `Expendio · ${myBatting.SO} ponches`, kind: "leader" });
+    }
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({ icon: "fa-solid fa-baseball-bat-ball", label: `Bateador de ${myBatting.AVG}`, kind: "avg300" });
     }
