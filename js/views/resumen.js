@@ -12,8 +12,16 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
-import { getCurrentPlayerId } from "../auth.js";
-import { getRsvps, setRsvp, getAnnouncements, getAnnouncementLikes, likeAnnouncement, unlikeAnnouncement } from "../db.js";
+import { getCurrentPlayerId, getSession } from "../auth.js";
+import {
+  getRsvps,
+  setRsvp,
+  getAnnouncements,
+  getAnnouncementLikes,
+  likeAnnouncement,
+  unlikeAnnouncement,
+  getAvatarUrl,
+} from "../db.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -37,6 +45,34 @@ function formatGameDate(dateStr) {
 // necesitar para algo que no sea una fila de stats.
 function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
+}
+
+// Igual que renderAvatar(), pero envuelto en un `[data-avatar]` para que
+// hydrateAvatars() (abajo) pueda reemplazarlo por la foto de Storage si
+// existe — mismo patrón que ya usan el perfil individual y el comparador
+// (ver js/views/jugador.js, js/views/comparar.js). Sin esto, un jugador con
+// foto propia subida desde su perfil seguiría viéndose con sus iniciales
+// aquí en Resumen.
+function avatarSlot(player, size) {
+  const id = player.id ?? player.playerId;
+  return `<span class="avatar-slot" data-avatar="${id}" data-size="${size}">${renderAvatar(player, size)}</span>`;
+}
+
+// Reemplaza los avatares de siempre (foto de data.js o iniciales, ya
+// pintados) por la foto personalizada de Storage cuando exista. El bucket
+// es privado (solo con sesión iniciada, ver getAvatarUrl en js/db.js): sin
+// sesión esto no hace nada y la vista se queda con lo que ya pintó.
+async function hydrateAvatars(root) {
+  if (!getSession()) return;
+  const slots = [...root.querySelectorAll("[data-avatar]")];
+  await Promise.all(
+    slots.map(async (slot) => {
+      const url = await getAvatarUrl(slot.dataset.avatar);
+      if (!url) return;
+      const size = slot.dataset.size;
+      slot.innerHTML = `<img class="avatar" src="${url}" alt="" style="width:${size}px;height:${size}px;font-size:${size * 0.4}px;">`;
+    })
+  );
 }
 
 // Armazón "hero" para tarjetas de un solo valor, sin 2do/3er lugar (Récord,
