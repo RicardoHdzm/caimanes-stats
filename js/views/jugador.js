@@ -160,20 +160,20 @@ function renderAchievements(player) {
 
   if (myBatting) {
     if (Number(myBatting.AVG) > 0 && rankAmong(qualifiedBatters, player.id, "AVG", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-medal", label: "Bate de oro · líder de AVG", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-medal", label: "Bate de oro", kind: "leader" });
     }
     if (Number(myBatting.HR) > 0 && rankAmong(battingList, player.id, "HR", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-bomb", label: "Rey de los jonrones", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-bomb", label: "Bombardero", kind: "leader" });
     }
     if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón de bases", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-person-running", label: "Ladrón", kind: "leader" });
     }
     if (Number(myBatting.RBI) > 0 && rankAmong(battingList, player.id, "RBI", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-tornado", label: "Rey del remolque", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-tornado", label: "Impulsador", kind: "leader" });
     }
     // "Expendio" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza.
-    // Mismo SO de bateo, no el de pitcheo (ese es "Máquina de ponches").
+    // Mismo SO de bateo, no el de pitcheo (ese es "Ponchador").
     if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
       chips.push({ icon: "fa-solid fa-beer-mug-empty", label: `Expendio · ${myBatting.SO} ponches`, kind: "leader" });
     }
@@ -184,7 +184,7 @@ function renderAchievements(player) {
 
   if (myPitching && myPitching.outs > 0) {
     if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-baseball", label: "Máquina de ponches", kind: "leader" });
+      chips.push({ icon: "fa-solid fa-baseball", label: "Ponchador", kind: "leader" });
     }
   }
 
