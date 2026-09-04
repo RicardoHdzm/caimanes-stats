@@ -301,7 +301,13 @@ export function renderResumen(container) {
   const minPA = minPlateAppearances(GAMES);
   const batSorted = battingList.filter((p) => p.qualified).sort((a, b) => Number(b.AVG) - Number(a.AVG));
   const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
-  const pitSorted = pitchingTotals(GAMES).sort((a, b) => Number(a.ERA) - Number(b.ERA));
+  // WHIP y no ERA: ERA depende de carreras limpias (ER), un dato que nunca
+  // se captura en data.js — siempre saldría 0.00 para todos y el "líder"
+  // sería un empate sin sentido. WHIP (bases por bolas + hits, por entrada)
+  // no depende de ER, así que sí refleja algo real.
+  const pitSorted = pitchingTotals(GAMES)
+    .filter((p) => p.outs > 0)
+    .sort((a, b) => Number(a.WHIP) - Number(b.WHIP));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
 
   const leadersHeading = document.createElement("h3");
@@ -330,8 +336,8 @@ export function renderResumen(container) {
       "fa-baseball",
       "Líder de pitcheo",
       pitSorted,
-      (p) => `${p.name} — ERA ${p.ERA}, ${p.SO} K en ${p.IP} IP`,
-      (p) => `${p.name} — ERA ${p.ERA}`
+      (p) => `${p.name} — WHIP ${p.WHIP}, ${p.SO} K en ${p.IP} IP`,
+      (p) => `${p.name} — WHIP ${p.WHIP}`
     ) +
     leaderCardHtml(
       "fa-beer-mug-empty",

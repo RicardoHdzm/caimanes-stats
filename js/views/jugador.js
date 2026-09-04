@@ -147,7 +147,6 @@ function renderAchievements(player) {
   const pitchingList = pitchingTotals(GAMES);
   const fieldingList = fieldingTotals(GAMES);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
-  const activePitchers = pitchingList.filter((r) => r.outs > 0);
 
   const myBatting = battingList.find((r) => r.playerId === player.id);
   const myPitching = pitchingList.find((r) => r.playerId === player.id);
@@ -177,9 +176,6 @@ function renderAchievements(player) {
   if (myPitching && myPitching.outs > 0) {
     if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
       chips.push({ icon: "fa-solid fa-baseball", label: "Máquina de ponches", kind: "leader" });
-    }
-    if (Number(myPitching.ERA) === 0 && rankAmong(activePitchers, player.id, "ERA", "asc")?.place === 1) {
-      chips.push({ icon: "fa-solid fa-shield", label: "Brazo de acero · ERA 0.00", kind: "leader" });
     }
   }
 
