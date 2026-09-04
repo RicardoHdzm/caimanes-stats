@@ -96,9 +96,19 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
+// Reintenta una vez tras un hipo de red — es un update (cambiar la
+// contraseña dos veces al mismo valor no hace nada raro), así que a
+// diferencia de un insert es seguro reintentarlo sin arriesgar nada
+// duplicado. Mismo patrón que runQuery/runMutation en js/db.js, repetido
+// aquí en chico para no crear un import circular (db.js ya importa de este
+// archivo).
 export async function changePassword(newPassword) {
   if (!supabase) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  let { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    ({ error } = await supabase.auth.updateUser({ password: newPassword }));
+  }
   if (error) throw error;
 }
 

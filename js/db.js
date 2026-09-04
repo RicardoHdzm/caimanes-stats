@@ -208,9 +208,9 @@ export async function getAllPositionOverrides() {
 export async function setPosition(playerId, position) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client
-    .from("player_positions")
-    .upsert({ player_id: playerId, position, updated_at: new Date().toISOString() });
+  const { error } = await runMutation(() =>
+    client.from("player_positions").upsert({ player_id: playerId, position, updated_at: new Date().toISOString() })
+  );
   if (error) throw error;
 }
 
@@ -250,9 +250,9 @@ export async function getAllWalkupOverrides() {
 export async function setWalkup(playerId, { title, artist, url }) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client
-    .from("player_walkups")
-    .upsert({ player_id: playerId, title, artist, url, updated_at: new Date().toISOString() });
+  const { error } = await runMutation(() =>
+    client.from("player_walkups").upsert({ player_id: playerId, title, artist, url, updated_at: new Date().toISOString() })
+  );
   if (error) throw error;
 }
 
@@ -291,7 +291,7 @@ export async function addComment(contextType, contextId, body) {
 export async function deleteComment(commentId) {
   const client = getClient();
   if (!client) throw new Error("Necesitas una cuenta para borrar comentarios.");
-  const { error } = await client.from("comments").delete().eq("id", commentId);
+  const { error } = await runMutation(() => client.from("comments").delete().eq("id", commentId));
   if (error) throw error;
 }
 
@@ -325,7 +325,9 @@ export async function unlikeComment(commentId) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
   if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
-  const { error } = await client.from("comment_likes").delete().eq("comment_id", commentId).eq("player_id", playerId);
+  const { error } = await runMutation(() =>
+    client.from("comment_likes").delete().eq("comment_id", commentId).eq("player_id", playerId)
+  );
   if (error) throw error;
 }
 
@@ -352,7 +354,7 @@ export async function postAnnouncement(body) {
 export async function deleteAnnouncement(id) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client.from("announcements").delete().eq("id", id);
+  const { error } = await runMutation(() => client.from("announcements").delete().eq("id", id));
   if (error) throw error;
 }
 
@@ -381,11 +383,9 @@ export async function unlikeAnnouncement(announcementId) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
   if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
-  const { error } = await client
-    .from("announcement_likes")
-    .delete()
-    .eq("announcement_id", announcementId)
-    .eq("player_id", playerId);
+  const { error } = await runMutation(() =>
+    client.from("announcement_likes").delete().eq("announcement_id", announcementId).eq("player_id", playerId)
+  );
   if (error) throw error;
 }
 
@@ -417,8 +417,8 @@ export async function getAvatarUrl(playerId) {
 export async function uploadAvatar(playerId, file) {
   const client = getClient();
   if (!client) throw new Error("Supabase no está configurado todavía.");
-  const { error } = await client.storage
-    .from("avatars")
-    .upload(`${playerId}/avatar`, file, { upsert: true, contentType: file.type });
+  const { error } = await runMutation(() =>
+    client.storage.from("avatars").upload(`${playerId}/avatar`, file, { upsert: true, contentType: file.type })
+  );
   if (error) throw error;
 }
