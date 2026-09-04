@@ -37,7 +37,7 @@ import { renderAchievements } from "./jugador.js";
 const CATALOG = [
   // ---- Trayectoria ----
   { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
-  { kind: "trajectory", icon: "fa-solid fa-hourglass-half", name: "Veterano", how: "Ha jugado temporadas con el equipo.", match: (l) => l === "Veterano" },
+  { kind: "trajectory", icon: "fa-solid fa-hat-cowboy", name: "Veterano", how: "Ha jugado temporadas con el equipo.", match: (l) => l === "Veterano" },
   { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Trotamundos", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Trotamundos" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "Caliente", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "Caliente" },
@@ -45,7 +45,7 @@ const CATALOG = [
   { kind: "streak", icon: "fa-solid fa-fire-flame-curved", name: "En llamas", how: "Racha activa de 2 o más juegos seguidos con multi-hit (2 o más hits por juego).", match: (l) => l === "En llamas" },
   { kind: "streak", icon: "fa-solid fa-lock", name: "Seguro", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Seguro" },
   // ---- Podio del equipo (oro/plata/bronce, según el lugar) ----
-  { kind: "gold", icon: "fa-solid fa-medal", name: "Bate de oro / plata / bronce", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.startsWith("Bate de ") },
+  { kind: "gold", icon: "fa-solid fa-baseball-bat-ball", name: "Bate de oro / plata / bronce", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.startsWith("Bate de ") },
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Bombardero", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Bombardero" },
   { kind: "gold", icon: "fa-solid fa-user-ninja", name: "Ninja", how: "Top 3 del equipo en bases robadas esta temporada.", match: (l) => l === "Ninja" },
   { kind: "gold", icon: "fa-solid fa-tornado", name: "Tornado", how: "Top 3 del equipo en carreras impulsadas (RBI) esta temporada.", match: (l) => l === "Tornado" },
@@ -55,22 +55,22 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-broom", name: "Escoba", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Escoba" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Triple Kill", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Kill" },
-  { kind: "gold", icon: "fa-solid fa-eye", name: "Ojo de águila", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Ojo de águila" },
-  { kind: "gold", icon: "fa-solid fa-bullseye", name: "Selectivo", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Selectivo" },
+  { kind: "gold", icon: "fa-solid fa-crow", name: "Ojo de águila", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Ojo de águila" },
+  { kind: "gold", icon: "fa-solid fa-hourglass-half", name: "Paciente", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Paciente" },
   { kind: "gold", icon: "fa-solid fa-star", name: "Estrella", how: "Top 3 del equipo en premios MVP esta temporada.", match: (l) => l === "Estrella" },
   // ---- Umbral fijo ----
-  { kind: "threshold", icon: "fa-solid fa-baseball-bat-ball", name: "Estelar", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "Estelar" },
+  { kind: "threshold", icon: "fa-solid fa-meteor", name: "Estelar", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "Estelar" },
   { kind: "threshold", icon: "fa-solid fa-gem", name: "Fuera de serie", how: "OPS de 1.000 o más esta temporada.", match: (l) => l === "Fuera de serie" },
   // ---- Participación ----
-  { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Nerd", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Nerd" },
+  { kind: "participation", icon: "fa-solid fa-calendar-check", name: "Desquehacerado", how: "Asistió a todos los juegos de la temporada.", match: (l) => l === "Desquehacerado" },
   { kind: "participation", icon: "fa-solid fa-hand", name: "Cumplidor", how: "Asistió a más de 5 juegos esta temporada.", match: (l) => l === "Cumplidor" },
   { kind: "participation", icon: "fa-solid fa-cat", name: "Nocturno", how: "Asistió a más de la mitad de los juegos a las 9:00pm de la temporada.", match: (l) => l === "Nocturno" },
-  { kind: "participation", icon: "fa-solid fa-shuffle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
-  { kind: "participation", icon: "fa-solid fa-crown", name: "Comodín total", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Comodín total" },
+  { kind: "participation", icon: "fa-solid fa-recycle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
+  { kind: "participation", icon: "fa-solid fa-crown", name: "Rey Caimán", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Rey Caimán" },
   // ---- Social ----
-  { kind: "social", icon: "fa-solid fa-heart", name: "Fan del equipo", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fan del equipo", async: true },
+  { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
   { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
-  { kind: "social", icon: "fa-solid fa-gavel", name: "Buen juez", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Buen juez", async: true },
+  { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Demócrata", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Demócrata", async: true },
   // ---- Perfil ----
   { kind: "profile", icon: "fa-solid fa-camera", name: "1, 2, 3... Flash!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "1, 2, 3... Flash!", async: true },
   { kind: "profile", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
@@ -100,7 +100,7 @@ async function getAsyncLabels(player) {
   const announcements = await getAnnouncements(1000);
   if (announcements.length > 0) {
     const likes = await getAnnouncementLikes(announcements.map((a) => a.id));
-    if (likes.some((l) => l.player_id === player.id)) labels.push("Fan del equipo");
+    if (likes.some((l) => l.player_id === player.id)) labels.push("Fanático");
   }
 
   if (GAMES.length > 0) {
@@ -111,7 +111,7 @@ async function getAsyncLabels(player) {
     const perGameVotes = await Promise.all(GAMES.map((g) => getMvpVotes(g.id)));
     const minVotes = Math.ceil(GAMES.length / 2);
     const gamesVoted = perGameVotes.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
-    if (gamesVoted >= minVotes) labels.push("Buen juez");
+    if (gamesVoted >= minVotes) labels.push("Demócrata");
   }
 
   return labels;
