@@ -59,16 +59,16 @@ function renderDebut(seasons) {
 // MVP/Debut, que siempre van solos en el suyo. `kind` es la CATEGORÍA, no
 // el logro individual — todos los de una misma categoría comparten color
 // (ver .achievement-badge--* en css/styles.css):
-//   trajectory    (verde oliva) — fundador, temporadas en el equipo, ligas jugadas
+//   trajectory    (azul marino) — fundador, temporadas en el equipo, ligas jugadas
 //   streak        (naranja) — racha de hits vigente
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
-//   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
+//   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (morado) — asistencia y versatilidad de posiciones
 //   social        (rojo rosado) — interacción con el equipo (ej. le dio
 //                             like a un anuncio) — no es sobre jugar, por
 //                             eso no comparte color con participation.
-//   profile       (azul)   — personalizaste tu perfil (foto, walkup song) —
+//   profile       (rosa)   — personalizaste tu perfil (foto, walkup song) —
 //                             estos dos dependen de Storage/Supabase, así
 //                             que no salen de aquí: los agrega
 //                             addAchievementMedal() más abajo, en cuanto
