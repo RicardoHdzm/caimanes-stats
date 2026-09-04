@@ -410,7 +410,7 @@ export function renderResumen(container) {
     recordsRow.innerHTML = records
       .map((r) => {
         const visualHtml = r.playerId
-          ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 56)}</div>`
+          ? `<div class="record-hero-avatar">${renderAvatar(playerFor(r), 72)}</div>`
           : `<div class="record-icon-badge"><i class="fa-solid ${r.icon}"></i></div>`;
         const runnersHtml = r.runnersUp?.length
           ? `
@@ -437,7 +437,7 @@ export function renderResumen(container) {
         <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
           <div class="record-hero">
             <div class="record-hero-main">
-              <span class="record-label"><i class="fa-solid ${r.icon}"></i> ${r.label}</span>
+              <span class="record-label"><i class="fa-solid ${r.icon}"></i>${r.label}</span>
               <span class="record-value">${r.value}</span>
               <span class="record-detail">${r.detail}</span>
               <span class="record-note">${r.note}</span>

@@ -2567,8 +2567,19 @@ main h3::before {
   transform: translateY(-2px);
 }
 
+/* Mismo tamaño/jerarquía que .leader-card h3 (icono grande arriba, título
+   chico debajo) — antes el icono de récords salía en línea con el título y
+   a tamaño de texto normal, mucho más chico que en las tarjetas de líderes;
+   ver comentario en .record-card--hero sobre por qué el acento es blanco y
+   no rojo. */
 .record-label {
-  font-size: var(--text-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 10px;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -2577,34 +2588,42 @@ main h3::before {
 
 .record-value {
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-size: var(--text-4xl);
   font-weight: 700;
+  font-style: italic;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
 
 .record-detail {
+  margin-top: 6px;
   font-size: var(--text-md);
   font-weight: 600;
 }
 
 .record-note {
+  margin-top: 2px;
   font-size: var(--text-xs);
   color: var(--muted);
 }
 
-/* Variante "hero" (mismo lenguaje visual que .leader-card--hero): fondo con
-   degradado de acento y, a la derecha, la foto real del dueño del récord en
-   vez del icono genérico — solo cuando hay un único dueño (r.playerId); con
-   empate o récord de equipo no hay a quién retratar y se usa una insignia
-   circular con el icono en su lugar. El 2do/3er lugar (.leader-runners, la
-   misma clase que usan los líderes de temporada) va debajo, fuera del
-   degradado — por eso el padding se mueve de la tarjeta a .record-hero. */
+/* Variante "hero" (mismo lenguaje visual que .leader-card--hero): número
+   grande y, a la derecha, la foto real del dueño del récord — solo cuando
+   hay un único dueño (r.playerId); con empate o récord de equipo no hay a
+   quién retratar y se usa una insignia circular con el icono en su lugar.
+   El acento es blanco/plateado (no el rojo de "Líderes") a propósito, para
+   distinguir "récord de la temporada" de "líder actual" — mismo criterio ya
+   usado en las tarjetas de "Stats de equipo". El 2do/3er lugar
+   (.leader-runners, la misma clase que usan los líderes de temporada) va
+   debajo, fuera del degradado — por eso el padding se mueve de la tarjeta a
+   .record-hero. */
 .record-card--hero {
   flex-direction: column;
   align-items: stretch;
   padding: 0;
   overflow: hidden;
-  border-top: 4px solid var(--accent);
+  border-top: 4px solid #fff;
 }
 
 .record-hero {
@@ -2612,20 +2631,26 @@ main h3::before {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px 16px;
-  background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
+  padding: 16px 16px 14px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
+}
+
+.record-label i {
+  font-size: var(--text-3xl);
+  color: #fff;
+}
+
+.record-label i::before {
+  background: linear-gradient(135deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .record-hero-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
   min-width: 0;
-}
-
-.record-label i {
-  color: var(--accent);
-  margin-right: 4px;
 }
 
 .record-hero-avatar {
@@ -2648,12 +2673,12 @@ main h3::before {
   background: var(--surface-alt);
   border: 1px solid var(--border);
   font-size: var(--text-xs);
-  color: var(--accent);
+  color: var(--muted);
 }
 
 .record-icon-badge {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -2661,8 +2686,14 @@ main h3::before {
   flex-shrink: 0;
   background: var(--surface-alt);
   border: 1px solid var(--border);
-  font-size: var(--text-2xl);
-  color: var(--accent);
+  font-size: var(--text-3xl);
+}
+
+.record-icon-badge i::before {
+  background: linear-gradient(135deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* ---- comparador ---- */
