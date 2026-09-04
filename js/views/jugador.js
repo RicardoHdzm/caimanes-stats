@@ -449,8 +449,8 @@ export function renderAchievements(player) {
     const nightGamesPlayed = gamesPlayedByPlayer(nightGames).get(player.id) ?? 0;
     if (nightGamesPlayed > nightGames.length / 2) {
       chips.push({
-        icon: "fa-solid fa-cat",
-        label: "Night Owl",
+        icon: "fa-solid fa-moon",
+        label: "Sleepwalker",
         kind: "participation",
         desc: `Asistió a más de la mitad de los juegos a las 9:00pm de la temporada (${nightGamesPlayed} de ${nightGames.length}).`,
       });

@@ -141,7 +141,7 @@ export const MANAGERS = ["p15"];
 //   {
 //     id: "g8", // el siguiente consecutivo (hay 7 juegos: g1…g7)
 //     date: "2026-03-01",
-//     time: "19:00", // opcional, formato 24h — usado por la medalla "Night Owl" (juegos a las 21:00)
+//     time: "19:00", // opcional, formato 24h — usado por la medalla "Sleepwalker" (juegos a las 21:00)
 //     opponent: "Nombre del rival",
 //     weCloseBatting: true,
 //     scoreUs: 8,
