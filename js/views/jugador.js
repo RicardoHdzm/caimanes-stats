@@ -106,6 +106,17 @@ function sortedAchievementsHtml(chips) {
     .join("");
 }
 
+// Encabezado de la tarjeta de medallas: título + botón a la guía completa
+// (ver js/views/medallas.js) — este jugador en específico, para que la guía
+// ya sepa marcar cuáles tiene. .medallero-card (ver css/styles.css) le da
+// position:relative a la tarjeta para poder anclar el botón en la esquina.
+function MEDALLERO_HEADER(playerId) {
+  return `
+    <h3><i class="fa-solid fa-medal"></i>Medallero</h3>
+    <a href="#/medallas/${playerId}" class="medallero-guide-btn">Guía de medallas</a>
+  `;
+}
+
 // Racha ACTIVA (hasta el juego más reciente) de juegos seguidos que cumplen
 // `qualifies(line)` — mismo criterio que hitStreaks() en stats.js (un juego
 // sin turnos al bat no cuenta ni a favor ni en contra, para no castigar a
