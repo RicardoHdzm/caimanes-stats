@@ -216,11 +216,15 @@ function renderAchievements(player) {
 
   if (chips.length === 0) return "";
   return `
-    <div class="achievements-row">
+    <div class="achievements-grid">
       ${chips
         .map(
-          (c) =>
-            `<span class="achievement-badge achievement-badge--${c.kind}"><i class="${c.icon}"></i>${escapeHtml(c.label)}</span>`
+          (c) => `
+            <div class="achievement-medal achievement-medal--${c.kind}">
+              <div class="achievement-medal-icon"><i class="${c.icon}"></i></div>
+              <span class="achievement-medal-label">${escapeHtml(c.label)}</span>
+            </div>
+          `
         )
         .join("")}
     </div>
