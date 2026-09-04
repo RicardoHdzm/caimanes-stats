@@ -514,20 +514,23 @@ export function renderJugadorDetalle(container, playerId) {
     });
   }
 
-  // ---- "Buen juez": votó por el MVP en todos los juegos de la temporada ----
+  // ---- "Buen juez": votó por el MVP en al menos la mitad de los juegos ----
   //
   // Lectura pública. No exige que haya jugado en cada juego para votar (esa
   // regla la impone la UI de js/views/juego.js, no la base de datos) — este
-  // logro es sobre participar en la votación, no sobre elegibilidad.
+  // logro es sobre participar en la votación, no sobre elegibilidad. Mitad
+  // redondeada hacia arriba (ej. 5 de 9), para que "la mitad" nunca sea
+  // menos de la mitad de verdad.
   if (GAMES.length > 0) {
+    const minVotes = Math.ceil(GAMES.length / 2);
     Promise.all(GAMES.map((g) => getMvpVotes(g.id))).then((perGame) => {
-      const votedAll = perGame.every((votes) => votes.some((v) => v.voter_player_id === player.id));
-      if (!votedAll) return;
+      const gamesVoted = perGame.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
+      if (gamesVoted < minVotes) return;
       addAchievementMedal({
         icon: "fa-solid fa-gavel",
         label: "Buen juez",
         kind: "social",
-        desc: `Votó por el MVP en los ${GAMES.length} juegos de la temporada.`,
+        desc: `Votó por el MVP en ${gamesVoted} de los ${GAMES.length} juegos de la temporada.`,
       });
     });
   }
