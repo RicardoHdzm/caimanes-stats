@@ -12,20 +12,23 @@ import { PLAYERS, DUES_PAID } from "./data.js";
 
 export { getClient };
 
-// Reintenta una consulta de lectura una vez tras una pausa corta antes de
-// rendirse. En el campo la señal es intermitente (ver sw.js) — sin esto, un
-// solo hipo de red se ve exactamente igual que "no hay comentarios/anuncios"
-// o "no ha pagado", sin forma de distinguirlo, y solo se arregla con un
-// refresh manual. `queryFn` es una función que regresa `{ data, error }`
-// (la forma que usa el cliente de Supabase en cada consulta); un reintento
-// es barato y resuelve la enorme mayoría de esos casos sin bloquear el
-// primer pintado (sigue siendo asíncrono). Solo para lecturas — las
-// escrituras (insert/upsert) no se reintentan aquí, podrían duplicar algo
-// si la primera sí llegó a pasar y solo se perdió la respuesta.
+// Reintenta una consulta de lectura hasta 2 veces (3 intentos en total, con
+// pausas cada vez más largas) antes de rendirse. En el campo la señal es
+// intermitente (ver sw.js) — un solo reintento de 800ms no alcanza si el
+// hipo dura varios segundos, y sin esto se ve exactamente igual que "no hay
+// comentarios/anuncios" o "no ha pagado", sin forma de distinguirlo, y solo
+// se arregla con un refresh manual (ver también el listener de "online" en
+// js/main.js, que ataca el mismo problema desde otro ángulo: repinta la
+// vista completa apenas vuelve la señal, en vez de solo reintentar la
+// consulta que ya se hizo). `queryFn` regresa `{ data, error }` (la forma
+// que usa el cliente de Supabase en cada consulta). Solo para lecturas —
+// las escrituras (insert/upsert) no se reintentan aquí, podrían duplicar
+// algo si la primera sí llegó a pasar y solo se perdió la respuesta.
 async function runQuery(queryFn) {
   let result = await queryFn();
-  if (result.error) {
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  for (const delay of [800, 2000]) {
+    if (!result.error) break;
+    await new Promise((resolve) => setTimeout(resolve, delay));
     result = await queryFn();
   }
   return result;
@@ -43,8 +46,9 @@ async function runQuery(queryFn) {
 // las lecturas.
 async function runMutation(mutationFn) {
   let result = await mutationFn();
-  if (result.error) {
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  for (const delay of [800, 2000]) {
+    if (!result.error) break;
+    await new Promise((resolve) => setTimeout(resolve, delay));
     result = await mutationFn();
   }
   return result;

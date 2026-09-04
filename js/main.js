@@ -198,6 +198,24 @@ window.addEventListener("hashchange", () => {
 // se resuelve el player_id) — la vista actual se repinta con el estado
 // nuevo, mismo tratamiento que un cambio de hash.
 window.addEventListener("caimanes:auth-changed", render);
+
+// Cada vista pide sus datos de Supabase UNA sola vez, al pintarse (avatares,
+// anuncios, RSVP, comentarios...) — runQuery/runMutation en js/db.js ya
+// reintentan solas ante un hipo de red, pero si la señal se cae varios
+// segundos seguidos (típico en el campo) se rinden igual, y la vista se
+// queda así hasta que alguien la vuelva a pintar. Sin esto, la única forma
+// de recuperarse era cambiar de pestaña y volver, o recargar a mano — lo
+// cual para un jugador cualquiera (a diferencia de quien está viendo esto
+// en código) se siente como que "la app no jala". Repintar la vista actual
+// en cuanto vuelve la señal (evento "online" del navegador) o en cuanto la
+// pestaña vuelve a estar visible (se minimizó, se cambió de app en el
+// celular y se regresó) cubre ambos casos sin que nadie tenga que hacer
+// nada — mismo tratamiento que un cambio de sesión, no se toca el scroll.
+window.addEventListener("online", render);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") render();
+});
+
 render();
 // No se espera a que termine para pintar la primera vez: initAuth() resuelve
 // la sesión de forma async y avisa por "caimanes:auth-changed" cuando esté

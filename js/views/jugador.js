@@ -63,6 +63,10 @@ function renderDebut(seasons) {
 //   streak        (naranja/fuego) — racha de hits vigente
 //   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
 //                             temporada (ver podiumChip() justo abajo)
+//   neg-gold/neg-silver/neg-bronze (pantano/verde bilis/óxido) — mismo
+//                             podio de arriba pero para estadísticas donde
+//                             ser el #1 es un chiste (Bartender,
+//                             Butterhands) — `negative: true` en addPodium.
 //   threshold     (cian)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (morado) — asistencia y versatilidad de posiciones
 //   social        (rosa)   — interactuar con el sitio: like a un
@@ -92,6 +96,9 @@ const KIND_ORDER = [
   "gold",
   "silver",
   "bronze",
+  "neg-gold",
+  "neg-silver",
+  "neg-bronze",
   "threshold",
   "participation",
   "social",
@@ -153,14 +160,21 @@ function achievementMedalHtml(c) {
 
 const PODIUM_KIND = { 1: "gold", 2: "silver", 3: "bronze" };
 const PODIUM_METAL = { 1: "Golden", 2: "Silver", 3: "Bronze" };
+// Podio "negativo" — mismo mecanismo de oro/plata/bronce, pero para
+// estadísticas donde ser el #1 es un chiste, no un logro (Bartender,
+// Butterhands...): oro/plata/bronce brillan, esto no debería. Pantano,
+// verde bilis y óxido, a petición expresa — ver .achievement-medal--neg-*
+// en css/styles.css.
+const NEG_PODIUM_KIND = { 1: "neg-gold", 2: "neg-silver", 3: "neg-bronze" };
 
 // Medalla de oro/plata/bronce según el lugar del jugador (1/2/3) en una
 // estadística del equipo esta temporada — null si no calificó (su valor es
 // 0) o no quedó en el podio. `label`/`desc` pueden ser un texto fijo (mismo
 // nombre sin importar el lugar — Kaboom!, Ninja, etc.) o una función
 // `(valor, lugar)` para las que sí cambian de nombre por lugar (Bate/Guante
-// de oro, plata, bronce).
-function podiumChip(list, playerId, key, { icon, label, desc }) {
+// de oro, plata, bronce). `negative: true` usa NEG_PODIUM_KIND en vez de
+// PODIUM_KIND — mismo top 3, otro color (ver arriba).
+function podiumChip(list, playerId, key, { icon, label, desc, negative }) {
   const row = list.find((r) => r.playerId === playerId);
   if (!row || Number(row[key]) <= 0) return null;
   const place = rankAmong(list, playerId, key, "desc")?.place;
@@ -168,7 +182,7 @@ function podiumChip(list, playerId, key, { icon, label, desc }) {
   return {
     icon,
     label: typeof label === "function" ? label(row[key], place) : label,
-    kind: PODIUM_KIND[place],
+    kind: (negative ? NEG_PODIUM_KIND : PODIUM_KIND)[place],
     desc: typeof desc === "function" ? desc(row[key], place) : desc,
   };
 }
@@ -273,6 +287,18 @@ export function renderAchievements(player) {
       desc: `Racha activa de ${onBaseStreak} juegos seguidos embasándose (hit o base por bolas).`,
     });
   }
+  // "Ice Cold" — espejo negativo de "On Fire": racha activa SIN hit, en vez
+  // de con hit. Mismo activeGameStreak() de arriba, solo invierte la
+  // condición.
+  const hitlessStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) === 0);
+  if (hitlessStreak >= 2) {
+    chips.push({
+      icon: "fa-solid fa-snowflake",
+      label: "Ice Cold",
+      kind: "streak",
+      desc: `Racha activa de ${hitlessStreak} juegos seguidos sin hit.`,
+    });
+  }
 
   // ---- Líderes de la temporada — top 3 con medalla de oro/plata/bronce
   // (ver podiumChip/addPodium arriba). Las rate stats (AVG/OBP) solo
@@ -314,6 +340,11 @@ export function renderAchievements(player) {
       label: "Tornado",
       desc: (value) => `Carreras impulsadas (RBI) esta temporada (${value}).`,
     });
+    addPodium(battingList, "R", {
+      icon: "fa-solid fa-rocket",
+      label: "Rocket",
+      desc: (value) => `Carreras anotadas esta temporada (${value}).`,
+    });
     // "Bartender" — el chiste ya existía en el "Líder cervecero" de Resumen
     // (SO de bateo × 12 botes): quien más se ponchó, "debe" la cerveza —
     // esa coletilla solo aplica al de oro. Mismo SO de bateo, no el de
@@ -321,6 +352,7 @@ export function renderAchievements(player) {
     addPodium(battingList, "SO", {
       icon: "fa-solid fa-beer-mug-empty",
       label: "Bartender",
+      negative: true,
       desc: (value, place) =>
         `Ponches de bateo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
     });
@@ -386,6 +418,22 @@ export function renderAchievements(player) {
       label: "Snipper",
       desc: (value) => `Ponches propinados (pitcheo) esta temporada (${value}).`,
     });
+    // "Wild Thing" — mismo chiste que Bartender/Butterhands: el que más
+    // bases por bolas otorga "gana" el podio.
+    addPodium(pitchingList, "BB", {
+      icon: "fa-solid fa-explosion",
+      label: "Wild Thing",
+      negative: true,
+      desc: (value) => `Bases por bolas otorgadas (pitcheo) esta temporada (${value}).`,
+    });
+    // "Gopher Ball" — término real de beisbol para el lanzamiento que se va
+    // de jonrón; el que más le conectan "gana" el podio.
+    addPodium(pitchingList, "HR", {
+      icon: "fa-solid fa-baseball",
+      label: "Gopher Ball",
+      negative: true,
+      desc: (value) => `Jonrones permitidos (pitcheo) esta temporada (${value}).`,
+    });
     // Volumen de trabajo, no efectividad — IP (formato de béisbol, ver
     // comentario de arriba de data.js) se compara numérico igual que AVG/OPS
     // en otras medallas: la parte fraccionaria (.0/.1/.2 outs) siempre es
@@ -409,12 +457,17 @@ export function renderAchievements(player) {
       desc: (value) => `Outs realizados (PO) esta temporada (${value}).`,
     });
     // "Butterhands" — mismo chiste que Bartender (arriba): el que más
-    // errores comete "gana" el podio, con el mismo sistema oro/plata/bronce
-    // que cualquier otra estadística. Ícono de jabón porque se le resbala.
+    // errores comete "gana" el podio. Ícono de jabón porque se le resbala.
     addPodium(fieldingList, "E", {
       icon: "fa-solid fa-soap",
       label: "Butterhands",
+      negative: true,
       desc: (value) => `Errores cometidos esta temporada (${value}).`,
+    });
+    addPodium(fieldingList, "A", {
+      icon: "fa-solid fa-jet-fighter-up",
+      label: "Wingman",
+      desc: (value) => `Asistencias (de out) esta temporada (${value}).`,
     });
   }
 
