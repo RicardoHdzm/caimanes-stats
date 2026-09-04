@@ -152,7 +152,7 @@ function achievementMedalHtml(c) {
 }
 
 const PODIUM_KIND = { 1: "gold", 2: "silver", 3: "bronze" };
-const PODIUM_METAL = { 1: "oro", 2: "plata", 3: "bronce" };
+const PODIUM_METAL = { 1: "Golden", 2: "Silver", 3: "Bronze" };
 
 // Medalla de oro/plata/bronce según el lugar del jugador (1/2/3) en una
 // estadística del equipo esta temporada — null si no calificó (su valor es
@@ -206,7 +206,7 @@ export function renderAchievements(player) {
     if (seasons.length > 4) {
       chips.push({
         icon: "fa-solid fa-anchor",
-        label: "Veterano",
+        label: "Veteran",
         kind: "trajectory",
         desc: `${seasons.length} temporadas jugadas con el equipo.`,
       });
@@ -216,7 +216,7 @@ export function renderAchievements(player) {
     if (leagues.size > 1) {
       chips.push({
         icon: "fa-solid fa-earth-americas",
-        label: "Viajero",
+        label: "Bon voyage",
         kind: "trajectory",
         desc: `Ha jugado en ${leagues.size} ligas distintas con el equipo.`,
       });
@@ -271,7 +271,7 @@ export function renderAchievements(player) {
   const fieldingList = fieldingTotals(GAMES);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
   const fieldersWithPlays = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
-  // Relación BB/SO — "Paciente": a diferencia de Ojo de águila (BB en
+  // Relación BB/SO — "Patient": a diferencia de Eagle Eye (BB en
   // bruto), esto premia disciplina de verdad, no solo volumen. Se descartan
   // los que no se han ponchado nunca (SO=0): con SO=0 cualquier BB da una
   // razón "infinita" que no refleja nada real.
@@ -284,7 +284,7 @@ export function renderAchievements(player) {
   if (myBatting) {
     addPodium(qualifiedBatters, "AVG", {
       icon: "fa-solid fa-baseball-bat-ball",
-      label: (value, place) => `Bate de ${PODIUM_METAL[place]}`,
+      label: (value, place) => `${PODIUM_METAL[place]} Bat`,
       desc: (value) => `Promedio de bateo (AVG) esta temporada (${value}).`,
     });
     addPodium(battingList, "HR", {
@@ -315,7 +315,7 @@ export function renderAchievements(player) {
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({
         icon: "fa-solid fa-meteor",
-        label: "Estelar",
+        label: "All-Star",
         kind: "threshold",
         desc: `Promedio de bateo (AVG) de .300 o más esta temporada (${myBatting.AVG}).`,
       });
@@ -332,18 +332,18 @@ export function renderAchievements(player) {
     });
     addPodium(battingList, "BB", {
       icon: "fa-solid fa-crow",
-      label: "Ojo de águila",
+      label: "Eagle Eye",
       desc: (value) => `Bases por bolas (BB) esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
       icon: "fa-solid fa-scale-balanced",
-      label: "Paciente",
+      label: "Patient",
       desc: (value) => `Mejor relación bases por bolas / ponches esta temporada (${value.toFixed(2)}).`,
     });
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
       chips.push({
         icon: "fa-solid fa-gem",
-        label: "Diamante",
+        label: "Diamond",
         kind: "threshold",
         desc: `OPS de 1.000 o más esta temporada (${myBatting.OPS}).`,
       });
@@ -388,7 +388,7 @@ export function renderAchievements(player) {
   if (myFielding) {
     addPodium(fieldersWithPlays, "FPCT", {
       icon: "fa-solid fa-hand-fist",
-      label: (value, place) => `Guante de ${PODIUM_METAL[place]}`,
+      label: (value, place) => `${PODIUM_METAL[place]} Glove`,
       desc: (value) => `Porcentaje de fildeo (FPCT) esta temporada (${value}).`,
     });
     addPodium(fieldingList, "PO", {
@@ -415,7 +415,7 @@ export function renderAchievements(player) {
   if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
     chips.push({
       icon: "fa-solid fa-calendar-check",
-      label: "Inquebrantable",
+      label: "It's a date!",
       kind: "participation",
       desc: "Asistió a todos los juegos de la temporada.",
     });
@@ -423,7 +423,7 @@ export function renderAchievements(player) {
   if (gamesPlayedCount > 5) {
     chips.push({
       icon: "fa-solid fa-hand",
-      label: "Cumplidor",
+      label: "High Five!",
       kind: "participation",
       desc: `Ya asistió a más de 5 juegos esta temporada (${gamesPlayedCount}).`,
     });
@@ -438,7 +438,7 @@ export function renderAchievements(player) {
     if (nightGamesPlayed > nightGames.length / 2) {
       chips.push({
         icon: "fa-solid fa-cat",
-        label: "Nocturno",
+        label: "Night Owl",
         kind: "participation",
         desc: `Asistió a más de la mitad de los juegos a las 9:00pm de la temporada (${nightGamesPlayed} de ${nightGames.length}).`,
       });
@@ -456,16 +456,16 @@ export function renderAchievements(player) {
   if (positionsPlayed.size >= 3) {
     chips.push({
       icon: "fa-solid fa-recycle",
-      label: "Versátil",
+      label: "All-Rounder",
       kind: "participation",
       desc: `Jugó en 3 o más posiciones distintas esta temporada (${positionsPlayed.size}).`,
     });
   }
-  // Más exigente que Versátil: las 9 posiciones de campo, no solo 3+.
+  // Más exigente que All-Rounder: las 9 posiciones de campo, no solo 3+.
   if (positionsPlayed.size === DEFENSE_POSITIONS.length) {
     chips.push({
       icon: "fa-solid fa-crown",
-      label: "Rey Caimán",
+      label: "Super Caiman",
       kind: "participation",
       desc: `Jugó en las ${DEFENSE_POSITIONS.length} posiciones de campo esta temporada.`,
     });
@@ -484,7 +484,7 @@ export function renderAchievements(player) {
   if (substitutionGames.size >= 2) {
     chips.push({
       icon: "fa-solid fa-up-down",
-      label: "Suplente",
+      label: "Sub",
       kind: "participation",
       desc: `Entró o salió de cambio en ${substitutionGames.size} juegos de la temporada.`,
     });
@@ -621,7 +621,7 @@ export function renderJugadorDetalle(container, playerId) {
     });
   });
 
-  // ---- "Fanático": le dio like a algún anuncio ----
+  // ---- "Superfan": le dio like a algún anuncio ----
   //
   // Lectura pública (anuncios y likes), corre con o sin sesión. No hay una
   // consulta directa "¿este jugador le dio like a algo?", así que se arma
@@ -633,13 +633,13 @@ export function renderJugadorDetalle(container, playerId) {
     if (!likes.some((l) => l.player_id === player.id)) return;
     addAchievementMedal({
       icon: "fa-solid fa-heart",
-      label: "Fanático",
+      label: "Superfan",
       kind: "social",
       desc: "Le dio like a algún anuncio del equipo.",
     });
   });
 
-  // ---- "Comentarista": comentó en al menos 5 juegos de la temporada ----
+  // ---- "Let's chat": comentó en al menos 5 juegos de la temporada ----
   //
   // Lectura pública. Un comentario por jugador por juego (constraint en
   // supabase/schema.sql), así que basta con contar en cuántos juegos
@@ -650,14 +650,14 @@ export function renderJugadorDetalle(container, playerId) {
       if (gamesCommented < 5) return;
       addAchievementMedal({
         icon: "fa-solid fa-comment",
-        label: "Comentarista",
+        label: "Let's chat",
         kind: "social",
         desc: `Comentó en ${gamesCommented} juegos de la temporada.`,
       });
     });
   }
 
-  // ---- "Demócrata": votó por el MVP en al menos la mitad de los juegos ----
+  // ---- "Voter": votó por el MVP en al menos la mitad de los juegos ----
   //
   // Lectura pública. No exige que haya jugado en cada juego para votar (esa
   // regla la impone la UI de js/views/juego.js, no la base de datos) — este
@@ -671,7 +671,7 @@ export function renderJugadorDetalle(container, playerId) {
       if (gamesVoted < minVotes) return;
       addAchievementMedal({
         icon: "fa-solid fa-thumbs-up",
-        label: "Demócrata",
+        label: "Voter",
         kind: "social",
         desc: `Votó por el MVP en ${gamesVoted} de los ${GAMES.length} juegos de la temporada.`,
       });
