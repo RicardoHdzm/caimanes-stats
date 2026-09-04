@@ -340,25 +340,20 @@ export function renderResumen(container) {
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders grid-4 team-stats-row tab-carousel";
-  teamRow.innerHTML = `
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-baseball-bat-ball"></i>Bateo de equipo</h3>
-      <p>AVG ${teamBat.AVG} · OBP ${teamBat.OBP} · SLG ${teamBat.SLG}</p>
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-bomb"></i>Home runs de equipo</h3>
-      <p>${teamBat.HR} HR</p>
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-baseball"></i>Pitcheo de equipo</h3>
-      <p>WHIP ${teamPit.WHIP} · ${teamPit.SO} K</p>
-    </div>
-    <div class="leader-card">
-      <h3><i class="fa-solid fa-shield"></i>Fildeo de equipo</h3>
-      <p>FPCT ${teamFld.FPCT}</p>
-    </div>
-  `;
+  teamRow.className = "leaders grid-2 team-stats-row tab-carousel";
+  teamRow.innerHTML =
+    heroCardShell(
+      "fa-baseball-bat-ball",
+      "Bateo de equipo",
+      `<span class="leader-hero-value">${teamBat.AVG}</span><span class="leader-hero-detail">OBP ${teamBat.OBP} · SLG ${teamBat.SLG}</span>`
+    ) +
+    heroCardShell("fa-bomb", "Home runs de equipo", `<span class="leader-hero-value">${teamBat.HR} HR</span>`) +
+    heroCardShell(
+      "fa-baseball",
+      "Pitcheo de equipo",
+      `<span class="leader-hero-value">${teamPit.WHIP} WHIP</span><span class="leader-hero-detail">${teamPit.SO} K</span>`
+    ) +
+    heroCardShell("fa-shield", "Fildeo de equipo", `<span class="leader-hero-value">${teamFld.FPCT}</span>`);
   container.appendChild(teamRow);
 
   const battingList = battingTotals(GAMES);
