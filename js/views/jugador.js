@@ -556,9 +556,9 @@ export function renderJugadorDetalle(container, playerId) {
     avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
     addAchievementMedal({
       icon: "fa-solid fa-camera",
-      label: "Say Cheese",
+      label: "1, 2, 3... Flash!",
       kind: "profile",
-      desc: "1, 2, 3... Flash!",
+      desc: "Subió una foto de perfil personalizada.",
     });
   });
 
@@ -703,9 +703,9 @@ export function renderJugadorDetalle(container, playerId) {
     walkupDisplay.innerHTML = renderWalkup(override);
     addAchievementMedal({
       icon: "fa-solid fa-music",
-      label: "Soundtrack",
+      label: "Greatests Hits",
       kind: "profile",
-      desc: "Greatest Hits.",
+      desc: "Personalizó su canción de entrada.",
     });
   });
 
