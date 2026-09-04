@@ -300,18 +300,20 @@ export function renderResumen(container) {
   const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
   if (recentGames.length > 0) {
     const form = document.createElement("div");
-    form.className = "leader-card form-card";
-    form.innerHTML = `
-      <h3><i class="fa-solid fa-clock-rotate-left"></i>Racha reciente</h3>
-      <div class="form-strip">
+    form.className = "leader-card leader-card--hero";
+    form.innerHTML = heroCardInnerHtml(
+      "fa-clock-rotate-left",
+      "Racha reciente",
+      "",
+      `<div class="form-strip">
         ${recentGames
           .map((g) => {
             const chip = FORM_CHIP[gameResult(g)] ?? { letter: "?", cls: "badge-unknown" };
             return `<span class="badge form-chip ${chip.cls}" title="${g.opponent} — ${g.date}">${chip.letter}</span>`;
           })
           .join("")}
-      </div>
-    `;
+      </div>`
+    );
     bottomRow.appendChild(form);
   }
 
