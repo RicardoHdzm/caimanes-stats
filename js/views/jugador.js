@@ -60,6 +60,11 @@ function renderDebut(seasons) {
 //   leader        (dorado) — eres el #1 del equipo en algo esta temporada
 //   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (naranja) — asistencia y versatilidad de posiciones
+//   profile       (azul)   — personalizaste tu perfil (foto, walkup song) —
+//                             estos dos dependen de Storage/Supabase, así
+//                             que no salen de aquí: los agrega
+//                             addAchievementMedal() más abajo, en cuanto
+//                             getAvatarUrl()/getWalkupOverride() contestan.
 function renderAchievements(player) {
   const chips = [];
   const seasons = player.seasons ?? [];
@@ -246,11 +251,37 @@ export function renderJugadorDetalle(container, playerId) {
   // Tarjeta aparte (no dentro de .game-hero) — solo si hay algo que
   // mostrar, para no dejar un encabezado "Logros" vacío.
   const achievementsHtml = renderAchievements(player);
+  let achievementsCard = null;
   if (achievementsHtml) {
-    const achievementsCard = document.createElement("div");
+    achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card";
     achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3>${achievementsHtml}`;
     container.appendChild(achievementsCard);
+  }
+
+  // Logros "profile" (foto y walkup personalizados, ver más abajo): a
+  // diferencia de los de renderAchievements(), dependen de una respuesta de
+  // Supabase, así que se agregan en cuanto contesta, sin bloquear el primer
+  // pintado. Si nadie más calificó para la tarjeta (achievementsCard sigue
+  // null), se crea aquí mismo, justo después de .game-hero — para que quede
+  // en el mismo lugar de siempre, no importa qué tanto se haya pintado ya
+  // debajo para cuando esto responda.
+  function addAchievementMedal(chip) {
+    if (!achievementsCard) {
+      achievementsCard = document.createElement("div");
+      achievementsCard.className = "leader-card player-standalone-card";
+      achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i>Logros</h3><div class="achievements-grid"></div>`;
+      hero.after(achievementsCard);
+    }
+    achievementsCard.querySelector(".achievements-grid").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="achievement-medal achievement-medal--${chip.kind}">
+          <div class="achievement-medal-icon"><i class="${chip.icon}"></i></div>
+          <span class="achievement-medal-label">${escapeHtml(chip.label)}</span>
+        </div>
+      `
+    );
   }
 
   // ---- Foto de perfil personalizada: lectura pública, edición propia ----
@@ -264,6 +295,7 @@ export function renderJugadorDetalle(container, playerId) {
   getAvatarUrl(player.id).then((url) => {
     if (!url || !avatarWrap) return;
     avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+    addAchievementMedal({ icon: "fa-solid fa-camera", label: "Cara conocida", kind: "profile" });
   });
 
   // ---- Tu resumen: solo en tu propio perfil ----
