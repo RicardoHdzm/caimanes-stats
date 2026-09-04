@@ -166,7 +166,10 @@ function podiumChip(list, playerId, key, { icon, label, desc }) {
   };
 }
 
-function renderAchievements(player) {
+// Exportada para que js/views/medallas.js (la guía de medallas) pueda
+// reusar exactamente el mismo cálculo — sin esto tendría que duplicar cada
+// condición de logro por separado y desincronizarse con el tiempo.
+export function renderAchievements(player) {
   const chips = [];
   // Agrega la medalla de podiumChip() (arriba) solo si el jugador de verdad
   // quedó en el top 3 — evita repetir el `if (chip) chips.push(chip)` en
