@@ -11,7 +11,7 @@ import {
   minPlateAppearances,
   seasonRecords,
 } from "../stats.js";
-import { heading, escapeHtml } from "../ui.js";
+import { heading, escapeHtml, renderAvatar } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getRsvps, setRsvp, getAnnouncements, getAnnouncementLikes, likeAnnouncement, unlikeAnnouncement } from "../db.js";
 
@@ -49,6 +49,64 @@ function leaderCardHtml(icon, title, sortedList, mainFormat, shortFormat, note) 
     <div class="leader-card">
       <h3><i class="fa-solid ${icon}"></i>${title}</h3>
       ${mainHtml}
+      ${runnersHtml}
+      ${noteHtml}
+    </div>
+  `;
+}
+
+// Versión "hero" de leaderCardHtml, solo para las 4 tarjetas de "Líderes de
+// la temporada" (bateo, HR, pitcheo, cervecero) — encabezado a color con el
+// número grande + foto del líder, y abajo una lista más chica con
+// avatar+nombre+valor del 2do/3er lugar. El resto de tarjetas basadas en
+// .leader-card (Salón de la fama, récords, stats de equipo, etc.) siguen
+// usando leaderCardHtml tal cual, sin tocar.
+function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
+  const [first, second, third] = list;
+  if (!first) {
+    return `
+      <div class="leader-card leader-card--hero">
+        <div class="leader-hero">
+          <div class="leader-hero-main">
+            <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+            <p>Sin datos todavía.</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  const heroPlayer = PLAYERS.find((pl) => pl.id === first.playerId) ?? { name: first.name };
+  const runnersUp = [second, third].filter(Boolean);
+  const runnersHtml = runnersUp.length
+    ? `
+      <div class="leader-runners">
+        ${runnersUp
+          .map((p) => {
+            const rp = PLAYERS.find((pl) => pl.id === p.playerId) ?? { name: p.name };
+            return `
+              <div class="leader-runner-row">
+                ${renderAvatar(rp, 26)}
+                <span class="leader-runner-name">${escapeHtml(p.name)}</span>
+                <span class="leader-runner-value">${valueOf(p)}</span>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    `
+    : "";
+  const noteHtml = note ? `<p class="leader-note">${note}</p>` : "";
+  return `
+    <div class="leader-card leader-card--hero">
+      <div class="leader-hero">
+        <div class="leader-hero-main">
+          <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+          <span class="leader-hero-value">${valueOf(first)}</span>
+          <span class="leader-hero-name">${escapeHtml(first.name)}</span>
+          ${detailOf ? `<span class="leader-hero-detail">${detailOf(first)}</span>` : ""}
+        </div>
+        <div class="leader-hero-avatar">${renderAvatar(heroPlayer, 72)}</div>
+      </div>
       ${runnersHtml}
       ${noteHtml}
     </div>
@@ -317,35 +375,34 @@ export function renderResumen(container) {
   const leadersRow = document.createElement("div");
   leadersRow.className = "leaders grid-4 tab-carousel";
   leadersRow.innerHTML =
-    leaderCardHtml(
-      "fa-baseball-bat-ball",
-      "Líder de bateo",
-      batSorted,
-      (p) => `${p.name} — AVG ${p.AVG}, ${p.HR} HR, ${p.RBI} RBI`,
-      (p) => `${p.name} — AVG ${p.AVG}`,
-      `Mínimo ${minPA} turnos (AB + BB) para calificar.`
-    ) +
-    leaderCardHtml(
-      "fa-bomb",
-      "Líder de home runs",
-      hrSorted,
-      (p) => (p.HR > 0 ? `${p.name} — ${p.HR} HR` : `${p.name} — ${p.HRC} HRC`),
-      (p) => (p.HR > 0 ? `${p.name} — ${p.HR} HR` : `${p.name} — ${p.HRC} HRC`)
-    ) +
-    leaderCardHtml(
-      "fa-baseball",
-      "Líder de pitcheo",
-      pitSorted,
-      (p) => `${p.name} — WHIP ${p.WHIP}, ${p.SO} K en ${p.IP} IP`,
-      (p) => `${p.name} — WHIP ${p.WHIP}`
-    ) +
-    leaderCardHtml(
-      "fa-beer-mug-empty",
-      "Líder cervecero",
-      soSorted,
-      (p) => `${p.name} — ${p.SO * 12} botes`,
-      (p) => `${p.name} — ${p.SO * 12} botes`
-    );
+    teamLeaderCardHtml({
+      icon: "fa-baseball-bat-ball",
+      title: "Líder de bateo",
+      list: batSorted,
+      valueOf: (p) => `${p.AVG}`,
+      detailOf: (p) => `${p.HR} HR · ${p.RBI} RBI`,
+      note: `Mínimo ${minPA} turnos (AB + BB) para calificar.`,
+    }) +
+    teamLeaderCardHtml({
+      icon: "fa-bomb",
+      title: "Líder de home runs",
+      list: hrSorted,
+      valueOf: (p) => (p.HR > 0 ? `${p.HR} HR` : `${p.HRC} HRC`),
+    }) +
+    teamLeaderCardHtml({
+      icon: "fa-baseball",
+      title: "Líder de pitcheo",
+      list: pitSorted,
+      valueOf: (p) => `${p.WHIP} WHIP`,
+      detailOf: (p) => `${p.SO} K en ${p.IP} IP`,
+    }) +
+    teamLeaderCardHtml({
+      icon: "fa-beer-mug-empty",
+      title: "Líder cervecero",
+      list: soSorted,
+      valueOf: (p) => `${p.SO * 12} botes`,
+      detailOf: (p) => `${p.SO} ponches`,
+    });
   container.appendChild(leadersRow);
 
   // ---- Récords de temporada ----
