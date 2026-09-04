@@ -270,12 +270,13 @@ export function renderResumen(container) {
   // deslizazo de distancia, no al final.
   for (const g of SCHEDULE) {
     const next = document.createElement("div");
-    next.className = "leader-card";
-    next.innerHTML = `
-      <h3><i class="fa-solid fa-calendar-day"></i>Próximo juego</h3>
-      <p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>
-      <div class="rsvp-actions"></div>
-    `;
+    next.className = "leader-card leader-card--hero";
+    next.innerHTML = heroCardInnerHtml(
+      "fa-calendar-day",
+      "Próximo juego",
+      `<p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${g.time}` : ""}<br>vs ${g.opponent}</p>`,
+      `<div class="rsvp-actions"></div>`
+    );
     bottomRow.appendChild(next);
     wireRsvp(next, g.id);
   }
@@ -287,11 +288,12 @@ export function renderResumen(container) {
     const word = STREAK_LABEL[streak.type];
     const plural = streak.count === 1 ? word : `${word}s`;
     const streakCard = document.createElement("div");
-    streakCard.className = "leader-card";
-    streakCard.innerHTML = `
-      <h3><i class="fa-solid ${STREAK_ICON[streak.type]}"></i>Racha actual</h3>
-      <p>${streak.count} ${plural} seguida${streak.count === 1 ? "" : "s"}</p>
-    `;
+    streakCard.className = "leader-card leader-card--hero";
+    streakCard.innerHTML = heroCardInnerHtml(
+      STREAK_ICON[streak.type],
+      "Racha actual",
+      `<span class="leader-hero-value">${streak.count}</span><span class="leader-hero-detail">${plural} seguida${streak.count === 1 ? "" : "s"}</span>`
+    );
     bottomRow.appendChild(streakCard);
   }
 
