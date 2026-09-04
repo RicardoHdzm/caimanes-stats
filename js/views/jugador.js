@@ -59,7 +59,8 @@ function renderDebut(seasons) {
 // (ver .achievement-badge--* en css/styles.css):
 //   trajectory    (morado) — fundador, temporadas en el equipo, ligas jugadas
 //   streak        (verde)  — racha de hits vigente
-//   leader        (dorado) — eres el #1 del equipo en algo esta temporada
+//   gold/silver/bronze — 1er/2do/3er lugar del equipo en algo esta
+//                             temporada (ver podiumChip() justo abajo)
 //   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
 //   participation (naranja) — asistencia y versatilidad de posiciones
 //   profile       (azul)   — personalizaste tu perfil (foto, walkup song) —
@@ -82,8 +83,37 @@ function achievementMedalHtml(c) {
   `;
 }
 
+const PODIUM_KIND = { 1: "gold", 2: "silver", 3: "bronze" };
+const PODIUM_METAL = { 1: "oro", 2: "plata", 3: "bronce" };
+
+// Medalla de oro/plata/bronce según el lugar del jugador (1/2/3) en una
+// estadística del equipo esta temporada — null si no calificó (su valor es
+// 0) o no quedó en el podio. `label`/`desc` pueden ser un texto fijo (mismo
+// nombre sin importar el lugar — Bombardero, Ninja, etc.) o una función
+// `(valor, lugar)` para las que sí cambian de nombre por lugar (Bate/Guante
+// de oro, plata, bronce).
+function podiumChip(list, playerId, key, { icon, label, desc }) {
+  const row = list.find((r) => r.playerId === playerId);
+  if (!row || Number(row[key]) <= 0) return null;
+  const place = rankAmong(list, playerId, key, "desc")?.place;
+  if (!place || place > 3) return null;
+  return {
+    icon,
+    label: typeof label === "function" ? label(row[key], place) : label,
+    kind: PODIUM_KIND[place],
+    desc: typeof desc === "function" ? desc(row[key], place) : desc,
+  };
+}
+
 function renderAchievements(player) {
   const chips = [];
+  // Agrega la medalla de podiumChip() (arriba) solo si el jugador de verdad
+  // quedó en el top 3 — evita repetir el `if (chip) chips.push(chip)` en
+  // cada estadística de abajo.
+  function addPodium(list, key, opts) {
+    const chip = podiumChip(list, player.id, key, opts);
+    if (chip) chips.push(chip);
+  }
   const seasons = player.seasons ?? [];
 
   if (seasons.length > 0) {
@@ -130,65 +160,51 @@ function renderAchievements(player) {
     });
   }
 
-  // ---- Líderes de la temporada — mismo criterio que las insignias de
-  // rango en las tarjetas de stats más abajo en este archivo: las rate
-  // stats (AVG/ERA) solo cuentan entre quienes califican, para que nadie
-  // con una sola jugada perfecta salga "líder". Todas comparten color
-  // (dorado): son la misma idea — "eres el #1 del equipo en esto" — como
-  // MVP.
+  // ---- Líderes de la temporada — top 3 con medalla de oro/plata/bronce
+  // (ver podiumChip/addPodium arriba). Las rate stats (AVG/OBP) solo
+  // cuentan entre quienes califican (mínimo de turnos), para que nadie con
+  // una sola jugada perfecta salga en el podio.
   const battingList = battingTotals(GAMES);
   const pitchingList = pitchingTotals(GAMES);
   const fieldingList = fieldingTotals(GAMES);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
+  const fieldersWithPlays = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
 
   const myBatting = battingList.find((r) => r.playerId === player.id);
   const myPitching = pitchingList.find((r) => r.playerId === player.id);
   const myFielding = fieldingList.find((r) => r.playerId === player.id);
 
   if (myBatting) {
-    if (Number(myBatting.AVG) > 0 && rankAmong(qualifiedBatters, player.id, "AVG", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-medal",
-        label: "Bate de oro",
-        kind: "leader",
-        desc: "Mejor promedio de bateo (AVG) del equipo esta temporada.",
-      });
-    }
-    if (Number(myBatting.HR) > 0 && rankAmong(battingList, player.id, "HR", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-bomb",
-        label: "Bombardero",
-        kind: "leader",
-        desc: "Más jonrones del equipo esta temporada.",
-      });
-    }
-    if (Number(myBatting.SB) > 0 && rankAmong(battingList, player.id, "SB", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-user-ninja",
-        label: "Ninja",
-        kind: "leader",
-        desc: "Más bases robadas del equipo esta temporada.",
-      });
-    }
-    if (Number(myBatting.RBI) > 0 && rankAmong(battingList, player.id, "RBI", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-tornado",
-        label: "Tornado",
-        kind: "leader",
-        desc: "Más carreras impulsadas (RBI) del equipo esta temporada.",
-      });
-    }
+    addPodium(qualifiedBatters, "AVG", {
+      icon: "fa-solid fa-medal",
+      label: (value, place) => `Bate de ${PODIUM_METAL[place]}`,
+      desc: (value) => `Promedio de bateo (AVG) del equipo esta temporada (${value}).`,
+    });
+    addPodium(battingList, "HR", {
+      icon: "fa-solid fa-bomb",
+      label: "Bombardero",
+      desc: (value) => `Jonrones del equipo esta temporada (${value}).`,
+    });
+    addPodium(battingList, "SB", {
+      icon: "fa-solid fa-user-ninja",
+      label: "Ninja",
+      desc: (value) => `Bases robadas del equipo esta temporada (${value}).`,
+    });
+    addPodium(battingList, "RBI", {
+      icon: "fa-solid fa-tornado",
+      label: "Tornado",
+      desc: (value) => `Carreras impulsadas (RBI) del equipo esta temporada (${value}).`,
+    });
     // "Mr. Expendio" — el chiste ya existía en el "Líder cervecero" de
     // Resumen (SO de bateo × 12 botes): quien más se ponchó, "debe" la
-    // cerveza. Mismo SO de bateo, no el de pitcheo (ese es "Francotirador").
-    if (Number(myBatting.SO) > 0 && rankAmong(battingList, player.id, "SO", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-beer-mug-empty",
-        label: "Mr. Expendio",
-        kind: "leader",
-        desc: `Más ponches de bateo del equipo esta temporada (${myBatting.SO}) — le toca poner la cerveza.`,
-      });
-    }
+    // cerveza — esa coletilla solo aplica al de oro. Mismo SO de bateo, no
+    // el de pitcheo (ese es "Francotirador").
+    addPodium(battingList, "SO", {
+      icon: "fa-solid fa-beer-mug-empty",
+      label: "Mr. Expendio",
+      desc: (value, place) =>
+        `Ponches de bateo del equipo esta temporada (${value})${place === 1 ? " — le toca poner la cerveza." : "."}`,
+    });
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({
         icon: "fa-solid fa-baseball-bat-ball",
@@ -197,30 +213,21 @@ function renderAchievements(player) {
         desc: `Promedio de bateo (AVG) de .300 o más esta temporada (${myBatting.AVG}).`,
       });
     }
-    if (myBatting["2B"] > 0 && rankAmong(battingList, player.id, "2B", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-dice",
-        label: "Double Trouble",
-        kind: "leader",
-        desc: `Más dobles del equipo esta temporada (${myBatting["2B"]}).`,
-      });
-    }
-    if (myBatting["3B"] > 0 && rankAmong(battingList, player.id, "3B", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-skull-crossbones",
-        label: "Triple Kill",
-        kind: "leader",
-        desc: `Más triples del equipo esta temporada (${myBatting["3B"]}).`,
-      });
-    }
-    if (Number(myBatting.BB) > 0 && rankAmong(battingList, player.id, "BB", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-eye",
-        label: "Ojo de águila",
-        kind: "leader",
-        desc: `Más bases por bolas (BB) del equipo esta temporada (${myBatting.BB}).`,
-      });
-    }
+    addPodium(battingList, "2B", {
+      icon: "fa-solid fa-dice",
+      label: "Double Trouble",
+      desc: (value) => `Dobles del equipo esta temporada (${value}).`,
+    });
+    addPodium(battingList, "3B", {
+      icon: "fa-solid fa-skull-crossbones",
+      label: "Triple Kill",
+      desc: (value) => `Triples del equipo esta temporada (${value}).`,
+    });
+    addPodium(battingList, "BB", {
+      icon: "fa-solid fa-eye",
+      label: "Ojo de águila",
+      desc: (value) => `Bases por bolas (BB) del equipo esta temporada (${value}).`,
+    });
     if (myBatting.qualified && Number(myBatting.OPS) >= 1) {
       chips.push({
         icon: "fa-solid fa-gem",
@@ -232,30 +239,23 @@ function renderAchievements(player) {
   }
 
   if (myPitching && myPitching.outs > 0) {
-    if (Number(myPitching.SO) > 0 && rankAmong(pitchingList, player.id, "SO", "desc")?.place === 1) {
-      chips.push({
-        icon: "fa-solid fa-crosshairs",
-        label: "Francotirador",
-        kind: "leader",
-        desc: "Más ponches propinados (pitcheo) del equipo esta temporada.",
-      });
-    }
-  }
-
-  if (myFielding && myFielding.PO + myFielding.A + myFielding.E > 0 && myFielding.FPCT === "1.000") {
-    chips.push({
-      icon: "fa-solid fa-hand-fist",
-      label: "Guante de oro",
-      kind: "leader",
-      desc: "Fildeo perfecto: cero errores en el campo esta temporada.",
+    addPodium(pitchingList, "SO", {
+      icon: "fa-solid fa-crosshairs",
+      label: "Francotirador",
+      desc: (value) => `Ponches propinados (pitcheo) del equipo esta temporada (${value}).`,
     });
   }
-  if (myFielding && myFielding.PO > 0 && rankAmong(fieldingList, player.id, "PO", "desc")?.place === 1) {
-    chips.push({
+
+  if (myFielding) {
+    addPodium(fieldersWithPlays, "FPCT", {
+      icon: "fa-solid fa-hand-fist",
+      label: (value, place) => `Guante de ${PODIUM_METAL[place]}`,
+      desc: (value) => `Porcentaje de fildeo (FPCT) del equipo esta temporada (${value}).`,
+    });
+    addPodium(fieldingList, "PO", {
       icon: "fa-solid fa-broom",
       label: "Escoba",
-      kind: "leader",
-      desc: `Más outs realizados (PO) del equipo esta temporada (${myFielding.PO}).`,
+      desc: (value) => `Outs realizados (PO) del equipo esta temporada (${value}).`,
     });
   }
 
@@ -265,15 +265,11 @@ function renderAchievements(player) {
   const mvpList = PLAYERS.map((p) => ({ playerId: p.id, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
     (p) => p.mvpTotal > 0
   );
-  const myMvp = mvpList.find((p) => p.playerId === player.id);
-  if (myMvp && rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place === 1) {
-    chips.push({
-      icon: "fa-solid fa-star",
-      label: "Estrella",
-      kind: "leader",
-      desc: `Más premios MVP del equipo esta temporada (${myMvp.mvpTotal}).`,
-    });
-  }
+  addPodium(mvpList, "mvpTotal", {
+    icon: "fa-solid fa-star",
+    label: "Estrella",
+    desc: (value) => `Premios MVP del equipo esta temporada (${value}).`,
+  });
 
   // ---- Asistencia y versatilidad ----
   const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;

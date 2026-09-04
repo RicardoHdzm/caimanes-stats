@@ -1126,13 +1126,28 @@ main h3::before {
   box-shadow: 0 0 12px rgba(63, 181, 111, 0.35);
 }
 
-/* Líder de la temporada — "eres el #1 del equipo en esto". Mismo dorado
-   que .mvp-badge a propósito, es la misma idea de fondo. */
-.achievement-medal--leader .achievement-medal-icon {
+/* Podio del equipo en esta estadística esta temporada — oro/plata/bronce
+   según el lugar (1/2/3, ver podiumChip() en js/views/jugador.js). Oro es
+   el mismo dorado que .mvp-badge a propósito, es la misma idea de fondo. */
+.achievement-medal--gold .achievement-medal-icon {
   border: 2px solid #f5b942;
   background: rgba(245, 185, 66, 0.15);
   color: #f5b942;
   box-shadow: 0 0 12px rgba(245, 185, 66, 0.35);
+}
+
+.achievement-medal--silver .achievement-medal-icon {
+  border: 2px solid #c4cdd6;
+  background: rgba(196, 205, 214, 0.15);
+  color: #c4cdd6;
+  box-shadow: 0 0 12px rgba(196, 205, 214, 0.35);
+}
+
+.achievement-medal--bronze .achievement-medal-icon {
+  border: 2px solid #cd7f32;
+  background: rgba(205, 127, 50, 0.15);
+  color: #cd7f32;
+  box-shadow: 0 0 12px rgba(205, 127, 50, 0.35);
 }
 
 /* Umbral fijo: cruzaste una marca (ej. AVG .300), no depende de ser el #1. */
