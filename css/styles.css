@@ -1538,13 +1538,11 @@ main h3::before {
 /* .leader-card normalmente vive dentro de un contenedor con `gap` (ver
    .leaders más abajo), que separa una tarjeta de la siguiente — pero en el
    perfil (Logros, Tu resumen) van sueltas, una tras otra directo en el
-   contenedor, así que sin esto quedan con los bordes pegados. Mismo
-   degradado de acento que .leader-hero (rojo, invertido con borde blanco
-   como el resto de tarjetas rojas) — antes se quedaban con fondo plano. */
+   contenedor, así que sin esto quedan con los bordes pegados. Estilo
+   normal a propósito (sin degradado ni invertir el borde): esos cambios
+   son solo para las tarjetas de Resumen, no las de perfil. */
 .player-standalone-card {
   margin-bottom: 16px;
-  background: linear-gradient(160deg, var(--accent-glow) 0%, transparent 65%), var(--surface);
-  border-top-color: #fff;
 }
 
 .leader-card:hover {
@@ -1569,11 +1567,24 @@ main h3::before {
   content: none;
 }
 
-/* Blanco/plateado a propósito, al revés del acento rojo del borde — ver
-   más abajo la variante de acento blanco, que es al revés (icono rojo). */
 .leader-card h3 i {
-  color: #fff;
+  color: var(--accent);
   font-size: var(--text-3xl);
+}
+
+/* Blanco/plateado a propósito, al revés del acento rojo del borde — pero
+   SOLO en las tarjetas "hero" de Resumen, no en las de perfil (Medallero,
+   Tu resumen), que se quedan con el rojo normal de arriba. Ver más abajo la
+   variante de acento blanco, que es al revés otra vez (icono rojo). */
+.leader-card--hero h3 i {
+  color: #fff;
+}
+
+.leader-card--hero h3 i::before {
+  background: linear-gradient(135deg, #ffffff, var(--muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .team-stats-row .leader-card,
