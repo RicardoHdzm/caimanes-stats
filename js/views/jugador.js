@@ -65,10 +65,10 @@ function renderDebut(seasons) {
 //                             que no salen de aquí: los agrega
 //                             addAchievementMedal() más abajo, en cuanto
 //                             getAvatarUrl()/getWalkupOverride() contestan.
-//   dues          (rojo/verde) — estado de inscripción (ver más abajo,
-//                             junto al badge "Estado de inscripción") —
-//                             solo se agrega con sesión iniciada, mismo
-//                             criterio que ese badge.
+//   dues-paid     (verde)  — ya pagó la inscripción de la temporada
+//   dues-unpaid   (rojo)   — todavía no la paga — ambos junto al badge
+//                             "Estado de inscripción" más abajo, solo con
+//                             sesión iniciada (mismo criterio que ese badge).
 // `desc` es la explicación que se ve al pasar el mouse (ver
 // achievementMedalHtml() justo abajo) — cada logro debe traer uno.
 function achievementMedalHtml(c) {
@@ -431,8 +431,18 @@ export function renderJugadorDetalle(container, playerId) {
       `;
       addAchievementMedal(
         paid
-          ? { icon: "fa-solid fa-sack-dollar", label: "Rich kid", kind: "dues", desc: "Ya pagó la inscripción de la temporada." }
-          : { icon: "fa-solid fa-hand-holding-dollar", label: "Moroso", kind: "dues", desc: "Todavía no paga la inscripción de la temporada." }
+          ? {
+              icon: "fa-solid fa-sack-dollar",
+              label: "Rich kid",
+              kind: "dues-paid",
+              desc: "Ya pagó la inscripción de la temporada.",
+            }
+          : {
+              icon: "fa-solid fa-hand-holding-dollar",
+              label: "Moroso",
+              kind: "dues-unpaid",
+              desc: "Todavía no paga la inscripción de la temporada.",
+            }
       );
     });
   }
