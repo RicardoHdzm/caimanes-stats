@@ -215,6 +215,19 @@ export async function getWalkupOverride(playerId) {
   return data;
 }
 
+// Todas las canciones personalizadas de una vez, como Map playerId ->
+// {title, artist, url} — para la playlist del equipo (ver
+// js/views/playlist.js), que necesita mezclarlas sobre PLAYERS completo en
+// vez de consultar jugador por jugador. Map vacío si Supabase no está
+// configurado o falla la consulta.
+export async function getAllWalkupOverrides() {
+  const client = getClient();
+  if (!client) return new Map();
+  const { data, error } = await runQuery(() => client.from("player_walkups").select("player_id, title, artist, url"));
+  if (error || !data) return new Map();
+  return new Map(data.map((row) => [row.player_id, { title: row.title, artist: row.artist, url: row.url }]));
+}
+
 // Upsert de la canción del propio jugador. Tira si quien llama no es ese
 // jugador — RLS lo bloquea allá, no aquí.
 export async function setWalkup(playerId, { title, artist, url }) {

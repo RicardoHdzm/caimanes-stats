@@ -8,6 +8,7 @@ import { renderJuegos } from "./views/juegos.js";
 import { renderCalendario } from "./views/calendario.js";
 import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
+import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { initAuth, mountAuthControl } from "./auth.js";
@@ -23,6 +24,7 @@ const routes = {
   calendario: renderCalendario,
   standing: renderStanding,
   alineacion: renderAlineacion,
+  playlist: renderPlaylist,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -44,6 +46,7 @@ const MORE_TABS = [
   { tab: "pitcheo", route: "#/pitcheo", label: "Pitcheo", icon: "fa-baseball" },
   { tab: "fildeo", route: "#/fildeo", label: "Fildeo", icon: "fa-shield" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
+  { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
 
 const app = document.getElementById("app");

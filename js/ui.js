@@ -215,6 +215,62 @@ export function renderAvatar(player, size = 40) {
   return `<span class="avatar avatar-initials" style="${style}">${initials}</span>`;
 }
 
+// Icono según de dónde venga el link de la canción de entrada (walk-up
+// song) — usado en el perfil (js/views/jugador.js) y en la playlist del
+// equipo (js/views/playlist.js).
+const WALKUP_PLATFORMS = [
+  { match: /(^|\.)spotify\.com$/, icon: "fa-brands fa-spotify" },
+  { match: /(^|\.)(youtube\.com|youtu\.be)$/, icon: "fa-brands fa-youtube" },
+  { match: /(^|\.)music\.apple\.com$/, icon: "fa-brands fa-apple" },
+  { match: /(^|\.)deezer\.com$/, icon: "fa-brands fa-deezer" },
+  { match: /(^|\.)soundcloud\.com$/, icon: "fa-brands fa-soundcloud" },
+];
+
+// Solo se aceptan links http(s): un `javascript:` en data.js correría al
+// abrirlo. Devuelve null si la URL no sirve, y entonces se pinta sin link.
+function safeWalkupUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function walkupIcon(parsedUrl) {
+  if (!parsedUrl) return "fa-solid fa-music";
+  const host = parsedUrl.hostname.toLowerCase();
+  return WALKUP_PLATFORMS.find((p) => p.match.test(host))?.icon ?? "fa-solid fa-music";
+}
+
+// Canción de entrada (walk-up song): la que suena cuando el jugador va al
+// bat. Sin `walkup.title` no se pinta nada.
+export function renderWalkup(walkup) {
+  if (!walkup?.title) return "";
+
+  const parsed = safeWalkupUrl(walkup.url);
+  const icon = walkupIcon(parsed);
+  const title = escapeHtml(walkup.title);
+  // Formato de un solo renglón: "Walkup Song: [icono] - Título - Artista".
+  // Sin artista se corta después del título, sin dejar un guion colgado.
+  const artist = walkup.artist
+    ? `<span class="walkup-sep">-</span><span class="walkup-artist">${escapeHtml(walkup.artist)}</span>`
+    : "";
+
+  const body = `
+    <span class="walkup-label">Walkup Song:</span>
+    <i class="${icon} walkup-icon"></i>
+    <span class="walkup-sep">-</span>
+    <span class="walkup-title">${title}</span>
+    ${artist}
+  `;
+
+  if (!parsed) return `<div class="walkup">${body}</div>`;
+  // Mismo icono de play que el botón "Ver replay" del detalle de juego.
+  return `<a class="walkup walkup-link" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer">${body}<i class="fa-solid fa-circle-play walkup-play"></i></a>`;
+}
+
 // Glosario chiquito debajo de una tabla: "AB = Turnos al bat · H = Hits ...".
 // Solo incluye las columnas que traen `full` definido.
 export function renderGlossary(container, columns) {
