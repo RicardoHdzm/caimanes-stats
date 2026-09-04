@@ -2,7 +2,7 @@
 // #admin-protected (ver js/admin-dues.js), así que ya está oculta para
 // cualquiera que no sea el coach; no hace falta comprobar isCoach() aquí,
 // solo dejar que RLS rechace la escritura si algo se coló.
-import { getAnnouncements, postAnnouncement, deleteAnnouncement } from "./db.js";
+import { getAnnouncements, postAnnouncement, deleteAnnouncement, getAnnouncementLikes } from "./db.js";
 
 const form = document.getElementById("announcement-form");
 const listEl = document.getElementById("announcements-admin-list");
@@ -11,10 +11,15 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
 }
 
-function rowMarkup(a) {
+// Solo lectura aquí (el coach no necesita darle like a su propio anuncio) —
+// el conteo es nomás para que vea qué tanto "pegó" cada aviso.
+function rowMarkup(a, likeCount) {
   return `
     <div class="announcement-admin-row" data-id="${a.id}">
-      <p><span class="announcement-date">${formatDate(a.created_at)}</span>${a.body.replace(/</g, "&lt;")}</p>
+      <p>
+        <span class="announcement-date">${formatDate(a.created_at)}</span>${a.body.replace(/</g, "&lt;")}
+        <span class="announcement-admin-likes"><i class="fa-solid fa-heart"></i> ${likeCount}</span>
+      </p>
       <button type="button" class="remove-row-btn" title="Borrar"><i class="fa-solid fa-trash"></i></button>
     </div>
   `;
@@ -23,7 +28,14 @@ function rowMarkup(a) {
 async function render() {
   if (!listEl) return;
   const items = await getAnnouncements(20);
-  listEl.innerHTML = items.length > 0 ? items.map(rowMarkup).join("") : '<p class="subtitle">Sin anuncios todavía.</p>';
+  if (items.length === 0) {
+    listEl.innerHTML = '<p class="subtitle">Sin anuncios todavía.</p>';
+    return;
+  }
+  const likes = await getAnnouncementLikes(items.map((a) => a.id));
+  const likeCounts = new Map();
+  for (const like of likes) likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
+  listEl.innerHTML = items.map((a) => rowMarkup(a, likeCounts.get(a.id) ?? 0)).join("");
 }
 
 form?.addEventListener("submit", async (e) => {

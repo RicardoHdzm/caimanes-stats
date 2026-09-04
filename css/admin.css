@@ -371,6 +371,17 @@
   margin-bottom: 4px;
 }
 
+.announcement-admin-likes {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.announcement-admin-likes i {
+  color: var(--accent-text);
+}
+
 /* ---- checklist de asistentes (lineup/) ---- */
 
 .attendee-controls {
