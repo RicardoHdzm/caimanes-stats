@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED } from "../data.js";
+import { PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks } from "../stats.js";
 import {
   heading,
@@ -221,6 +221,18 @@ export function renderAchievements(player) {
         desc: `Ha jugado en ${leagues.size} ligas distintas con el equipo.`,
       });
     }
+  }
+
+  // Administra el equipo (cuenta de coach) — a mano, ver MANAGERS en
+  // js/data.js. Independiente del bloque de temporadas de arriba: no
+  // depende de tener `seasons` capturado.
+  if (MANAGERS.includes(player.id)) {
+    chips.push({
+      icon: "fa-solid fa-whistle",
+      label: "Manager",
+      kind: "trajectory",
+      desc: "Administra el equipo.",
+    });
   }
 
   const streak = hitStreaks(GAMES).find((s) => s.playerId === player.id);

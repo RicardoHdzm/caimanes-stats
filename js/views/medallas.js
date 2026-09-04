@@ -39,6 +39,7 @@ const CATALOG = [
   { kind: "trajectory", icon: "fa-solid fa-egg", name: "Caimaneggs", how: "Estuvo en el equipo desde la primera temporada.", match: (l) => l === "Caimaneggs" },
   { kind: "trajectory", icon: "fa-solid fa-anchor", name: "Veteran", how: "Ha jugado más de 4 temporadas con el equipo.", match: (l) => l === "Veteran" },
   { kind: "trajectory", icon: "fa-solid fa-earth-americas", name: "Bon voyage", how: "Ha jugado en más de una liga con el equipo.", match: (l) => l === "Bon voyage" },
+  { kind: "trajectory", icon: "fa-solid fa-whistle", name: "Manager", how: "Administra el equipo.", match: (l) => l === "Manager" },
   // ---- Racha ----
   { kind: "streak", icon: "fa-solid fa-fire", name: "On Fire", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "On Fire" },
   { kind: "streak", icon: "fa-solid fa-bolt", name: "The Streak", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "The Streak" },

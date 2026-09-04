@@ -92,6 +92,11 @@ export const DUES_PAID = {};
 // medalla "Fragile" (ver js/views/jugador.js).
 export const INJURED = ["p1", "p2"];
 
+// Ids de jugadores que administran el equipo (cuenta de coach en Supabase,
+// ver COACH_EMAIL en js/auth.js) — a mano, igual que INJURED de arriba.
+// Alimenta la medalla "Manager" (ver js/views/jugador.js).
+export const MANAGERS = ["p15"];
+
 // Un objeto por juego jugado. Cada línea de bateo/pitcheo/fildeo se
 // referencia al jugador con playerId (usa los id de arriba, ej. "p1").
 // Si un jugador no participó en algo (ej. no pitcheó ese juego), simplemente
