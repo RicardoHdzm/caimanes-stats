@@ -13,6 +13,7 @@ import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { initAuth, mountAuthControl } from "./auth.js";
 import { ordinalTemporada } from "./ui.js";
+import { initTheme } from "./theme.js";
 
 const routes = {
   resumen: renderResumen,
@@ -144,6 +145,7 @@ function render() {
 }
 
 buildBottomTabs();
+initTheme();
 mountAuthControl(document.getElementById("auth-slot"));
 window.addEventListener("hashchange", render);
 // Se dispara desde js/auth.js cada vez que cambia la sesión (login, logout,

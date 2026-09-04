@@ -2,6 +2,14 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
+<!-- Mismo tema que el sitio principal, sin parpadeo — ver index.html. -->
+<script>
+  try {
+    if (localStorage.getItem("caimanes-theme") === "light") {
+      document.documentElement.dataset.theme = "light";
+    }
+  } catch (e) {}
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
 <title>Generador de alineación — Caimanes de Villas</title>

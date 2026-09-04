@@ -2,6 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <!-- Antes que cualquier CSS: lee el tema guardado y lo aplica ya, para que
+       la página no "parpadee" oscuro-y-luego-claro en cada carga. El resto
+       de la lógica (botón, guardar el cambio) vive en js/theme.js. -->
+  <script>
+    try {
+      if (localStorage.getItem("caimanes-theme") === "light") {
+        document.documentElement.dataset.theme = "light";
+      }
+    } catch (e) {}
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
        como teléfono/dirección y los subrayan como link tocable — no son
@@ -53,6 +63,11 @@
     >
       <i class="fa-brands fa-instagram"></i>
     </a>
+    <!-- Junto al de Instagram, mismo tamaño/estilo — ver js/theme.js para la
+         lógica (guardar la elección, cambiar el ícono). -->
+    <button type="button" id="theme-toggle" class="social-link theme-toggle-btn" aria-label="Cambiar a tema claro">
+      <i class="fa-solid fa-sun"></i>
+    </button>
     <div class="topbar-inner">
       <a href="#/resumen" aria-label="Ir a Resumen">
         <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />

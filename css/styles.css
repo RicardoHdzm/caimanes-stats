@@ -97,6 +97,42 @@
      bajar --pattern-gap la hace más densa. */
   --pattern-line: rgba(74, 158, 255, 0.05);
   --pattern-gap: 16px;
+
+  /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
+     separado de --surface aunque hoy valga lo mismo, para que el tema
+     claro pueda darle su propio tono sin tocar las superficies. */
+  --bg-glow: #1a1e23;
+}
+
+/* ---- Tema claro ----
+   Se activa con [data-theme="light"] en <html> (ver js/theme.js — botón
+   junto al ícono de Instagram — y el script inline en <head> de cada
+   .html, que lo aplica antes del primer pintado para no parpadear). Solo
+   se redefinen los tokens de fondo/superficie/texto — el rojo de acento,
+   los colores de posición (--pos-*) y los semánticos (--win/--loss/...) se
+   quedan igual en los dos temas, es la misma identidad visual. */
+:root[data-theme="light"] {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-alt: #eef0f3;
+  --surface-raised: #ffffff;
+  --border: #dbdfe4;
+  --text: #1a1e23;
+  --muted: #5b6470;
+
+  /* --accent-text (el rojo para TEXTO chico) está afinado para leerse sobre
+     fondo oscuro — sobre blanco un rojo tan claro pierde contraste, así que
+     aquí usa el tono más oscuro que ya existía para hovers. */
+  --accent-text: #b3172a;
+  --accent-glow: rgba(226, 32, 47, 0.25);
+
+  --zebra: rgba(0, 0, 0, 0.025);
+  --pattern-line: rgba(74, 158, 255, 0.06);
+
+  --bg-glow: #ffffff;
+
+  --shadow-card: 0 8px 20px -12px rgba(20, 24, 28, 0.18);
+  --shadow-raised: 0 12px 28px -14px rgba(20, 24, 28, 0.22);
 }
 
 * {
@@ -127,7 +163,7 @@ body {
       var(--pattern-line) 0 1px,
       transparent 1px var(--pattern-gap)
     ),
-    radial-gradient(1200px 500px at 50% -10%, #1a1e23 0%, var(--bg) 60%),
+    radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
     var(--bg);
   color: var(--text);
 }
@@ -208,6 +244,15 @@ body {
   font-size: var(--text-2xl);
 }
 
+/* Botón de tema (js/theme.js) — mismo círculo que .social-link (hereda esa
+   clase en el HTML), nomás corrido a la derecha para no encimarse con
+   Instagram. Como <button>, sin estilos de <a> que limpiar. */
+.theme-toggle-btn {
+  left: 76px;
+  cursor: pointer;
+  font: inherit;
+}
+
 @media (max-width: 640px) {
   .social-link {
     top: 12px;
@@ -218,6 +263,10 @@ body {
 
   .social-link i {
     font-size: var(--text-xl);
+  }
+
+  .theme-toggle-btn {
+    left: 60px;
   }
 }
 
