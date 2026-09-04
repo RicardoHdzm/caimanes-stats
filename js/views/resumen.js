@@ -373,7 +373,7 @@ export function renderResumen(container) {
   container.appendChild(leadersHeading);
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-4 tab-carousel";
+  leadersRow.className = "leaders grid-2 tab-carousel";
   leadersRow.innerHTML =
     teamLeaderCardHtml({
       icon: "fa-baseball-bat-ball",
