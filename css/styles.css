@@ -1523,11 +1523,6 @@ main h3::before {
   transition: transform 0.15s;
 }
 
-/* Invertido a propósito: el fondo de las tarjetas "hero" con degradado
-   rojo (ver --accent-glow en .leader-hero) lleva borde blanco/plateado, no
-   rojo — más contraste. Va antes de .leader-card--hero-white más abajo
-   para que esa sí quede en rojo (mismo orden de cascada, misma
-   especificidad de una sola clase). */
 .leader-card--hero {
   border-top-color: var(--accent);
 }
@@ -1569,33 +1564,15 @@ main h3::before {
   font-size: var(--text-3xl);
 }
 
-/* Blanco/plateado a propósito, al revés del acento rojo del borde — pero
-   SOLO en las tarjetas "hero" de Resumen, no en las de perfil (Medallero,
-   Tu resumen), que se quedan con el rojo normal de arriba. Ver más abajo la
-   variante de acento blanco, que es al revés otra vez (icono rojo). */
+/* Rojo, no el blanco/plateado de arriba — pero SOLO en las tarjetas "hero"
+   de Resumen (récords, líderes, stats de equipo, etc: todas con el mismo
+   estilo, degradado blanco de fondo + icono rojo). Las de perfil
+   (Medallero, Tu resumen) se quedan con el .leader-card h3 i de arriba. */
 .leader-card--hero h3 i {
   color: var(--accent);
 }
 
 .leader-card--hero h3 i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.team-stats-row .leader-card,
-.leader-card--hero-white {
-  border-top-color: var(--accent);
-}
-
-.team-stats-row .leader-card h3 i,
-.leader-card--hero-white h3 i {
-  color: var(--accent);
-}
-
-.team-stats-row .leader-card h3 i::before,
-.leader-card--hero-white h3 i::before {
   background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
@@ -1712,11 +1689,6 @@ main h3::before {
 .leader-hero-avatar .avatar {
   border: 3px solid var(--surface);
   box-shadow: var(--shadow-card);
-}
-
-.team-stats-row .leader-hero,
-.leader-card--hero-white .leader-hero {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.14) 0%, transparent 65%), var(--surface);
 }
 
 /* Contenido extra debajo del encabezado a color que NO es una lista de
