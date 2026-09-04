@@ -56,8 +56,8 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-skull-crossbones", name: "Killer", how: "Top 3 del equipo en outs realizados (PO) esta temporada.", match: (l) => l === "Killer" },
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-chess-knight", name: "Triple Threat", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Threat" },
-  { kind: "gold", icon: "fa-solid fa-crow", name: "Ojo de águila", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Ojo de águila" },
-  { kind: "gold", icon: "fa-solid fa-scale-balanced", name: "Paciente", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Paciente" },
+  { kind: "gold", icon: "fa-solid fa-crow", name: "Eagle Eye", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Eagle Eye" },
+  { kind: "gold", icon: "fa-solid fa-scale-balanced", name: "Patient", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Patient" },
   { kind: "gold", icon: "fa-solid fa-star", name: "Starboy", how: "Top 3 del equipo en premios MVP esta temporada.", match: (l) => l === "Starboy" },
   // ---- Umbral fijo ----
   { kind: "threshold", icon: "fa-solid fa-meteor", name: "Estelar", how: "Promedio de bateo (AVG) de .300 o más esta temporada.", match: (l) => l === "Estelar" },
