@@ -105,8 +105,14 @@ function renderDebut(seasons) {
 // data.js/GAMES, sin nada nuevo que mantener a mano. Públicas (no dependen
 // de sesión): son datos de roster, no información privada. Van en su
 // propia tarjeta (ver más abajo), varias por renglón — a diferencia de
-// MVP/Debut, que siempre van solos en el suyo — cada logro con su propio
-// color (`kind`) para distinguirse de un vistazo.
+// MVP/Debut, que siempre van solos en el suyo. `kind` es la CATEGORÍA, no
+// el logro individual — todos los de una misma categoría comparten color
+// (ver .achievement-badge--* en css/styles.css):
+//   trajectory    (morado) — fundador, temporadas en el equipo, ligas jugadas
+//   streak        (verde)  — racha de hits vigente
+//   leader        (dorado) — eres el #1 del equipo en algo esta temporada
+//   threshold     (rosa)   — cruzaste una marca fija (no depende de ser el #1)
+//   participation (naranja) — asistencia y versatilidad de posiciones
 function renderAchievements(player) {
   const chips = [];
   const seasons = player.seasons ?? [];
@@ -189,7 +195,7 @@ function renderAchievements(player) {
   // ---- Asistencia y versatilidad ----
   const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
   if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
-    chips.push({ icon: "fa-solid fa-calendar-check", label: "Asistencia perfecta", kind: "attendance" });
+    chips.push({ icon: "fa-solid fa-calendar-check", label: "Asistencia perfecta", kind: "participation" });
   }
 
   // Posiciones distintas jugadas esta temporada — vienen del `position` de
@@ -204,7 +210,7 @@ function renderAchievements(player) {
     chips.push({
       icon: "fa-solid fa-people-arrows",
       label: `Multiposición: ${positionsPlayed.size} posiciones distintas`,
-      kind: "multi",
+      kind: "participation",
     });
   }
 
