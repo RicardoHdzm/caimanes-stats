@@ -1307,12 +1307,14 @@ main h3::before {
 }
 
 /* Personalizaste tu perfil (foto o walkup song) — ver addAchievementMedal()
-   en js/views/jugador.js. */
+   en js/views/jugador.js. Rosa — --pos-special ya no lo usa ninguna otra
+   categoría (streak es naranja desde hace rato), así que no compite con
+   nada. */
 .achievement-medal--profile .achievement-medal-icon {
-  border: 2px solid var(--pos-pitcher);
-  background: rgba(74, 158, 255, 0.15);
-  color: var(--pos-pitcher);
-  box-shadow: 0 0 12px rgba(74, 158, 255, 0.35);
+  border: 2px solid var(--pos-special);
+  background: rgba(255, 111, 181, 0.15);
+  color: var(--pos-special);
+  box-shadow: 0 0 12px rgba(255, 111, 181, 0.35);
 }
 
 /* Estado de inscripción — mismo verde/rojo que ya usa el badge "Estado de
