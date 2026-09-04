@@ -917,8 +917,10 @@ main h3::before {
 
 /* Insignias de logros del perfil (ver renderAchievements en
    js/views/jugador.js) — en su propia tarjeta, varias por renglón (a
-   diferencia de MVP/Debut, que siempre van solos en el suyo), cada una con
-   su propio color para distinguirse de un vistazo. */
+   diferencia de MVP/Debut, que siempre van solos en el suyo). El color va
+   por CATEGORÍA (`kind`), no por logro individual — todos los de una
+   misma categoría comparten uno, para que de un vistazo se distinga qué
+   tipo de logro es cada quien. */
 .achievements-row {
   display: flex;
   flex-wrap: wrap;
@@ -938,54 +940,40 @@ main h3::before {
   letter-spacing: 0.03em;
 }
 
-.achievement-badge--founder {
+/* Trayectoria con el equipo: fundador, temporadas, ligas jugadas. */
+.achievement-badge--trajectory {
   border: 1px solid var(--pos-catcher);
   background: rgba(168, 85, 247, 0.12);
   color: var(--pos-catcher);
 }
 
-.achievement-badge--tenure {
-  border: 1px solid var(--pos-pitcher);
-  background: rgba(74, 158, 255, 0.12);
-  color: var(--pos-pitcher);
-}
-
-.achievement-badge--leagues {
-  border: 1px solid var(--pos-dh);
-  background: rgba(255, 140, 51, 0.12);
-  color: var(--pos-dh);
-}
-
+/* Racha de hits vigente. */
 .achievement-badge--streak {
   border: 1px solid var(--win);
   background: rgba(63, 181, 111, 0.12);
   color: var(--win);
 }
 
-/* "Eres el #1 del equipo en esto" — mismo dorado que .mvp-badge a
-   propósito, es la misma idea de fondo. */
+/* Líder de la temporada — "eres el #1 del equipo en esto". Mismo dorado
+   que .mvp-badge a propósito, es la misma idea de fondo. */
 .achievement-badge--leader {
   border: 1px solid #f5b942;
   background: rgba(245, 185, 66, 0.12);
   color: #f5b942;
 }
 
-.achievement-badge--avg300 {
+/* Umbral fijo: cruzaste una marca (ej. AVG .300), no depende de ser el #1. */
+.achievement-badge--threshold {
   border: 1px solid var(--pos-special);
   background: rgba(255, 111, 181, 0.12);
   color: var(--pos-special);
 }
 
-.achievement-badge--attendance {
-  border: 1px solid var(--win);
-  background: rgba(63, 181, 111, 0.12);
-  color: var(--win);
-}
-
-.achievement-badge--multi {
-  border: 1px solid #2dd4bf;
-  background: rgba(45, 212, 191, 0.12);
-  color: #2dd4bf;
+/* Asistencia y versatilidad. */
+.achievement-badge--participation {
+  border: 1px solid var(--pos-dh);
+  background: rgba(255, 140, 51, 0.12);
+  color: var(--pos-dh);
 }
 
 .replay-btn {
