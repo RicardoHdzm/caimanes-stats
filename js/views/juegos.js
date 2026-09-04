@@ -40,6 +40,7 @@ export function renderJuegos(container) {
     return {
       id: g.id,
       date: g.date,
+      time: g.time ?? "",
       opponent: g.opponent,
       // No es una sede: en esta liga no hay local/visitante, solo en qué
       // parte de la entrada bateamos. Cerrar bateando = batear en la parte
@@ -55,6 +56,7 @@ export function renderJuegos(container) {
 
   const resultColumns = [
     { key: "date", label: "Fecha", sticky: true },
+    { key: "time", label: "Hora" },
     { key: "opponent", label: "Rival" },
     { key: "close", label: "Entrada", full: "Parte de la entrada en que bateamos — baja = cerramos, alta = abrimos" },
     { key: "score", label: "Marcador" },

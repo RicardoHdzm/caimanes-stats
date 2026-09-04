@@ -126,7 +126,7 @@ export function renderJuegoDetalle(container, gameId) {
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
-    <div class="game-hero-date">${game.date}</div>
+    <div class="game-hero-date">${game.date}${game.time ? ` — ${game.time}` : ""}</div>
     <div class="game-hero-meta">
       <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
     </div>
