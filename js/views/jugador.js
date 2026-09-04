@@ -255,8 +255,8 @@ export function renderAchievements(player) {
   const onBaseStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) > 0 || (line.BB ?? 0) > 0);
   if (onBaseStreak >= 2) {
     chips.push({
-      icon: "fa-solid fa-lock",
-      label: "Seguro",
+      icon: "fa-solid fa-magnet",
+      label: "Base Magnet",
       kind: "streak",
       desc: `Racha activa de ${onBaseStreak} juegos seguidos embasándose (hit o base por bolas).`,
     });
@@ -468,7 +468,7 @@ export function renderAchievements(player) {
   if (INJURED.includes(player.id)) {
     chips.push({
       icon: "fa-solid fa-wheelchair",
-      label: "Lesionado",
+      label: "Fragile",
       kind: "participation",
       desc: "Se lesionó durante la temporada.",
     });

@@ -43,7 +43,7 @@ const CATALOG = [
   { kind: "streak", icon: "fa-solid fa-fire", name: "On Fire", how: "Racha activa de 2 o más juegos seguidos con hit.", match: (l) => l === "On Fire" },
   { kind: "streak", icon: "fa-solid fa-bolt", name: "The Streak", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "The Streak" },
   { kind: "streak", icon: "fa-solid fa-fire-flame-curved", name: "Too Hot!", how: "Racha activa de 2 o más juegos seguidos con multi-hit (2 o más hits por juego).", match: (l) => l === "Too Hot!" },
-  { kind: "streak", icon: "fa-solid fa-lock", name: "Seguro", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Seguro" },
+  { kind: "streak", icon: "fa-solid fa-magnet", name: "Base Magnet", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Base Magnet" },
   // ---- Podio del equipo (oro/plata/bronce, según el lugar) ----
   { kind: "gold", icon: "fa-solid fa-baseball-bat-ball", name: "Bate de oro / plata / bronce", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.startsWith("Bate de ") },
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Kaboom!", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Kaboom!" },
@@ -68,7 +68,7 @@ const CATALOG = [
   { kind: "participation", icon: "fa-solid fa-recycle", name: "Versátil", how: "Jugó en 3 o más posiciones distintas esta temporada.", match: (l) => l === "Versátil" },
   { kind: "participation", icon: "fa-solid fa-crown", name: "Rey Caimán", how: "Jugó en las 9 posiciones de campo esta temporada.", match: (l) => l === "Rey Caimán" },
   { kind: "participation", icon: "fa-solid fa-up-down", name: "Suplente", how: "Entró o salió de cambio en al menos 2 juegos de la temporada.", match: (l) => l === "Suplente" },
-  { kind: "participation", icon: "fa-solid fa-wheelchair", name: "Lesionado", how: "Se lesionó durante la temporada.", match: (l) => l === "Lesionado" },
+  { kind: "participation", icon: "fa-solid fa-wheelchair", name: "Fragile", how: "Se lesionó durante la temporada.", match: (l) => l === "Fragile" },
   // ---- Social ----
   { kind: "social", icon: "fa-solid fa-heart", name: "Fanático", how: "Le dio like a algún anuncio del equipo.", match: (l) => l === "Fanático", async: true },
   { kind: "social", icon: "fa-solid fa-comment", name: "Comentarista", how: "Comentó en al menos 5 juegos de la temporada.", match: (l) => l === "Comentarista", async: true },
