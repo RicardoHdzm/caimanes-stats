@@ -7,8 +7,9 @@
        de la lógica (botón, guardar el cambio) vive en js/theme.js. -->
   <script>
     try {
-      if (localStorage.getItem("caimanes-theme") === "light") {
-        document.documentElement.dataset.theme = "light";
+      var theme = localStorage.getItem("caimanes-theme");
+      if (theme === "light" || theme === "eclipse") {
+        document.documentElement.dataset.theme = theme;
       }
     } catch (e) {}
   </script>
@@ -63,12 +64,14 @@
     >
       <i class="fa-brands fa-instagram"></i>
     </a>
-    <!-- Interruptor sol/luna — el círculo rojo se desliza al lado activo por
-         puro CSS ([data-theme="light"] en <html>, ver css/styles.css); el
-         botón nomás pone y quita ese atributo (ver js/theme.js). -->
-    <button type="button" id="theme-toggle" class="theme-switch" aria-label="Cambiar a tema claro">
+    <!-- Interruptor sol/eclipse/luna — el círculo rojo se desliza al lado
+         activo por puro CSS ([data-theme] en <html>, ver css/styles.css);
+         el botón nomás avanza al siguiente tema del ciclo (ver
+         js/theme.js). -->
+    <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Luna — clic para cambiar">
       <span class="theme-switch-thumb"></span>
       <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
+      <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
       <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
     </button>
     <div class="topbar-inner">

@@ -150,6 +150,33 @@
   --row-you-solid: #fbe4e6;
 }
 
+/* ---- Tema Eclipse ----
+   El azul marino clásico del sitio, de antes de que Luna se volviera gris
+   neutro — se conserva como tercera opción para quien lo prefiera. Se
+   activa con [data-theme="eclipse"] en <html> (mismo mecanismo que el
+   claro de arriba). Además del fondo, este tema también cambia el rojo de
+   acento (--accent y derivados) y --muted — a diferencia de Sol/Luna, que
+   solo tocan fondo/superficie/texto y comparten el mismo rojo. */
+:root[data-theme="eclipse"] {
+  --bg: #121c25;
+  --surface: #1b2830;
+  --surface-alt: #223039;
+  --surface-raised: #283945;
+  --border: #34495a;
+  --muted: #a3a5a4;
+
+  --accent: #bf0f35;
+  --accent-text: #e8375c;
+  --accent-dark: #7d0924;
+  --accent-glow: rgba(191, 15, 53, 0.35);
+
+  --bg-glow: #1b2830;
+
+  /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
+     --surface y --accent de este tema. */
+  --row-you-solid: #342431;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -260,19 +287,21 @@ body {
   font-size: var(--text-xl);
 }
 
-/* Interruptor sol/luna (js/theme.js) — junto a Instagram, misma esquina y
-   centrado a la misma altura (ver .social-link arriba). El círculo rojo (el
-   "thumb") y los dos íconos se desliza/cambian de color al lado activo
-   nomás con CSS: [data-theme="light"] en <html>, sin que JS toque estilos.
+/* Interruptor sol/eclipse/luna (js/theme.js) — junto a Instagram, misma
+   esquina y centrado a la misma altura (ver .social-link arriba). El
+   círculo rojo (el "thumb") y los tres íconos se desliza/cambian de color
+   al lado activo nomás con CSS: [data-theme="light"|"eclipse"] en <html>
+   (sin atributo = Luna, el oscuro de siempre), sin que JS toque estilos.
    Tanto el thumb como los íconos son position:absolute con el MISMO
-   tamaño/posición cada uno (3px o 33px) — así el ícono queda exactamente
-   centrado sobre su círculo, en vez de depender de que un reparto flex
-   coincida por casualidad con dónde cae el círculo. */
+   tamaño/posición cada uno (3px/33px/63px) — así el ícono queda
+   exactamente centrado sobre su círculo, en vez de depender de que un
+   reparto flex coincida por casualidad con dónde cae el círculo. Orden
+   izquierda-a-derecha = claro-a-oscuro: sol, eclipse, luna. */
 .theme-switch {
   position: absolute;
   top: 23px;
   left: 62px;
-  width: 64px;
+  width: 94px;
   height: 34px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border);
@@ -283,7 +312,7 @@ body {
 .theme-switch-thumb {
   position: absolute;
   top: 3px;
-  left: 33px; /* oscuro (default): junto a la luna */
+  left: 63px; /* Luna (default): junto a la luna */
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -293,7 +322,11 @@ body {
 }
 
 :root[data-theme="light"] .theme-switch-thumb {
-  left: 3px; /* claro: junto al sol */
+  left: 3px; /* Sol */
+}
+
+:root[data-theme="eclipse"] .theme-switch-thumb {
+  left: 33px; /* Eclipse */
 }
 
 .theme-switch-icon {
@@ -313,21 +346,30 @@ body {
   left: 3px;
 }
 
-.theme-switch-icon--moon {
+.theme-switch-icon--eclipse {
   left: 33px;
 }
 
-/* El ícono del lado activo queda en blanco, sobre el círculo rojo; el
-   inactivo se apaga a --muted (regla base de arriba). */
+.theme-switch-icon--moon {
+  left: 63px;
+}
+
+/* El ícono del tema activo queda en blanco, sobre el círculo rojo; los
+   otros dos se apagan a --muted (regla base de arriba). */
 .theme-switch-icon--moon {
   color: #fff;
 }
 
-:root[data-theme="light"] .theme-switch-icon--moon {
+:root[data-theme="light"] .theme-switch-icon--moon,
+:root[data-theme="eclipse"] .theme-switch-icon--moon {
   color: var(--muted);
 }
 
 :root[data-theme="light"] .theme-switch-icon--sun {
+  color: #fff;
+}
+
+:root[data-theme="eclipse"] .theme-switch-icon--eclipse {
   color: #fff;
 }
 
@@ -346,7 +388,7 @@ body {
   .theme-switch {
     top: 17px;
     left: 52px;
-    width: 56px;
+    width: 82px;
     height: 30px;
   }
 
@@ -357,19 +399,27 @@ body {
   }
 
   .theme-switch-thumb {
-    left: 29px; /* oscuro (default): junto a la luna */
+    left: 55px; /* Luna (default): junto a la luna */
   }
 
   .theme-switch-icon--sun {
     left: 3px;
   }
 
-  .theme-switch-icon--moon {
+  .theme-switch-icon--eclipse {
     left: 29px;
   }
 
+  .theme-switch-icon--moon {
+    left: 55px;
+  }
+
   :root[data-theme="light"] .theme-switch-thumb {
-    left: 3px; /* claro: junto al sol */
+    left: 3px; /* Sol */
+  }
+
+  :root[data-theme="eclipse"] .theme-switch-thumb {
+    left: 29px; /* Eclipse */
   }
 }
 

@@ -5,8 +5,9 @@
 <!-- Mismo tema que el sitio principal, sin parpadeo — ver index.html. -->
 <script>
   try {
-    if (localStorage.getItem("caimanes-theme") === "light") {
-      document.documentElement.dataset.theme = "light";
+    var theme = localStorage.getItem("caimanes-theme");
+    if (theme === "light" || theme === "eclipse") {
+      document.documentElement.dataset.theme = theme;
     }
   } catch (e) {}
 </script>
