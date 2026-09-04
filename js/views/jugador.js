@@ -456,7 +456,12 @@ export function renderJugadorDetalle(container, playerId) {
     if (!override) return;
     currentWalkup = override;
     walkupDisplay.innerHTML = renderWalkup(override);
-    addAchievementMedal({ icon: "fa-solid fa-music", label: "Entrada con estilo", kind: "profile" });
+    addAchievementMedal({
+      icon: "fa-solid fa-music",
+      label: "Soundtrack",
+      kind: "profile",
+      desc: "Personalizó su walkup song (canción de entrada).",
+    });
   });
 
   // ---- Editar perfil: un solo botón, un solo panel ----
