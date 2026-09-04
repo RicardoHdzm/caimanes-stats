@@ -104,6 +104,20 @@ function buildBottomTabs() {
     a.dataset.tab = t.tab;
     a.innerHTML = `<i class="fa-solid ${t.icon}"></i><span>${t.label}</span>`;
     bottomTabs.appendChild(a);
+
+    // Mi Perfil va justo después de Resumen — mismo lugar que en la nav de
+    // escritorio (ver #nav-mi-perfil en index.html). Empieza oculta: render()
+    // le pone el href y la muestra en cuanto hay sesión iniciada.
+    if (t.tab === "resumen") {
+      const miPerfil = document.createElement("a");
+      miPerfil.href = "#";
+      miPerfil.className = "bottom-tab";
+      miPerfil.id = "bottom-tab-mi-perfil";
+      miPerfil.dataset.tab = "mi-perfil";
+      miPerfil.hidden = true;
+      miPerfil.innerHTML = `<i class="fa-solid fa-id-card"></i><span>Mi Perfil</span>`;
+      bottomTabs.appendChild(miPerfil);
+    }
   }
 
   const moreBtn = document.createElement("button");
@@ -140,6 +154,12 @@ function render() {
   const myId = getCurrentPlayerId();
   miPerfilLink.hidden = !myId;
   if (myId) miPerfilLink.href = `#/jugador/${myId}`;
+
+  const bottomMiPerfilLink = bottomTabs.querySelector('[data-tab="mi-perfil"]');
+  if (bottomMiPerfilLink) {
+    bottomMiPerfilLink.hidden = !myId;
+    if (myId) bottomMiPerfilLink.href = `#/jugador/${myId}`;
+  }
 
   const route = currentRoute();
   toggleMoreSheet(false);

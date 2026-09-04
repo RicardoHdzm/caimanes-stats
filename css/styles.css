@@ -831,6 +831,15 @@ body {
     cursor: pointer;
   }
 
+  /* Sin esto, [hidden] no le gana a "display: flex" de arriba (misma
+     especificidad, y flex está declarado después) — la pestaña "Mi Perfil"
+     (#bottom-tab-mi-perfil, ver js/main.js) se seguiría viendo sin sesión
+     iniciada aunque JS le ponga el atributo `hidden`. Mismo bug ya corregido
+     arriba para la nav de escritorio (ver .tabs a[hidden]). */
+  .bottom-tab[hidden] {
+    display: none;
+  }
+
   .bottom-tab i {
     font-size: 18px;
   }
