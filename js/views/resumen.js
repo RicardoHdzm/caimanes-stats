@@ -27,14 +27,6 @@ function formatGameDate(dateStr) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-// "Fulano, Mengano y Zutano" — mismo formato que ya usa js/stats.js para
-// empates en récords, repetido aquí en chico porque esa versión es privada
-// de ese módulo.
-function joinNames(names) {
-  if (names.length === 1) return names[0];
-  return `${names.slice(0, -1).join(", ")} y ${names[names.length - 1]}`;
-}
-
 // Tarjeta de líder con el #1 en grande (encabezado a color + su foto) y el
 // 2do/3er lugar chico debajo (avatar + nombre + valor). La usan "Líderes de
 // la temporada" y "Salón de la fama" (Más veterano, Más MVPs); el resto de
@@ -475,64 +467,5 @@ export function renderResumen(container) {
     }
 
     container.appendChild(recordsRow);
-  }
-
-  // ---- Salón de la fama ----
-  //
-  // A diferencia de "Líderes"/"Récords" (esta temporada nada más), esto usa
-  // `seasons` — la lista de TODAS las temporadas que el jugador ha estado
-  // en el equipo (ver js/data.js SEASONS), no solo cuándo debutó — alguien
-  // pudo haberse ausentado una temporada y regresado después. Solo se
-  // pinta lo que de verdad aplica: sin nadie con `seasons` cargado, ninguna
-  // de estas tres tarjetas tiene qué mostrar y la sección entera no aparece.
-  const withSeasons = PLAYERS.filter((p) => p.seasons?.length > 0);
-  if (withSeasons.length > 0) {
-    const famaHeading = document.createElement("h3");
-    famaHeading.textContent = "Salón de la fama";
-    container.appendChild(famaHeading);
-
-    const famaRow = document.createElement("div");
-    famaRow.className = "leaders grid-2 tab-carousel";
-
-    // "Más veterano" por temporadas acumuladas (seasons.length), no por
-    // debut: con ausencias de por medio, quien debutó primero no siempre
-    // es quien más temporadas lleva jugadas.
-    const veteranSorted = [...withSeasons].sort((a, b) => b.seasons.length - a.seasons.length);
-    let html = teamLeaderCardHtml({
-      icon: "fa-landmark",
-      title: "Más veterano",
-      list: veteranSorted,
-      valueOf: (p) => `${p.seasons.length} temporada${p.seasons.length === 1 ? "" : "s"}`,
-    });
-
-    const mvpCounts = PLAYERS.map((p) => ({ ...p, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
-      (p) => p.mvpTotal > 0
-    );
-    if (mvpCounts.length > 0) {
-      mvpCounts.sort((a, b) => b.mvpTotal - a.mvpTotal);
-      html += teamLeaderCardHtml({
-        icon: "fa-star",
-        title: "Más MVPs",
-        list: mvpCounts,
-        valueOf: (p) => `${p.mvpTotal} MVP${p.mvpTotal === 1 ? "" : "s"}`,
-        detailOf: () => "Esta temporada",
-      });
-    }
-
-    // Rookies = su única temporada registrada es la actual (si tuviera una
-    // anterior y faltara la actual, no seguiría activo; ese caso no cuenta
-    // como rookie, cuenta como que ya no está).
-    const rookies = withSeasons.filter((p) => p.seasons.length === 1 && p.seasons[0] === TEAM.seasonsTotal);
-    if (rookies.length > 0) {
-      html += `
-        <div class="leader-card">
-          <h3><i class="fa-solid fa-seedling"></i>Rookies de la temporada</h3>
-          <p>${joinNames(rookies.map((p) => p.name))}</p>
-        </div>
-      `;
-    }
-
-    famaRow.innerHTML = html;
-    container.appendChild(famaRow);
   }
 }
