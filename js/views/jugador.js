@@ -227,18 +227,18 @@ export function renderAchievements(player) {
   if (streak?.active && streak.current >= 2) {
     chips.push({
       icon: "fa-solid fa-fire",
-      label: "Caliente",
+      label: "On Fire",
       kind: "streak",
       desc: `Racha activa de ${streak.current} juegos seguidos con hit.`,
     });
   }
-  // "Hit Record" — a diferencia de Caliente, cuenta la racha más larga de
+  // "The Streak" — a diferencia de On Fire, cuenta la racha más larga de
   // TODA la temporada aunque ya haya terminado (streak.longest, no
   // streak.current) — reconoce el logro aunque ya no siga activo.
   if (streak && streak.longest > 5) {
     chips.push({
-      icon: "fa-solid fa-award",
-      label: "Hit Record",
+      icon: "fa-solid fa-bolt",
+      label: "The Streak",
       kind: "streak",
       desc: `Su racha más larga de la temporada fue de ${streak.longest} juegos seguidos con hit.`,
     });
@@ -247,7 +247,7 @@ export function renderAchievements(player) {
   if (multiHitStreak >= 2) {
     chips.push({
       icon: "fa-solid fa-fire-flame-curved",
-      label: "En llamas",
+      label: "Too Hot!",
       kind: "streak",
       desc: `Racha activa de ${multiHitStreak} juegos seguidos con multi-hit (2 o más hits).`,
     });
