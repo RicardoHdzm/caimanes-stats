@@ -429,6 +429,11 @@ export function renderJugadorDetalle(container, playerId) {
           Estado de inscripción: ${paid ? "Pagada" : "Sin pagar"}
         </span>
       `;
+      addAchievementMedal(
+        paid
+          ? { icon: "fa-solid fa-sack-dollar", label: "Rich kid", kind: "dues", desc: "Ya pagó la inscripción de la temporada." }
+          : { icon: "fa-solid fa-hand-holding-dollar", label: "Moroso", kind: "dues", desc: "Todavía no paga la inscripción de la temporada." }
+      );
     });
   }
 
