@@ -1452,10 +1452,10 @@ main h3::before {
   line-height: 1.4;
 }
 
-/* El rival del próximo juego usa .leader-hero-value (el mismo tamaño
-   gigante del número en Racha actual / Juegos jugados, etc.) porque es el
-   dato que más importa de un vistazo. La fecha/hora va aparte, más chica,
-   debajo. Doble clase para ganarle en especificidad a `.leader-card p`. */
+/* Solo el "vs" usa .leader-hero-value (el mismo tamaño gigante del número
+   en Racha actual / Juegos jugados, etc.) — el rival sigue en el tamaño
+   normal de `.leader-card p`. La fecha/hora va aparte, más chica, debajo.
+   Doble clase para ganarle en especificidad a `.leader-card p`. */
 .leader-card p.next-game-info {
   margin-top: 4px;
   font-size: var(--text-md);
