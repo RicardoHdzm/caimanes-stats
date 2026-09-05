@@ -1042,7 +1042,9 @@ main h3::before {
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  font-size: var(--text-xl);
+  /* Más grande que en mobile (ver el override abajo) — en escritorio hay
+     de sobra ancho para que "Equipo vs Rival" se lea a mayor tamaño. */
+  font-size: var(--text-2xl);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -1091,9 +1093,14 @@ main h3::before {
 }
 
 .game-hero-date {
-  margin-bottom: 10px;
+  /* Antes centrada arriba del badge de resultado — se saca del flujo y se
+     manda a la esquina, chica, mismo patrón que #profile-debut-badge, para
+     que el badge de Victoria/Derrota quede como lo primero que se lee. */
+  position: absolute;
+  top: 14px;
+  right: 14px;
   color: var(--muted);
-  font-size: var(--text-md);
+  font-size: var(--text-2xs);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -1105,6 +1112,15 @@ main h3::before {
 
 .game-hero-replay {
   margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  /* El tamaño grande de .game-hero-teams es solo para escritorio — en
+     celular se queda como estaba (si no, "Equipo vs Rival" ya no cabe en
+     una sola línea). */
+  .game-hero-teams {
+    font-size: var(--text-xl);
+  }
 }
 
 /* ---- Tarjeta principal del perfil de jugador (js/views/jugador.js) ----

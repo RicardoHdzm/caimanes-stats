@@ -32,11 +32,16 @@ function formatGameTime(timeStr) {
 }
 
 // El voto de MVP solo se acepta en el juego MÁS RECIENTE — en cuanto se
-// agrega un juego posterior, el anterior se congela con lo que ya se votó
-// (el badge/medallas siguen contando ese resultado, nomás ya no se puede
-// cambiar). Por fecha (string ISO, ordena bien con localeCompare) y, si
-// empatan (doble cartelera el mismo día), por el número más alto del id.
-function isLatestGame(game) {
+// agrega un juego posterior, el anterior se congela con lo que ya se votó.
+// Mientras sigue siendo el más reciente (votación abierta) el resultado NO
+// cuenta todavía para nada fuera de esta página: ni la estrella/pill de
+// arriba, ni el conteo "MVP x N"/medalla Starboy del perfil (ver
+// mvpCountsFromVotes en js/views/jugador.js) — todos usan isLatestGame para
+// saltarse ese juego hasta que cierre, así el resultado final nunca se
+// adelanta a medio contar. Por fecha (string ISO, ordena bien con
+// localeCompare) y, si empatan (doble cartelera el mismo día), por el
+// número más alto del id.
+export function isLatestGame(game) {
   if (GAMES.length === 0) return false;
   const latest = [...GAMES]
     .sort((a, b) => {
@@ -304,6 +309,15 @@ export function renderJuegoDetalle(container, gameId) {
   back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver a juegos';
   container.appendChild(back);
 
+  // Quién abre la entrada va primero: `weCloseBatting === true` es nosotros
+  // cerrando (bateamos en la baja), o sea el rival abre; `false` es al
+  // revés, nosotros abrimos. Sin dato (null) se deja el orden de siempre
+  // (nosotros primero) — ver el comentario de weCloseBatting en data.js.
+  const teamsHtml =
+    game.weCloseBatting === true
+      ? `<span class="game-hero-opponent">${game.opponent}</span><span class="game-hero-vs">vs</span><span>${TEAM.name}</span>`
+      : `<span>${TEAM.name}</span><span class="game-hero-vs">vs</span><span class="game-hero-opponent">${game.opponent}</span>`;
+
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
@@ -311,11 +325,7 @@ export function renderJuegoDetalle(container, gameId) {
     <div class="game-hero-meta">
       <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
     </div>
-    <div class="game-hero-teams">
-      <span>${TEAM.name}</span>
-      <span class="game-hero-vs">vs</span>
-      <span class="game-hero-opponent">${game.opponent}</span>
-    </div>
+    <div class="game-hero-teams">${teamsHtml}</div>
     <div class="game-hero-score${known ? "" : " pending"}">
       ${known ? `${game.scoreUs}<span class="sep">-</span>${game.scoreThem}` : "Marcador pendiente"}
     </div>

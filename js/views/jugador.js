@@ -29,7 +29,7 @@ import {
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
 import { wireRsvp } from "./resumen.js";
-import { mvpCandidateIds } from "./juego.js";
+import { mvpCandidateIds, isLatestGame } from "./juego.js";
 
 // Tamaño del avatar grande del perfil (ver renderJugadorDetalle) — una sola
 // constante para los 3 lugares que lo pintan (inicial, y las dos veces que
@@ -225,11 +225,16 @@ function podiumChip(list, playerId, key, { icon, label, desc, negative, maxPlace
 // DESPUÉS de votado (llega el capture real, se agrega una sustitución...)
 // puede dejar huérfano un voto por quien dejó de ser top 6; sin filtrarlo
 // aquí también, "MVP x N"/Starboy contarían un MVP que el badge del juego
-// ya ni siquiera muestra.
+// ya ni siquiera muestra. También se salta por completo el juego MÁS
+// RECIENTE (isLatestGame): con la votación todavía abierta el resultado
+// puede cambiar en cualquier momento — igual que el badge/estrella de
+// js/views/juego.js, no cuenta para nada hasta que cierre.
 export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
   const counts = new Map();
   perGameVotes.forEach((votes, i) => {
-    const candidateIds = games[i] ? mvpCandidateIds(games[i]) : null;
+    const game = games[i];
+    if (game && isLatestGame(game)) return;
+    const candidateIds = game ? mvpCandidateIds(game) : null;
     const tally = new Map();
     for (const v of votes) {
       if (candidateIds && !candidateIds.has(v.voted_player_id)) continue;
