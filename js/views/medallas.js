@@ -17,10 +17,10 @@
 // con que empiece igual, sin importar el lugar. Si algún día se agrega o
 // renombra un logro, hay que actualizar esta lista a mano — no hay forma
 // de generarla sola sin duplicar la lógica de cálculo en sentido inverso.
-import { PLAYERS, GAMES } from "../data.js";
+import { PLAYERS } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId, getSession } from "../auth.js";
-import { rankAmong } from "../stats.js";
+import { rankAmong, currentSeasonGames } from "../stats.js";
 import {
   getAvatarUrl,
   getWalkupOverride,
@@ -120,20 +120,22 @@ async function getAsyncLabels(player) {
     if (likes.some((l) => l.player_id === player.id)) labels.push("Superfan");
   }
 
-  if (GAMES.length > 0) {
-    const perGameComments = await Promise.all(GAMES.map((g) => getComments("game", g.id)));
+  // Solo la temporada actual — ver currentSeasonGames en js/stats.js.
+  const games = currentSeasonGames();
+  if (games.length > 0) {
+    const perGameComments = await Promise.all(games.map((g) => getComments("game", g.id)));
     const gamesCommented = perGameComments.filter((comments) => comments.some((c) => c.player_id === player.id)).length;
     if (gamesCommented >= 5) labels.push("Let's chat");
 
-    const perGameVotes = await Promise.all(GAMES.map((g) => getMvpVotes(g.id)));
-    const minVotes = Math.ceil(GAMES.length / 2);
+    const perGameVotes = await Promise.all(games.map((g) => getMvpVotes(g.id)));
+    const minVotes = Math.ceil(games.length / 2);
     const gamesVoted = perGameVotes.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
     if (gamesVoted >= minVotes) labels.push("Voter");
 
     // "Starboy" — top 3 del equipo en MVPs VOTADOS (ver mvpCountsFromVotes,
     // exportada de js/views/jugador.js) — misma perGameVotes de arriba, no
     // hace falta pedirla otra vez.
-    const mvpCounts = mvpCountsFromVotes(perGameVotes);
+    const mvpCounts = mvpCountsFromVotes(perGameVotes, games);
     const mvpList = [...mvpCounts.entries()].map(([playerId, mvpTotal]) => ({ playerId, mvpTotal }));
     const place = rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place;
     if (place && place <= 3) labels.push("Starboy");

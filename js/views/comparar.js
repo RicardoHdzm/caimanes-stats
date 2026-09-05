@@ -1,5 +1,12 @@
-import { PLAYERS, GAMES } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, outsTotals, gamesPlayedByPlayer } from "../stats.js";
+import { PLAYERS } from "../data.js";
+import {
+  currentSeasonGames,
+  battingTotals,
+  pitchingTotals,
+  fieldingTotals,
+  outsTotals,
+  gamesPlayedByPlayer,
+} from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
 import { getSession } from "../auth.js";
 import { getAvatarUrl } from "../db.js";
@@ -141,11 +148,12 @@ function comparisonBody(leftId, rightId) {
   const right = PLAYERS.find((p) => p.id === rightId);
   if (!left || !right) return "";
 
-  const batting = battingTotals(GAMES);
-  const pitching = pitchingTotals(GAMES);
-  const fielding = fieldingTotals(GAMES);
-  const outs = outsTotals(GAMES);
-  const played = gamesPlayedByPlayer(GAMES);
+  const games = currentSeasonGames();
+  const batting = battingTotals(games);
+  const pitching = pitchingTotals(games);
+  const fielding = fieldingTotals(games);
+  const outs = outsTotals(games);
+  const played = gamesPlayedByPlayer(games);
   const find = (list, id) => list.find((r) => r.playerId === id) ?? null;
 
   return `

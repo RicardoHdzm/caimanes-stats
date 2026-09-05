@@ -31,6 +31,13 @@ export const SEASONS = [
   { year: 2026, league: "Liga Valle Alto" }, // 8 (actual)
 ];
 
+// La temporada actual — por convención, siempre SEASONS.length ===
+// TEAM.seasonsTotal (ver arriba), así que no hace falta un contador aparte.
+// Todo lo que es "de esta temporada" (Resumen, Bateo, Pitcheo, Fildeo,
+// medallas, PLAYOFFS...) filtra por esto — ver currentSeasonGames() en
+// js/stats.js y el campo `season` de cada juego en GAMES, abajo.
+export const CURRENT_SEASON = TEAM.seasonsTotal;
+
 // Roster del equipo.
 // number: número de camiseta (null si aún no lo sabes)
 // position: posición principal — vacío si aún no la sabes. Códigos válidos:
@@ -102,6 +109,19 @@ export const MANAGERS = ["p15"];
 // Si un jugador no participó en algo (ej. no pitcheó ese juego), simplemente
 // no aparece en ese arreglo.
 //
+// `season`: número de temporada (ver SEASONS arriba, no el año — dos
+// temporadas pueden caer en el mismo año, ej. 7 y 8 son ambas 2026), igual
+// que ya se usa en PLAYERS[].seasons. Todas las vistas de "esta temporada"
+// (Resumen, Bateo, Pitcheo, Fildeo, medallas...) filtran GAMES con
+// currentSeasonGames() (ver js/stats.js), que solo deja pasar
+// `season === CURRENT_SEASON`; GAMES completo (todas las temporadas) solo
+// lo usan el detalle de un juego puntual (link directo por id) y
+// "Temporadas anteriores" (js/views/temporadas.js). Al abrir una temporada
+// nueva: agrega una fila a SEASONS, sube TEAM.seasonsTotal (y
+// seasonsInLeague si sigue en la misma liga) y actualiza
+// TEAM.gamesInSeason al calendario nuevo — con eso CURRENT_SEASON avanza
+// solo, no hace falta tocar código.
+//
 // `weCloseBatting` NO es una sede: en esta liga no hay local ni visitante,
 // todos juegan en el mismo campo. Es solo quién batea al final de cada
 // entrada — true si cerramos nosotros, false si cierra el rival, null si
@@ -140,6 +160,7 @@ export const MANAGERS = ["p15"];
 // export const GAMES = [
 //   {
 //     id: "g8", // el siguiente consecutivo (hay 7 juegos: g1…g7)
+//     season: 8, // ver CURRENT_SEASON, arriba de SEASONS
 //     date: "2026-03-01",
 //     time: "19:00", // opcional, formato 24h — usado por la medalla "Sleepwalker" (juegos a las 21:00)
 //     opponent: "Nombre del rival",
@@ -178,6 +199,7 @@ export const MANAGERS = ["p15"];
 export const GAMES = [
   {
     id: "g1",
+    season: 8,
     date: "2026-06-12",
     time: "21:00",
     opponent: "BNG Agroproductos",
@@ -212,6 +234,7 @@ export const GAMES = [
   },
   {
     id: "g2",
+    season: 8,
     date: "2026-06-25",
     time: "19:00",
     opponent: "Muñekos",
@@ -258,6 +281,7 @@ export const GAMES = [
   },
   {
     id: "g3",
+    season: 8,
     date: "2026-07-10",
     time: "19:00",
     opponent: "Bronx",
@@ -309,6 +333,7 @@ export const GAMES = [
   },
   {
     id: "g4",
+    season: 8,
     date: "2026-07-21",
     time: "21:00",
     opponent: "Los Pichichis",
@@ -347,6 +372,7 @@ export const GAMES = [
   },
     {
     id: "g5",
+    season: 8,
     date: "2026-07-28",
     time: "19:00",
     opponent: "Tamagochis",
@@ -397,6 +423,7 @@ export const GAMES = [
   },
   {
     id: "g6",
+    season: 8,
     date: "2026-08-14",
     time: "19:00",
     opponent: "Jolinos",
@@ -455,6 +482,7 @@ export const GAMES = [
   },
     {
     id: "g7",
+    season: 8,
     date: "2026-08-20",
     time: "19:00",
     opponent: "Sox",
@@ -511,6 +539,7 @@ export const GAMES = [
     // Reemplaza el bloque completo del juego "g8" en GAMES por esto:
   {
     id: "g8",
+    season: 8,
     date: "2026-08-27",
     time: "21:00",
     opponent: "Rockin' Roll",
@@ -567,6 +596,7 @@ export const GAMES = [
         // Reemplaza el bloque completo del juego "g9" en GAMES por esto:
   {
     id: "g9",
+    season: 8,
     date: "2026-09-01",
     time: "19:00",
     opponent: "Los Primos",
@@ -625,6 +655,50 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
   },
 ];
+
+// Juegos de PLAYOFFS — solo temporadas que llegaron a esta fase tienen
+// entrada aquí. Van APARTE de GAMES a propósito, para que un juego de
+// playoffs nunca se mezcle con las stats/medallas de "esta temporada"
+// (currentSeasonGames() en js/stats.js solo mira GAMES) ni con el total de
+// TEAM.gamesInSeason (que ya de por sí excluye playoffs, ver arriba).
+//
+// Un objeto por temporada, con sus rondas — cada ronda es una serie a
+// mejor de 3 contra un rival. No hace falta capturar cuántos equipos
+// clasificaron ni en qué ronda se entra: nomás vas agregando la ronda que
+// se juegue, en el orden en que se juegan. `name` es libre (tú decides
+// cómo llamarla: "Cuartos de final", "Semifinal", "Final"...).
+// `isFinal: true` en la ronda que sea la final del campeonato: si la
+// ganamos (2 juegos), la temporada se marca campeona sola — ver
+// playoffStatus()/playoffSeasonStatus() en js/stats.js, nada que declarar
+// a mano aparte de esta bandera.
+//
+// Cada juego de una ronda usa EXACTAMENTE el mismo esquema que un juego de
+// GAMES (batting/pitching/fielding/outs/substitutions/scoreUs/scoreThem/
+// weCloseBatting/time/replayUrl) — así se reutiliza tal cual el box score y
+// la votación de MVP de js/views/juego.js. El `id` de cada juego sigue la
+// MISMA secuencia global que los de GAMES (siguiente número disponible,
+// ver nextGameId() en js/admin.js) para que nunca choquen entre sí — sí
+// lleva su propio `opponent` (igual que en GAMES, aunque se repita el del
+// rival de la ronda) para que el detalle del juego (js/views/juego.js) no
+// necesite ningún caso especial; no lleva `season` propio, ese lo hereda
+// de la entrada de PLAYOFFS en la que vive.
+//
+// export const PLAYOFFS = [
+//   {
+//     season: 8,
+//     rounds: [
+//       {
+//         name: "Cuartos de final",
+//         opponent: "Nombre del rival",
+//         isFinal: false,
+//         games: [
+//           { id: "g10", date: "2026-09-15", time: "19:00", opponent: "Nombre del rival", weCloseBatting: null, scoreUs: null, scoreThem: null, batting: [], pitching: [], fielding: [], outs: [], substitutions: [] },
+//         ],
+//       },
+//     ],
+//   },
+// ];
+export const PLAYOFFS = [];
 
 // Próximos juegos (todavía sin jugar, sin marcador).
  export const SCHEDULE = [

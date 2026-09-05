@@ -1105,6 +1105,24 @@ main h3::before {
   letter-spacing: 0.04em;
 }
 
+/* Solo en un juego de playoffs (ver findGame en js/views/juego.js) — el
+   marcador de la serie se recalcula en vivo, nunca se guarda a mano. */
+.game-hero-playoff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 10px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(160deg, #ffd76a, #d4a017);
+  color: #4a3200;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  width: fit-content;
+}
+
 .game-hero-meta .badge {
   padding: 6px 14px;
   font-size: var(--text-sm);
@@ -1929,6 +1947,70 @@ main h3::before {
 
 .leader-card--hero {
   border-top-color: var(--accent);
+}
+
+/* ---- Playoffs (js/views/playoffs.js) ---- */
+
+.playoff-season-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: var(--text-sm);
+  margin-bottom: 16px;
+}
+
+.playoff-status--progress {
+  background: color-mix(in srgb, var(--accent) 15%, var(--surface-alt));
+  color: var(--accent-text);
+}
+
+.playoff-status--out {
+  background: color-mix(in srgb, var(--loss) 18%, var(--surface-alt));
+  color: var(--loss);
+}
+
+.playoff-status--champ {
+  background: linear-gradient(160deg, #ffd76a, #d4a017);
+  color: #4a3200;
+}
+
+.playoff-round-card h3 {
+  margin-bottom: 2px;
+}
+
+.playoff-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.playoff-game-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-alt);
+  color: var(--text);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  transition: border-color 0.15s;
+}
+
+.playoff-game-row:hover {
+  border-color: var(--accent);
+}
+
+.playoff-game-result {
+  font-weight: 700;
 }
 
 /* .leader-card normalmente vive dentro de un contenedor con `gap` (ver

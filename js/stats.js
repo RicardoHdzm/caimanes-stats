@@ -1,4 +1,14 @@
-import { PLAYERS, GAMES } from "./data.js";
+import { PLAYERS, GAMES, CURRENT_SEASON } from "./data.js";
+
+// Solo los juegos de la temporada actual — lo que usan Resumen, Bateo,
+// Pitcheo, Fildeo, medallas, etc. para que un juego de una temporada
+// pasada (o de playoffs, que viven aparte en PLAYOFFS) no se mezcle con
+// "esta temporada". El detalle de un juego puntual (link directo por id) y
+// "Temporadas anteriores" (js/views/temporadas.js) siguen usando GAMES
+// completo a propósito, filtrando por su propio número de temporada.
+export function currentSeasonGames(games = GAMES) {
+  return games.filter((g) => g.season === CURRENT_SEASON);
+}
 
 // ---- helpers de entradas pitcheadas (notación .1 = 1 out, .2 = 2 outs) ----
 export function ipToOuts(ip) {
@@ -212,6 +222,41 @@ export function gameResult(g) {
     return "T";
   }
   return g.result ?? null;
+}
+
+// Estado de una serie de playoffs (mejor de 3, ver PLAYOFFS en data.js):
+// cuenta victorias/derrotas de round.games con gameResult() de arriba.
+// "ganada"/"perdida" en cuanto alguien llega a 2 — un empate no cuenta para
+// ninguno de los dos lados (no debería pasar en un playoff, pero por si
+// las dudas no se cuenta como victoria de nadie).
+export function playoffStatus(round) {
+  const games = round.games ?? [];
+  let ourWins = 0;
+  let theirWins = 0;
+  for (const g of games) {
+    const result = gameResult(g);
+    if (result === "W") ourWins++;
+    else if (result === "L") theirWins++;
+  }
+  const status = ourWins >= 2 ? "ganada" : theirWins >= 2 ? "perdida" : "en_curso";
+  return { ourWins, theirWins, status };
+}
+
+// Estado de playoffs de una temporada completa (una entrada de PLAYOFFS):
+// recorre sus rondas en orden — la primera que se pierde termina la
+// temporada ("eliminados"); si la última ronda (o la marcada `isFinal`) se
+// gana, la temporada queda "campeones". Sin ronda perdida ni final ganada
+// todavía: "en_curso" (avanzando ronda a ronda conforme se juega). Todo
+// derivado en vivo de los juegos capturados — nada que declarar a mano
+// aparte de `isFinal` en la ronda que corresponda.
+export function playoffSeasonStatus(entry) {
+  const rounds = entry?.rounds ?? [];
+  const roundStatuses = rounds.map((round) => ({ round, ...playoffStatus(round) }));
+  const lost = roundStatuses.find((r) => r.status === "perdida");
+  if (lost) return { status: "eliminados", rounds: roundStatuses };
+  const wonFinal = roundStatuses.find((r) => r.round.isFinal && r.status === "ganada");
+  if (wonFinal) return { status: "campeones", rounds: roundStatuses };
+  return { status: "en_curso", rounds: roundStatuses };
 }
 
 // Racha activa: cuántos juegos seguidos (contando desde el más reciente hacia

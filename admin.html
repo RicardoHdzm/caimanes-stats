@@ -127,8 +127,16 @@
         <option value="">— Nuevo juego —</option>
       </select>
     </label>
+    <label class="playoff-toggle-label">
+      <input type="checkbox" id="is-playoff-toggle" name="isPlayoff" /> ¿Es un juego de playoffs?
+    </label>
     <form id="game-form" class="admin-form">
       <label>ID (único)<input type="text" name="id" required /></label>
+      <label id="season-field">Temporada<input type="number" name="season" min="1" required /></label>
+      <div id="playoff-fields" hidden>
+        <label>Ronda (ej. "Cuartos de final")<input type="text" name="roundName" /></label>
+        <label class="playoff-final-label"><input type="checkbox" name="isFinal" /> ¿Es la final del campeonato?</label>
+      </div>
       <label>Fecha<input type="date" name="date" required /></label>
       <label>Hora (opcional)<input type="time" name="time" /></label>
       <label>Rival<input type="text" name="opponent" required /></label>

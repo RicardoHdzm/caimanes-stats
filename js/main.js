@@ -5,6 +5,8 @@ import { renderBateo } from "./views/bateo.js";
 import { renderPitcheo } from "./views/pitcheo.js";
 import { renderFildeo } from "./views/fildeo.js";
 import { renderJuegos } from "./views/juegos.js";
+import { renderPlayoffs } from "./views/playoffs.js";
+import { renderTemporadas } from "./views/temporadas.js";
 import { renderCalendario } from "./views/calendario.js";
 import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
@@ -25,6 +27,7 @@ const routes = {
   pitcheo: renderPitcheo,
   fildeo: renderFildeo,
   juegos: renderJuegos,
+  playoffs: renderPlayoffs,
   calendario: renderCalendario,
   standing: renderStanding,
   alineacion: renderAlineacion,
@@ -48,6 +51,8 @@ const BOTTOM_TABS = [
 // Alineación al final.
 const MORE_TABS = [
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
+  { tab: "playoffs", route: "#/playoffs", label: "Playoffs", icon: "fa-trophy" },
+  { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
   { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "bateo", route: "#/bateo", label: "Bateo", icon: "fa-baseball-bat-ball" },
@@ -111,6 +116,12 @@ function currentRoute() {
   // esa vista viven en la URL para poder compartir la comparación armada.
   if (first === "alineacion") {
     return { tab: "alineacion", render: (container) => renderAlineacion(container, second, third) };
+  }
+  // #/temporadas/8 — el número de temporada es opcional (sin él, se
+  // muestra la más reciente con juegos capturados, ver defaultSeason en
+  // js/views/temporadas.js).
+  if (first === "temporadas") {
+    return { tab: "temporadas", render: (container) => renderTemporadas(container, second) };
   }
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };

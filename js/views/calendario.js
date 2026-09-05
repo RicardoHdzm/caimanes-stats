@@ -1,5 +1,5 @@
-import { GAMES, SCHEDULE } from "../data.js";
-import { gameResult } from "../stats.js";
+import { SCHEDULE } from "../data.js";
+import { currentSeasonGames, gameResult } from "../stats.js";
 import { heading } from "../ui.js";
 
 const MONTHS = [
@@ -22,7 +22,7 @@ function formatDate(d) {
 // Un evento por fecha: juego jugado (con resultado) o juego programado.
 function buildEventsByDate() {
   const map = new Map();
-  for (const g of GAMES) {
+  for (const g of currentSeasonGames()) {
     map.set(g.date, { type: "played", game: g });
   }
   for (const s of SCHEDULE) {

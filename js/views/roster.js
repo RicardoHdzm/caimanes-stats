@@ -1,5 +1,5 @@
-import { PLAYERS, GAMES, TEAM } from "../data.js";
-import { gamesPlayedByPlayer } from "../stats.js";
+import { PLAYERS, TEAM } from "../data.js";
+import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, getAllPositionOverrides } from "../db.js";
@@ -39,7 +39,7 @@ function renderDuesCell(playerId, duesMap) {
 export function renderRoster(container) {
   heading(container, "Roster");
 
-  const played = gamesPlayedByPlayer(GAMES);
+  const played = gamesPlayedByPlayer(currentSeasonGames());
   const rows = PLAYERS.map((p) => ({
     ...p,
     gamesPlayed: played.get(p.id) ?? 0,

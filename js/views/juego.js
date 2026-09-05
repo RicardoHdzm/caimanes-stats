@@ -1,5 +1,5 @@
-import { GAMES, TEAM, PLAYERS } from "../data.js";
-import { playerName, gameResult } from "../stats.js";
+import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
+import { playerName, gameResult, playoffStatus } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
@@ -41,9 +41,33 @@ function formatGameTime(timeStr) {
 // adelanta a medio contar. Por fecha (string ISO, ordena bien con
 // localeCompare) y, si empatan (doble cartelera el mismo día), por el
 // número más alto del id.
+// Todos los juegos de playoffs, de cualquier temporada, en un solo arreglo
+// plano — ver PLAYOFFS en js/data.js.
+function allPlayoffGames() {
+  return PLAYOFFS.flatMap((entry) => entry.rounds.flatMap((round) => round.games ?? []));
+}
+
+// Busca un juego por id en GAMES (temporada regular, cualquier temporada) o,
+// si no está ahí, entre los juegos de PLAYOFFS — un link a #/juegos/:id
+// funciona igual para cualquiera de los dos. `playoffContext` viene
+// {season, round} cuando el juego es de playoffs, o null si es de GAMES —
+// se usa para el badge extra del hero y el marcador de la serie.
+export function findGame(id) {
+  const game = GAMES.find((g) => g.id === id);
+  if (game) return { game, playoffContext: null };
+  for (const entry of PLAYOFFS) {
+    for (const round of entry.rounds) {
+      const found = (round.games ?? []).find((g) => g.id === id);
+      if (found) return { game: found, playoffContext: { season: entry.season, round } };
+    }
+  }
+  return { game: null, playoffContext: null };
+}
+
 export function isLatestGame(game) {
-  if (GAMES.length === 0) return false;
-  const latest = [...GAMES]
+  const pool = [...GAMES, ...allPlayoffGames()];
+  if (pool.length === 0) return false;
+  const latest = [...pool]
     .sort((a, b) => {
       const byDate = a.date.localeCompare(b.date);
       if (byDate !== 0) return byDate;
@@ -286,7 +310,7 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
 }
 
 export function renderJuegoDetalle(container, gameId) {
-  const game = GAMES.find((g) => g.id === gameId);
+  const { game, playoffContext } = findGame(gameId);
 
   if (!game) {
     heading(container, "Juego no encontrado");
@@ -318,9 +342,20 @@ export function renderJuegoDetalle(container, gameId) {
       ? `<span class="game-hero-opponent">${game.opponent}</span><span class="game-hero-vs">vs</span><span>${TEAM.name}</span>`
       : `<span>${TEAM.name}</span><span class="game-hero-vs">vs</span><span class="game-hero-opponent">${game.opponent}</span>`;
 
+  // Badge extra solo si el juego viene de PLAYOFFS (findGame arriba) — el
+  // marcador de la serie se recalcula en vivo con playoffStatus() a partir
+  // de los juegos ya capturados de esa ronda, nunca se guarda a mano.
+  const playoffBadgeHtml = playoffContext
+    ? (() => {
+        const { ourWins, theirWins } = playoffStatus(playoffContext.round);
+        return `<div class="game-hero-playoff-badge"><i class="fa-solid fa-trophy"></i> Playoffs · ${escapeHtml(playoffContext.round.name)} · Serie ${ourWins}-${theirWins}</div>`;
+      })()
+    : "";
+
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
+    ${playoffBadgeHtml}
     <div class="game-hero-date">${formatGameDate(game.date)}${game.time ? ` · ${formatGameTime(game.time)}` : ""}</div>
     <div class="game-hero-meta">
       <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>

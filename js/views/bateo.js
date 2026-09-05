@@ -1,9 +1,12 @@
-import { battingTotals, outsTotals } from "../stats.js";
+import { battingTotals, outsTotals, currentSeasonGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 
 export function renderBateo(container) {
   heading(container, "Estadísticas de bateo");
+
+  // Solo la temporada actual — ver currentSeasonGames en js/stats.js.
+  const games = currentSeasonGames();
 
   const columns = [
     { key: "name", label: "Jugador", sticky: true },
@@ -30,7 +33,7 @@ export function renderBateo(container) {
 
   renderSortableTable(tableEl, {
     columns,
-    rows: battingTotals(),
+    rows: battingTotals(games),
     defaultSort: "AVG",
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
@@ -63,7 +66,7 @@ export function renderBateo(container) {
 
   renderSortableTable(outsTableEl, {
     columns: outsColumns,
-    rows: outsTotals(),
+    rows: outsTotals(games),
     defaultSort: "TOTAL",
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;

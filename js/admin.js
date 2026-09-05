@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES, SEASONS } from "./data.js";
+import { PLAYERS, GAMES, SEASONS, CURRENT_SEASON, PLAYOFFS } from "./data.js";
 
 // ---- Navegación entre secciones (ver <nav class="admin-tabs"> en
 // admin.html) — antes todo vivía junto en una sola página larguísima. Los
@@ -292,18 +292,45 @@ scoreKnownSelect.addEventListener("change", () => {
   resultField.hidden = known;
 });
 
+// Un juego de playoffs no lleva `season` propio (lo hereda de la ronda en
+// PLAYOFFS, ver js/data.js) — a cambio pide en qué ronda va y si es la
+// final. Alternar el checkbox solo muestra/oculta esos campos; el
+// generador de código de más abajo decide qué armar según este estado.
+const isPlayoffToggle = document.getElementById("is-playoff-toggle");
+const seasonField = document.getElementById("season-field");
+const playoffFields = document.getElementById("playoff-fields");
+isPlayoffToggle.addEventListener("change", () => {
+  const isPlayoff = isPlayoffToggle.checked;
+  seasonField.hidden = isPlayoff;
+  playoffFields.hidden = !isPlayoff;
+});
+
 // El siguiente ID sale del número MÁS ALTO que ya existe, no de cuántos
 // juegos hay. Con el conteo, un juego borrado o un ID fuera de secuencia
 // hacía que se sugiriera uno ya ocupado — así fue como aparecieron los
 // huecos (g-1, g0, g1, g2, g5…) en la numeración vieja.
+// Incluye los juegos de playoffs (PLAYOFFS) además de GAMES — comparten la
+// misma secuencia global de ids para que nunca choquen entre sí (ver
+// PLAYOFFS en js/data.js).
+function allGameIds() {
+  const playoffGames = PLAYOFFS.flatMap((entry) => entry.rounds.flatMap((round) => round.games ?? []));
+  return [...GAMES, ...playoffGames].map((g) => g.id);
+}
+
 function nextGameId() {
-  const numeros = GAMES.map((g) => Number(String(g.id).replace(/^g/, ""))).filter(Number.isFinite);
+  const numeros = allGameIds().map((id) => Number(String(id).replace(/^g/, ""))).filter(Number.isFinite);
   const max = numeros.length > 0 ? Math.max(...numeros) : 0;
   return `g${max + 1}`;
 }
 
 function resetGameForm() {
   gameIdInput.value = nextGameId();
+  isPlayoffToggle.checked = false;
+  seasonField.hidden = false;
+  playoffFields.hidden = true;
+  gameForm.querySelector('[name="season"]').value = CURRENT_SEASON;
+  gameForm.querySelector('[name="roundName"]').value = "";
+  gameForm.querySelector('[name="isFinal"]').checked = false;
   gameForm.querySelector('[name="date"]').value = "";
   gameForm.querySelector('[name="time"]').value = "";
   gameForm.querySelector('[name="opponent"]').value = "";
@@ -329,6 +356,13 @@ function resetGameForm() {
 
 function loadGameIntoForm(game) {
   gameIdInput.value = game.id;
+  // "Editar juego existente" solo lista juegos de GAMES (temporada
+  // regular) — nunca de PLAYOFFS, así que siempre se sale del modo
+  // playoffs al cargar uno.
+  isPlayoffToggle.checked = false;
+  seasonField.hidden = false;
+  playoffFields.hidden = true;
+  gameForm.querySelector('[name="season"]').value = game.season ?? CURRENT_SEASON;
   gameForm.querySelector('[name="date"]').value = game.date;
   gameForm.querySelector('[name="time"]').value = game.time ?? "";
   gameForm.querySelector('[name="opponent"]').value = game.opponent;
@@ -383,9 +417,22 @@ resetGameForm();
 const gameOutput = document.getElementById("game-output");
 const gameCode = document.getElementById("game-code");
 
+// Agrega `extra` espacios al principio de cada línea de `text` — para
+// anidar el mismo bloque de juego a distinta profundidad según en dónde
+// vaya a pegarse (directo en GAMES, o dentro de rounds/games en PLAYOFFS).
+function indentBlock(text, extra) {
+  const pad = " ".repeat(extra);
+  return text
+    .split("\n")
+    .map((l) => pad + l)
+    .join("\n");
+}
+
 document.getElementById("generate-game-btn").addEventListener("click", () => {
   const data = new FormData(document.getElementById("game-form"));
   const id = data.get("id").trim();
+  const isPlayoff = isPlayoffToggle.checked;
+  const season = Number(data.get("season")) || CURRENT_SEASON;
   const date = data.get("date");
   const time = data.get("time");
   const opponent = data.get("opponent").trim();
@@ -393,43 +440,103 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   const weCloseBatting = closeValue === "unknown" ? "null" : closeValue;
   const scoreKnown = data.get("scoreKnown") === "yes";
 
-  const lines = [];
-  if (gameSelect.value) {
-    lines.push(`  // Reemplaza el bloque completo del juego "${gameSelect.value}" en GAMES por esto:`);
-  }
-  lines.push("  {");
-  lines.push(`    id: ${JSON.stringify(id)},`);
-  lines.push(`    date: ${JSON.stringify(date)},`);
-  if (time) lines.push(`    time: ${JSON.stringify(time)},`);
-  lines.push(`    opponent: ${JSON.stringify(opponent)},`);
-  lines.push(`    weCloseBatting: ${weCloseBatting},`);
+  // Campos del juego en sí, sin indentación todavía (se anidan distinto
+  // según el caso, ver abajo). Un juego de playoffs no lleva `season`
+  // propio — lo hereda de la ronda en PLAYOFFS.
+  const fieldLines = [];
+  fieldLines.push(`id: ${JSON.stringify(id)},`);
+  if (!isPlayoff) fieldLines.push(`season: ${season},`);
+  fieldLines.push(`date: ${JSON.stringify(date)},`);
+  if (time) fieldLines.push(`time: ${JSON.stringify(time)},`);
+  fieldLines.push(`opponent: ${JSON.stringify(opponent)},`);
+  fieldLines.push(`weCloseBatting: ${weCloseBatting},`);
   if (scoreKnown) {
-    lines.push(`    scoreUs: ${Number(data.get("scoreUs") || 0)},`);
-    lines.push(`    scoreThem: ${Number(data.get("scoreThem") || 0)},`);
+    fieldLines.push(`scoreUs: ${Number(data.get("scoreUs") || 0)},`);
+    fieldLines.push(`scoreThem: ${Number(data.get("scoreThem") || 0)},`);
   } else {
-    lines.push(`    result: ${JSON.stringify(data.get("result"))}, // marcador todavía no capturado`);
-    lines.push(`    scoreUs: null,`);
-    lines.push(`    scoreThem: null,`);
+    fieldLines.push(`result: ${JSON.stringify(data.get("result"))}, // marcador todavía no capturado`);
+    fieldLines.push(`scoreUs: null,`);
+    fieldLines.push(`scoreThem: null,`);
   }
-
-  lines.push("    batting: [");
-  for (const row of battingEditor.getRows()) lines.push(`      ${lineToCode(BATTING_FIELDS, row)},`);
-  lines.push("    ],");
-  lines.push("    pitching: [");
-  for (const row of pitchingEditor.getRows()) lines.push(`      ${lineToCode(PITCHING_FIELDS, row)},`);
-  lines.push("    ],");
-  lines.push("    fielding: [");
-  for (const row of fieldingEditor.getRows()) lines.push(`      ${lineToCode(FIELDING_FIELDS, row)},`);
-  lines.push("    ],");
-  lines.push("    outs: [");
-  for (const row of outsEditor.getRows()) lines.push(`      ${lineToCode(OUTS_FIELDS, row)},`);
-  lines.push("    ],");
-  lines.push("    substitutions: [");
-  for (const row of substitutionsEditor.getRows()) lines.push(`      ${lineToCode(SUBSTITUTION_FIELDS, row)},`);
-  lines.push("    ],");
+  fieldLines.push("batting: [");
+  for (const row of battingEditor.getRows()) fieldLines.push(`  ${lineToCode(BATTING_FIELDS, row)},`);
+  fieldLines.push("],");
+  fieldLines.push("pitching: [");
+  for (const row of pitchingEditor.getRows()) fieldLines.push(`  ${lineToCode(PITCHING_FIELDS, row)},`);
+  fieldLines.push("],");
+  fieldLines.push("fielding: [");
+  for (const row of fieldingEditor.getRows()) fieldLines.push(`  ${lineToCode(FIELDING_FIELDS, row)},`);
+  fieldLines.push("],");
+  fieldLines.push("outs: [");
+  for (const row of outsEditor.getRows()) fieldLines.push(`  ${lineToCode(OUTS_FIELDS, row)},`);
+  fieldLines.push("],");
+  fieldLines.push("substitutions: [");
+  for (const row of substitutionsEditor.getRows()) fieldLines.push(`  ${lineToCode(SUBSTITUTION_FIELDS, row)},`);
+  fieldLines.push("],");
   const replayUrl = data.get("replayUrl").trim();
-  if (replayUrl) lines.push(`    replayUrl: ${JSON.stringify(replayUrl)},`);
-  lines.push("  },");
+  if (replayUrl) fieldLines.push(`replayUrl: ${JSON.stringify(replayUrl)},`);
+
+  // "{" + campos indentados 2 + "}," — el objeto del juego, sin indentación
+  // de base todavía.
+  const gameBlock = ["{", indentBlock(fieldLines.join("\n"), 2), "},"].join("\n");
+
+  const lines = [];
+  if (!isPlayoff) {
+    if (gameSelect.value) {
+      lines.push(`  // Reemplaza el bloque completo del juego "${gameSelect.value}" en GAMES por esto:`);
+    }
+    lines.push(indentBlock(gameBlock, 2));
+  } else {
+    // Busca dónde ya va este juego dentro de PLAYOFFS (misma temporada +
+    // misma ronda por nombre) para generar solo lo que hace falta agregar
+    // — el juego suelto, la ronda completa, o la entrada de temporada
+    // completa — igual que "Reemplaza el bloque..." ya hace para GAMES.
+    const roundName = data.get("roundName").trim();
+    const isFinal = data.get("isFinal") === "on";
+    const seasonEntry = PLAYOFFS.find((p) => p.season === CURRENT_SEASON);
+    const round = seasonEntry?.rounds.find((r) => r.name === roundName);
+
+    if (round) {
+      lines.push(`  // Agrega este juego al arreglo "games" de la ronda "${roundName}" (temporada ${CURRENT_SEASON}) en PLAYOFFS:`);
+      lines.push(indentBlock(gameBlock, 2));
+    } else if (seasonEntry) {
+      lines.push(`  // Agrega esta ronda al arreglo "rounds" de la temporada ${CURRENT_SEASON} en PLAYOFFS:`);
+      const roundLines = [
+        "{",
+        `  name: ${JSON.stringify(roundName)},`,
+        `  opponent: ${JSON.stringify(opponent)},`,
+        `  isFinal: ${isFinal},`,
+        "  games: [",
+        indentBlock(gameBlock, 4),
+        "  ],",
+        "},",
+      ].join("\n");
+      lines.push(indentBlock(roundLines, 2));
+    } else {
+      lines.push(`  // Agrega esto como una nueva entrada en PLAYOFFS:`);
+      const entryLines = [
+        "{",
+        `  season: ${CURRENT_SEASON},`,
+        "  rounds: [",
+        indentBlock(
+          [
+            "{",
+            `  name: ${JSON.stringify(roundName)},`,
+            `  opponent: ${JSON.stringify(opponent)},`,
+            `  isFinal: ${isFinal},`,
+            "  games: [",
+            indentBlock(gameBlock, 4),
+            "  ],",
+            "},",
+          ].join("\n"),
+          4
+        ),
+        "  ],",
+        "},",
+      ].join("\n");
+      lines.push(indentBlock(entryLines, 2));
+    }
+  }
 
   gameCode.textContent = lines.join("\n");
   gameOutput.hidden = false;

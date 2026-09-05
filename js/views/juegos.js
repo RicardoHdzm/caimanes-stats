@@ -1,5 +1,5 @@
-import { GAMES, SCHEDULE } from "../data.js";
-import { gameResult } from "../stats.js";
+import { SCHEDULE } from "../data.js";
+import { currentSeasonGames, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary } from "../ui.js";
 
 const RESULT_BADGE = {
@@ -35,7 +35,7 @@ export function renderJuegos(container) {
   resultsHeading.textContent = "Resultados (clic en un juego para ver el detalle)";
   container.appendChild(resultsHeading);
 
-  const rows = GAMES.map((g) => {
+  const rows = currentSeasonGames().map((g) => {
     const known = g.scoreUs != null && g.scoreThem != null;
     return {
       id: g.id,

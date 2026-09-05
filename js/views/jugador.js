@@ -1,5 +1,15 @@
 import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, outsTotals, gamesPlayedByPlayer, rankAmong, hitStreaks, attendanceStreaks } from "../stats.js";
+import {
+  currentSeasonGames,
+  battingTotals,
+  pitchingTotals,
+  fieldingTotals,
+  outsTotals,
+  gamesPlayedByPlayer,
+  rankAmong,
+  hitStreaks,
+  attendanceStreaks,
+} from "../stats.js";
 import {
   heading,
   renderSortableTable,
@@ -252,6 +262,11 @@ export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
 // condición de logro por separado y desincronizarse con el tiempo.
 export function renderAchievements(player) {
   const chips = [];
+  // Solo la temporada actual — ver currentSeasonGames en js/stats.js. Las
+  // medallas de trayectoria/perfil de abajo (Caimaneggs, Veteran, Bon
+  // voyage, Manager, Fragile) no usan `games` — esas se quedan siempre en
+  // el medallero, sin importar la temporada.
+  const games = currentSeasonGames();
   // Agrega la medalla de podiumChip() (arriba) solo si el jugador de verdad
   // quedó en el top 3 — evita repetir el `if (chip) chips.push(chip)` en
   // cada estadística de abajo.
@@ -309,7 +324,7 @@ export function renderAchievements(player) {
     });
   }
 
-  const streak = hitStreaks(GAMES).find((s) => s.playerId === player.id);
+  const streak = hitStreaks(games).find((s) => s.playerId === player.id);
   if (streak?.active && streak.current >= 2) {
     chips.push({
       icon: "fa-solid fa-fire",
@@ -332,7 +347,7 @@ export function renderAchievements(player) {
   // "Ironman" — mismo criterio que "The Streak" (racha más larga de la
   // temporada, siga activa o no), pero de juegos JUGADOS en vez de con hit
   // — ver attendanceStreaks() en js/stats.js.
-  const attendance = attendanceStreaks(GAMES).find((s) => s.playerId === player.id);
+  const attendance = attendanceStreaks(games).find((s) => s.playerId === player.id);
   if (attendance && attendance.longest > 5) {
     chips.push({
       icon: "fa-solid fa-link",
@@ -341,7 +356,7 @@ export function renderAchievements(player) {
       desc: `Su racha más larga de la temporada fue de ${attendance.longest} juegos seguidos jugados.`,
     });
   }
-  const multiHitStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) >= 2);
+  const multiHitStreak = activeGameStreak(games, player.id, (line) => (line.H ?? 0) >= 2);
   if (multiHitStreak >= 2) {
     chips.push({
       icon: "fa-solid fa-fire-flame-curved",
@@ -350,7 +365,7 @@ export function renderAchievements(player) {
       desc: `Racha activa de ${multiHitStreak} juegos seguidos con multi-hit (2 o más hits).`,
     });
   }
-  const onBaseStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) > 0 || (line.BB ?? 0) > 0);
+  const onBaseStreak = activeGameStreak(games, player.id, (line) => (line.H ?? 0) > 0 || (line.BB ?? 0) > 0);
   if (onBaseStreak >= 2) {
     chips.push({
       icon: "fa-solid fa-magnet",
@@ -363,7 +378,7 @@ export function renderAchievements(player) {
   // de con hit. Mismo activeGameStreak() de arriba, solo invierte la
   // condición. `kind` propio ("ice", no "streak") a petición expresa: el
   // naranja/fuego de las rachas no le queda a algo frío — color hielo aparte.
-  const hitlessStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) === 0);
+  const hitlessStreak = activeGameStreak(games, player.id, (line) => (line.H ?? 0) === 0);
   if (hitlessStreak >= 2) {
     chips.push({
       icon: "fa-solid fa-snowflake",
@@ -377,10 +392,10 @@ export function renderAchievements(player) {
   // (ver podiumChip/addPodium arriba). Las rate stats (AVG/OBP) solo
   // cuentan entre quienes califican (mínimo de turnos), para que nadie con
   // una sola jugada perfecta salga en el podio.
-  const battingList = battingTotals(GAMES);
-  const pitchingList = pitchingTotals(GAMES);
-  const fieldingList = fieldingTotals(GAMES);
-  const outsList = outsTotals(GAMES);
+  const battingList = battingTotals(games);
+  const pitchingList = pitchingTotals(games);
+  const fieldingList = fieldingTotals(games);
+  const outsList = outsTotals(games);
   // Outs totales: ponche (SO, de battingList) + los 6 tipos de la tabla
   // propia (TOTAL, de outsList, ver outsTotals en js/stats.js) — mismo
   // cálculo que la tarjeta "Outs" del perfil, pero de TODO el equipo, para
@@ -515,7 +530,7 @@ export function renderAchievements(player) {
     // "Cycle" — sencillo + doble + triple + jonrón en el MISMO juego. `H` es
     // el total de hits (no solo sencillos), así que el sencillo sale de
     // restarle 2B/3B/HR+HRC — mismo cálculo que `singles` en stats.js.
-    const hitCycle = GAMES.some((game) => {
+    const hitCycle = games.some((game) => {
       const line = game.batting?.find((b) => b.playerId === player.id);
       if (!line) return false;
       const homers = (line.HR ?? 0) + (line.HRC ?? 0);
@@ -600,8 +615,8 @@ export function renderAchievements(player) {
   // más abajo (ver mvpCountsFromVotes y el addAchievementMedal de Starboy).
 
   // ---- Asistencia y versatilidad ----
-  const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
-  if (GAMES.length > 0 && gamesPlayedCount === GAMES.length) {
+  const gamesPlayedCount = gamesPlayedByPlayer(games).get(player.id) ?? 0;
+  if (games.length > 0 && gamesPlayedCount === games.length) {
     chips.push({
       icon: "fa-solid fa-calendar-check",
       label: "It's a date!",
@@ -621,7 +636,7 @@ export function renderAchievements(player) {
   // Juegos a las 9:00pm ("nocturnos") — depende del `time` de cada juego en
   // data.js (opcional; juegos sin `time` capturado simplemente no cuentan
   // para ningún lado de esta comparación).
-  const nightGames = GAMES.filter((g) => g.time === "21:00");
+  const nightGames = games.filter((g) => g.time === "21:00");
   if (nightGames.length > 0) {
     const nightGamesPlayed = gamesPlayedByPlayer(nightGames).get(player.id) ?? 0;
     if (nightGamesPlayed > nightGames.length / 2) {
@@ -638,7 +653,7 @@ export function renderAchievements(player) {
   // cada línea de bateo (ver GAMES en data.js), no de fildeo (esas líneas
   // no traen posición, solo PO/A/E).
   const positionsPlayed = new Set();
-  for (const game of GAMES) {
+  for (const game of games) {
     const line = game.batting?.find((b) => b.playerId === player.id);
     if (line?.position) positionsPlayed.add(line.position);
   }
@@ -664,7 +679,7 @@ export function renderAchievements(player) {
   // cada juego de data.js) en al menos 2 juegos distintos — cuenta juegos,
   // no cambios: varios cambios en el mismo juego solo cuentan una vez.
   const substitutionGames = new Set();
-  for (const game of GAMES) {
+  for (const game of games) {
     const subs = game.substitutions ?? [];
     if (subs.some((s) => s.playerOut === player.id || s.playerIn === player.id)) {
       substitutionGames.add(game.id);
@@ -731,13 +746,15 @@ export function renderJugadorDetalle(container, playerId) {
   back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver al roster';
   container.appendChild(back);
 
-  const played = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
+  // Solo la temporada actual — ver currentSeasonGames en js/stats.js. Los
+  // playoffs viven aparte en PLAYOFFS, así que no se cuelan aquí tampoco.
+  const games = currentSeasonGames();
+  const played = gamesPlayedByPlayer(games).get(player.id) ?? 0;
   const isOwnProfile = getCurrentPlayerId() === player.id;
-  // TEAM.gamesInSeason (no GAMES.length): es el total de la temporada, no
+  // TEAM.gamesInSeason (no games.length): es el total de la temporada, no
   // solo los que ya se han capturado — así la barra de verdad avanza hacia
   // "toda la temporada", en vez de mostrar 100% apenas jugó todos los
-  // registrados hasta ahora. Se topa en 100% por si acaso (playoffs u otro
-  // juego de más que suba GAMES.length por encima del total esperado).
+  // registrados hasta ahora. Se topa en 100% por si acaso.
   const attendancePct = TEAM.gamesInSeason > 0 ? Math.min(100, Math.round((played / TEAM.gamesInSeason) * 100)) : 0;
   // Tarjeta propia del perfil (no reusa .game-hero de js/views/juego.js —
   // otro contexto, otra información — para poder rediseñarla sin arriesgar
@@ -862,8 +879,8 @@ export function renderJugadorDetalle(container, playerId) {
   // Lectura pública. Un comentario por jugador por juego (constraint en
   // supabase/schema.sql), así que basta con contar en cuántos juegos
   // distintos aparece su player_id, no cuántos comentarios en total.
-  if (GAMES.length > 0) {
-    Promise.all(GAMES.map((g) => getComments("game", g.id))).then((perGame) => {
+  if (games.length > 0) {
+    Promise.all(games.map((g) => getComments("game", g.id))).then((perGame) => {
       const gamesCommented = perGame.filter((comments) => comments.some((c) => c.player_id === player.id)).length;
       if (gamesCommented < 5) return;
       addAchievementMedal({
@@ -882,16 +899,16 @@ export function renderJugadorDetalle(container, playerId) {
   // logro es sobre participar en la votación, no sobre elegibilidad. Mitad
   // redondeada hacia arriba (ej. 5 de 9), para que "la mitad" nunca sea
   // menos de la mitad de verdad.
-  if (GAMES.length > 0) {
-    const minVotes = Math.ceil(GAMES.length / 2);
-    Promise.all(GAMES.map((g) => getMvpVotes(g.id))).then((perGame) => {
+  if (games.length > 0) {
+    const minVotes = Math.ceil(games.length / 2);
+    Promise.all(games.map((g) => getMvpVotes(g.id))).then((perGame) => {
       const gamesVoted = perGame.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
       if (gamesVoted >= minVotes) {
         addAchievementMedal({
           icon: "fa-solid fa-thumbs-up",
           label: "Voter",
           kind: "social",
-          desc: `Votó por el MVP en ${gamesVoted} de los ${GAMES.length} juegos de la temporada.`,
+          desc: `Votó por el MVP en ${gamesVoted} de los ${games.length} juegos de la temporada.`,
         });
       }
 
@@ -899,7 +916,7 @@ export function renderJugadorDetalle(container, playerId) {
       // del MVP VOTADO (ver mvpCountsFromVotes más arriba), no de un dato
       // fijo de data.js. Misma llamada de votos que "Voter" de arriba, no
       // hace falta pedirla dos veces.
-      const mvpCounts = mvpCountsFromVotes(perGame);
+      const mvpCounts = mvpCountsFromVotes(perGame, games);
       const myMvpCount = mvpCounts.get(player.id) ?? 0;
       const mvpChipSlot = hero.querySelector("#mvp-chip-slot");
       if (mvpChipSlot && myMvpCount > 0) {
@@ -1295,16 +1312,16 @@ export function renderJugadorDetalle(container, playerId) {
     });
   }
 
-  const battingList = battingTotals(GAMES);
-  const pitchingList = pitchingTotals(GAMES);
-  const fieldingList = fieldingTotals(GAMES);
+  const battingList = battingTotals(games);
+  const pitchingList = pitchingTotals(games);
+  const fieldingList = fieldingTotals(games);
   const battingSeason = battingList.find((r) => r.playerId === player.id);
   const pitchingSeason = pitchingList.find((r) => r.playerId === player.id);
   const fieldingSeason = fieldingList.find((r) => r.playerId === player.id);
   // Ponche (batting) + rodado/elevado/línea/base/regla (tabla propia, ver
   // outsTotals en js/stats.js) — la tarjeta de "Outs" de abajo es el total
   // real de veces que lo sacaron, sin importar de qué tabla venga cada tipo.
-  const myOuts = outsTotals(GAMES).find((r) => r.playerId === player.id);
+  const myOuts = outsTotals(games).find((r) => r.playerId === player.id);
   const totalOuts = (battingSeason?.SO ?? 0) + (myOuts?.TOTAL ?? 0);
 
   // Insignia "en qué lugar del equipo vas" en la esquina de cada tarjeta —
@@ -1446,7 +1463,7 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(cards);
   }
 
-  const gamesSorted = [...GAMES].sort((a, b) => a.date.localeCompare(b.date));
+  const gamesSorted = [...games].sort((a, b) => a.date.localeCompare(b.date));
 
   // ---- Bateo juego por juego ----
   const battingRows = [];

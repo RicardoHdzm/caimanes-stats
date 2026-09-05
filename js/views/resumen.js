@@ -1,5 +1,6 @@
-import { GAMES, SCHEDULE, TEAM, PLAYERS } from "../data.js";
+import { SCHEDULE, TEAM, PLAYERS } from "../data.js";
 import {
+  currentSeasonGames,
   teamRecord,
   battingTotals,
   pitchingTotals,
@@ -217,6 +218,11 @@ function announcementItem(a, likeCount, likedByMe, canLike) {
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
+  // Solo juegos de la temporada actual — un juego de una temporada pasada
+  // (o de playoffs, aparte en PLAYOFFS) no debe mezclarse con "esta
+  // temporada" (ver currentSeasonGames en js/stats.js).
+  const games = currentSeasonGames();
+
   // Anuncios del equipo — solo se pintan si hay alguno (el coach los publica
   // desde admin.html, ver js/admin-announcements.js). Van antes que todo lo
   // demás porque son avisos, se quieren ver de inmediato al abrir la app.
@@ -274,7 +280,7 @@ export function renderResumen(container) {
   // vez de .card/.card-icon — esas siguen usándose tal cual en otras
   // páginas (ver js/views/jugador.js, js/lineup.js), así que no se tocan;
   // aquí nomás se cambia qué markup arma esta fila en particular.
-  const rec = teamRecord(GAMES);
+  const rec = teamRecord(games);
   const cards = document.createElement("div");
   cards.className = "cards tab-carousel";
   cards.innerHTML =
@@ -307,7 +313,7 @@ export function renderResumen(container) {
     wireRsvp(next, g.id);
   }
 
-  const streak = currentStreak(GAMES);
+  const streak = currentStreak(games);
   if (streak) {
     const STREAK_LABEL = { W: "victoria", L: "derrota", T: "empate" };
     const STREAK_ICON = { W: "fa-fire", L: "fa-arrow-trend-down", T: "fa-equals" };
@@ -323,7 +329,7 @@ export function renderResumen(container) {
     bottomRow.appendChild(streakCard);
   }
 
-  const recentGames = [...GAMES].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
+  const recentGames = [...games].sort((a, b) => a.date.localeCompare(b.date)).slice(-5);
   if (recentGames.length > 0) {
     const form = document.createElement("div");
     form.className = "leader-card leader-card--hero";
@@ -357,9 +363,9 @@ export function renderResumen(container) {
 
   if (bottomRow.children.length > 0) container.appendChild(bottomRow);
 
-  const teamBat = teamBattingTotals(GAMES);
-  const teamPit = teamPitchingTotals(GAMES);
-  const teamFld = teamFieldingTotals(GAMES);
+  const teamBat = teamBattingTotals(games);
+  const teamPit = teamPitchingTotals(games);
+  const teamFld = teamFieldingTotals(games);
 
   const teamHeading = document.createElement("h3");
   teamHeading.textContent = "Stats de equipo";
@@ -382,10 +388,10 @@ export function renderResumen(container) {
     heroCardShell("fa-shield", "Fildeo de equipo", `<span class="leader-hero-value">${teamFld.FPCT}</span>`);
   container.appendChild(teamRow);
 
-  const battingList = battingTotals(GAMES);
+  const battingList = battingTotals(games);
   // El líder de promedio solo sale de entre los que llegan al mínimo de
   // apariciones al plato; los demás siguen en la tabla de bateo completa.
-  const minPA = minPlateAppearances(GAMES);
+  const minPA = minPlateAppearances(games);
   const batSorted = battingList.filter((p) => p.qualified).sort((a, b) => Number(b.AVG) - Number(a.AVG));
   const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
   const rbiSorted = [...battingList].sort((a, b) => b.RBI - a.RBI);
@@ -394,7 +400,7 @@ export function renderResumen(container) {
   // se captura en data.js — siempre saldría 0.00 para todos y el "líder"
   // sería un empate sin sentido. WHIP (bases por bolas + hits, por entrada)
   // no depende de ER, así que sí refleja algo real.
-  const pitSorted = pitchingTotals(GAMES)
+  const pitSorted = pitchingTotals(games)
     .filter((p) => p.outs > 0)
     .sort((a, b) => Number(a.WHIP) - Number(b.WHIP));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
@@ -450,7 +456,7 @@ export function renderResumen(container) {
   hydrateAvatars(leadersRow);
 
   // ---- Récords de temporada ----
-  const records = seasonRecords(GAMES);
+  const records = seasonRecords(games);
   if (records.length > 0) {
     const recordsHeading = document.createElement("h3");
     recordsHeading.textContent = "Récords de la temporada";
