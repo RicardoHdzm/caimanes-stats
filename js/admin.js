@@ -1,5 +1,30 @@
 import { PLAYERS, GAMES, SEASONS } from "./data.js";
 
+// ---- Navegación entre secciones (ver <nav class="admin-tabs"> en
+// admin.html) — antes todo vivía junto en una sola página larguísima. Los
+// botones son links reales (href="#pagos", etc.), así que cambiar de
+// sección es solo cambiar el hash de la URL — funciona el botón atrás del
+// navegador y se puede compartir el link directo a una sección. Corre
+// siempre (con o sin sesión de coach): #admin-protected sigue oculto por
+// separado hasta que admin-dues.js confirma la cuenta; esto solo decide
+// CUÁL de las secciones de adentro se ve una vez que ese candado se abre.
+const ADMIN_SECTION_IDS = ["pagos", "rsvp", "anuncios", "temporadas", "jugador", "juego"];
+const adminTabs = document.getElementById("admin-tabs");
+
+function showAdminSection(id) {
+  const validId = ADMIN_SECTION_IDS.includes(id) ? id : ADMIN_SECTION_IDS[0];
+  for (const sectionId of ADMIN_SECTION_IDS) {
+    const section = document.getElementById(`admin-section-${sectionId}`);
+    if (section) section.hidden = sectionId !== validId;
+  }
+  for (const tab of adminTabs?.querySelectorAll("[data-tab]") ?? []) {
+    tab.classList.toggle("active", tab.dataset.tab === validId);
+  }
+}
+
+window.addEventListener("hashchange", () => showAdminSection(location.hash.slice(1)));
+showAdminSection(location.hash.slice(1));
+
 // P, C, 1B, 2B, 3B, SS, LF, CF, RF, DH, UTIL, JC (jugador de cortesía,
 // solo batea) y JD (jugador designado, batea y eventualmente entra al campo).
 const POSITION_OPTIONS = ["", "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH", "UTIL", "JC", "JD"];

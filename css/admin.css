@@ -4,6 +4,43 @@
   padding: 24px;
 }
 
+/* Un botón por sección (ver js/admin.js) — envuelve en varias líneas en
+   vez de scroll horizontal: son pocos botones y de largo bien distinto
+   ("Anuncios" vs "Agregar / editar juego"), forzarlos a una sola fila
+   angosta se vería más apretado que dejarlos acomodarse solos. */
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.admin-tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.admin-tabs a:hover {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.admin-tabs a.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 .admin-section {
   background: var(--surface);
   border: 1px solid var(--border);

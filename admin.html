@@ -69,7 +69,7 @@
       <div id="admin-rsvp-content"></div>
     </section>
 
-    <section class="admin-section">
+    <section class="admin-section" id="admin-section-anuncios" hidden>
       <h2>Anuncios</h2>
       <p class="subtitle">Se ven en Resumen para todos, con o sin cuenta — se guardan al momento.</p>
       <form id="announcement-form" class="admin-form" style="align-items: start;">
@@ -80,7 +80,7 @@
       <div id="announcements-admin-list" class="announcements-admin-list"></div>
     </section>
 
-    <section class="admin-section">
+    <section class="admin-section" id="admin-section-temporadas" hidden>
       <h2>Temporadas por jugador</h2>
       <p class="subtitle">
         Marca en qué temporadas ha estado cada jugador — pueden quedar huecos si se ausentó alguna y regresó.
@@ -95,7 +95,7 @@
       </div>
     </section>
 
-    <section class="admin-section">
+    <section class="admin-section" id="admin-section-jugador" hidden>
       <h2>Agregar jugador</h2>
     <p class="subtitle">Llena el formulario y copia el código en <code>PLAYERS</code> dentro de <code>js/data.js</code>.</p>
     <form id="player-form" class="admin-form">
@@ -119,7 +119,7 @@
     </div>
   </section>
 
-  <section class="admin-section">
+  <section class="admin-section" id="admin-section-juego" hidden>
     <h2>Agregar / editar juego</h2>
     <p class="subtitle">Llena los datos del juego y las líneas de bateo/pitcheo/fildeo, luego copia el código en <code>GAMES</code> dentro de <code>js/data.js</code>. Para editar uno que ya existe, selecciónalo abajo: se rellena el formulario y el código generado reemplaza ese bloque completo.</p>
     <label class="game-select-label">Editar juego existente
