@@ -3045,7 +3045,10 @@ body.modal-open {
    (ver .more-sheet-grid button en este mismo archivo). */
 .mvp-vote-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  /* 150px de mínimo — a propósito, para que como mucho quepan 6 columnas
+     por renglón (con 7 se veían muy apretadas) en el ancho normal de
+     `main` (ver css/styles.css). */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -3089,6 +3092,23 @@ button.mvp-vote-card:active {
   font-weight: 700;
   font-size: var(--text-sm);
   line-height: 1.2;
+}
+
+/* Decisión de pitcheo (W/L/SV) junto al nombre — sin esto, un cerrador que
+   entró a la boleta solo por su Salvamento (ver rankParticipants en
+   js/views/juego.js) se vería con puros ceros, sin ninguna pista de por
+   qué está ahí. */
+.mvp-vote-decision {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  vertical-align: middle;
 }
 
 .mvp-vote-stats {

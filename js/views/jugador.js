@@ -1,5 +1,5 @@
 import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks, attendanceStreaks } from "../stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, outsTotals, gamesPlayedByPlayer, rankAmong, hitStreaks, attendanceStreaks } from "../stats.js";
 import {
   heading,
   renderSortableTable,
@@ -207,6 +207,27 @@ function podiumChip(list, playerId, key, { icon, label, desc, negative, maxPlace
     kind: (negative ? NEG_PODIUM_KIND : PODIUM_KIND)[place],
     desc: typeof desc === "function" ? desc(row[key], place) : desc,
   };
+}
+
+// Cuántos MVPs de juego se ganó cada jugador, a partir del voto del equipo
+// (ya no hay `game.mvp` fijo en data.js) — `perGameVotes` es un array con
+// las filas de voto de CADA juego, en el mismo orden/forma que regresa
+// getMvpVotes() (ver Promise.all(GAMES.map(...)) más abajo, y en
+// js/views/medallas.js). El líder de un juego (más votos que cualquier
+// otro, sin empate) es quien se lleva el MVP de ESE juego — mismo criterio
+// que el badge del detalle de juego (ver renderMvpVote en
+// js/views/juego.js), para que "cuántos MVPs llevas" siempre cuente lo
+// mismo sin importar desde dónde se calcule.
+export function mvpCountsFromVotes(perGameVotes) {
+  const counts = new Map();
+  for (const votes of perGameVotes) {
+    const tally = new Map();
+    for (const v of votes) tally.set(v.voted_player_id, (tally.get(v.voted_player_id) ?? 0) + 1);
+    const sorted = [...tally.entries()].sort((a, b) => b[1] - a[1]);
+    const leaderId = sorted.length > 0 && (sorted.length === 1 || sorted[1][1] < sorted[0][1]) ? sorted[0][0] : null;
+    if (leaderId) counts.set(leaderId, (counts.get(leaderId) ?? 0) + 1);
+  }
+  return counts;
 }
 
 // Exportada para que js/views/medallas.js (la guía de medallas) pueda
@@ -521,17 +542,9 @@ export function renderAchievements(player) {
     });
   }
 
-  // Más MVPs de la temporada — mismo cálculo que usaba "Salón de la fama"
-  // en Resumen (ver historial de js/views/resumen.js): cuenta cuántos
-  // GAMES.mvp le tocaron a cada jugador y compara contra el resto.
-  const mvpList = PLAYERS.map((p) => ({ playerId: p.id, mvpTotal: GAMES.filter((g) => g.mvp === p.id).length })).filter(
-    (p) => p.mvpTotal > 0
-  );
-  addPodium(mvpList, "mvpTotal", {
-    icon: "fa-solid fa-star",
-    label: "Starboy",
-    desc: (value) => `Premios MVP ganados esta temporada (${value}).`,
-  });
+  // "Starboy" ya no vive aquí — depende del MVP VOTADO (Supabase), no de un
+  // dato síncrono de data.js, así que se calcula async junto con "Voter"
+  // más abajo (ver mvpCountsFromVotes y el addAchievementMedal de Starboy).
 
   // ---- Asistencia y versatilidad ----
   const gamesPlayedCount = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
@@ -666,7 +679,6 @@ export function renderJugadorDetalle(container, playerId) {
   container.appendChild(back);
 
   const played = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
-  const mvpCount = GAMES.filter((g) => g.mvp === player.id).length;
   const isOwnProfile = getCurrentPlayerId() === player.id;
   // TEAM.gamesInSeason (no GAMES.length): es el total de la temporada, no
   // solo los que ya se han capturado — así la barra de verdad avanza hacia
@@ -707,11 +719,7 @@ export function renderJugadorDetalle(container, playerId) {
           </div>
           <div class="profile-attendance-bar"><div class="profile-attendance-fill" style="width:${attendancePct}%"></div></div>
         </div>
-        ${
-          mvpCount > 0
-            ? `<div class="profile-hero-meta-row"><span class="profile-meta-chip profile-meta-chip--mvp"><i class="fa-solid fa-star"></i> MVP x${mvpCount}</span></div>`
-            : ""
-        }
+        <div id="mvp-chip-slot"></div>
         <div id="profile-edit-slot"></div>
       </div>
     </div>
@@ -825,13 +833,33 @@ export function renderJugadorDetalle(container, playerId) {
     const minVotes = Math.ceil(GAMES.length / 2);
     Promise.all(GAMES.map((g) => getMvpVotes(g.id))).then((perGame) => {
       const gamesVoted = perGame.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
-      if (gamesVoted < minVotes) return;
-      addAchievementMedal({
-        icon: "fa-solid fa-thumbs-up",
-        label: "Voter",
-        kind: "social",
-        desc: `Votó por el MVP en ${gamesVoted} de los ${GAMES.length} juegos de la temporada.`,
+      if (gamesVoted >= minVotes) {
+        addAchievementMedal({
+          icon: "fa-solid fa-thumbs-up",
+          label: "Voter",
+          kind: "social",
+          desc: `Votó por el MVP en ${gamesVoted} de los ${GAMES.length} juegos de la temporada.`,
+        });
+      }
+
+      // "Starboy" + el chip de "MVP x N" junto al nombre — los dos salen
+      // del MVP VOTADO (ver mvpCountsFromVotes más arriba), no de un dato
+      // fijo de data.js. Misma llamada de votos que "Voter" de arriba, no
+      // hace falta pedirla dos veces.
+      const mvpCounts = mvpCountsFromVotes(perGame);
+      const myMvpCount = mvpCounts.get(player.id) ?? 0;
+      const mvpChipSlot = hero.querySelector("#mvp-chip-slot");
+      if (mvpChipSlot && myMvpCount > 0) {
+        mvpChipSlot.innerHTML = `<div class="profile-hero-meta-row"><span class="profile-meta-chip profile-meta-chip--mvp"><i class="fa-solid fa-star"></i> MVP x${myMvpCount}</span></div>`;
+      }
+
+      const mvpList = [...mvpCounts.entries()].map(([playerId, mvpTotal]) => ({ playerId, mvpTotal }));
+      const starboyChip = podiumChip(mvpList, player.id, "mvpTotal", {
+        icon: "fa-solid fa-star",
+        label: "Starboy",
+        desc: (value) => `Premios MVP ganados esta temporada (${value}).`,
       });
+      if (starboyChip) addAchievementMedal(starboyChip);
     });
   }
 
@@ -1220,6 +1248,11 @@ export function renderJugadorDetalle(container, playerId) {
   const battingSeason = battingList.find((r) => r.playerId === player.id);
   const pitchingSeason = pitchingList.find((r) => r.playerId === player.id);
   const fieldingSeason = fieldingList.find((r) => r.playerId === player.id);
+  // Ponche (batting) + rodado/elevado/línea/base/regla (tabla propia, ver
+  // outsTotals en js/stats.js) — la tarjeta de "Outs" de abajo es el total
+  // real de veces que lo sacaron, sin importar de qué tabla venga cada tipo.
+  const myOuts = outsTotals(GAMES).find((r) => r.playerId === player.id);
+  const totalOuts = (battingSeason?.SO ?? 0) + (myOuts?.TOTAL ?? 0);
 
   // Insignia "en qué lugar del equipo vas" en la esquina de cada tarjeta —
   // SOLO en tu propio perfil, nunca en el de alguien más (cada quien ve
@@ -1283,9 +1316,9 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-value">${battingSeason.OPS}</span>
         <span class="card-label">OPS</span>
       </div>
-      <div class="card" title="Ponche + out por rodado/elevado/línea (ver desglose en Bateo)">
+      <div class="card" title="Ponche + rodado/elevado/línea/base/regla (ver desglose en Bateo)">
         <i class="fa-solid fa-ban card-icon"></i>
-        <span class="card-value">${battingSeason.OUTS}</span>
+        <span class="card-value">${totalOuts}</span>
         <span class="card-label">Outs</span>
       </div>
     `;
@@ -1381,11 +1414,31 @@ export function renderJugadorDetalle(container, playerId) {
       R: line.R ?? 0,
       BB: line.BB ?? 0,
       SO: line.SO ?? 0,
-      GO: line.GO ?? 0,
-      FO: line.FO ?? 0,
-      LO: line.LO ?? 0,
       SB: line.SB ?? 0,
       AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
+    });
+  }
+
+  // ---- Outs juego por juego ----
+  const outsRows = [];
+  for (const game of gamesSorted) {
+    const line = (game.outs ?? []).find((l) => l.playerId === player.id);
+    if (!line) continue;
+    const GO = line.GO ?? 0;
+    const FO = line.FO ?? 0;
+    const LO = line.LO ?? 0;
+    const BO = line.BO ?? 0;
+    const RO = line.RO ?? 0;
+    outsRows.push({
+      gameId: game.id,
+      date: game.date,
+      opponent: game.opponent,
+      GO,
+      FO,
+      LO,
+      BO,
+      RO,
+      TOTAL: GO + FO + LO + BO + RO,
     });
   }
 
@@ -1435,9 +1488,6 @@ export function renderJugadorDetalle(container, playerId) {
       { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
       { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
       { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
-      { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
-      { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
-      { key: "LO", label: "LO", full: "Out por línea", numeric: true },
       { key: "AVG", label: "AVG", full: "Promedio del juego", numeric: true },
     ];
 
@@ -1453,6 +1503,36 @@ export function renderJugadorDetalle(container, playerId) {
       },
     });
     renderGlossary(container, battingColumns);
+  }
+
+  if (outsRows.length > 0) {
+    const h3 = document.createElement("h3");
+    h3.textContent = "Outs por juego";
+    container.appendChild(h3);
+
+    const outsColumns = [
+      { key: "date", label: "Fecha", sticky: true },
+      { key: "opponent", label: "Rival" },
+      { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
+      { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
+      { key: "LO", label: "LO", full: "Out por línea", numeric: true },
+      { key: "BO", label: "BO", full: "Out en base", numeric: true },
+      { key: "RO", label: "RO", full: "Out de regla", numeric: true },
+      { key: "TOTAL", label: "Total", numeric: true },
+    ];
+
+    const outsEl = document.createElement("div");
+    container.appendChild(outsEl);
+    renderSortableTable(outsEl, {
+      columns: outsColumns,
+      rows: outsRows,
+      defaultSort: "date",
+      defaultDir: 1,
+      onRowClick: (row) => {
+        location.hash = `#/juegos/${row.gameId}`;
+      },
+    });
+    renderGlossary(container, outsColumns);
   }
 
   // ---- Pitcheo juego por juego ----

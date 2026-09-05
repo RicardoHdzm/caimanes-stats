@@ -22,7 +22,7 @@ function fmt3(n) {
 }
 
 function emptyBatting() {
-  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, GO: 0, FO: 0, LO: 0, SB: 0 };
+  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 };
 }
 
 function emptyPitching() {
@@ -31,6 +31,10 @@ function emptyPitching() {
 
 function emptyFielding() {
   return { G: 0, PO: 0, A: 0, E: 0 };
+}
+
+function emptyOuts() {
+  return { G: 0, GO: 0, FO: 0, LO: 0, BO: 0, RO: 0 };
 }
 
 export function playerName(playerId) {
@@ -65,9 +69,6 @@ export function battingTotals(games = GAMES) {
       t.R += line.R ?? 0;
       t.BB += line.BB ?? 0;
       t.SO += line.SO ?? 0;
-      t.GO += line.GO ?? 0;
-      t.FO += line.FO ?? 0;
-      t.LO += line.LO ?? 0;
       t.SB += line.SB ?? 0;
       totals.set(line.playerId, t);
     }
@@ -81,16 +82,11 @@ export function battingTotals(games = GAMES) {
     const AVG = div(t.H, t.AB);
     const OBP = div(t.H + t.BB, t.AB + t.BB);
     const SLG = div(TB, t.AB);
-    // Outs totales al bat, por tipo: ponche (SO) + rodado/elevado/línea
-    // (GO/FO/LO) — no es lo mismo que "AB - H" (eso ignora bases por error,
-    // toque de sacrificio, etc.), es la cuenta real de lo que se capturó.
-    const OUTS = t.SO + t.GO + t.FO + t.LO;
     return {
       playerId,
       name: playerName(playerId),
       ...t,
       PA,
-      OUTS,
       qualified: PA >= minPA,
       AVG: fmt3(AVG),
       OBP: fmt3(OBP),
@@ -158,6 +154,33 @@ export function fieldingTotals(games = GAMES) {
       FPCT: fmt3(FPCT),
     };
   });
+}
+
+// Cómo lo sacaron, más allá del ponche (SO, que ya vive en battingTotals) —
+// tabla propia (ver `outs` en cada juego de js/data.js) porque no todo out
+// es al bat: BO (out en base) y RO (out de regla) pueden pasar sin turno de
+// por medio. `TOTAL` suma los 5 tipos de esta tabla; para "cuántas veces lo
+// sacaron en total" hay que sumarle además el SO de battingTotals.
+export function outsTotals(games = GAMES) {
+  const totals = new Map();
+  for (const game of games) {
+    for (const line of game.outs ?? []) {
+      const t = totals.get(line.playerId) ?? emptyOuts();
+      t.G += 1;
+      t.GO += line.GO ?? 0;
+      t.FO += line.FO ?? 0;
+      t.LO += line.LO ?? 0;
+      t.BO += line.BO ?? 0;
+      t.RO += line.RO ?? 0;
+      totals.set(line.playerId, t);
+    }
+  }
+  return [...totals.entries()].map(([playerId, t]) => ({
+    playerId,
+    name: playerName(playerId),
+    ...t,
+    TOTAL: t.GO + t.FO + t.LO + t.BO + t.RO,
+  }));
 }
 
 // Un juego puede no tener marcador todavía (scoreUs/scoreThem null) si ya

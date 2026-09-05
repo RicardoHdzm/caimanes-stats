@@ -20,6 +20,7 @@
 import { PLAYERS, GAMES } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId, getSession } from "../auth.js";
+import { rankAmong } from "../stats.js";
 import {
   getAvatarUrl,
   getWalkupOverride,
@@ -29,7 +30,7 @@ import {
   getComments,
   getMvpVotes,
 } from "../db.js";
-import { renderAchievements } from "./jugador.js";
+import { renderAchievements, mvpCountsFromVotes } from "./jugador.js";
 
 // `async: true` marca las que no salen de renderAchievements() (dependen de
 // una respuesta de Supabase) — sus filas empiezan en "Cargando…" y se
@@ -62,7 +63,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-chess-knight", name: "Triple Threat", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Threat" },
   { kind: "gold", icon: "fa-solid fa-crow", name: "Eagle Eye", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Eagle Eye" },
   { kind: "gold", icon: "fa-solid fa-scale-balanced", name: "Patient", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Patient" },
-  { kind: "gold", icon: "fa-solid fa-star", name: "Starboy", how: "Top 3 del equipo en premios MVP esta temporada.", match: (l) => l === "Starboy" },
+  { kind: "gold", icon: "fa-solid fa-star", name: "Starboy", how: "Top 3 del equipo en premios MVP esta temporada.", match: (l) => l === "Starboy", async: true },
   // ---- Podio negativo (mismo mecanismo, pero ser el #1 es un chiste) ----
   { kind: "ice", icon: "fa-solid fa-snowflake", name: "Ice Cold", how: "Racha activa de 2 o más juegos seguidos sin hit.", match: (l) => l === "Ice Cold" },
   { kind: "neg-gold", icon: "fa-solid fa-hand-back-fist", name: "Punch-Out", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Punch-Out" },
@@ -125,6 +126,14 @@ async function getAsyncLabels(player) {
     const minVotes = Math.ceil(GAMES.length / 2);
     const gamesVoted = perGameVotes.filter((votes) => votes.some((v) => v.voter_player_id === player.id)).length;
     if (gamesVoted >= minVotes) labels.push("Voter");
+
+    // "Starboy" — top 3 del equipo en MVPs VOTADOS (ver mvpCountsFromVotes,
+    // exportada de js/views/jugador.js) — misma perGameVotes de arriba, no
+    // hace falta pedirla otra vez.
+    const mvpCounts = mvpCountsFromVotes(perGameVotes);
+    const mvpList = [...mvpCounts.entries()].map(([playerId, mvpTotal]) => ({ playerId, mvpTotal }));
+    const place = rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place;
+    if (place && place <= 3) labels.push("Starboy");
   }
 
   return labels;

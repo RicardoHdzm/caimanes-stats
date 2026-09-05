@@ -44,11 +44,18 @@ const BATTING_FIELDS = [
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },
   { key: "SO", label: "SO", full: "Ponches", type: "number" },
   { key: "SB", label: "SB", full: "Bases robadas", type: "number" },
-  // GO/FO/LO al final y resaltados (ver highlight en createRowsEditor): son
-  // los más nuevos y los que más se prestan a olvidarse de llenar.
-  { key: "GO", label: "GO", full: "Out por rodado", type: "number", highlight: true },
-  { key: "FO", label: "FO", full: "Out por elevado", type: "number", highlight: true },
-  { key: "LO", label: "LO", full: "Out por línea", type: "number", highlight: true },
+];
+
+// Cómo lo sacaron, más allá del ponche (SO, arriba) — tabla propia (ver
+// `outs` en cada juego de js/data.js) porque no todo out es al bat: BO/RO
+// pueden pasar sin turno de por medio.
+const OUTS_FIELDS = [
+  { key: "playerId", label: "Jugador", type: "player" },
+  { key: "GO", label: "GO", full: "Out por rodado", type: "number" },
+  { key: "FO", label: "FO", full: "Out por elevado", type: "number" },
+  { key: "LO", label: "LO", full: "Out por línea", type: "number" },
+  { key: "BO", label: "BO", full: "Out en base", type: "number" },
+  { key: "RO", label: "RO", full: "Out de regla", type: "number" },
 ];
 
 const PITCHING_FIELDS = [
@@ -91,10 +98,7 @@ function createRowsEditor(container, fields) {
   const table = document.createElement("table");
   table.className = "rows-table";
   table.innerHTML = `<thead><tr>${fields
-    .map(
-      (f) =>
-        `<th${f.highlight ? ' class="col-highlight"' : ""}><span class="th-abbr">${f.label}</span>${f.full ? `<span class="th-full">${f.full}</span>` : ""}</th>`
-    )
+    .map((f) => `<th><span class="th-abbr">${f.label}</span>${f.full ? `<span class="th-full">${f.full}</span>` : ""}</th>`)
     .join("")}<th></th></tr></thead>`;
   const tbody = document.createElement("tbody");
   table.appendChild(tbody);
@@ -106,19 +110,15 @@ function createRowsEditor(container, fields) {
     tr.innerHTML =
       fields
         .map((f) => {
-          // `highlight` (GO/FO/LO, ver BATTING_FIELDS) — un ligero tinte
-          // rojo en la celda, para que no se pasen de largo entre tantas
-          // columnas numéricas iguales.
-          const tdClass = f.highlight ? ' class="col-highlight"' : "";
           if (f.type === "player") {
-            return `<td${tdClass}><select data-key="${f.key}">${playerOptionsHtml()}</select></td>`;
+            return `<td><select data-key="${f.key}">${playerOptionsHtml()}</select></td>`;
           }
           if (f.type === "select") {
             const opts = f.options.map((o) => `<option value="${o}">${o || "—"}</option>`).join("");
-            return `<td${tdClass}><select data-key="${f.key}">${opts}</select></td>`;
+            return `<td><select data-key="${f.key}">${opts}</select></td>`;
           }
           const numAttrs = f.type === "number" ? `step="${f.step ?? "1"}"` : "";
-          return `<td${tdClass}><input data-key="${f.key}" type="${f.type}" ${numAttrs} /></td>`;
+          return `<td><input data-key="${f.key}" type="${f.type}" ${numAttrs} /></td>`;
         })
         .join("") + `<td><button type="button" class="remove-row-btn" title="Quitar"><i class="fa-solid fa-xmark"></i></button></td>`;
     tr.querySelector(".remove-row-btn").addEventListener("click", () => tr.remove());
@@ -264,6 +264,7 @@ playerForm.addEventListener("submit", (e) => {
 const battingEditor = createRowsEditor(document.getElementById("batting-rows"), BATTING_FIELDS);
 const pitchingEditor = createRowsEditor(document.getElementById("pitching-rows"), PITCHING_FIELDS);
 const fieldingEditor = createRowsEditor(document.getElementById("fielding-rows"), FIELDING_FIELDS);
+const outsEditor = createRowsEditor(document.getElementById("outs-rows"), OUTS_FIELDS);
 const substitutionsEditor = createRowsEditor(document.getElementById("substitutions-rows"), SUBSTITUTION_FIELDS);
 
 for (const btn of document.querySelectorAll(".add-row-btn")) {
@@ -272,6 +273,7 @@ for (const btn of document.querySelectorAll(".add-row-btn")) {
     batting: battingEditor,
     pitching: pitchingEditor,
     fielding: fieldingEditor,
+    outs: outsEditor,
     substitutions: substitutionsEditor,
   }[section];
   btn.addEventListener("click", () => editor.addRow());
@@ -310,7 +312,6 @@ function resetGameForm() {
   gameForm.querySelector('[name="scoreUs"]').value = "";
   gameForm.querySelector('[name="scoreThem"]').value = "";
   gameForm.querySelector('[name="replayUrl"]').value = "";
-  mvpSelect.value = "";
 
   battingEditor.clearRows();
   battingEditor.addRow();
@@ -318,6 +319,8 @@ function resetGameForm() {
   pitchingEditor.addRow();
   fieldingEditor.clearRows();
   fieldingEditor.addRow();
+  outsEditor.clearRows();
+  outsEditor.addRow();
   substitutionsEditor.clearRows();
   substitutionsEditor.addRow();
 }
@@ -337,7 +340,6 @@ function loadGameIntoForm(game) {
   gameForm.querySelector('[name="scoreThem"]').value = known ? game.scoreThem : "";
   gameForm.querySelector('[name="result"]').value = game.result ?? "W";
   gameForm.querySelector('[name="replayUrl"]').value = game.replayUrl ?? "";
-  mvpSelect.value = game.mvp ?? "";
 
   battingEditor.clearRows();
   for (const line of game.batting ?? []) battingEditor.addRow(line);
@@ -351,13 +353,14 @@ function loadGameIntoForm(game) {
   for (const line of game.fielding ?? []) fieldingEditor.addRow(line);
   if (!(game.fielding ?? []).length) fieldingEditor.addRow();
 
+  outsEditor.clearRows();
+  for (const line of game.outs ?? []) outsEditor.addRow(line);
+  if (!(game.outs ?? []).length) outsEditor.addRow();
+
   substitutionsEditor.clearRows();
   for (const line of game.substitutions ?? []) substitutionsEditor.addRow(line);
   if (!(game.substitutions ?? []).length) substitutionsEditor.addRow();
 }
-
-const mvpSelect = document.getElementById("mvp-select");
-mvpSelect.innerHTML = playerOptionsHtml();
 
 const gameSelect = document.getElementById("game-select");
 for (const g of GAMES) {
@@ -413,13 +416,14 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   lines.push("    fielding: [");
   for (const row of fieldingEditor.getRows()) lines.push(`      ${lineToCode(FIELDING_FIELDS, row)},`);
   lines.push("    ],");
+  lines.push("    outs: [");
+  for (const row of outsEditor.getRows()) lines.push(`      ${lineToCode(OUTS_FIELDS, row)},`);
+  lines.push("    ],");
   lines.push("    substitutions: [");
   for (const row of substitutionsEditor.getRows()) lines.push(`      ${lineToCode(SUBSTITUTION_FIELDS, row)},`);
   lines.push("    ],");
   const replayUrl = data.get("replayUrl").trim();
   if (replayUrl) lines.push(`    replayUrl: ${JSON.stringify(replayUrl)},`);
-  const mvp = data.get("mvp");
-  if (mvp) lines.push(`    mvp: ${JSON.stringify(mvp)},`);
   lines.push("  },");
 
   gameCode.textContent = lines.join("\n");

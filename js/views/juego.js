@@ -14,16 +14,24 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
-// Voto de MVP del equipo — distinto del `game.mvp` fijo que capturas a mano
-// en data.js (ese sigue siendo "el oficial"; este es el que vota el
-// equipo, se muestran los dos). El conteo es público; votar solo aparece
+// Voto de MVP del equipo — es el ÚNICO MVP que existe (ya no se captura a
+// mano en Admin): el líder claro del voto (más votos que cualquier otro,
+// sin empate) es "el oficial" — se usa para el badge debajo de "Ver
+// replay" (mvpBadgeSlot) y, en el perfil de cada jugador, para la medalla
+// "Starboy" y el conteo de "MVP x N" (ver mvpCountsFromVotes, exportada de
+// js/views/jugador.js). El conteo de votos es público; votar solo aparece
 // habilitado si quien tiene sesión apareció en el line-up de ESTE juego
 // (bateo, pitcheo o fildeo) — `participantIds` ya viene filtrado así.
 //
 // Antes era un <select> con nombres nada más; ahora cada candidato es una
 // tarjeta con su foto y sus números DE ESTE JUEGO (no de temporada) — así
 // se vota viendo quién de verdad la rompió ese día, sin tener que
-// adivinar o irse a buscar el box score aparte.
+// adivinar o irse a buscar el box score aparte. No se muestran TODOS los
+// que jugaron: solo hasta MAX_MVP_CANDIDATES, por mejor desempeño (ver
+// rankParticipants) — salvo un pitcher con decisión de Victoria o Salvamento,
+// que siempre aparece aunque su noche al bat/campo haya sido floja.
+const MAX_MVP_CANDIDATES = 6;
+
 function mvpCardStats(game, playerId) {
   const batting = game.batting?.find((l) => l.playerId === playerId);
   const fielding = game.fielding?.find((l) => l.playerId === playerId);
@@ -33,18 +41,47 @@ function mvpCardStats(game, playerId) {
     rbi: batting?.RBI ?? 0,
     po: fielding?.PO ?? 0,
     a: fielding?.A ?? 0,
+    h: batting?.H ?? 0,
   };
 }
 
+// Qué tan buena fue la noche de cada quien, en un solo número — hits +
+// carreras + impulsadas + outs realizados + asistencias. Nada científico,
+// nomás para separar a quien de verdad influyó en el juego de quien tuvo
+// una noche tranquila, y no llenar la votación con 15+ tarjetas.
+function performanceScore(game, playerId) {
+  const { h, r, rbi, po, a } = mvpCardStats(game, playerId);
+  return h + r + rbi + po + a;
+}
+
+// Quiénes entran a la boleta: hasta MAX_MVP_CANDIDATES por mejor
+// desempeño, más cualquier pitcher con decisión W/SV (siempre entra, sin
+// contar contra ese límite) — un cerrador que salvó el juego pudo no
+// haber bateado ni fildeado nada esa noche, pero se ganó estar en la
+// boleta igual. El orden final es de mejor a peor desempeño.
+function rankParticipants(game, participantIds) {
+  const guaranteedIds = new Set(
+    (game.pitching ?? []).filter((l) => l.decision === "W" || l.decision === "SV").map((l) => l.playerId)
+  );
+  const scoreOf = new Map([...participantIds].map((id) => [id, performanceScore(game, id)]));
+  const ranked = [...participantIds].sort((a, b) => scoreOf.get(b) - scoreOf.get(a));
+
+  const candidateIds = new Set(guaranteedIds);
+  for (const id of ranked) {
+    if (candidateIds.size >= MAX_MVP_CANDIDATES) break;
+    candidateIds.add(id);
+  }
+  return [...candidateIds].sort((a, b) => scoreOf.get(b) - scoreOf.get(a));
+}
+
 // `mvpBadgeSlot` es el badge de "MVP: nombre" debajo de "Ver replay" (ver
-// hero.innerHTML en renderJuegoDetalle) — cuando el voto tiene un líder
-// claro (más votos que cualquier otro, sin empate), lo reemplaza por ese
-// líder automáticamente; sin eso, se queda con el `game.mvp` oficial que
-// capturaste a mano (o vacío, si tampoco hay ese).
+// hero.innerHTML en renderJuegoDetalle) — se actualiza solo para reflejar
+// al líder claro del voto; sin un líder claro (empate, o nadie ha votado
+// todavía) se queda vacío.
 function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
   const gameId = game.id;
   const heading3 = document.createElement("h3");
-  heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo (votado)';
+  heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo';
   container.appendChild(heading3);
 
   const hint = document.createElement("p");
@@ -56,6 +93,9 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
   gridEl.className = "mvp-vote-grid";
   gridEl.textContent = "Cargando votos…";
   container.appendChild(gridEl);
+
+  const candidateIds = rankParticipants(game, participantIds);
+  const pitchingByPlayer = new Map((game.pitching ?? []).map((l) => [l.playerId, l]));
 
   function cardHtml(playerId, voteCount, myVote, myId, isLeader) {
     const player = PLAYERS.find((p) => p.id === playerId);
@@ -74,11 +114,16 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
           ? `<span class="mvp-vote-count mvp-vote-count--leader" title="Va ganando la votación"><i class="fa-solid fa-star"></i></span>`
           : `<span class="mvp-vote-count">${voteCount}</span>`
         : "";
+    // Decisión de pitcheo (si tuvo) — sin esto, un cerrador que entró a la
+    // boleta solo por su Salvamento se vería con puros ceros, sin ninguna
+    // pista de por qué está ahí.
+    const decision = pitchingByPlayer.get(playerId)?.decision;
+    const decisionBadge = decision ? `<span class="mvp-vote-decision">${decision}</span>` : "";
     return `
       <${tag} class="mvp-vote-card${isMine ? " active" : ""}" ${attrs}>
         ${countBadge}
         <span class="mvp-vote-avatar" data-avatar-player="${playerId}">${renderAvatar(player, 52)}</span>
-        <span class="mvp-vote-name">${escapeHtml(player.name)}</span>
+        <span class="mvp-vote-name">${escapeHtml(player.name)}${decisionBadge}</span>
         <div class="mvp-vote-stats">
           <span class="mvp-vote-stat"><b>${avg}</b><small>AVG</small></span>
           <span class="mvp-vote-stat"><b>${r}</b><small>R</small></span>
@@ -117,27 +162,25 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
     const myVote = rows.find((r) => r.voter_player_id === myId)?.voted_player_id ?? null;
 
     // Líder = quien tiene MÁS votos que cualquier otro — con empate (o sin
-    // ningún voto) no hay líder claro, y el badge oficial (game.mvp) se
-    // queda como estaba.
+    // ningún voto) no hay líder claro, y el badge se queda vacío.
     const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
     const leaderId = sorted.length > 0 && (sorted.length === 1 || sorted[1][1] < sorted[0][1]) ? sorted[0][0] : null;
 
-    gridEl.innerHTML = [...participantIds]
+    gridEl.innerHTML = candidateIds
       .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, myId, id === leaderId))
       .join("");
 
     if (mvpBadgeSlot) {
       mvpBadgeSlot.innerHTML = leaderId
         ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(leaderId)}</div>`
-        : game.mvp
-          ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
-          : "";
+        : "";
     }
 
     // La foto de siempre (fija de data.js o iniciales) ya se pintó arriba
     // sin esperar a nadie — si alguien subió una foto propia a Storage, la
-    // reemplaza (mismo patrón que el perfil y los comentarios).
-    for (const id of participantIds) {
+    // reemplaza (mismo patrón que el perfil y los comentarios). Solo para
+    // quien de verdad está en la boleta (candidateIds), no todo participantIds.
+    for (const id of candidateIds) {
       getAvatarUrl(id).then((url) => {
         if (!url) return;
         const slot = gridEl.querySelector(`[data-avatar-player="${id}"]`);
@@ -195,13 +238,7 @@ export function renderJuegoDetalle(container, gameId) {
         ? `<div class="game-hero-replay"><a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a></div>`
         : ""
     }
-    <div id="mvp-badge-slot">
-      ${
-        game.mvp
-          ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
-          : ""
-      }
-    </div>
+    <div id="mvp-badge-slot"></div>
   `;
   container.appendChild(hero);
 
@@ -265,9 +302,6 @@ export function renderJuegoDetalle(container, gameId) {
         RBI: line.RBI ?? 0,
         BB: line.BB ?? 0,
         SO: line.SO ?? 0,
-        GO: line.GO ?? 0,
-        FO: line.FO ?? 0,
-        LO: line.LO ?? 0,
         SB: line.SB ?? 0,
         AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
       };
@@ -308,9 +342,6 @@ export function renderJuegoDetalle(container, gameId) {
     { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
     { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
     { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
-    { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
-    { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
-    { key: "LO", label: "LO", full: "Out por línea", numeric: true },
     { key: "AVG", label: "AVG", full: "Promedio del juego", numeric: true },
   ];
 
@@ -421,6 +452,53 @@ export function renderJuegoDetalle(container, gameId) {
     rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
   renderGlossary(container, fieldingColumns);
+
+  const outsRows = (game.outs ?? []).map((line) => {
+    const GO = line.GO ?? 0;
+    const FO = line.FO ?? 0;
+    const LO = line.LO ?? 0;
+    const BO = line.BO ?? 0;
+    const RO = line.RO ?? 0;
+    return {
+      playerId: line.playerId,
+      name: playerName(line.playerId),
+      GO,
+      FO,
+      LO,
+      BO,
+      RO,
+      TOTAL: GO + FO + LO + BO + RO,
+    };
+  });
+
+  if (outsRows.length > 0) {
+    const outsHeading = document.createElement("h3");
+    outsHeading.textContent = "Outs";
+    container.appendChild(outsHeading);
+
+    const outsColumns = [
+      { key: "name", label: "Jugador", sticky: true },
+      { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
+      { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
+      { key: "LO", label: "LO", full: "Out por línea", numeric: true },
+      { key: "BO", label: "BO", full: "Out en base", numeric: true },
+      { key: "RO", label: "RO", full: "Out de regla", numeric: true },
+      { key: "TOTAL", label: "Total", numeric: true },
+    ];
+
+    const outsEl = document.createElement("div");
+    container.appendChild(outsEl);
+    renderSortableTable(outsEl, {
+      columns: outsColumns,
+      rows: outsRows,
+      defaultSort: "TOTAL",
+      onRowClick: (row) => {
+        location.hash = `#/jugador/${row.playerId}`;
+      },
+      rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
+    });
+    renderGlossary(container, outsColumns);
+  }
 
   const substitutions = game.substitutions ?? [];
   if (substitutions.length > 0) {
