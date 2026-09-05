@@ -175,6 +175,21 @@
   text-align: center;
 }
 
+/* Columnas "destacadas" (GO/FO/LO por ahora, ver `highlight` en
+   BATTING_FIELDS de js/admin.js) — un tinte rojo ligero para que no se
+   pasen de largo entre tantas columnas numéricas iguales. */
+.rows-table th.col-highlight {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface-alt));
+}
+
+.rows-table td.col-highlight {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.rows-table td.col-highlight input {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
 .remove-row-btn {
   background: transparent;
   border: 1px solid var(--border);

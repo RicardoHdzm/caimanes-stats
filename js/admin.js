@@ -13,15 +13,17 @@ const BATTING_FIELDS = [
   { key: "2B", label: "2B", full: "Dobles", type: "number" },
   { key: "3B", label: "3B", full: "Triples", type: "number" },
   { key: "HR", label: "HR", full: "Home runs", type: "number" },
-  { key: "HRC", label: "HRC", full: "Home runs de campo", type: "number" },
+  { key: "HRC", label: "HRC", full: "HR Campo", type: "number" },
   { key: "RBI", label: "RBI", full: "Impulsadas", type: "number" },
   { key: "R", label: "R", full: "Carreras", type: "number" },
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },
   { key: "SO", label: "SO", full: "Ponches", type: "number" },
-  { key: "GO", label: "GO", full: "Out por rodado", type: "number" },
-  { key: "FO", label: "FO", full: "Out por elevado", type: "number" },
-  { key: "LO", label: "LO", full: "Out por línea", type: "number" },
   { key: "SB", label: "SB", full: "Bases robadas", type: "number" },
+  // GO/FO/LO al final y resaltados (ver highlight en createRowsEditor): son
+  // los más nuevos y los que más se prestan a olvidarse de llenar.
+  { key: "GO", label: "GO", full: "Out por rodado", type: "number", highlight: true },
+  { key: "FO", label: "FO", full: "Out por elevado", type: "number", highlight: true },
+  { key: "LO", label: "LO", full: "Out por línea", type: "number", highlight: true },
 ];
 
 const PITCHING_FIELDS = [
@@ -66,7 +68,7 @@ function createRowsEditor(container, fields) {
   table.innerHTML = `<thead><tr>${fields
     .map(
       (f) =>
-        `<th><span class="th-abbr">${f.label}</span>${f.full ? `<span class="th-full">${f.full}</span>` : ""}</th>`
+        `<th${f.highlight ? ' class="col-highlight"' : ""}><span class="th-abbr">${f.label}</span>${f.full ? `<span class="th-full">${f.full}</span>` : ""}</th>`
     )
     .join("")}<th></th></tr></thead>`;
   const tbody = document.createElement("tbody");
@@ -79,15 +81,19 @@ function createRowsEditor(container, fields) {
     tr.innerHTML =
       fields
         .map((f) => {
+          // `highlight` (GO/FO/LO, ver BATTING_FIELDS) — un ligero tinte
+          // rojo en la celda, para que no se pasen de largo entre tantas
+          // columnas numéricas iguales.
+          const tdClass = f.highlight ? ' class="col-highlight"' : "";
           if (f.type === "player") {
-            return `<td><select data-key="${f.key}">${playerOptionsHtml()}</select></td>`;
+            return `<td${tdClass}><select data-key="${f.key}">${playerOptionsHtml()}</select></td>`;
           }
           if (f.type === "select") {
             const opts = f.options.map((o) => `<option value="${o}">${o || "—"}</option>`).join("");
-            return `<td><select data-key="${f.key}">${opts}</select></td>`;
+            return `<td${tdClass}><select data-key="${f.key}">${opts}</select></td>`;
           }
           const numAttrs = f.type === "number" ? `step="${f.step ?? "1"}"` : "";
-          return `<td><input data-key="${f.key}" type="${f.type}" ${numAttrs} /></td>`;
+          return `<td${tdClass}><input data-key="${f.key}" type="${f.type}" ${numAttrs} /></td>`;
         })
         .join("") + `<td><button type="button" class="remove-row-btn" title="Quitar"><i class="fa-solid fa-xmark"></i></button></td>`;
     tr.querySelector(".remove-row-btn").addEventListener("click", () => tr.remove());

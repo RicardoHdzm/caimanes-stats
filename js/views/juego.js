@@ -248,15 +248,15 @@ export function renderJuegoDetalle(container, gameId) {
     { key: "2B", label: "2B", full: "Dobles", numeric: true },
     { key: "3B", label: "3B", full: "Triples", numeric: true },
     { key: "HR", label: "HR", full: "Home runs", numeric: true },
-    { key: "HRC", label: "HRC", full: "Home runs de campo", numeric: true },
+    { key: "HRC", label: "HRC", full: "HR Campo", numeric: true },
     { key: "R", label: "R", full: "Carreras", numeric: true },
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
     { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
     { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+    { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
     { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
     { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
     { key: "LO", label: "LO", full: "Out por línea", numeric: true },
-    { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
     { key: "AVG", label: "AVG", full: "Promedio del juego", numeric: true },
   ];
 
