@@ -51,6 +51,14 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// "NOMBRE DE CANCION" / "nombre de cancion" -> "Nombre De Cancion" — al
+// guardar la canción de entrada (ver el botón de Guardar más abajo), para
+// que la playlist no se vea con un tipografiado distinto por cada quien
+// según cómo la haya escrito.
+function toTitleCase(text) {
+  return text.replace(/\S+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+}
+
 // "Debut: 2023 - 2da Temporada - Liga Gaspasa" — solo si el jugador trae
 // `seasons` en data.js (opcional, igual que photo/walkup). El debut es la
 // más chica de la lista, no necesariamente la primera temporada del
@@ -1217,8 +1225,11 @@ export function renderJugadorDetalle(container, playerId) {
     walkupSaveBtn.addEventListener("click", async () => {
       walkupError.hidden = true;
       const saved = {
-        title: walkupTitleInput.value.trim(),
-        artist: walkupArtistInput.value.trim() || null,
+        // "NOMBRE DE CANCION" -> "Nombre De Cancion" — a quien escribe todo
+        // en mayúsculas (o minúsculas) se le pareja solo, para que la
+        // playlist no se vea con un tipografiado distinto por cada quien.
+        title: toTitleCase(walkupTitleInput.value.trim()),
+        artist: toTitleCase(walkupArtistInput.value.trim()) || null,
         url: walkupUrlInput.value.trim() || null,
       };
       if (!saved.title) {
@@ -1230,6 +1241,8 @@ export function renderJugadorDetalle(container, playerId) {
       try {
         await setWalkup(player.id, saved);
         currentWalkup = saved;
+        walkupTitleInput.value = saved.title;
+        walkupArtistInput.value = saved.artist ?? "";
         walkupDisplay.innerHTML = renderWalkup(saved);
         flashSaved(walkupSaveBtn, "Guardado");
       } catch {

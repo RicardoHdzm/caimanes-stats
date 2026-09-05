@@ -4,29 +4,34 @@
 // sitio: primero pinta con lo fijo de data.js, y en cuanto llegan las
 // personalizadas de Supabase (getAllWalkupOverrides) se repinta con esas.
 import { PLAYERS } from "../data.js";
-import { heading, renderAvatar, escapeHtml, safeWalkupUrl } from "../ui.js";
+import { heading, renderAvatar, renderSortableTable, escapeHtml, safeWalkupUrl } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
 
 // El placeholder de PLAYERS[].walkup en data.js ("Canción" / "Artista", sin
 // url) es el valor por default de quien todavía no ha puesto la suya — no
 // cuenta como canción real. Sin este filtro, la playlist se llenaría de
-// tarjetas vacías tipo "Canción" / "Artista" para casi todo el roster.
+// filas/tarjetas vacías tipo "Canción" / "Artista" para casi todo el roster.
 function hasRealWalkup(walkup) {
   if (!walkup?.title) return false;
   if (walkup.title === "Canción" && walkup.artist === "Artista" && !walkup.url) return false;
   return true;
 }
 
-// Tarjeta: foto, jugador, canción, artista y un botón de play — el link
-// real de Spotify/YouTube/etc. si hay uno válido; sin link, el botón se ve
-// pero no hace nada (no hay a dónde mandarlo).
-function playlistCard(player, walkup) {
+// El link real de Spotify/YouTube/etc. si hay uno válido; sin link, el
+// botón se ve pero no hace nada (no hay a dónde mandarlo). Compartido entre
+// la tabla de arriba y las tarjetas de abajo, `cls` es la clase base de
+// cada una (mismo look, tamaño distinto por CSS).
+function playButtonHtml(walkup, cls) {
   const parsed = safeWalkupUrl(walkup.url);
-  const artist = walkup.artist ? `<p class="playlist-card-artist">${escapeHtml(walkup.artist)}</p>` : "";
-  const playButton = parsed
-    ? `<a class="playlist-card-play" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer" aria-label="Reproducir"><i class="fa-solid fa-circle-play"></i></a>`
-    : `<span class="playlist-card-play playlist-card-play--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
+  return parsed
+    ? `<a class="${cls}" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer" aria-label="Reproducir"><i class="fa-solid fa-circle-play"></i></a>`
+    : `<span class="${cls} ${cls}--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
+}
 
+// Tarjeta: foto, jugador, canción, artista y el botón de play — de QUIÉN es
+// cada canción (la tabla de arriba es la playlist en sí, sin esa parte).
+function playlistCard(player, walkup) {
+  const artist = walkup.artist ? `<p class="playlist-card-artist">${escapeHtml(walkup.artist)}</p>` : "";
   return `
     <div class="playlist-card">
       <a href="#/jugador/${player.id}" class="playlist-card-avatar" data-avatar="${player.id}">${renderAvatar(player, 72)}</a>
@@ -35,7 +40,7 @@ function playlistCard(player, walkup) {
         <p class="playlist-card-title">${escapeHtml(walkup.title)}</p>
         ${artist}
       </div>
-      ${playButton}
+      ${playButtonHtml(walkup, "playlist-card-play")}
     </div>
   `;
 }
@@ -54,28 +59,18 @@ async function hydrateAvatars(root) {
   );
 }
 
+const TRACK_COLUMNS = [
+  { key: "track", label: "#", numeric: true },
+  { key: "title", label: "Canción" },
+  { key: "artist", label: "Artista" },
+  { key: "play", label: "", render: (_, row) => playButtonHtml(row.walkup, "playlist-track-play") },
+];
+
 export function renderPlaylist(container) {
   heading(container, "Playlist del equipo");
 
-  // Playlist real de Spotify con todas las canciones — el iframe viene tal
-  // cual del botón "Compartir > Insertar" de Spotify, solo envuelto en un
-  // contenedor propio para el margen.
-  const embedWrap = document.createElement("div");
-  embedWrap.className = "playlist-embed";
-  embedWrap.innerHTML = `
-    <iframe
-      data-testid="embed-iframe"
-      style="border-radius: 12px"
-      src="https://open.spotify.com/embed/playlist/0VxLvZORg84K42UUqv3a2i?utm_source=generator&si=511797c306f74d83"
-      width="100%"
-      height="352"
-      frameBorder="0"
-      allowfullscreen=""
-      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      loading="lazy"
-    ></iframe>
-  `;
-  container.appendChild(embedWrap);
+  const tableEl = document.createElement("div");
+  container.appendChild(tableEl);
 
   const listHeading = document.createElement("h3");
   listHeading.textContent = "Canción de cada quien";
@@ -92,10 +87,26 @@ export function renderPlaylist(container) {
     const rows = PLAYERS.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
       hasRealWalkup(r.walkup)
     );
-    listEl.innerHTML =
-      rows.length > 0
-        ? rows.map((r) => playlistCard(r.player, r.walkup)).join("")
-        : '<p class="subtitle">Nadie ha registrado su canción de entrada todavía.</p>';
+
+    if (rows.length === 0) {
+      tableEl.innerHTML = "";
+      listEl.innerHTML = '<p class="subtitle">Nadie ha registrado su canción de entrada todavía.</p>';
+      return;
+    }
+
+    // La tabla de arriba (la playlist en sí, numerada) — orden fijo: el
+    // mismo en el que aparecen en el roster, no se reordena solo (no es
+    // sortable, ver renderSortableTable). Track number = su lugar en esta
+    // lista, no un dato guardado en ningún lado.
+    renderSortableTable(tableEl, {
+      columns: TRACK_COLUMNS,
+      rows: rows.map((r, i) => ({ track: i + 1, title: r.walkup.title, artist: r.walkup.artist ?? "", walkup: r.walkup })),
+      sortable: false,
+      defaultSort: "track",
+      defaultDir: 1,
+    });
+
+    listEl.innerHTML = rows.map((r) => playlistCard(r.player, r.walkup)).join("");
     hydrateAvatars(listEl);
   }
 

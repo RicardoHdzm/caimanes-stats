@@ -2871,21 +2871,26 @@ main h3::before {
 
 /* ---- playlist del equipo (js/views/playlist.js) ---- */
 
-.playlist-embed {
-  margin: 16px 0 24px;
+/* Botón de play dentro de la tabla de arriba (la playlist en sí) — mismo
+   look que .playlist-card-play de las tarjetas de abajo, pero más chico
+   para caber cómodo en una celda de tabla. */
+.playlist-track-play {
+  font-size: 1.3rem;
+  color: var(--accent-text);
+  line-height: 1;
 }
 
-.playlist-embed iframe {
-  display: block;
-  max-width: 100%;
+.playlist-track-play--disabled {
+  color: var(--muted);
+  opacity: 0.4;
 }
 
-/* Tarjetas (foto, jugador, canción, artista, botón de play) en vez del
-   renglón de antes — grid para que se acomoden solas según el ancho, igual
-   que .mvp-vote-grid. */
+/* Tarjetas (foto, jugador, canción, artista, botón de play) — de quién es
+   cada canción, debajo de la tabla. 3 columnas fijas en escritorio (a
+   petición expresa); en celular, una sola (ver el @media más abajo). */
 .playlist-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -2948,6 +2953,20 @@ main h3::before {
 .playlist-card-play--disabled {
   color: var(--muted);
   opacity: 0.4;
+}
+
+@media (max-width: 900px) {
+  /* 3 columnas fijas no caben cómodas por debajo del ancho de tablet — 2
+     hasta celular grande, 1 en celular angosto (ver el segundo @media). */
+  .playlist-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .playlist-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---- selector de Bateo/Pitcheo/Fildeo (js/views/estadisticas.js) ----
