@@ -29,6 +29,7 @@ import {
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
 import { wireRsvp } from "./resumen.js";
+import { mvpCandidateIds } from "./juego.js";
 
 // Tamaño del avatar grande del perfil (ver renderJugadorDetalle) — una sola
 // constante para los 3 lugares que lo pintan (inicial, y las dos veces que
@@ -218,15 +219,26 @@ function podiumChip(list, playerId, key, { icon, label, desc, negative, maxPlace
 // que el badge del detalle de juego (ver renderMvpVote en
 // js/views/juego.js), para que "cuántos MVPs llevas" siempre cuente lo
 // mismo sin importar desde dónde se calcule.
-export function mvpCountsFromVotes(perGameVotes) {
+// `games` (paralelo a `perGameVotes`, por eso GAMES por default) se usa
+// para descartar votos por alguien que ya no entra en la boleta de ESE
+// juego (ver mvpCandidateIds en js/views/juego.js) — un juego editado
+// DESPUÉS de votado (llega el capture real, se agrega una sustitución...)
+// puede dejar huérfano un voto por quien dejó de ser top 6; sin filtrarlo
+// aquí también, "MVP x N"/Starboy contarían un MVP que el badge del juego
+// ya ni siquiera muestra.
+export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
   const counts = new Map();
-  for (const votes of perGameVotes) {
+  perGameVotes.forEach((votes, i) => {
+    const candidateIds = games[i] ? mvpCandidateIds(games[i]) : null;
     const tally = new Map();
-    for (const v of votes) tally.set(v.voted_player_id, (tally.get(v.voted_player_id) ?? 0) + 1);
+    for (const v of votes) {
+      if (candidateIds && !candidateIds.has(v.voted_player_id)) continue;
+      tally.set(v.voted_player_id, (tally.get(v.voted_player_id) ?? 0) + 1);
+    }
     const sorted = [...tally.entries()].sort((a, b) => b[1] - a[1]);
     const leaderId = sorted.length > 0 && (sorted.length === 1 || sorted[1][1] < sorted[0][1]) ? sorted[0][0] : null;
     if (leaderId) counts.set(leaderId, (counts.get(leaderId) ?? 0) + 1);
-  }
+  });
   return counts;
 }
 

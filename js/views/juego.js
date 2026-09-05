@@ -14,6 +14,23 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// "2026-09-01" -> "Martes 1 de septiembre de 2026". `T00:00:00` evita que
+// el string se interprete como UTC y se recorra un día en husos negativos
+// (mismo truco que ya usa formatGameDate en js/views/resumen.js).
+function formatGameDate(dateStr) {
+  const date = new Date(`${dateStr}T00:00:00`);
+  const text = date.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+// "19:00" -> "7:00 pm". Solo se usa para mostrar; el valor crudo (24h) es
+// el que se sigue guardando/capturando en Admin.
+function formatGameTime(timeStr) {
+  const [h, m] = timeStr.split(":").map(Number);
+  const date = new Date(2000, 0, 1, h, m);
+  return date.toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+}
+
 // El voto de MVP solo se acepta en el juego MÁS RECIENTE — en cuanto se
 // agrega un juego posterior, el anterior se congela con lo que ya se votó
 // (el badge/medallas siguen contando ese resultado, nomás ya no se puede
@@ -91,6 +108,24 @@ function rankParticipants(game, participantIds) {
   return [...candidateIds].sort((a, b) => scoreOf.get(b) - scoreOf.get(a));
 }
 
+// Quiénes PUDIERON aparecer en la boleta de un juego — mismo cálculo que
+// rankParticipants(), pero armando primero el participantIds desde cero.
+// Exportada para que jugador.js/medallas.js puedan filtrar con esto los
+// votos guardados: si se edita el box score de un juego DESPUÉS de que ya
+// se votó (llega el capture real, se agrega una sustitución, etc.), un
+// voto por alguien que ya no entra en el top 6 se queda huérfano en la
+// base de datos — sin este filtro seguiría contando para el líder/medallas
+// aunque su tarjeta ya ni se muestre (fue justo lo que pasó en g9: un voto
+// por Javier Urquiza sobrevivió a que su noche dejara de ser top 6).
+export function mvpCandidateIds(game) {
+  const participantIds = new Set([
+    ...(game.batting ?? []).map((l) => l.playerId),
+    ...(game.pitching ?? []).map((l) => l.playerId),
+    ...(game.fielding ?? []).map((l) => l.playerId),
+  ]);
+  return new Set(rankParticipants(game, participantIds));
+}
+
 // `mvpBadgeSlot` es el badge de "MVP: nombre" debajo de "Ver replay" (ver
 // hero.innerHTML en renderJuegoDetalle) — se actualiza solo para reflejar
 // al líder claro del voto; sin un líder claro (empate, o nadie ha votado
@@ -101,12 +136,15 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo';
   container.appendChild(heading3);
 
-  const hint = document.createElement("p");
-  hint.className = "subtitle";
-  hint.textContent = isLatest
-    ? "Toca a un jugador para votar por él (no puedes votar por ti mismo). Vuelve a tocar tu voto actual para quitarlo."
-    : "La votación de este juego ya cerró — hay un juego más reciente.";
-  container.appendChild(hint);
+  // Sin hint cuando la votación sigue abierta — las tarjetas ya se explican
+  // solas (botón vs. tarjeta informativa). Cerrada, sí se avisa por qué ya
+  // no se puede votar.
+  if (!isLatest) {
+    const hint = document.createElement("p");
+    hint.className = "subtitle";
+    hint.textContent = "La votación de este juego ya cerró.";
+    container.appendChild(hint);
+  }
 
   const gridEl = document.createElement("div");
   gridEl.className = "mvp-vote-grid";
@@ -190,8 +228,13 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     }
   });
 
+  const candidateIdSet = new Set(candidateIds);
+
   async function refresh() {
-    const rows = await getMvpVotes(gameId);
+    // Un voto por alguien que ya no está en la boleta (juego editado después
+    // de votado — ver mvpCandidateIds) no debe contar ni para el líder ni
+    // para el conteo de nadie: se descarta aquí, no solo al no dibujarlo.
+    const rows = (await getMvpVotes(gameId)).filter((r) => candidateIdSet.has(r.voted_player_id));
     const counts = new Map();
     for (const r of rows) counts.set(r.voted_player_id, (counts.get(r.voted_player_id) ?? 0) + 1);
     const myId = getCurrentPlayerId();
@@ -257,7 +300,7 @@ export function renderJuegoDetalle(container, gameId) {
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
-    <div class="game-hero-date">${game.date}${game.time ? ` — ${game.time}` : ""}</div>
+    <div class="game-hero-date">${formatGameDate(game.date)}${game.time ? ` · ${formatGameTime(game.time)}` : ""}</div>
     <div class="game-hero-meta">
       <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
     </div>

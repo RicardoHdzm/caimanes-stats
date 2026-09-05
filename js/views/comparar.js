@@ -1,5 +1,5 @@
 import { PLAYERS, GAMES } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer } from "../stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, outsTotals, gamesPlayedByPlayer } from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
 import { getSession } from "../auth.js";
 import { getAvatarUrl } from "../db.js";
@@ -43,6 +43,18 @@ const FIELDING_ROWS = [
   { key: "A", label: "Asistencias", dir: 1 },
   { key: "E", label: "Errores", dir: -1 },
   { key: "FPCT", label: "FPCT", dir: 1, decimals: true },
+];
+
+// Tipos de out por fuera del ponche (ver outsTotals en ../stats.js) — todos
+// "gana el más bajo", igual que SO en Bateo: aquí más outs nunca es mejor.
+const OUTS_ROWS = [
+  { key: "GO", label: "Out por rodado", dir: -1 },
+  { key: "FO", label: "Out por elevado", dir: -1 },
+  { key: "LO", label: "Out por línea", dir: -1 },
+  { key: "BO", label: "Out en base", dir: -1 },
+  { key: "RO", label: "Out de regla", dir: -1 },
+  { key: "SAC", label: "Out por sacrificio", dir: -1 },
+  { key: "TOTAL", label: "Total de outs", dir: -1 },
 ];
 
 function playerSelect(id, selectedId) {
@@ -132,6 +144,7 @@ function comparisonBody(leftId, rightId) {
   const batting = battingTotals(GAMES);
   const pitching = pitchingTotals(GAMES);
   const fielding = fieldingTotals(GAMES);
+  const outs = outsTotals(GAMES);
   const played = gamesPlayedByPlayer(GAMES);
   const find = (list, id) => list.find((r) => r.playerId === id) ?? null;
 
@@ -143,6 +156,7 @@ function comparisonBody(leftId, rightId) {
     ${comparisonBlock("Bateo", BATTING_ROWS, find(batting, left.id), find(batting, right.id))}
     ${comparisonBlock("Pitcheo", PITCHING_ROWS, find(pitching, left.id), find(pitching, right.id))}
     ${comparisonBlock("Fildeo", FIELDING_ROWS, find(fielding, left.id), find(fielding, right.id))}
+    ${comparisonBlock("Outs", OUTS_ROWS, find(outs, left.id), find(outs, right.id))}
   `;
 }
 
