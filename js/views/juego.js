@@ -14,6 +14,23 @@ function formatAvg(h, ab) {
   return (h / ab).toFixed(3).replace(/^0\./, ".");
 }
 
+// El voto de MVP solo se acepta en el juego MÁS RECIENTE — en cuanto se
+// agrega un juego posterior, el anterior se congela con lo que ya se votó
+// (el badge/medallas siguen contando ese resultado, nomás ya no se puede
+// cambiar). Por fecha (string ISO, ordena bien con localeCompare) y, si
+// empatan (doble cartelera el mismo día), por el número más alto del id.
+function isLatestGame(game) {
+  if (GAMES.length === 0) return false;
+  const latest = [...GAMES]
+    .sort((a, b) => {
+      const byDate = a.date.localeCompare(b.date);
+      if (byDate !== 0) return byDate;
+      return Number(String(a.id).replace(/^g/, "")) - Number(String(b.id).replace(/^g/, ""));
+    })
+    .at(-1);
+  return latest?.id === game.id;
+}
+
 // Voto de MVP del equipo — es el ÚNICO MVP que existe (ya no se captura a
 // mano en Admin): el líder claro del voto (más votos que cualquier otro,
 // sin empate) es "el oficial" — se usa para el badge debajo de "Ver
@@ -78,7 +95,7 @@ function rankParticipants(game, participantIds) {
 // hero.innerHTML en renderJuegoDetalle) — se actualiza solo para reflejar
 // al líder claro del voto; sin un líder claro (empate, o nadie ha votado
 // todavía) se queda vacío.
-function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
+function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) {
   const gameId = game.id;
   const heading3 = document.createElement("h3");
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo';
@@ -86,7 +103,9 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
 
   const hint = document.createElement("p");
   hint.className = "subtitle";
-  hint.textContent = "Toca a un jugador para votar por él (no puedes votar por ti mismo). Vuelve a tocar tu voto actual para quitarlo.";
+  hint.textContent = isLatest
+    ? "Toca a un jugador para votar por él (no puedes votar por ti mismo). Vuelve a tocar tu voto actual para quitarlo."
+    : "La votación de este juego ya cerró — hay un juego más reciente.";
   container.appendChild(hint);
 
   const gridEl = document.createElement("div");
@@ -100,12 +119,12 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
   function cardHtml(playerId, voteCount, myVote, myId, isLeader) {
     const player = PLAYERS.find((p) => p.id === playerId);
     if (!player) return "";
-    const { avg, r, rbi, po, a } = mvpCardStats(game, playerId);
     const isMine = playerId === myVote;
-    // No puedes votar por ti mismo — tu propia tarjeta se queda como
-    // informativa (<div>, no <button>) aunque sí te toque votar en este
-    // juego.
-    const interactive = !!myId && participantIds.has(myId) && playerId !== myId;
+    // No puedes votar por ti mismo, y ya no se puede votar en absoluto si
+    // este ya no es el juego más reciente (isLatest) — tu propia tarjeta
+    // (o todas, si la votación cerró) se queda como informativa (<div>, no
+    // <button>).
+    const interactive = isLatest && !!myId && participantIds.has(myId) && playerId !== myId;
     const tag = interactive ? "button" : "div";
     const attrs = interactive ? `type="button" data-vote-for="${playerId}"` : "";
     const countBadge =
@@ -116,21 +135,37 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
         : "";
     // Decisión de pitcheo (si tuvo) — sin esto, un cerrador que entró a la
     // boleta solo por su Salvamento se vería con puros ceros, sin ninguna
-    // pista de por qué está ahí.
-    const decision = pitchingByPlayer.get(playerId)?.decision;
-    const decisionBadge = decision ? `<span class="mvp-vote-decision">${decision}</span>` : "";
+    // pista de por qué está ahí. Victoria en verde, Salvamento en amarillo.
+    const pitchingLine = pitchingByPlayer.get(playerId);
+    const decision = pitchingLine?.decision;
+    const decisionClass = decision === "W" ? " mvp-vote-decision--win" : decision === "SV" ? " mvp-vote-decision--save" : "";
+    const decisionBadge = decision ? `<span class="mvp-vote-decision${decisionClass}">${decision}</span>` : "";
+    // Si pitcheó en este juego, sus números son de pitcheo (carreras
+    // permitidas, bases por bolas, ponches, jonrones permitidos) — el AVG/
+    // RBI/PO/A de bateo no dicen nada de una buena salida en la lomita.
+    const statsHtml = pitchingLine
+      ? `
+        <span class="mvp-vote-stat"><b>${pitchingLine.R ?? 0}</b><small>R</small></span>
+        <span class="mvp-vote-stat"><b>${pitchingLine.BB ?? 0}</b><small>BB</small></span>
+        <span class="mvp-vote-stat"><b>${pitchingLine.SO ?? 0}</b><small>SO</small></span>
+        <span class="mvp-vote-stat"><b>${pitchingLine.HR ?? 0}</b><small>HR</small></span>
+      `
+      : (() => {
+          const { avg, r, rbi, po, a } = mvpCardStats(game, playerId);
+          return `
+            <span class="mvp-vote-stat"><b>${avg}</b><small>AVG</small></span>
+            <span class="mvp-vote-stat"><b>${r}</b><small>R</small></span>
+            <span class="mvp-vote-stat"><b>${rbi}</b><small>RBI</small></span>
+            <span class="mvp-vote-stat"><b>${po}</b><small>PO</small></span>
+            <span class="mvp-vote-stat"><b>${a}</b><small>A</small></span>
+          `;
+        })();
     return `
       <${tag} class="mvp-vote-card${isMine ? " active" : ""}" ${attrs}>
         ${countBadge}
         <span class="mvp-vote-avatar" data-avatar-player="${playerId}">${renderAvatar(player, 52)}</span>
         <span class="mvp-vote-name">${escapeHtml(player.name)}${decisionBadge}</span>
-        <div class="mvp-vote-stats">
-          <span class="mvp-vote-stat"><b>${avg}</b><small>AVG</small></span>
-          <span class="mvp-vote-stat"><b>${r}</b><small>R</small></span>
-          <span class="mvp-vote-stat"><b>${rbi}</b><small>RBI</small></span>
-          <span class="mvp-vote-stat"><b>${po}</b><small>PO</small></span>
-          <span class="mvp-vote-stat"><b>${a}</b><small>A</small></span>
-        </div>
+        <div class="mvp-vote-stats">${statsHtml}</div>
       </${tag}>
     `;
   }
@@ -250,7 +285,7 @@ export function renderJuegoDetalle(container, gameId) {
       ...(game.pitching ?? []).map((l) => l.playerId),
       ...(game.fielding ?? []).map((l) => l.playerId),
     ]);
-    renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"));
+    renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"), isLatestGame(game));
   }
 
   const lineupHeading = document.createElement("h3");

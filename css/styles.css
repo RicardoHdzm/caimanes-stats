@@ -3111,6 +3111,18 @@ button.mvp-vote-card:active {
   vertical-align: middle;
 }
 
+.mvp-vote-decision--win {
+  background: color-mix(in srgb, var(--win) 20%, var(--surface-raised));
+  border-color: var(--win);
+  color: var(--win);
+}
+
+.mvp-vote-decision--save {
+  background: color-mix(in srgb, #f5b942 20%, var(--surface-raised));
+  border-color: #f5b942;
+  color: #f5b942;
+}
+
 .mvp-vote-stats {
   display: flex;
   gap: 8px;
