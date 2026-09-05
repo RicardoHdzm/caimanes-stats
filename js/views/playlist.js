@@ -57,11 +57,6 @@ async function hydrateAvatars(root) {
 export function renderPlaylist(container) {
   heading(container, "Playlist del equipo");
 
-  const subtitle = document.createElement("p");
-  subtitle.className = "subtitle";
-  subtitle.textContent = "Las canciones de entrada de todo el equipo, en un solo lugar.";
-  container.appendChild(subtitle);
-
   // Playlist real de Spotify con todas las canciones — el iframe viene tal
   // cual del botón "Compartir > Insertar" de Spotify, solo envuelto en un
   // contenedor propio para el margen.

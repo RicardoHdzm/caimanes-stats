@@ -45,7 +45,7 @@ function heroCard(icon, title, value, detail) {
 }
 
 export function renderTemporadas(container, seasonParam) {
-  heading(container, "Temporadas anteriores", "Los datos de cada temporada se conservan aquí, aparte de la actual.");
+  heading(container, "Temporadas anteriores");
 
   const requested = Number(seasonParam);
   const season = Number.isInteger(requested) && requested >= 1 && requested <= SEASONS.length ? requested : defaultSeason();
