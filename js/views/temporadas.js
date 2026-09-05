@@ -26,16 +26,38 @@ function seasonLabel(n) {
   return meta ? `${ordinalTemporada(n)} Temporada — ${meta.year} · ${meta.league}` : `${ordinalTemporada(n)} Temporada`;
 }
 
+// Mismo armazón "hero" que usa Resumen para Récord/Carreras/etc. (ver
+// heroCardShell en js/views/resumen.js) — se duplica chico aquí en vez de
+// exportarlo, mismo criterio que ya usan formatGameDate y compañía en cada
+// vista.
+function heroCard(icon, title, value, detail) {
+  return `
+    <div class="leader-card leader-card--hero">
+      <div class="leader-hero">
+        <div class="leader-hero-main">
+          <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+          <span class="leader-hero-value">${value}</span>
+          ${detail ? `<span class="leader-hero-detail">${detail}</span>` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export function renderTemporadas(container, seasonParam) {
   heading(container, "Temporadas anteriores", "Los datos de cada temporada se conservan aquí, aparte de la actual.");
 
   const requested = Number(seasonParam);
   const season = Number.isInteger(requested) && requested >= 1 && requested <= SEASONS.length ? requested : defaultSeason();
 
+  const picker = document.createElement("div");
+  picker.className = "temporada-picker";
   const pickerLabel = document.createElement("label");
-  pickerLabel.className = "game-select-label";
+  pickerLabel.setAttribute("for", "temporada-select");
   pickerLabel.textContent = "Temporada";
   const select = document.createElement("select");
+  select.id = "temporada-select";
+  select.className = "temporada-select";
   for (let n = SEASONS.length; n >= 1; n--) {
     const opt = document.createElement("option");
     opt.value = String(n);
@@ -46,8 +68,8 @@ export function renderTemporadas(container, seasonParam) {
   select.addEventListener("change", () => {
     location.hash = `#/temporadas/${select.value}`;
   });
-  pickerLabel.appendChild(select);
-  container.appendChild(pickerLabel);
+  picker.append(pickerLabel, select);
+  container.appendChild(picker);
 
   const games = GAMES.filter((g) => g.season === season);
   if (games.length === 0) {
@@ -60,14 +82,13 @@ export function renderTemporadas(container, seasonParam) {
 
   // ---- Récord ----
   const rec = teamRecord(games);
-  const recordCard = document.createElement("div");
-  recordCard.className = "leader-card player-standalone-card";
-  recordCard.innerHTML = `
-    <h3><i class="fa-solid fa-clipboard-list"></i> Récord de la temporada</h3>
-    <p class="leader-hero-value" style="display:block;">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</p>
-    <p class="subtitle">${rec.G} juego${rec.G === 1 ? "" : "s"} · ${rec.RF} carreras a favor, ${rec.RA} en contra</p>
-  `;
-  container.appendChild(recordCard);
+  const recordRow = document.createElement("div");
+  recordRow.className = "leaders section-gap";
+  recordRow.innerHTML =
+    heroCard("fa-trophy", "Récord", `${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}`, `${rec.G} juego${rec.G === 1 ? "" : "s"}`) +
+    heroCard("fa-bolt", "Carreras anotadas", rec.RF) +
+    heroCard("fa-shield-halved", "Carreras permitidas", rec.RA);
+  container.appendChild(recordRow);
 
   // ---- Playoffs de esa temporada, si los hubo ----
   const playoffEntry = PLAYOFFS.find((p) => p.season === season);

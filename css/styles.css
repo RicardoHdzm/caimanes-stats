@@ -3675,6 +3675,54 @@ button.mvp-vote-card:active {
   outline-offset: 1px;
 }
 
+/* ---- selector de temporada (js/views/temporadas.js) ---- */
+
+.temporada-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.temporada-picker label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.temporada-select {
+  min-width: 260px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.temporada-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 640px) {
+  .temporada-picker {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .temporada-select {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .compare-vs {
   font-size: var(--text-sm);
   font-weight: 700;
