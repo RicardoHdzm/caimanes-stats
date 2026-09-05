@@ -2,7 +2,7 @@ import { GAMES, TEAM, PLAYERS } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getMvpVotes, setMvpVote, deleteMvpVote } from "../db.js";
+import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
@@ -36,7 +36,12 @@ function mvpCardStats(game, playerId) {
   };
 }
 
-function renderMvpVote(container, game, participantIds) {
+// `mvpBadgeSlot` es el badge de "MVP: nombre" debajo de "Ver replay" (ver
+// hero.innerHTML en renderJuegoDetalle) — cuando el voto tiene un líder
+// claro (más votos que cualquier otro, sin empate), lo reemplaza por ese
+// líder automáticamente; sin eso, se queda con el `game.mvp` oficial que
+// capturaste a mano (o vacío, si tampoco hay ese).
+function renderMvpVote(container, game, participantIds, mvpBadgeSlot) {
   const gameId = game.id;
   const heading3 = document.createElement("h3");
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo (votado)';
@@ -44,7 +49,7 @@ function renderMvpVote(container, game, participantIds) {
 
   const hint = document.createElement("p");
   hint.className = "subtitle";
-  hint.textContent = "Toca a un jugador para votar por él. Vuelve a tocar tu voto actual para quitarlo.";
+  hint.textContent = "Toca a un jugador para votar por él (no puedes votar por ti mismo). Vuelve a tocar tu voto actual para quitarlo.";
   container.appendChild(hint);
 
   const gridEl = document.createElement("div");
@@ -52,17 +57,27 @@ function renderMvpVote(container, game, participantIds) {
   gridEl.textContent = "Cargando votos…";
   container.appendChild(gridEl);
 
-  function cardHtml(playerId, voteCount, myVote, canVote) {
+  function cardHtml(playerId, voteCount, myVote, myId, isLeader) {
     const player = PLAYERS.find((p) => p.id === playerId);
     if (!player) return "";
     const { avg, r, rbi, po, a } = mvpCardStats(game, playerId);
     const isMine = playerId === myVote;
-    const tag = canVote ? "button" : "div";
-    const attrs = canVote ? `type="button" data-vote-for="${playerId}"` : "";
+    // No puedes votar por ti mismo — tu propia tarjeta se queda como
+    // informativa (<div>, no <button>) aunque sí te toque votar en este
+    // juego.
+    const interactive = !!myId && participantIds.has(myId) && playerId !== myId;
+    const tag = interactive ? "button" : "div";
+    const attrs = interactive ? `type="button" data-vote-for="${playerId}"` : "";
+    const countBadge =
+      voteCount > 0
+        ? isLeader
+          ? `<span class="mvp-vote-count mvp-vote-count--leader" title="Va ganando la votación"><i class="fa-solid fa-star"></i></span>`
+          : `<span class="mvp-vote-count">${voteCount}</span>`
+        : "";
     return `
       <${tag} class="mvp-vote-card${isMine ? " active" : ""}" ${attrs}>
-        ${voteCount > 0 ? `<span class="mvp-vote-count">${voteCount}</span>` : ""}
-        <span class="mvp-vote-avatar">${renderAvatar(player, 52)}</span>
+        ${countBadge}
+        <span class="mvp-vote-avatar" data-avatar-player="${playerId}">${renderAvatar(player, 52)}</span>
         <span class="mvp-vote-name">${escapeHtml(player.name)}</span>
         <div class="mvp-vote-stats">
           <span class="mvp-vote-stat"><b>${avg}</b><small>AVG</small></span>
@@ -100,10 +115,37 @@ function renderMvpVote(container, game, participantIds) {
     for (const r of rows) counts.set(r.voted_player_id, (counts.get(r.voted_player_id) ?? 0) + 1);
     const myId = getCurrentPlayerId();
     const myVote = rows.find((r) => r.voter_player_id === myId)?.voted_player_id ?? null;
-    const canVote = !!myId && participantIds.has(myId);
+
+    // Líder = quien tiene MÁS votos que cualquier otro — con empate (o sin
+    // ningún voto) no hay líder claro, y el badge oficial (game.mvp) se
+    // queda como estaba.
+    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    const leaderId = sorted.length > 0 && (sorted.length === 1 || sorted[1][1] < sorted[0][1]) ? sorted[0][0] : null;
+
     gridEl.innerHTML = [...participantIds]
-      .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, canVote))
+      .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, myId, id === leaderId))
       .join("");
+
+    if (mvpBadgeSlot) {
+      mvpBadgeSlot.innerHTML = leaderId
+        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(leaderId)}</div>`
+        : game.mvp
+          ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
+          : "";
+    }
+
+    // La foto de siempre (fija de data.js o iniciales) ya se pintó arriba
+    // sin esperar a nadie — si alguien subió una foto propia a Storage, la
+    // reemplaza (mismo patrón que el perfil y los comentarios).
+    for (const id of participantIds) {
+      getAvatarUrl(id).then((url) => {
+        if (!url) return;
+        const slot = gridEl.querySelector(`[data-avatar-player="${id}"]`);
+        if (!slot) return;
+        const player = PLAYERS.find((p) => p.id === id);
+        slot.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player?.name ?? id)}" style="width:52px;height:52px;font-size:20.8px;">`;
+      });
+    }
   }
 
   refresh();
@@ -153,11 +195,13 @@ export function renderJuegoDetalle(container, gameId) {
         ? `<div class="game-hero-replay"><a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a></div>`
         : ""
     }
-    ${
-      game.mvp
-        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
-        : ""
-    }
+    <div id="mvp-badge-slot">
+      ${
+        game.mvp
+          ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(game.mvp)}</div>`
+          : ""
+      }
+    </div>
   `;
   container.appendChild(hero);
 
@@ -169,7 +213,7 @@ export function renderJuegoDetalle(container, gameId) {
       ...(game.pitching ?? []).map((l) => l.playerId),
       ...(game.fielding ?? []).map((l) => l.playerId),
     ]);
-    renderMvpVote(container, game, participantIds);
+    renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"));
   }
 
   const lineupHeading = document.createElement("h3");

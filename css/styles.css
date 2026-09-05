@@ -3133,6 +3133,15 @@ button.mvp-vote-card:active {
   box-shadow: var(--shadow-card);
 }
 
+/* Quien va ganando la votación (ver `isLeader` en renderMvpVote, js/views/
+   juego.js) cambia el círculo rojo con el número por una estrella dorada —
+   ya no hace falta el número ahí, la estrella sola dice "vas ganando". */
+.mvp-vote-count--leader {
+  background: linear-gradient(160deg, #ffd76a, #d4a017);
+  color: #4a3200;
+  font-size: var(--text-sm);
+}
+
 /* ---- gráfica de tendencia ---- */
 
 .chart-wrap {
