@@ -228,7 +228,9 @@ const WALKUP_PLATFORMS = [
 
 // Solo se aceptan links http(s): un `javascript:` en data.js correría al
 // abrirlo. Devuelve null si la URL no sirve, y entonces se pinta sin link.
-function safeWalkupUrl(url) {
+// Exportada para que la playlist del equipo (js/views/playlist.js) arme su
+// propio botón de play sin duplicar esta validación.
+export function safeWalkupUrl(url) {
   if (!url) return null;
   try {
     const parsed = new URL(url);

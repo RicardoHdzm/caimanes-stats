@@ -2880,49 +2880,74 @@ main h3::before {
   max-width: 100%;
 }
 
-.playlist-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* Tarjetas (foto, jugador, canción, artista, botón de play) en vez del
+   renglón de antes — grid para que se acomoden solas según el ancho, igual
+   que .mvp-vote-grid. */
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
 }
 
-.playlist-row {
+.playlist-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 12px;
+  padding: 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--surface-alt);
 }
 
-/* .walkup trae margin-top:18px pensado para ir debajo del nombre en el
-   perfil — aquí va al lado, sin ese espacio arriba. flex:1 para que se
-   estire y el nombre del jugador se quede con su ancho natural. */
-.playlist-row .walkup {
-  flex: 1 1 260px;
-  margin-top: 0;
-}
-
-.playlist-player {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.playlist-card-avatar {
   flex-shrink: 0;
-  text-decoration: none;
-  color: var(--text);
 }
 
-.playlist-name {
+.playlist-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.playlist-card-name {
+  display: block;
   font-family: var(--font-display);
   font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
   transition: color 0.15s;
 }
 
-.playlist-player:hover .playlist-name {
+.playlist-card-name:hover {
   color: var(--accent-text);
+}
+
+.playlist-card-title {
+  margin: 4px 0 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-card-artist {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playlist-card-play {
+  flex-shrink: 0;
+  font-size: 1.8rem;
+  color: var(--accent-text);
+  line-height: 1;
+}
+
+.playlist-card-play--disabled {
+  color: var(--muted);
+  opacity: 0.4;
 }
 
 @media (max-width: 640px) {
@@ -3758,8 +3783,7 @@ button.mvp-vote-card:active {
   margin-bottom: 4px;
 }
 
-/* Avatar + nombre, mismo lenguaje visual que .playlist-player (ver
-   js/views/playlist.js) — sin jugador que resolver (dato huérfano, ver
+/* Avatar + nombre en línea — sin jugador que resolver (dato huérfano, ver
    commentItem en js/views/comments.js) no es un link, pero conserva el
    mismo layout para no saltar de línea distinto. */
 .comment-author {
