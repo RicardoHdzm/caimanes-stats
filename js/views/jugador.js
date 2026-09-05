@@ -433,12 +433,12 @@ export function renderAchievements(player) {
       negative: true,
       desc: (value) => `Ponches de bateo esta temporada (${value}).`,
     });
-    // "Easy Out" — top 3 en outs TOTALES (ponche + rodado/elevado/línea/
+    // "You're Out!" — top 3 en outs TOTALES (ponche + rodado/elevado/línea/
     // base/regla/sacrificio, ver totalOutsList arriba): a diferencia de
     // Punch-Out (solo ponches), este cuenta cualquier forma de salir out.
     addPodium(totalOutsList, "totalOuts", {
       icon: "fa-solid fa-ban",
-      label: "Easy Out",
+      label: "You're Out!",
       negative: true,
       desc: (value) => `Outs totales esta temporada (${value}).`,
     });
