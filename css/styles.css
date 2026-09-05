@@ -3110,17 +3110,18 @@ button.mvp-vote-card:active {
   line-height: 1.2;
 }
 
-/* Decisión de pitcheo (W/L/SV), esquina superior IZQUIERDA (.mvp-vote-count
-   ya ocupa la derecha) — sin esto, un cerrador que entró a la boleta solo
-   por su Salvamento (ver rankParticipants en js/views/juego.js) se vería
-   con puros ceros, sin ninguna pista de por qué está ahí. */
+/* Decisión de pitcheo (W/L/SV), esquina superior IZQUIERDA — a diferencia
+   de .mvp-vote-count (la derecha, que sí flota fuera de la tarjeta), esta
+   va POR DENTRO (top/left positivos, no negativos): flotando afuera
+   chocaba con el badge de la tarjeta vecina de al lado (su .mvp-vote-count
+   sobresaliendo por la derecha) en el pasillo angosto entre tarjetas. Sin
+   este badge, un cerrador que entró a la boleta solo por su Salvamento
+   (ver rankParticipants en js/views/juego.js) se vería con puros ceros,
+   sin ninguna pista de por qué está ahí. */
 .mvp-vote-decision {
   position: absolute;
-  /* -4px, no -8px: con el gap de 12px de .mvp-vote-grid, a -8px este badge
-     y el .mvp-vote-count de la tarjeta vecina (que sobresale por su propio
-     lado derecho) alcanzaban a encimarse en el pasillo entre tarjetas. */
-  top: -4px;
-  left: -4px;
+  top: 8px;
+  left: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3174,8 +3175,8 @@ button.mvp-vote-card:active {
 
 .mvp-vote-count {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: -8px;
+  right: -8px;
   display: flex;
   align-items: center;
   justify-content: center;
