@@ -576,26 +576,6 @@ body {
   line-height: 1.5;
 }
 
-.auth-signout {
-  margin-top: 10px;
-  width: 100%;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--muted);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
-  padding: 6px 0;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.auth-signout:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
 @media (max-width: 640px) {
   /* En celular ya no hay pill de cuenta en el header — "Iniciar sesión",
      "Cerrar sesión" y "Admin" viven en el menú de "apps" (ver
@@ -3057,74 +3037,100 @@ body.modal-open {
   color: var(--loss);
 }
 
-/* Voto de MVP del equipo, en el detalle de un juego jugado. */
-.vote-tally {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
-}
-
-.vote-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-alt);
-  font-size: var(--text-sm);
-}
-
-.vote-row:first-child {
-  border-color: #f5b942;
-  color: #f5b942;
-  font-weight: 700;
-}
-
-.vote-form {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
+/* Voto de MVP del equipo, en el detalle de un juego jugado — una tarjeta
+   por candidato (foto + números DE ESE JUEGO), no el <select> de antes.
+   Botón real (interactivo, ver `canVote` en renderMvpVote) o <div> (nomás
+   informativo) según si a quien mira le toca votar — mismo reset de
+   estilos nativos de botón que ya usan otros grids de tarjetas del sitio
+   (ver .more-sheet-grid button en este mismo archivo). */
+.mvp-vote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
   margin-bottom: 20px;
 }
 
-.vote-form select {
-  flex: 1;
-  min-width: 180px;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
+.mvp-vote-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
   border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   background: var(--surface-alt);
   color: var(--text);
-}
-
-/* .auth-signout trae width: 100%/margin-top pensados para un panel
-   apilado en columna (login del header, cuenta del perfil) — aquí va en
-   línea junto al botón de votar, así que se anulan esos dos. */
-.vote-form .auth-signout {
-  width: auto;
-  margin-top: 0;
-  padding: 8px 14px;
-  /* .auth-signout normalmente usa la fuente de cuerpo y sin mayúsculas
-     (el "Salir" del header/perfil se ve bien así) — aquí junto a
-     "Votar"/"Cambiar voto" (.auth-submit) debe verse igual de sólido, así
-     que toma su misma fuente y peso. */
-  font-family: var(--font-display);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-/* Votar / Cambiar voto / Quitar voto miden lo mismo — "Cambiar voto" es el
-   texto más ancho de los tres, el resto se centra dentro de ese mismo
-   espacio en vez de quedar más angosto. */
-.vote-form .auth-submit,
-.vote-form .auth-signout {
-  min-width: 140px;
+  font-family: inherit;
   text-align: center;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+button.mvp-vote-card {
+  cursor: pointer;
+}
+
+button.mvp-vote-card:hover {
+  border-color: var(--accent);
+}
+
+button.mvp-vote-card:active {
+  transform: scale(0.97);
+}
+
+.mvp-vote-card.active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-alt));
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.mvp-vote-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  line-height: 1.2;
+}
+
+.mvp-vote-stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.mvp-vote-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mvp-vote-stat b {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.mvp-vote-stat small {
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mvp-vote-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  box-shadow: var(--shadow-card);
 }
 
 /* ---- gráfica de tendencia ---- */
