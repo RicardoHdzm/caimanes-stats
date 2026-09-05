@@ -160,9 +160,11 @@ export const MANAGERS = ["p15"];
 //     // las bases o por una regla, sin turno de por medio). Todos opcionales,
 //     // se capturan en admin.html. GO = rodado, FO = elevado, LO = línea,
 //     // BO = out en base (adelantando, robando, etc.), RO = out de regla
-//     // (batear fuera de orden, interferencia, apelación...).
+//     // (batear fuera de orden, interferencia, apelación...), SAC = out por
+//     // sacrificio (toque o elevado que avanza a un corredor a propósito —
+//     // medalla "Kamikaze", ver js/views/jugador.js).
 //     outs: [
-//       { playerId: "p1", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0 },
+//       { playerId: "p1", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
 //     ],
 //     substitutions: [
 //       { inning: 5, type: "campo", playerOut: "p1", playerIn: "p3", position: "SS" },

@@ -62,6 +62,7 @@ const CATALOG = [
   { kind: "gold", icon: "fa-solid fa-dice", name: "Double Trouble", how: "Top 3 del equipo en dobles esta temporada.", match: (l) => l === "Double Trouble" },
   { kind: "gold", icon: "fa-solid fa-chess-knight", name: "Triple Threat", how: "Top 3 del equipo en triples esta temporada.", match: (l) => l === "Triple Threat" },
   { kind: "gold", icon: "fa-solid fa-crow", name: "Eagle Eye", how: "Top 3 del equipo en bases por bolas (BB) esta temporada.", match: (l) => l === "Eagle Eye" },
+  { kind: "gold", icon: "fa-solid fa-ghost", name: "Kamikaze", how: "Top 3 del equipo en outs por sacrificio esta temporada.", match: (l) => l === "Kamikaze" },
   { kind: "gold", icon: "fa-solid fa-scale-balanced", name: "Patient", how: "Top 3 del equipo en relación bases por bolas / ponches esta temporada.", match: (l) => l === "Patient" },
   { kind: "gold", icon: "fa-solid fa-star", name: "Starboy", how: "Top 3 del equipo en premios MVP esta temporada.", match: (l) => l === "Starboy", async: true },
   // ---- Podio negativo (mismo mecanismo, pero ser el #1 es un chiste) ----

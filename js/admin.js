@@ -56,6 +56,7 @@ const OUTS_FIELDS = [
   { key: "LO", label: "LO", full: "Out por línea", type: "number" },
   { key: "BO", label: "BO", full: "Out en base", type: "number" },
   { key: "RO", label: "RO", full: "Out de regla", type: "number" },
+  { key: "SAC", label: "SAC", full: "Out por sacrificio", type: "number" },
 ];
 
 const PITCHING_FIELDS = [

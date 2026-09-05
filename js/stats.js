@@ -34,7 +34,7 @@ function emptyFielding() {
 }
 
 function emptyOuts() {
-  return { G: 0, GO: 0, FO: 0, LO: 0, BO: 0, RO: 0 };
+  return { G: 0, GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 };
 }
 
 export function playerName(playerId) {
@@ -159,7 +159,7 @@ export function fieldingTotals(games = GAMES) {
 // Cómo lo sacaron, más allá del ponche (SO, que ya vive en battingTotals) —
 // tabla propia (ver `outs` en cada juego de js/data.js) porque no todo out
 // es al bat: BO (out en base) y RO (out de regla) pueden pasar sin turno de
-// por medio. `TOTAL` suma los 5 tipos de esta tabla; para "cuántas veces lo
+// por medio. `TOTAL` suma los 6 tipos de esta tabla; para "cuántas veces lo
 // sacaron en total" hay que sumarle además el SO de battingTotals.
 export function outsTotals(games = GAMES) {
   const totals = new Map();
@@ -172,6 +172,7 @@ export function outsTotals(games = GAMES) {
       t.LO += line.LO ?? 0;
       t.BO += line.BO ?? 0;
       t.RO += line.RO ?? 0;
+      t.SAC += line.SAC ?? 0;
       totals.set(line.playerId, t);
     }
   }
@@ -179,7 +180,7 @@ export function outsTotals(games = GAMES) {
     playerId,
     name: playerName(playerId),
     ...t,
-    TOTAL: t.GO + t.FO + t.LO + t.BO + t.RO,
+    TOTAL: t.GO + t.FO + t.LO + t.BO + t.RO + t.SAC,
   }));
 }
 

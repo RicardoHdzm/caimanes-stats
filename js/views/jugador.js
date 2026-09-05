@@ -133,7 +133,7 @@ function sortedAchievementsHtml(chips) {
 // de ahí para no crear un import circular (medallas.js ya importa
 // renderAchievements de este archivo). Si se agrega o quita una medalla del
 // catálogo, hay que actualizar este número a mano también.
-const TOTAL_MEDALS = 47;
+const TOTAL_MEDALS = 48;
 
 function MEDALLERO_HEADER(count) {
   // El span envolvente mantiene "Medallero" y el conteo en el mismo
@@ -363,6 +363,7 @@ export function renderAchievements(player) {
   const battingList = battingTotals(GAMES);
   const pitchingList = pitchingTotals(GAMES);
   const fieldingList = fieldingTotals(GAMES);
+  const outsList = outsTotals(GAMES);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
   const fieldersWithPlays = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
   // Relación BB/SO — "Patient": a diferencia de Eagle Eye (BB en
@@ -445,6 +446,14 @@ export function renderAchievements(player) {
       icon: "fa-solid fa-crow",
       label: "Eagle Eye",
       desc: (value) => `Bases por bolas (BB) esta temporada (${value}).`,
+    });
+    // "Kamikaze" — top 3 en outs por sacrificio (tabla propia, ver
+    // outsTotals en js/stats.js): se saca a propósito para avanzar a un
+    // compañero, "se sacrifica" por el equipo.
+    addPodium(outsList, "SAC", {
+      icon: "fa-solid fa-ghost",
+      label: "Kamikaze",
+      desc: (value) => `Outs por sacrificio esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
       icon: "fa-solid fa-scale-balanced",
@@ -1429,6 +1438,7 @@ export function renderJugadorDetalle(container, playerId) {
     const LO = line.LO ?? 0;
     const BO = line.BO ?? 0;
     const RO = line.RO ?? 0;
+    const SAC = line.SAC ?? 0;
     outsRows.push({
       gameId: game.id,
       date: game.date,
@@ -1438,7 +1448,8 @@ export function renderJugadorDetalle(container, playerId) {
       LO,
       BO,
       RO,
-      TOTAL: GO + FO + LO + BO + RO,
+      SAC,
+      TOTAL: GO + FO + LO + BO + RO + SAC,
     });
   }
 
@@ -1518,6 +1529,7 @@ export function renderJugadorDetalle(container, playerId) {
       { key: "LO", label: "LO", full: "Out por línea", numeric: true },
       { key: "BO", label: "BO", full: "Out en base", numeric: true },
       { key: "RO", label: "RO", full: "Out de regla", numeric: true },
+      { key: "SAC", label: "SAC", full: "Out por sacrificio", numeric: true },
       { key: "TOTAL", label: "Total", numeric: true },
     ];
 

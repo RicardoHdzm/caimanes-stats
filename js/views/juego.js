@@ -162,9 +162,10 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
         })();
     return `
       <${tag} class="mvp-vote-card${isMine ? " active" : ""}" ${attrs}>
+        ${decisionBadge}
         ${countBadge}
         <span class="mvp-vote-avatar" data-avatar-player="${playerId}">${renderAvatar(player, 52)}</span>
-        <span class="mvp-vote-name">${escapeHtml(player.name)}${decisionBadge}</span>
+        <span class="mvp-vote-name">${escapeHtml(player.name)}</span>
         <div class="mvp-vote-stats">${statsHtml}</div>
       </${tag}>
     `;
@@ -494,6 +495,7 @@ export function renderJuegoDetalle(container, gameId) {
     const LO = line.LO ?? 0;
     const BO = line.BO ?? 0;
     const RO = line.RO ?? 0;
+    const SAC = line.SAC ?? 0;
     return {
       playerId: line.playerId,
       name: playerName(line.playerId),
@@ -502,7 +504,8 @@ export function renderJuegoDetalle(container, gameId) {
       LO,
       BO,
       RO,
-      TOTAL: GO + FO + LO + BO + RO,
+      SAC,
+      TOTAL: GO + FO + LO + BO + RO + SAC,
     };
   });
 
@@ -518,6 +521,7 @@ export function renderJuegoDetalle(container, gameId) {
       { key: "LO", label: "LO", full: "Out por línea", numeric: true },
       { key: "BO", label: "BO", full: "Out en base", numeric: true },
       { key: "RO", label: "RO", full: "Out de regla", numeric: true },
+      { key: "SAC", label: "SAC", full: "Out por sacrificio", numeric: true },
       { key: "TOTAL", label: "Total", numeric: true },
     ];
 

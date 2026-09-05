@@ -3094,21 +3094,27 @@ button.mvp-vote-card:active {
   line-height: 1.2;
 }
 
-/* Decisión de pitcheo (W/L/SV) junto al nombre — sin esto, un cerrador que
-   entró a la boleta solo por su Salvamento (ver rankParticipants en
-   js/views/juego.js) se vería con puros ceros, sin ninguna pista de por
-   qué está ahí. */
+/* Decisión de pitcheo (W/L/SV), esquina superior IZQUIERDA (.mvp-vote-count
+   ya ocupa la derecha) — sin esto, un cerrador que entró a la boleta solo
+   por su Salvamento (ver rankParticipants en js/views/juego.js) se vería
+   con puros ceros, sin ninguna pista de por qué está ahí. */
 .mvp-vote-decision {
-  display: inline-block;
-  margin-left: 4px;
-  padding: 1px 6px;
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
   border-radius: var(--radius-pill);
   background: var(--surface-raised);
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: var(--text-2xs);
-  font-weight: 700;
-  vertical-align: middle;
+  font-weight: 800;
+  box-shadow: var(--shadow-card);
 }
 
 .mvp-vote-decision--win {

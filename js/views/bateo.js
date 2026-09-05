@@ -54,6 +54,7 @@ export function renderBateo(container) {
     { key: "LO", label: "LO", full: "Out por línea", numeric: true },
     { key: "BO", label: "BO", full: "Out en base", numeric: true },
     { key: "RO", label: "RO", full: "Out de regla", numeric: true },
+    { key: "SAC", label: "SAC", full: "Out por sacrificio", numeric: true },
     { key: "TOTAL", label: "Total", numeric: true },
   ];
 
