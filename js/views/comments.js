@@ -6,8 +6,8 @@
 // tiene su propio like/unlike, uno por jugador (interruptor, no acumula).
 import { PLAYERS } from "../data.js";
 import { getCurrentPlayerId, isCoach } from "../auth.js";
-import { getComments, addComment, deleteComment, getCommentLikes, likeComment, unlikeComment } from "../db.js";
-import { escapeHtml } from "../ui.js";
+import { getComments, addComment, deleteComment, getCommentLikes, likeComment, unlikeComment, getAvatarUrl } from "../db.js";
+import { escapeHtml, renderAvatar } from "../ui.js";
 
 function formatDate(iso) {
   const date = new Date(iso);
@@ -15,11 +15,24 @@ function formatDate(iso) {
 }
 
 function commentItem(c, likeCount, likedByMe, canLike, canDelete) {
-  const name = PLAYERS.find((p) => p.id === c.player_id)?.name ?? c.player_id;
+  const player = PLAYERS.find((p) => p.id === c.player_id);
+  // Mismo lenguaje visual que .playlist-player (js/views/playlist.js):
+  // avatar chico + nombre, link al perfil. Sin jugador que resolver (dato
+  // huérfano) se queda como el texto plano de antes, sin avatar ni link.
+  // El span con data-avatar-player es el gancho para reemplazar esto por la
+  // foto subida a Storage, si tiene una — ver el .then(getAvatarUrl) en
+  // refresh() más abajo. Sin eso, se queda con lo de siempre (foto fija de
+  // data.js o iniciales).
+  const author = player
+    ? `<a href="#/jugador/${player.id}" class="comment-author">
+         <span data-avatar-player="${player.id}">${renderAvatar(player, 28)}</span>
+         <span class="comment-author-name">${escapeHtml(player.name)}</span>
+       </a>`
+    : `<span class="comment-author"><span class="comment-author-name">${escapeHtml(c.player_id)}</span></span>`;
   return `
     <div class="comment-item">
       <div class="comment-meta">
-        <span class="comment-author">${escapeHtml(name)}</span>
+        ${author}
         <span class="comment-date">${formatDate(c.created_at)}</span>
       </div>
       <p class="comment-body">${escapeHtml(c.body)}</p>
@@ -99,6 +112,21 @@ export function renderComments(container, { contextType, contextId }) {
             )
             .join("")
         : '<p class="subtitle">Sin comentarios todavía.</p>';
+
+    // El avatar ya pintado arriba es el de siempre (foto fija de data.js o
+    // iniciales, ver renderAvatar) — si alguien subió una foto propia a
+    // Storage, la reemplaza aquí (mismo patrón que el perfil, ver
+    // js/views/jugador.js). Un comentario por jugador por juego, así que no
+    // hay ids repetidos que pedir dos veces.
+    for (const c of comments) {
+      getAvatarUrl(c.player_id).then((url) => {
+        if (!url) return;
+        const slot = listEl.querySelector(`[data-avatar-player="${c.player_id}"]`);
+        if (!slot) return;
+        const player = PLAYERS.find((p) => p.id === c.player_id);
+        slot.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player?.name ?? c.player_id)}" style="width:28px;height:28px;font-size:11.2px;">`;
+      });
+    }
 
     if (myId) {
       // Un comentario por jugador por juego: si ya tienes uno, no se

@@ -3594,9 +3594,25 @@ body.modal-open {
   margin-bottom: 4px;
 }
 
+/* Avatar + nombre, mismo lenguaje visual que .playlist-player (ver
+   js/views/playlist.js) — sin jugador que resolver (dato huérfano, ver
+   commentItem en js/views/comments.js) no es un link, pero conserva el
+   mismo layout para no saltar de línea distinto. */
 .comment-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.comment-author-name {
   font-weight: 700;
   font-size: var(--text-sm);
+}
+
+a.comment-author:hover .comment-author-name {
+  color: var(--accent-text);
 }
 
 .comment-date {
