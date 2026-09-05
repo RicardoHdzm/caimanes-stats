@@ -1447,27 +1447,34 @@ export function renderJugadorDetalle(container, playerId) {
   }
 
   // ---- Outs juego por juego ----
+  // El ponche (SO) ya vive en `batting`, no en la tabla propia de `outs`
+  // (ver js/data.js) — solo aquí, en esta tabla del perfil, se juntan las
+  // dos para tener el desglose completo de outs de un vistazo. Admin se
+  // queda igual: SO se sigue capturando donde siempre, en Bateo/line-up.
   const outsRows = [];
   for (const game of gamesSorted) {
-    const line = (game.outs ?? []).find((l) => l.playerId === player.id);
-    if (!line) continue;
-    const GO = line.GO ?? 0;
-    const FO = line.FO ?? 0;
-    const LO = line.LO ?? 0;
-    const BO = line.BO ?? 0;
-    const RO = line.RO ?? 0;
-    const SAC = line.SAC ?? 0;
+    const battingLine = (game.batting ?? []).find((l) => l.playerId === player.id);
+    const outsLine = (game.outs ?? []).find((l) => l.playerId === player.id);
+    if (!battingLine && !outsLine) continue;
+    const SO = battingLine?.SO ?? 0;
+    const GO = outsLine?.GO ?? 0;
+    const FO = outsLine?.FO ?? 0;
+    const LO = outsLine?.LO ?? 0;
+    const BO = outsLine?.BO ?? 0;
+    const RO = outsLine?.RO ?? 0;
+    const SAC = outsLine?.SAC ?? 0;
     outsRows.push({
       gameId: game.id,
       date: game.date,
       opponent: game.opponent,
+      SO,
       GO,
       FO,
       LO,
       BO,
       RO,
       SAC,
-      TOTAL: GO + FO + LO + BO + RO + SAC,
+      TOTAL: SO + GO + FO + LO + BO + RO + SAC,
     });
   }
 
@@ -1542,6 +1549,7 @@ export function renderJugadorDetalle(container, playerId) {
     const outsColumns = [
       { key: "date", label: "Fecha", sticky: true },
       { key: "opponent", label: "Rival" },
+      { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
       { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
       { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
       { key: "LO", label: "LO", full: "Out por línea", numeric: true },
