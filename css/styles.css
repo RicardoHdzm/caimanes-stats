@@ -3893,6 +3893,30 @@ button.mvp-vote-card:active {
   color: var(--text);
 }
 
+/* Logos de patrocinadores (ver SPONSORS en js/data.js) — PNGs transparentes
+   con el logo en negro. En tema claro se ven tal cual; en Eclipse y Luna
+   (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
+   necesidad de guardar una segunda versión de cada logo. */
+.footer-sponsors {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-bottom: 18px;
+}
+
+.footer-sponsor-logo {
+  height: 32px;
+  width: auto;
+  opacity: 0.85;
+  filter: invert(1);
+}
+
+:root[data-theme="light"] .footer-sponsor-logo {
+  filter: none;
+}
+
 /* ---- Comentarios (juego + alineación) ---- */
 
 .comments-list {

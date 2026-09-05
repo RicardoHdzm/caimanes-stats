@@ -1,4 +1,4 @@
-import { TEAM } from "./data.js";
+import { TEAM, SPONSORS } from "./data.js";
 import { renderResumen } from "./views/resumen.js";
 import { renderRoster } from "./views/roster.js";
 import { renderEstadisticas } from "./views/estadisticas.js";
@@ -83,6 +83,17 @@ document.getElementById("season-label").textContent =
   `${TEAM.league} ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada - ${ordinalTemporada(TEAM.seasonsTotal)} Temporada`;
 
 document.getElementById("footer-year").textContent = new Date().getFullYear();
+
+// Logos de patrocinadores en el pie de página — ver SPONSORS en js/data.js
+// y .footer-sponsor-logo en css/styles.css (se invierten a blanco solos en
+// los temas oscuros). `escapeHtml` no hace falta aquí: el nombre/ruta salen
+// de data.js, no de un usuario.
+const footerSponsors = document.getElementById("footer-sponsors");
+if (footerSponsors && SPONSORS.length > 0) {
+  footerSponsors.innerHTML = SPONSORS.map(
+    (s) => `<img class="footer-sponsor-logo" src="${s.logo}" alt="${s.name}" loading="lazy">`
+  ).join("");
+}
 
 function currentRoute() {
   const hash = location.hash.replace(/^#\//, "");

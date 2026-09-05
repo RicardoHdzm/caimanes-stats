@@ -742,3 +742,15 @@ export const STANDINGS = {
     { pos: 18, team: "Pichichi Blue Jeys", JJ: 7, JG: 0, JE: 0, JP: 7, CF: 36, CC: 99 },
   ],
 };
+
+// Patrocinadores — se ven como una tira de logos al final de cada página
+// (ver #footer-sponsors en index.html, pintada por js/main.js). Cada
+// archivo debe ser un PNG transparente con el logo en NEGRO — en tema claro
+// se usa tal cual, y en Eclipse/Luna (los dos oscuros) se invierte a blanco
+// solo, sin necesidad de guardar dos versiones (ver .footer-sponsor-logo en
+// css/styles.css). `url` es opcional: sin él, el logo se ve pero no es
+// clicable.
+export const SPONSORS = [
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
+  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor02.png" },
+];
