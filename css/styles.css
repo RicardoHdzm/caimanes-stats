@@ -802,6 +802,10 @@ body {
     margin: 0;
   }
 
+  .more-sheet-brand-app {
+    color: var(--accent-text);
+  }
+
   .more-sheet-close {
     display: flex;
     align-items: center;
@@ -820,19 +824,6 @@ body {
   .more-sheet-close:active {
     transform: scale(0.88);
     background: var(--surface-raised);
-  }
-
-  /* Logo del equipo arriba del grid — mismo espíritu que la pantalla de
-     inicio de un celular, que suele traer un fondo/marca antes de los
-     íconos de apps. Tamaño chico a propósito: es un adorno de encabezado,
-     no compite con los tiles de abajo. */
-  .more-sheet-logo {
-    display: block;
-    width: 84px;
-    height: 84px;
-    object-fit: contain;
-    margin: 0 auto 12px;
-    opacity: 0.9;
   }
 
   /* Grid de "apps" — 3 por renglón, ícono en su propio cuadro redondeado

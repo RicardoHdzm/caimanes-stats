@@ -161,12 +161,11 @@ function buildBottomTabs() {
   // cerrarlo así.
   moreSheet.innerHTML = `
     <div class="more-sheet-header">
-      <h3>Menú</h3>
+      <h3>Menú Caiman<span class="more-sheet-brand-app">App</span></h3>
       <button type="button" class="more-sheet-close" id="more-sheet-close-btn" aria-label="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-    <img src="assets/logo.png" alt="Caimanes de Villas" class="more-sheet-logo">
     <div class="more-sheet-grid">
       ${APPS_GRID.map(
         (t) => `
