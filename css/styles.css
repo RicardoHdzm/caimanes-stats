@@ -802,10 +802,6 @@ body {
     margin: 0;
   }
 
-  .more-sheet-brand-app {
-    color: var(--accent-text);
-  }
-
   .more-sheet-close {
     display: flex;
     align-items: center;

@@ -161,7 +161,7 @@ function buildBottomTabs() {
   // cerrarlo así.
   moreSheet.innerHTML = `
     <div class="more-sheet-header">
-      <h3>Menú Caiman<span class="more-sheet-brand-app">App</span></h3>
+      <h3>Menú</h3>
       <button type="button" class="more-sheet-close" id="more-sheet-close-btn" aria-label="Cerrar">
         <i class="fa-solid fa-xmark"></i>
       </button>
@@ -175,6 +175,14 @@ function buildBottomTabs() {
         </a>
       `
       ).join("")}
+      <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" id="more-tile-instagram" aria-label="Instagram del equipo">
+        <span class="more-app-icon"><i class="fa-brands fa-instagram"></i></span>
+        <span>Instagram</span>
+      </a>
+      <button type="button" id="more-tile-theme">
+        <span class="more-app-icon"><i class="fa-solid fa-moon" id="more-tile-theme-icon"></i></span>
+        <span>Tema</span>
+      </button>
       <a href="admin.html" id="more-tile-admin" hidden>
         <span class="more-app-icon"><i class="fa-solid fa-user-gear"></i></span>
         <span>Admin</span>
@@ -186,14 +194,6 @@ function buildBottomTabs() {
       <button type="button" id="more-tile-logout" hidden>
         <span class="more-app-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
         <span>Cerrar sesión</span>
-      </button>
-      <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" id="more-tile-instagram" aria-label="Instagram del equipo">
-        <span class="more-app-icon"><i class="fa-brands fa-instagram"></i></span>
-        <span>Instagram</span>
-      </a>
-      <button type="button" id="more-tile-theme">
-        <span class="more-app-icon"><i class="fa-solid fa-moon" id="more-tile-theme-icon"></i></span>
-        <span>Tema</span>
       </button>
     </div>
   `;
