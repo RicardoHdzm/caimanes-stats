@@ -133,7 +133,7 @@ function sortedAchievementsHtml(chips) {
 // de ahí para no crear un import circular (medallas.js ya importa
 // renderAchievements de este archivo). Si se agrega o quita una medalla del
 // catálogo, hay que actualizar este número a mano también.
-const TOTAL_MEDALS = 49;
+const TOTAL_MEDALS = 50;
 
 function MEDALLERO_HEADER(count) {
   // El span envolvente mantiene "Medallero" y el conteo en el mismo
@@ -472,6 +472,15 @@ export function renderAchievements(player) {
       icon: "fa-solid fa-ghost",
       label: "Kamikaze",
       desc: (value) => `Outs por sacrificio esta temporada (${value}).`,
+    });
+    // "Air Drop" — top 3 en outs por elevado (tabla propia, ver outsTotals
+    // en js/stats.js): mandarla al aire nomás para que la atrapen no es
+    // gran cosa, de ahí el podio negativo.
+    addPodium(outsList, "FO", {
+      icon: "fa-solid fa-parachute-box",
+      label: "Air Drop",
+      negative: true,
+      desc: (value) => `Outs por elevado esta temporada (${value}).`,
     });
     addPodium(selectiveList, "ratio", {
       icon: "fa-solid fa-scale-balanced",
