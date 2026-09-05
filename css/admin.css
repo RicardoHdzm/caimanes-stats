@@ -1,7 +1,10 @@
 .admin-main {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 24px;
+  /* Chico a propósito, solo aquí — las tablas de bateo/pitcheo/fildeo son
+     bien anchas (muchas columnas numéricas) y cada pixel de margen es un
+     pixel menos de tabla visible sin tener que hacer scroll horizontal. */
+  padding: 12px;
 }
 
 /* Un botón por sección (ver js/admin.js) — envuelve en varias líneas en
@@ -45,8 +48,8 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
+  padding: 12px;
+  margin-top: 16px;
 }
 
 .admin-section h3 {
