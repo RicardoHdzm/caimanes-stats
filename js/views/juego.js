@@ -1,6 +1,6 @@
-import { GAMES, TEAM } from "../data.js";
+import { GAMES, TEAM, PLAYERS } from "../data.js";
 import { playerName, gameResult } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote } from "../db.js";
 import { renderComments } from "./comments.js";
@@ -16,84 +16,94 @@ function formatAvg(h, ab) {
 
 // Voto de MVP del equipo — distinto del `game.mvp` fijo que capturas a mano
 // en data.js (ese sigue siendo "el oficial"; este es el que vota el
-// equipo, se muestran los dos). El conteo es público; el formulario de
-// voto solo aparece si quien tiene sesión apareció en el line-up de ESTE
-// juego (bateo, pitcheo o fildeo) — `participantIds` ya viene filtrado así.
-function renderMvpVote(container, gameId, participantIds) {
+// equipo, se muestran los dos). El conteo es público; votar solo aparece
+// habilitado si quien tiene sesión apareció en el line-up de ESTE juego
+// (bateo, pitcheo o fildeo) — `participantIds` ya viene filtrado así.
+//
+// Antes era un <select> con nombres nada más; ahora cada candidato es una
+// tarjeta con su foto y sus números DE ESTE JUEGO (no de temporada) — así
+// se vota viendo quién de verdad la rompió ese día, sin tener que
+// adivinar o irse a buscar el box score aparte.
+function mvpCardStats(game, playerId) {
+  const batting = game.batting?.find((l) => l.playerId === playerId);
+  const fielding = game.fielding?.find((l) => l.playerId === playerId);
+  return {
+    avg: formatAvg(batting?.H ?? 0, batting?.AB ?? 0),
+    r: batting?.R ?? 0,
+    rbi: batting?.RBI ?? 0,
+    po: fielding?.PO ?? 0,
+    a: fielding?.A ?? 0,
+  };
+}
+
+function renderMvpVote(container, game, participantIds) {
+  const gameId = game.id;
   const heading3 = document.createElement("h3");
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo (votado)';
   container.appendChild(heading3);
 
-  const tallyEl = document.createElement("div");
-  tallyEl.className = "vote-tally";
-  tallyEl.textContent = "Cargando votos…";
-  container.appendChild(tallyEl);
+  const hint = document.createElement("p");
+  hint.className = "subtitle";
+  hint.textContent = "Toca a un jugador para votar por él. Vuelve a tocar tu voto actual para quitarlo.";
+  container.appendChild(hint);
 
-  const formSlot = document.createElement("div");
-  container.appendChild(formSlot);
+  const gridEl = document.createElement("div");
+  gridEl.className = "mvp-vote-grid";
+  gridEl.textContent = "Cargando votos…";
+  container.appendChild(gridEl);
 
-  function renderForm(myVote) {
-    const myId = getCurrentPlayerId();
-    if (!myId || !participantIds.has(myId)) {
-      formSlot.innerHTML = "";
-      return;
-    }
-    const options = [...participantIds]
-      .map((id) => `<option value="${id}"${id === myVote ? " selected" : ""}>${playerName(id)}</option>`)
-      .join("");
-    formSlot.innerHTML = `
-      <form class="vote-form">
-        <select name="voted" required>
-          <option value="" disabled${myVote ? "" : " selected"}>Elige a alguien...</option>
-          ${options}
-        </select>
-        <button type="submit" class="auth-submit">${myVote ? "Cambiar voto" : "Votar"}</button>
-        ${myVote ? '<button type="button" class="auth-signout" id="vote-remove-btn">Quitar voto</button>' : ""}
-      </form>
+  function cardHtml(playerId, voteCount, myVote, canVote) {
+    const player = PLAYERS.find((p) => p.id === playerId);
+    if (!player) return "";
+    const { avg, r, rbi, po, a } = mvpCardStats(game, playerId);
+    const isMine = playerId === myVote;
+    const tag = canVote ? "button" : "div";
+    const attrs = canVote ? `type="button" data-vote-for="${playerId}"` : "";
+    return `
+      <${tag} class="mvp-vote-card${isMine ? " active" : ""}" ${attrs}>
+        ${voteCount > 0 ? `<span class="mvp-vote-count">${voteCount}</span>` : ""}
+        <span class="mvp-vote-avatar">${renderAvatar(player, 52)}</span>
+        <span class="mvp-vote-name">${escapeHtml(player.name)}</span>
+        <div class="mvp-vote-stats">
+          <span class="mvp-vote-stat"><b>${avg}</b><small>AVG</small></span>
+          <span class="mvp-vote-stat"><b>${r}</b><small>R</small></span>
+          <span class="mvp-vote-stat"><b>${rbi}</b><small>RBI</small></span>
+          <span class="mvp-vote-stat"><b>${po}</b><small>PO</small></span>
+          <span class="mvp-vote-stat"><b>${a}</b><small>A</small></span>
+        </div>
+      </${tag}>
     `;
-    const form = formSlot.querySelector(".vote-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const votedId = new FormData(form).get("voted");
-      if (!votedId) return;
-      const btn = form.querySelector("button[type=submit]");
-      btn.disabled = true;
-      try {
-        await setMvpVote(gameId, votedId);
-        await refresh();
-      } catch {
-        // Silencioso a propósito: un error de red no debe romper la
-        // sección, se puede reintentar votando de nuevo.
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    form.querySelector("#vote-remove-btn")?.addEventListener("click", async () => {
-      const removeBtn = form.querySelector("#vote-remove-btn");
-      removeBtn.disabled = true;
-      try {
-        await deleteMvpVote(gameId);
-        await refresh();
-      } catch {
-        removeBtn.disabled = false;
-      }
-    });
   }
+
+  gridEl.addEventListener("click", async (e) => {
+    const card = e.target.closest("[data-vote-for]");
+    if (!card || card.disabled) return;
+    const votedId = card.dataset.voteFor;
+    card.disabled = true;
+    try {
+      if (card.classList.contains("active")) {
+        await deleteMvpVote(gameId);
+      } else {
+        await setMvpVote(gameId, votedId);
+      }
+      await refresh();
+    } catch {
+      // Silencioso a propósito: un error de red no debe romper la
+      // sección, se puede reintentar votando de nuevo.
+      card.disabled = false;
+    }
+  });
 
   async function refresh() {
     const rows = await getMvpVotes(gameId);
     const counts = new Map();
     for (const r of rows) counts.set(r.voted_player_id, (counts.get(r.voted_player_id) ?? 0) + 1);
-    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
-    tallyEl.innerHTML =
-      sorted.length > 0
-        ? sorted
-            .map(([id, n]) => `<div class="vote-row"><span>${playerName(id)}</span><span>${n} voto${n === 1 ? "" : "s"}</span></div>`)
-            .join("")
-        : "Nadie ha votado todavía.";
-    const mine = rows.find((r) => r.voter_player_id === getCurrentPlayerId());
-    renderForm(mine?.voted_player_id ?? null);
+    const myId = getCurrentPlayerId();
+    const myVote = rows.find((r) => r.voter_player_id === myId)?.voted_player_id ?? null;
+    const canVote = !!myId && participantIds.has(myId);
+    gridEl.innerHTML = [...participantIds]
+      .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, canVote))
+      .join("");
   }
 
   refresh();
@@ -159,7 +169,7 @@ export function renderJuegoDetalle(container, gameId) {
       ...(game.pitching ?? []).map((l) => l.playerId),
       ...(game.fielding ?? []).map((l) => l.playerId),
     ]);
-    renderMvpVote(container, game.id, participantIds);
+    renderMvpVote(container, game, participantIds);
   }
 
   const lineupHeading = document.createElement("h3");
