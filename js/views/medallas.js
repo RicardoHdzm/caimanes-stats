@@ -68,6 +68,7 @@ const CATALOG = [
   // ---- Podio negativo (mismo mecanismo, pero ser el #1 es un chiste) ----
   { kind: "ice", icon: "fa-solid fa-snowflake", name: "Ice Cold", how: "Racha activa de 2 o más juegos seguidos sin hit.", match: (l) => l === "Ice Cold" },
   { kind: "neg-gold", icon: "fa-solid fa-hand-back-fist", name: "Punch-Out", how: "Top 3 del equipo en ponches de bateo esta temporada.", match: (l) => l === "Punch-Out" },
+  { kind: "neg-gold", icon: "fa-solid fa-ban", name: "Easy Out", how: "Top 3 del equipo en outs totales esta temporada (ponche, rodado, elevado, línea, base, regla y sacrificio).", match: (l) => l === "Easy Out" },
   { kind: "neg-gold", icon: "fa-solid fa-gift", name: "Wild Thing", how: "El que más bases por bolas otorga (pitcheo) esta temporada.", match: (l) => l === "Wild Thing" },
   { kind: "neg-gold", icon: "fa-solid fa-burst", name: "Gopher Ball", how: "Al que más jonrones le conectan (pitcheo) esta temporada.", match: (l) => l === "Gopher Ball" },
   { kind: "neg-gold", icon: "fa-solid fa-soap", name: "Butterhands", how: "Top 3 del equipo en errores cometidos esta temporada.", match: (l) => l === "Butterhands" },

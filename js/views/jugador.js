@@ -133,7 +133,7 @@ function sortedAchievementsHtml(chips) {
 // de ahí para no crear un import circular (medallas.js ya importa
 // renderAchievements de este archivo). Si se agrega o quita una medalla del
 // catálogo, hay que actualizar este número a mano también.
-const TOTAL_MEDALS = 48;
+const TOTAL_MEDALS = 49;
 
 function MEDALLERO_HEADER(count) {
   // El span envolvente mantiene "Medallero" y el conteo en el mismo
@@ -364,6 +364,15 @@ export function renderAchievements(player) {
   const pitchingList = pitchingTotals(GAMES);
   const fieldingList = fieldingTotals(GAMES);
   const outsList = outsTotals(GAMES);
+  // Outs totales: ponche (SO, de battingList) + los 6 tipos de la tabla
+  // propia (TOTAL, de outsList, ver outsTotals en js/stats.js) — mismo
+  // cálculo que la tarjeta "Outs" del perfil, pero de TODO el equipo, para
+  // poder rankear quién es el que más veces sale.
+  const totalOutsList = PLAYERS.map((p) => {
+    const so = battingList.find((r) => r.playerId === p.id)?.SO ?? 0;
+    const otherOuts = outsList.find((r) => r.playerId === p.id)?.TOTAL ?? 0;
+    return { playerId: p.id, totalOuts: so + otherOuts };
+  }).filter((r) => r.totalOuts > 0);
   const qualifiedBatters = battingList.filter((r) => r.qualified);
   const fieldersWithPlays = fieldingList.filter((r) => r.PO + r.A + r.E > 0);
   // Relación BB/SO — "Patient": a diferencia de Eagle Eye (BB en
@@ -423,6 +432,15 @@ export function renderAchievements(player) {
       label: "Punch-Out",
       negative: true,
       desc: (value) => `Ponches de bateo esta temporada (${value}).`,
+    });
+    // "Easy Out" — top 3 en outs TOTALES (ponche + rodado/elevado/línea/
+    // base/regla/sacrificio, ver totalOutsList arriba): a diferencia de
+    // Punch-Out (solo ponches), este cuenta cualquier forma de salir out.
+    addPodium(totalOutsList, "totalOuts", {
+      icon: "fa-solid fa-ban",
+      label: "Easy Out",
+      negative: true,
+      desc: (value) => `Outs totales esta temporada (${value}).`,
     });
     if (myBatting.qualified && Number(myBatting.AVG) >= 0.3) {
       chips.push({

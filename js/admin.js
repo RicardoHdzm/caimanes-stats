@@ -305,6 +305,7 @@ function nextGameId() {
 function resetGameForm() {
   gameIdInput.value = nextGameId();
   gameForm.querySelector('[name="date"]').value = "";
+  gameForm.querySelector('[name="time"]').value = "";
   gameForm.querySelector('[name="opponent"]').value = "";
   gameForm.querySelector('[name="weCloseBatting"]').value = "unknown";
   scoreKnownSelect.value = "yes";
@@ -329,6 +330,7 @@ function resetGameForm() {
 function loadGameIntoForm(game) {
   gameIdInput.value = game.id;
   gameForm.querySelector('[name="date"]').value = game.date;
+  gameForm.querySelector('[name="time"]').value = game.time ?? "";
   gameForm.querySelector('[name="opponent"]').value = game.opponent;
   gameForm.querySelector('[name="weCloseBatting"]').value =
     game.weCloseBatting === true ? "true" : game.weCloseBatting === false ? "false" : "unknown";
@@ -385,6 +387,7 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   const data = new FormData(document.getElementById("game-form"));
   const id = data.get("id").trim();
   const date = data.get("date");
+  const time = data.get("time");
   const opponent = data.get("opponent").trim();
   const closeValue = data.get("weCloseBatting");
   const weCloseBatting = closeValue === "unknown" ? "null" : closeValue;
@@ -397,6 +400,7 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
   lines.push("  {");
   lines.push(`    id: ${JSON.stringify(id)},`);
   lines.push(`    date: ${JSON.stringify(date)},`);
+  if (time) lines.push(`    time: ${JSON.stringify(time)},`);
   lines.push(`    opponent: ${JSON.stringify(opponent)},`);
   lines.push(`    weCloseBatting: ${weCloseBatting},`);
   if (scoreKnown) {
