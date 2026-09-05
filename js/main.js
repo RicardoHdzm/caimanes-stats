@@ -1,9 +1,7 @@
 import { TEAM } from "./data.js";
 import { renderResumen } from "./views/resumen.js";
 import { renderRoster } from "./views/roster.js";
-import { renderBateo } from "./views/bateo.js";
-import { renderPitcheo } from "./views/pitcheo.js";
-import { renderFildeo } from "./views/fildeo.js";
+import { renderEstadisticas } from "./views/estadisticas.js";
 import { renderJuegos } from "./views/juegos.js";
 import { renderPlayoffs } from "./views/playoffs.js";
 import { renderTemporadas } from "./views/temporadas.js";
@@ -23,9 +21,7 @@ import { initTheme } from "./theme.js";
 const routes = {
   resumen: renderResumen,
   roster: renderRoster,
-  bateo: renderBateo,
-  pitcheo: renderPitcheo,
-  fildeo: renderFildeo,
+  estadisticas: renderEstadisticas,
   juegos: renderJuegos,
   playoffs: renderPlayoffs,
   calendario: renderCalendario,
@@ -47,17 +43,15 @@ const BOTTOM_TABS = [
 
 // Juegos y Standing van primero: son las más consultadas de las que ya no
 // caben abajo. Calendario después (lo que más se consulta entre semana),
-// luego las 3 tablas de stats detalladas (consulta más ocasional) y
-// Alineación al final.
+// luego Estadísticas (Bateo/Pitcheo/Fildeo unificados, ver
+// js/views/estadisticas.js — consulta más ocasional) y Alineación al final.
 const MORE_TABS = [
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "playoffs", route: "#/playoffs", label: "Playoffs", icon: "fa-trophy" },
   { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
   { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
-  { tab: "bateo", route: "#/bateo", label: "Bateo", icon: "fa-baseball-bat-ball" },
-  { tab: "pitcheo", route: "#/pitcheo", label: "Pitcheo", icon: "fa-baseball" },
-  { tab: "fildeo", route: "#/fildeo", label: "Fildeo", icon: "fa-shield" },
+  { tab: "estadisticas", route: "#/estadisticas", label: "Estadísticas", icon: "fa-chart-simple" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
@@ -119,6 +113,16 @@ function currentRoute() {
   // js/views/temporadas.js).
   if (first === "temporadas") {
     return { tab: "temporadas", render: (container) => renderTemporadas(container, second) };
+  }
+  // #/estadisticas/bateo — Bateo, Pitcheo y Fildeo unificados en una sola
+  // pestaña con selector (ver js/views/estadisticas.js). Los links viejos
+  // #/bateo, #/pitcheo y #/fildeo se siguen abriendo en el tipo que
+  // corresponde, por si quedó alguno guardado.
+  if (first === "estadisticas") {
+    return { tab: "estadisticas", render: (container) => renderEstadisticas(container, second) };
+  }
+  if (first === "bateo" || first === "pitcheo" || first === "fildeo") {
+    return { tab: "estadisticas", render: (container) => renderEstadisticas(container, first) };
   }
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };
