@@ -2961,6 +2961,12 @@ main h3::before {
   flex-wrap: wrap;
 }
 
+@media (max-width: 640px) {
+  .stats-switcher {
+    justify-content: center;
+  }
+}
+
 .stats-switcher-btn {
   display: flex;
   flex-direction: column;

@@ -20,7 +20,7 @@ const STATS = [
 export function renderEstadisticas(container, tipo) {
   const initial = STATS.some((s) => s.id === tipo) ? tipo : "bateo";
 
-  heading(container, "Estadísticas", "Elige qué estadística quieres ver.");
+  heading(container, "Estadísticas");
 
   const switcher = document.createElement("div");
   switcher.className = "stats-switcher";

@@ -41,17 +41,17 @@ const BOTTOM_TABS = [
   { tab: "roster", route: "#/roster", label: "Roster", icon: "fa-users" },
 ];
 
-// Juegos y Standing van primero: son las más consultadas de las que ya no
-// caben abajo. Calendario después (lo que más se consulta entre semana),
-// luego Estadísticas (Bateo/Pitcheo/Fildeo unificados, ver
-// js/views/estadisticas.js — consulta más ocasional) y Alineación al final.
+// Mismo orden que la nav de escritorio (ver <nav class="tabs"> en
+// index.html): lo del día a día primero (Juegos, Calendario, Standing),
+// luego lo de playoffs/stats (consulta más ocasional) y las herramientas
+// extra (Alineación, Playlist) al final.
 const MORE_TABS = [
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
-  { tab: "playoffs", route: "#/playoffs", label: "Playoffs", icon: "fa-trophy" },
-  { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
-  { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
+  { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
+  { tab: "playoffs", route: "#/playoffs", label: "Playoffs", icon: "fa-trophy" },
   { tab: "estadisticas", route: "#/estadisticas", label: "Estadísticas", icon: "fa-chart-simple" },
+  { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
