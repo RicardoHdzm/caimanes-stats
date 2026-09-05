@@ -42,13 +42,28 @@
   <div id="admin-protected" hidden>
     <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
 
-    <section class="admin-section">
+    <!-- Un botón por sección — antes estaba todo junto en una sola página
+         larguísima. Enlaces reales (href="#id"), no botones con JS: el
+         cambio de sección es solo la URL (#pagos, #rsvp, ...) y un
+         hashchange en js/admin.js decide cuál mostrar — así funciona el
+         botón atrás del navegador y se puede mandar el link directo a una
+         sección. admin-section--active la resalta (ver css/admin.css). -->
+    <nav class="admin-tabs" id="admin-tabs">
+      <a href="#pagos" data-tab="pagos"><i class="fa-solid fa-sack-dollar"></i> Estado de pago</a>
+      <a href="#rsvp" data-tab="rsvp"><i class="fa-solid fa-calendar-check"></i> Próximo juego</a>
+      <a href="#anuncios" data-tab="anuncios"><i class="fa-solid fa-bullhorn"></i> Anuncios</a>
+      <a href="#temporadas" data-tab="temporadas"><i class="fa-solid fa-calendar-days"></i> Temporadas</a>
+      <a href="#jugador" data-tab="jugador"><i class="fa-solid fa-user-plus"></i> Agregar jugador</a>
+      <a href="#juego" data-tab="juego"><i class="fa-solid fa-baseball-bat-ball"></i> Agregar / editar juego</a>
+    </nav>
+
+    <section class="admin-section" id="admin-section-pagos">
       <h2>Estado de pago</h2>
       <p class="subtitle">Ya no se edita desde aquí — vive directo en <code>DUES_PAID</code>, en js/data.js. Para marcar a alguien como pendiente, agrega su id ahí con <code>false</code> y sube el cambio. Esto solo muestra el estado actual.</p>
       <div class="dues-admin-list" id="dues-admin-list"></div>
     </section>
 
-    <section class="admin-section">
+    <section class="admin-section" id="admin-section-rsvp" hidden>
       <h2>Próximo juego</h2>
       <p class="subtitle">Quién ya confirmó asistencia, quién dijo que no, y quién todavía no responde.</p>
       <div id="admin-rsvp-content"></div>
