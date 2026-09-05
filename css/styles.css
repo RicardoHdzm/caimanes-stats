@@ -3116,8 +3116,11 @@ button.mvp-vote-card:active {
    con puros ceros, sin ninguna pista de por qué está ahí. */
 .mvp-vote-decision {
   position: absolute;
-  top: -8px;
-  left: -8px;
+  /* -4px, no -8px: con el gap de 12px de .mvp-vote-grid, a -8px este badge
+     y el .mvp-vote-count de la tarjeta vecina (que sobresale por su propio
+     lado derecho) alcanzaban a encimarse en el pasillo entre tarjetas. */
+  top: -4px;
+  left: -4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3171,8 +3174,8 @@ button.mvp-vote-card:active {
 
 .mvp-vote-count {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -4px;
+  right: -4px;
   display: flex;
   align-items: center;
   justify-content: center;
