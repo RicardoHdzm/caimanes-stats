@@ -245,13 +245,20 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
     const leaderId = sorted.length > 0 && (sorted.length === 1 || sorted[1][1] < sorted[0][1]) ? sorted[0][0] : null;
 
+    // La estrella dorada y el pill de "MVP: nombre" son el resultado FINAL,
+    // no un marcador en vivo — mientras la votación sigue abierta (isLatest)
+    // el número de votos se ve normal en la tarjeta de quien va ganando,
+    // pero sin adelantar quién es el MVP: eso solo se revela al cerrar,
+    // cuando llega un juego más reciente y este deja de aceptar votos.
+    const displayLeaderId = isLatest ? null : leaderId;
+
     gridEl.innerHTML = candidateIds
-      .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, myId, id === leaderId))
+      .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, myId, id === displayLeaderId))
       .join("");
 
     if (mvpBadgeSlot) {
-      mvpBadgeSlot.innerHTML = leaderId
-        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(leaderId)}</div>`
+      mvpBadgeSlot.innerHTML = displayLeaderId
+        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(displayLeaderId)}</div>`
         : "";
     }
 
