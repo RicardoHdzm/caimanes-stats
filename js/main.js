@@ -13,7 +13,8 @@ import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
 import { renderLogin } from "./views/login.js";
-import { initAuth, mountAuthControl, getCurrentPlayerId } from "./auth.js";
+import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut } from "./auth.js";
+import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
 
@@ -32,19 +33,22 @@ const routes = {
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
-// nav de arriba sigue intacta y es la real en escritorio; esta es aparte
-// porque en 9 rutas no caben cómodas 5 botones de pulgar, así que solo van
-// al frente las 4 de "vistazo rápido" y el resto vive detrás de "Más".
+// nav de arriba sigue intacta y es la real en escritorio; esta es aparte y
+// se queda solo con lo esencial de un vistazo rápido — Inicio, Perfil,
+// Roster — el resto (Juegos y Standing incluidos) vive detrás de "Menú",
+// a petición expresa (antes Juegos/Standing también estaban aquí abajo).
 const BOTTOM_TABS = [
-  { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-house" },
+  { tab: "resumen", route: "#/resumen", label: "Inicio", icon: "fa-house" },
   { tab: "roster", route: "#/roster", label: "Roster", icon: "fa-users" },
-  { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
-  { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
 ];
 
-// Calendario primero: es lo que más se consulta entre semana. Las 3 tablas
-// de stats detalladas (consulta más ocasional) y Alineación van al final.
+// Juegos y Standing van primero: son las más consultadas de las que ya no
+// caben abajo. Calendario después (lo que más se consulta entre semana),
+// luego las 3 tablas de stats detalladas (consulta más ocasional) y
+// Alineación al final.
 const MORE_TABS = [
+  { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
+  { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "bateo", route: "#/bateo", label: "Bateo", icon: "fa-baseball-bat-ball" },
   { tab: "pitcheo", route: "#/pitcheo", label: "Pitcheo", icon: "fa-baseball" },
@@ -56,14 +60,14 @@ const MORE_TABS = [
   // { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
 
-// Todo lo navegable en celular, para el panel de "Más" — ya no es solo las
-// 5 rutas que no caben en la barra de abajo: ahora es una pantalla completa
-// tipo "apps del celular" con TODO, incluidas Resumen/Mi Perfil/Roster/
-// Juegos/Standing (que ya están abajo, pero repetidas aquí no estorban y
-// así "Más" es de verdad un mapa completo del sitio). Se arma recorriendo
-// BOTTOM_TABS en vez de copiarlo a mano, para no desincronizarse si cambia
-// esa lista — mismo criterio (buscar "resumen" por tab, no por posición)
-// que ya usa buildBottomTabs() de abajo para insertar Mi Perfil.
+// Todo lo navegable en celular, para el panel de "Menú" — no es solo las
+// rutas que no caben en la barra de abajo: es una pantalla completa tipo
+// "apps del celular" con TODO, incluidas Resumen/Mi Perfil/Roster (que ya
+// están abajo, pero repetidas aquí no estorban y así "Menú" es de verdad
+// un mapa completo del sitio). Se arma recorriendo BOTTOM_TABS en vez de
+// copiarlo a mano, para no desincronizarse si cambia esa lista — mismo
+// criterio (buscar "resumen" por tab, no por posición) que ya usa
+// buildBottomTabs() de abajo para insertar Mi Perfil.
 const APPS_GRID = [];
 for (const t of BOTTOM_TABS) {
   APPS_GRID.push(t);
@@ -162,6 +166,7 @@ function buildBottomTabs() {
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
+    <img src="assets/logo.png" alt="Caimanes de Villas" class="more-sheet-logo">
     <div class="more-sheet-grid">
       ${APPS_GRID.map(
         (t) => `
@@ -171,9 +176,45 @@ function buildBottomTabs() {
         </a>
       `
       ).join("")}
+      <a href="admin.html" id="more-tile-admin" hidden>
+        <span class="more-app-icon"><i class="fa-solid fa-user-gear"></i></span>
+        <span>Admin</span>
+      </a>
+      <a href="#/login" id="more-tile-login">
+        <span class="more-app-icon"><i class="fa-solid fa-right-to-bracket"></i></span>
+        <span>Iniciar sesión</span>
+      </a>
+      <button type="button" id="more-tile-logout" hidden>
+        <span class="more-app-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+        <span>Cerrar sesión</span>
+      </button>
+      <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" id="more-tile-instagram" aria-label="Instagram del equipo">
+        <span class="more-app-icon"><i class="fa-brands fa-instagram"></i></span>
+        <span>Instagram</span>
+      </a>
+      <button type="button" id="more-tile-theme">
+        <span class="more-app-icon"><i class="fa-solid fa-moon" id="more-tile-theme-icon"></i></span>
+        <span>Tema</span>
+      </button>
     </div>
   `;
   moreSheet.querySelector("#more-sheet-close-btn").addEventListener("click", () => toggleMoreSheet(false));
+
+  // "Iniciar sesión" del menú guarda en qué página estabas, igual que el
+  // link del header (ver wireAuthControl en js/auth.js) — así al terminar
+  // de loguearte regresas ahí en vez de a Resumen siempre. Se lee el hash
+  // ANTES de que el navegador procese el click del link, así que todavía
+  // es el hash VIEJO.
+  moreSheet.querySelector("#more-tile-login").addEventListener("click", () => {
+    sessionStorage.setItem("caimanes-login-return", location.hash || "#/resumen");
+  });
+  // Cierra el menú de inmediato en vez de esperar a que signOut() (async)
+  // dispare el re-render por "caimanes:auth-changed" — mismo trato que el
+  // botón de cerrar sesión del header (ver wireAuthControl en js/auth.js).
+  moreSheet.querySelector("#more-tile-logout").addEventListener("click", () => {
+    toggleMoreSheet(false);
+    signOut();
+  });
 }
 
 function toggleMoreSheet(forceOpen) {
@@ -201,6 +242,18 @@ function render() {
     el.hidden = !myId;
     if (myId) el.href = `#/jugador/${myId}`;
   }
+
+  // Iniciar/Cerrar sesión y Admin (solo coach) en el menú de "apps" — mismo
+  // estado que ya calcula js/auth.js para el botón del header, nomás
+  // reflejado aquí también. Sin Supabase configurado no hay cuentas de
+  // ningún tipo, así que los tres se quedan ocultos siempre.
+  const session = SUPABASE_CONFIGURED && getSession();
+  const loginTile = moreSheet.querySelector("#more-tile-login");
+  const logoutTile = moreSheet.querySelector("#more-tile-logout");
+  const adminTile = moreSheet.querySelector("#more-tile-admin");
+  if (loginTile) loginTile.hidden = !SUPABASE_CONFIGURED || !!session;
+  if (logoutTile) logoutTile.hidden = !session;
+  if (adminTile) adminTile.hidden = !session || !isCoach();
 
   const route = currentRoute();
   toggleMoreSheet(false);

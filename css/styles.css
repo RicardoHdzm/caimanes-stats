@@ -378,52 +378,13 @@ body {
 }
 
 @media (max-width: 640px) {
-  .social-link {
-    top: 16px;
-    left: 12px;
-    width: 32px;
-    height: 32px;
-  }
-
-  .social-link i {
-    font-size: var(--text-lg);
-  }
-
+  /* En celular, Instagram y el interruptor de tema se mudan al menú de
+     "apps" (ver #more-tile-instagram/#more-tile-theme en js/main.js) — el
+     header se queda solo con el logo, y estos dos ya no ocupan esquina
+     propia ahí. */
+  .social-link,
   .theme-switch {
-    top: 17px;
-    left: 52px;
-    width: 82px;
-    height: 30px;
-  }
-
-  .theme-switch-thumb,
-  .theme-switch-icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .theme-switch-thumb {
-    left: 55px; /* Luna (default): junto a la luna */
-  }
-
-  .theme-switch-icon--sun {
-    left: 3px;
-  }
-
-  .theme-switch-icon--eclipse {
-    left: 29px;
-  }
-
-  .theme-switch-icon--moon {
-    left: 55px;
-  }
-
-  :root[data-theme="light"] .theme-switch-thumb {
-    left: 3px; /* Sol */
-  }
-
-  :root[data-theme="eclipse"] .theme-switch-thumb {
-    left: 29px; /* Eclipse */
+    display: none;
   }
 }
 
@@ -452,6 +413,7 @@ body {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--muted);
+  text-decoration: none;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s;
 }
@@ -463,6 +425,18 @@ body {
 
 .auth-btn i {
   font-size: var(--text-2xl);
+}
+
+/* Admin/Cerrar sesión (ver loggedInMarkup en js/auth.js): botones
+   secundarios aparte del pill, más chicos — mismo tamaño que .social-link
+   (Instagram) del otro lado del header, a petición expresa. */
+.auth-btn-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.auth-btn-icon i {
+  font-size: var(--text-md);
 }
 
 /* Con sesión iniciada el botón se pinta de rojo (el acento del sitio) en
@@ -497,55 +471,21 @@ body {
   white-space: nowrap;
 }
 
-/* Ancla a la derecha del botón (no a la izquierda): .auth-slot ahora vive
-   en la esquina derecha del header, así el panel se abre hacia adentro de
-   la pantalla en vez de salirse por el borde. */
-.auth-panel {
-  position: absolute;
-  top: 56px;
-  right: 0;
-  z-index: 26;
-  width: 240px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  box-shadow: var(--shadow-raised);
-}
-
-/* Item del menú de cuenta ("Ir a perfil") — mismo lenguaje visual que
-   .more-sheet a más abajo (ítem de lista, ícono a la izquierda). */
-.auth-panel-link {
+/* Fila de controles con sesión iniciada: el pill con tu nombre (link
+   directo a tu perfil) + botones redondos aparte para Admin (solo coach) y
+   Cerrar sesión — ya no hay panel desplegable (ver loggedInMarkup en
+   js/auth.js). */
+.auth-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  text-decoration: none;
-  font-size: var(--text-sm);
-  font-weight: 600;
+  gap: 8px;
 }
 
-.auth-panel-link:hover {
-  background: var(--surface-alt);
-  color: var(--accent-text);
-}
-
-.auth-panel-link i {
-  width: 18px;
-  text-align: center;
-  color: var(--muted);
-}
-
-.auth-panel h4 {
-  margin: 0 0 10px;
-  font-family: var(--font-display);
-  font-size: var(--text-md);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text);
+/* El pill de "Mi cuenta" (sesión sin vincular a un jugador todavía, ver
+   loggedInMarkup en js/auth.js) es un <span>, no un link — nada a dónde
+   ir, así que tampoco debe verse clicable. */
+.auth-controls span.auth-btn {
+  cursor: default;
 }
 
 /* :not([hidden]) — igual criterio que .more-sheet más abajo: en
@@ -622,6 +562,20 @@ body {
   text-align: center;
 }
 
+/* .leader-card p (más abajo) le gana en especificidad a un solo .auth-error/
+   .auth-hint e impone su tamaño grande en itálicas — mismo problema y
+   mismo arreglo de "doble clase" que ya usa .leader-card .leader-note más
+   abajo. Afecta el error del login (login-card es .leader-card) y el
+   aviso de "inicia sesión para..." del RSVP (la tarjeta de Próximo juego
+   también es .leader-card). */
+.leader-card .auth-error,
+.leader-card .auth-hint {
+  font-size: var(--text-2xs);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 .auth-signout {
   margin-top: 10px;
   width: 100%;
@@ -643,52 +597,13 @@ body {
 }
 
 @media (max-width: 640px) {
-  /* En la esquina se encima con el logo grande en pantallas angostas — aquí
-     se saca del position:absolute y se pone en flujo normal, debajo del
-     logo (mismo criterio que el badge de inscripción del perfil). Se deja
-     position:relative (no static) para que .auth-panel — position:absolute,
-     pensado para anclarse a este botón — no salte a anclarse a .topbar. */
+  /* En celular ya no hay pill de cuenta en el header — "Iniciar sesión",
+     "Cerrar sesión" y "Admin" viven en el menú de "apps" (ver
+     #more-tile-login/#more-tile-logout/#more-tile-admin en js/main.js) y
+     "Mi Perfil" ya tiene su propio tab abajo, así que este botón (con o sin
+     sesión) sobraba aquí — a petición expresa. En escritorio sigue igual. */
   .auth-slot {
-    position: relative;
-    top: auto;
-    right: auto;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    /* Aire antes del borde de abajo del header — sin esto el botón queda
-       pegado al filo. */
-    padding-bottom: 16px;
-  }
-
-  .auth-btn {
-    width: 40px;
-    height: 40px;
-  }
-
-  .auth-btn i {
-    font-size: var(--text-xl);
-  }
-
-  .auth-btn-named {
-    width: auto;
-    height: auto;
-    padding: 6px 12px 6px 10px;
-  }
-
-  /* Ya no hace falta truncar el nombre: el botón se centra debajo del logo
-     (ver .auth-slot arriba), no comparte esquina con nada — le sobra
-     ancho para mostrarse completo. */
-
-  /* .auth-slot ya no envuelve justo al botón (es un bloque centrado de
-     ancho completo, ver arriba) — sin esto, el "right: 0" de .auth-panel
-     (pensado para pegarse al borde del botón) se iría al borde de la
-     pantalla. Centrado bajo el botón en su lugar. */
-  .auth-panel {
-    top: 48px;
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 220px;
+    display: none;
   }
 }
 
@@ -860,7 +775,13 @@ body {
     position: fixed;
     inset: 0;
     z-index: 45;
-    background: var(--bg);
+    /* Misma trama diagonal + resplandor del <body> (ver más arriba) — un
+       fondo plano se sentía vacío con solo unos íconos flotando encima;
+       esto le da la misma textura y profundidad que el resto del sitio. */
+    background:
+      repeating-linear-gradient(135deg, var(--pattern-line) 0 1px, transparent 1px var(--pattern-gap)),
+      radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
+      var(--bg);
     padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
   }
@@ -893,46 +814,129 @@ body {
     color: var(--text);
     font-size: var(--text-lg);
     cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .more-sheet-close:active {
+    transform: scale(0.88);
+    background: var(--surface-raised);
+  }
+
+  /* Logo del equipo arriba del grid — mismo espíritu que la pantalla de
+     inicio de un celular, que suele traer un fondo/marca antes de los
+     íconos de apps. Tamaño chico a propósito: es un adorno de encabezado,
+     no compite con los tiles de abajo. */
+  .more-sheet-logo {
+    display: block;
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    margin: 0 auto 12px;
+    opacity: 0.9;
   }
 
   /* Grid de "apps" — 3 por renglón, ícono en su propio cuadro redondeado
-     arriba del nombre, como la pantalla de inicio de un celular. */
+     arriba del nombre, como la pantalla de inicio de un celular. Cada tile
+     entra con un pequeño "pop" escalonado (más estilo que aparecer de
+     golpe) — se reinicia solo cada vez que se abre el panel, porque
+     `.more-sheet` pasa de display:none a flex (el navegador reinicia
+     animaciones al re-insertar en el árbol de render). */
   .more-sheet-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 22px 12px;
+    gap: 30px 14px;
+    /* `flex: 1` + `align-content: center` reparte el espacio sobrante
+       arriba y abajo del grid en vez de dejarlo todo amontonado hasta el
+       fondo de la pantalla (lo que se sentía "vacío" con pocos íconos en
+       un celular alto). */
+    flex: 1;
+    align-content: center;
   }
 
-  .more-sheet-grid a {
+  /* :is(a, button) — el tile de Tema es un <button> (dispara JS, no
+     navega, ver js/theme.js), pero se ve idéntico a los demás: mismo reset
+     de estilos nativos de botón (borde/fondo/fuente) para que no se note
+     la diferencia. */
+  .more-sheet-grid a,
+  .more-sheet-grid button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: var(--text);
     text-decoration: none;
     text-align: center;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    animation: more-app-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  }
+
+  /* El `display: flex` de arriba le gana al `display: none` por default del
+     atributo `hidden` (mismo patrón de bug ya visto en este archivo con
+     nav-mi-perfil/bottom-tab-mi-perfil — cualquier regla de autor que toque
+     `display` le gana al estilo por default del navegador, sin importar
+     especificidad). Sin esto, un tile oculto (Mi Perfil sin sesión,
+     Admin/Iniciar/Cerrar sesión según el estado) se seguía viendo igual. */
+  .more-sheet-grid a[hidden],
+  .more-sheet-grid button[hidden] {
+    display: none;
+  }
+
+  .more-sheet-grid :nth-child(1) { animation-delay: 0.02s; }
+  .more-sheet-grid :nth-child(2) { animation-delay: 0.05s; }
+  .more-sheet-grid :nth-child(3) { animation-delay: 0.08s; }
+  .more-sheet-grid :nth-child(4) { animation-delay: 0.11s; }
+  .more-sheet-grid :nth-child(5) { animation-delay: 0.14s; }
+  .more-sheet-grid :nth-child(6) { animation-delay: 0.17s; }
+  .more-sheet-grid :nth-child(7) { animation-delay: 0.2s; }
+  .more-sheet-grid :nth-child(8) { animation-delay: 0.23s; }
+  .more-sheet-grid :nth-child(9) { animation-delay: 0.26s; }
+  .more-sheet-grid :nth-child(10) { animation-delay: 0.29s; }
+  .more-sheet-grid :nth-child(n + 11) { animation-delay: 0.32s; }
+
+  @keyframes more-app-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .more-app-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 18px;
-    background: var(--surface-alt);
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, var(--surface-raised), var(--surface-alt));
     border: 1px solid var(--border);
-    color: var(--accent);
-    font-size: 1.3rem;
+    box-shadow: var(--shadow-card);
+    color: var(--accent-text);
+    font-size: 1.6rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+  }
+
+  .more-sheet-grid a:active .more-app-icon,
+  .more-sheet-grid button:active .more-app-icon {
+    transform: scale(0.9);
   }
 
   .more-sheet-grid a.active .more-app-icon {
-    background: var(--accent);
+    background: linear-gradient(160deg, var(--accent-text), var(--accent));
     border-color: var(--accent);
     color: #fff;
+    box-shadow: 0 10px 22px -8px color-mix(in srgb, var(--accent) 65%, transparent);
   }
 
-  .more-sheet-grid a span:last-child {
+  .more-sheet-grid a span:last-child,
+  .more-sheet-grid button span:last-child {
     font-size: var(--text-xs);
     font-weight: 600;
     line-height: 1.2;
@@ -1054,7 +1058,7 @@ main h3::before {
     position: static;
     display: flex;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 
   #profile-debut-badge .debut-badge {

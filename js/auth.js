@@ -177,18 +177,21 @@ export async function changePassword(newPassword) {
 }
 
 // ---- Control de login en el header (#auth-slot en index.html) ----
+//
+// Ya no es un botón que despliega un menú (ver historial) — a petición
+// expresa, el pill con tu nombre ahora navega directo a tu perfil, y
+// Cerrar sesión (y Admin, para el coach) son botones redondos aparte, al
+// lado — mismo lenguaje visual que Instagram/tema del otro lado del
+// header, no un menú escondido. En celular todo #auth-slot se oculta (ver
+// css/styles.css): esas mismas acciones viven en el menú de "apps" de
+// js/main.js.
 
 let containerEl = null;
-let outsideClickWired = false;
 
 // Se llama una vez desde js/main.js al arrancar, y de nuevo cada vez que
 // cambia la sesión (ver onAuthStateChange arriba).
 export function mountAuthControl(el) {
   containerEl = el;
-  if (!outsideClickWired) {
-    document.addEventListener("click", () => setPanelOpen(false));
-    outsideClickWired = true;
-  }
   renderAuthControl();
 }
 
@@ -200,14 +203,6 @@ export function renderAuthControl() {
   }
   containerEl.innerHTML = session ? loggedInMarkup() : loggedOutMarkup();
   wireAuthControl();
-}
-
-function setPanelOpen(open) {
-  const panel = containerEl?.querySelector("#auth-panel");
-  const toggle = containerEl?.querySelector("#auth-toggle");
-  if (!panel || !toggle) return;
-  panel.hidden = !open;
-  toggle.setAttribute("aria-expanded", String(open));
 }
 
 // Antes era un botón que abría un desplegable con el formulario ahí mismo
@@ -223,65 +218,39 @@ function loggedOutMarkup() {
 }
 
 function loggedInMarkup() {
-  // Con jugador ya identificado, el botón muestra tu nombre y despliega un
-  // menú chico (Ir a perfil / Cerrar sesión, y para el coach también Ir al
-  // Admin) — no navega directo, así se puede cerrar sesión desde cualquier
-  // página sin pasar por el perfil.
-  if (playerId) {
-    const player = PLAYERS.find((p) => p.id === playerId);
-    const label = player ? `#${player.number ?? "-"} - ${player.name}` : "Mi cuenta";
-    return `
-      <button type="button" class="auth-btn auth-btn-in auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
-        <span class="auth-btn-name">${label}</span>
-      </button>
-      <div class="auth-panel" id="auth-panel" hidden>
-        <a href="#/jugador/${playerId}" class="auth-panel-link" id="auth-profile-link">
-          <i class="fa-solid fa-id-card"></i> Ir a perfil
-        </a>
-        ${
-          isCoach()
-            ? `<a href="admin.html" class="auth-panel-link" id="auth-admin-link">
-                 <i class="fa-solid fa-user-shield"></i> Ir al Admin
-               </a>`
-            : ""
-        }
-        <button type="button" class="auth-signout" id="auth-signout-btn">Cerrar sesión</button>
-      </div>
-    `;
-  }
-  // Cuenta con sesión pero sin vincular todavía a un jugador (falta la fila
-  // en player_whitelist) — no hay a qué perfil mandarla, así que se queda
-  // con un panel mínimo solo para poder cerrar sesión.
+  const player = playerId ? PLAYERS.find((p) => p.id === playerId) : null;
+  // Con jugador ya identificado el pill es un link directo a tu perfil. Sin
+  // vincular todavía (falta la fila en player_whitelist) no hay a qué
+  // perfil mandarte, así que se queda como una etiqueta fija — el `title`
+  // explica por qué en vez del texto que antes vivía en el panel.
+  const pill = player
+    ? `<a href="#/jugador/${playerId}" class="auth-btn auth-btn-in auth-btn-named" aria-label="Ir a tu perfil">
+         <span class="auth-btn-name">#${player.number ?? "-"} - ${player.name}</span>
+       </a>`
+    : `<span class="auth-btn auth-btn-in auth-btn-named" title="Tu cuenta todavía no está vinculada a un jugador — pídeselo al coach.">
+         <i class="fa-solid fa-user-check"></i>
+         <span class="auth-btn-name">Mi cuenta</span>
+       </span>`;
+
   return `
-    <button type="button" class="auth-btn auth-btn-in auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Tu cuenta">
-      <i class="fa-solid fa-user-check"></i>
-      <span class="auth-btn-name">Mi cuenta</span>
-    </button>
-    <div class="auth-panel" id="auth-panel" hidden>
-      <h4>${session?.user?.email ?? "Cuenta"}</h4>
-      <p class="auth-hint">Tu cuenta todavía no está vinculada a un jugador — pídeselo al coach.</p>
-      <button type="button" class="auth-signout" id="auth-signout-btn">Salir</button>
+    <div class="auth-controls">
+      ${pill}
+      ${
+        isCoach()
+          ? `<a href="admin.html" class="auth-btn auth-btn-icon" id="auth-admin-btn" aria-label="Ir al Admin">
+               <i class="fa-solid fa-user-gear"></i>
+             </a>`
+          : ""
+      }
+      <button type="button" class="auth-btn auth-btn-icon" id="auth-signout-btn" aria-label="Cerrar sesión">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
     </div>
   `;
 }
 
 function wireAuthControl() {
-  const toggle = containerEl.querySelector("#auth-toggle");
-  const panel = containerEl.querySelector("#auth-panel");
-  toggle?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    setPanelOpen(panel.hidden);
-  });
-  panel?.addEventListener("click", (e) => e.stopPropagation());
-
-  containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", async () => {
-    await signOut();
-    setPanelOpen(false);
-  });
-
-  // El link de "Ir a perfil" navega solo (es un <a href>) — esto nomás
-  // cierra el panel para que no se quede abierto sobre la página nueva.
-  containerEl.querySelector("#auth-profile-link")?.addEventListener("click", () => setPanelOpen(false));
+  containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", () => signOut());
 
   // "Iniciar sesión" (solo existe deslogueado, ver loggedOutMarkup) guarda
   // en qué página estabas ANTES de ir a #/login — la lee js/views/login.js
