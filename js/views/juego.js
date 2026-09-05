@@ -211,6 +211,9 @@ export function renderJuegoDetalle(container, gameId) {
         RBI: line.RBI ?? 0,
         BB: line.BB ?? 0,
         SO: line.SO ?? 0,
+        GO: line.GO ?? 0,
+        FO: line.FO ?? 0,
+        LO: line.LO ?? 0,
         SB: line.SB ?? 0,
         AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
       };
@@ -250,6 +253,9 @@ export function renderJuegoDetalle(container, gameId) {
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
     { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
     { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+    { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
+    { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
+    { key: "LO", label: "LO", full: "Out por línea", numeric: true },
     { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
     { key: "AVG", label: "AVG", full: "Promedio del juego", numeric: true },
   ];

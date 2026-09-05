@@ -22,7 +22,7 @@ function fmt3(n) {
 }
 
 function emptyBatting() {
-  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 };
+  return { G: 0, AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, GO: 0, FO: 0, LO: 0, SB: 0 };
 }
 
 function emptyPitching() {
@@ -65,6 +65,9 @@ export function battingTotals(games = GAMES) {
       t.R += line.R ?? 0;
       t.BB += line.BB ?? 0;
       t.SO += line.SO ?? 0;
+      t.GO += line.GO ?? 0;
+      t.FO += line.FO ?? 0;
+      t.LO += line.LO ?? 0;
       t.SB += line.SB ?? 0;
       totals.set(line.playerId, t);
     }
@@ -78,11 +81,16 @@ export function battingTotals(games = GAMES) {
     const AVG = div(t.H, t.AB);
     const OBP = div(t.H + t.BB, t.AB + t.BB);
     const SLG = div(TB, t.AB);
+    // Outs totales al bat, por tipo: ponche (SO) + rodado/elevado/línea
+    // (GO/FO/LO) — no es lo mismo que "AB - H" (eso ignora bases por error,
+    // toque de sacrificio, etc.), es la cuenta real de lo que se capturó.
+    const OUTS = t.SO + t.GO + t.FO + t.LO;
     return {
       playerId,
       name: playerName(playerId),
       ...t,
       PA,
+      OUTS,
       qualified: PA >= minPA,
       AVG: fmt3(AVG),
       OBP: fmt3(OBP),
@@ -211,6 +219,40 @@ export function gamesPlayedByPlayer(games = GAMES) {
     }
   }
   return counts;
+}
+
+// Racha de juegos SEGUIDOS jugados (medalla "Ironman", ver js/views/
+// jugador.js) — a diferencia de hitStreaks(), aquí no hay "juego sin turnos
+// que no cuenta ni a favor ni en contra": CADA juego de la temporada es un
+// checkpoint (apareció en bateo/pitcheo/fildeo, o no), así que faltar a uno
+// corta la racha aunque haya jugado antes y después.
+export function attendanceStreaks(games = GAMES) {
+  const ordered = [...games].sort((a, b) => a.date.localeCompare(b.date));
+  const gameRosters = ordered.map(
+    (game) =>
+      new Set([
+        ...(game.batting ?? []).map((l) => l.playerId),
+        ...(game.pitching ?? []).map((l) => l.playerId),
+        ...(game.fielding ?? []).map((l) => l.playerId),
+      ])
+  );
+  const result = [];
+  for (const player of PLAYERS) {
+    let current = 0;
+    let longest = 0;
+    for (const roster of gameRosters) {
+      if (roster.has(player.id)) {
+        current += 1;
+        longest = Math.max(longest, current);
+      } else {
+        current = 0;
+      }
+    }
+    if (longest > 0) {
+      result.push({ playerId: player.id, name: playerName(player.id), longest, current, active: current === longest && current > 0 });
+    }
+  }
+  return result;
 }
 
 // ---- récords de temporada ----

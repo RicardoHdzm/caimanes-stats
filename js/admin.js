@@ -18,6 +18,9 @@ const BATTING_FIELDS = [
   { key: "R", label: "R", full: "Carreras", type: "number" },
   { key: "BB", label: "BB", full: "Bases por bolas", type: "number" },
   { key: "SO", label: "SO", full: "Ponches", type: "number" },
+  { key: "GO", label: "GO", full: "Out por rodado", type: "number" },
+  { key: "FO", label: "FO", full: "Out por elevado", type: "number" },
+  { key: "LO", label: "LO", full: "Out por línea", type: "number" },
   { key: "SB", label: "SB", full: "Bases robadas", type: "number" },
 ];
 

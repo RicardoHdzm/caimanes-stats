@@ -1,5 +1,5 @@
 import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks } from "../stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks, attendanceStreaks } from "../stats.js";
 import {
   heading,
   renderSortableTable,
@@ -133,7 +133,7 @@ function sortedAchievementsHtml(chips) {
 // de ahí para no crear un import circular (medallas.js ya importa
 // renderAchievements de este archivo). Si se agrega o quita una medalla del
 // catálogo, hay que actualizar este número a mano también.
-const TOTAL_MEDALS = 46;
+const TOTAL_MEDALS = 47;
 
 function MEDALLERO_HEADER(count) {
   // El span envolvente mantiene "Medallero" y el conteo en el mismo
@@ -289,6 +289,18 @@ export function renderAchievements(player) {
       label: "The Streak",
       kind: "streak",
       desc: `Su racha más larga de la temporada fue de ${streak.longest} juegos seguidos con hit.`,
+    });
+  }
+  // "Ironman" — mismo criterio que "The Streak" (racha más larga de la
+  // temporada, siga activa o no), pero de juegos JUGADOS en vez de con hit
+  // — ver attendanceStreaks() en js/stats.js.
+  const attendance = attendanceStreaks(GAMES).find((s) => s.playerId === player.id);
+  if (attendance && attendance.longest > 5) {
+    chips.push({
+      icon: "fa-solid fa-link",
+      label: "Ironman",
+      kind: "streak",
+      desc: `Su racha más larga de la temporada fue de ${attendance.longest} juegos seguidos jugados.`,
     });
   }
   const multiHitStreak = activeGameStreak(GAMES, player.id, (line) => (line.H ?? 0) >= 2);
@@ -1271,6 +1283,11 @@ export function renderJugadorDetalle(container, playerId) {
         <span class="card-value">${battingSeason.OPS}</span>
         <span class="card-label">OPS</span>
       </div>
+      <div class="card" title="Ponche + out por rodado/elevado/línea (ver desglose en Bateo)">
+        <i class="fa-solid fa-ban card-icon"></i>
+        <span class="card-value">${battingSeason.OUTS}</span>
+        <span class="card-label">Outs</span>
+      </div>
     `;
     container.appendChild(cards);
   }
@@ -1364,6 +1381,9 @@ export function renderJugadorDetalle(container, playerId) {
       R: line.R ?? 0,
       BB: line.BB ?? 0,
       SO: line.SO ?? 0,
+      GO: line.GO ?? 0,
+      FO: line.FO ?? 0,
+      LO: line.LO ?? 0,
       SB: line.SB ?? 0,
       AVG: formatAvg(line.H ?? 0, line.AB ?? 0),
     });
@@ -1414,6 +1434,9 @@ export function renderJugadorDetalle(container, playerId) {
       { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
       { key: "BB", label: "BB", full: "Bases por bolas", numeric: true },
       { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
+      { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
+      { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
+      { key: "LO", label: "LO", full: "Out por línea", numeric: true },
       { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
       { key: "AVG", label: "AVG", full: "Promedio del juego", numeric: true },
     ];

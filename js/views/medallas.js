@@ -45,6 +45,7 @@ const CATALOG = [
   { kind: "streak", icon: "fa-solid fa-bolt", name: "The Streak", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos con hit (siga activa o no).", match: (l) => l === "The Streak" },
   { kind: "streak", icon: "fa-solid fa-fire-flame-curved", name: "Too Hot!", how: "Racha activa de 2 o más juegos seguidos con multi-hit (2 o más hits por juego).", match: (l) => l === "Too Hot!" },
   { kind: "streak", icon: "fa-solid fa-magnet", name: "Base Magnet", how: "Racha activa de 2 o más juegos seguidos embasándose (hit o base por bolas).", match: (l) => l === "Base Magnet" },
+  { kind: "streak", icon: "fa-solid fa-link", name: "Ironman", how: "Su racha más larga de la temporada fue de más de 5 juegos seguidos jugados (siga activa o no).", match: (l) => l === "Ironman" },
   // ---- Podio del equipo (oro/plata/bronce, según el lugar) ----
   { kind: "gold", icon: "fa-solid fa-baseball-bat-ball", name: "Golden / Silver / Bronze Bat", how: "Top 3 del equipo en promedio de bateo (AVG) esta temporada.", match: (l) => l.endsWith(" Bat") },
   { kind: "gold", icon: "fa-solid fa-bomb", name: "Kaboom!", how: "Top 3 del equipo en jonrones esta temporada.", match: (l) => l === "Kaboom!" },
