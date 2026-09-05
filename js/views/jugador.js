@@ -1,4 +1,4 @@
-import { PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
+import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, gamesPlayedByPlayer, rankAmong, hitStreaks } from "../stats.js";
 import {
   heading,
@@ -29,6 +29,11 @@ import {
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
 import { wireRsvp } from "./resumen.js";
+
+// Tamaño del avatar grande del perfil (ver renderJugadorDetalle) — una sola
+// constante para los 3 lugares que lo pintan (inicial, y las dos veces que
+// se reemplaza por una foto real de Storage), para que no se desincronicen.
+const PROFILE_AVATAR_SIZE = 190;
 
 function formatAvg(h, ab) {
   if (!ab) return ".000";
@@ -124,8 +129,18 @@ function sortedAchievementsHtml(chips) {
 // dónde quede en el HTML), pero en celular pasa a flujo normal, y ahí sí
 // importa: tiene que quedar debajo de las medallas, no entre el título y
 // el grid.
-function MEDALLERO_HEADER() {
-  return `<h3><i class="fa-solid fa-medal"></i>Medallero</h3>`;
+// Debe coincidir con CATALOG.length en js/views/medallas.js — no se importa
+// de ahí para no crear un import circular (medallas.js ya importa
+// renderAchievements de este archivo). Si se agrega o quita una medalla del
+// catálogo, hay que actualizar este número a mano también.
+const TOTAL_MEDALS = 46;
+
+function MEDALLERO_HEADER(count) {
+  // El span envolvente mantiene "Medallero" y el conteo en el mismo
+  // renglón — .leader-card h3 es flex-direction:column (ícono arriba,
+  // título abajo, ver css/styles.css); sin este envoltorio, el conteo
+  // saldría como una tercera línea suelta en vez de ir junto al título.
+  return `<h3><i class="fa-solid fa-medal"></i><span>Medallero <span class="medallero-count" id="medallero-count">${count}/${TOTAL_MEDALS}</span></span></h3>`;
 }
 
 // Botón a la guía completa (ver js/views/medallas.js) — este jugador en
@@ -640,28 +655,54 @@ export function renderJugadorDetalle(container, playerId) {
 
   const played = gamesPlayedByPlayer(GAMES).get(player.id) ?? 0;
   const mvpCount = GAMES.filter((g) => g.mvp === player.id).length;
+  const isOwnProfile = getCurrentPlayerId() === player.id;
+  // TEAM.gamesInSeason (no GAMES.length): es el total de la temporada, no
+  // solo los que ya se han capturado — así la barra de verdad avanza hacia
+  // "toda la temporada", en vez de mostrar 100% apenas jugó todos los
+  // registrados hasta ahora. Se topa en 100% por si acaso (playoffs u otro
+  // juego de más que suba GAMES.length por encima del total esperado).
+  const attendancePct = TEAM.gamesInSeason > 0 ? Math.min(100, Math.round((played / TEAM.gamesInSeason) * 100)) : 0;
+  // Tarjeta propia del perfil (no reusa .game-hero de js/views/juego.js —
+  // otro contexto, otra información — para poder rediseñarla sin arriesgar
+  // la del detalle de un juego). PROFILE_AVATAR_SIZE se repite en 3 lugares
+  // (pintado inicial + las dos veces que se reemplaza por una foto real,
+  // más abajo) — una sola constante evita que se desincronicen si cambia.
   const hero = document.createElement("div");
-  hero.className = "game-hero";
+  hero.className = "profile-hero";
   hero.innerHTML = `
-    <div id="dues-badge"></div>
-    <div id="profile-avatar" style="margin-bottom: 12px;">${renderAvatar(player, 120)}</div>
-    <div class="game-hero-teams">
-      <span>#${player.number ?? "-"}</span>
-      <span class="game-hero-vs">·</span>
-      <span class="game-hero-opponent">${player.name}</span>
+    <div id="profile-debut-badge">${renderDebut(player.seasons)}</div>
+    <div class="profile-hero-top">
+      <div class="profile-avatar-col">
+        <div id="profile-avatar" class="profile-avatar-wrap">
+          <span id="profile-avatar-img">${renderAvatar(player, PROFILE_AVATAR_SIZE)}</span>
+          ${
+            isOwnProfile
+              ? '<div class="profile-avatar-overlay" id="profile-avatar-overlay" role="button" tabindex="0" aria-label="Cambiar foto de perfil"><i class="fa-solid fa-camera"></i></div>'
+              : ""
+          }
+        </div>
+      </div>
+      <div class="profile-hero-info">
+        <div class="profile-hero-name">
+          <span class="profile-hero-number">#${player.number ?? "-"}</span>
+          <span>${escapeHtml(player.name)}</span>
+          <span class="profile-hero-name-positions" id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
+        </div>
+        <div id="walkup-display">${renderWalkup(player.walkup)}</div>
+        <div class="profile-attendance">
+          <div class="profile-attendance-label">
+            <span>${played}/${TEAM.gamesInSeason} juegos jugados</span>
+          </div>
+          <div class="profile-attendance-bar"><div class="profile-attendance-fill" style="width:${attendancePct}%"></div></div>
+        </div>
+        ${
+          mvpCount > 0
+            ? `<div class="profile-hero-meta-row"><span class="profile-meta-chip profile-meta-chip--mvp"><i class="fa-solid fa-star"></i> MVP x${mvpCount}</span></div>`
+            : ""
+        }
+        <div id="profile-edit-slot"></div>
+      </div>
     </div>
-    <div class="game-hero-meta" style="margin-top: 12px;">
-      <span id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
-    </div>
-    <div class="game-hero-date">${played} juego${played === 1 ? "" : "s"} jugado${played === 1 ? "" : "s"} esta temporada</div>
-    ${
-      mvpCount > 0
-        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP x${mvpCount} esta temporada</div>`
-        : ""
-    }
-    ${renderDebut(player.seasons)}
-    <div id="walkup-display">${renderWalkup(player.walkup)}</div>
-    <div id="profile-edit-slot"></div>
   `;
   container.appendChild(hero);
 
@@ -676,7 +717,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (achievementChips.length > 0) {
     achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card medallero-card";
-    achievementsCard.innerHTML = `${MEDALLERO_HEADER()}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>${MEDALLERO_GUIDE_BTN(player.id)}`;
+    achievementsCard.innerHTML = `${MEDALLERO_HEADER(achievementChips.length)}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>${MEDALLERO_GUIDE_BTN(player.id)}`;
     container.appendChild(achievementsCard);
   }
 
@@ -692,10 +733,15 @@ export function renderJugadorDetalle(container, playerId) {
     if (!achievementsCard) {
       achievementsCard = document.createElement("div");
       achievementsCard.className = "leader-card player-standalone-card medallero-card";
-      achievementsCard.innerHTML = `${MEDALLERO_HEADER()}<div class="achievements-grid"></div>${MEDALLERO_GUIDE_BTN(player.id)}`;
+      achievementsCard.innerHTML = `${MEDALLERO_HEADER(achievementChips.length)}<div class="achievements-grid"></div>${MEDALLERO_GUIDE_BTN(player.id)}`;
       hero.after(achievementsCard);
     }
     achievementsCard.querySelector(".achievements-grid").innerHTML = sortedAchievementsHtml(achievementChips);
+    // La tarjeta ya pudo haber nacido con un conteo viejo (arriba, o en el
+    // primer pintado) — esto lo actualiza cada vez que llega una medalla
+    // más, async, después de ese primer pintado.
+    const countEl = achievementsCard.querySelector("#medallero-count");
+    if (countEl) countEl.textContent = `${achievementChips.length}/${TOTAL_MEDALS}`;
   }
 
   // ---- Foto de perfil personalizada: lectura pública, edición propia ----
@@ -705,10 +751,13 @@ export function renderJugadorDetalle(container, playerId) {
   // reemplaza — con o sin sesión (la lectura es pública, ver
   // supabase/schema.sql); getAvatarUrl regresa null si no ha subido
   // ninguna, y esta vista se queda con lo de siempre.
-  const avatarWrap = hero.querySelector("#profile-avatar");
+  // #profile-avatar-img (no #profile-avatar directo): ese wrap también
+  // contiene el overlay de cámara en tu propio perfil (ver isOwnProfile más
+  // arriba) — reemplazar su innerHTML completo se lo llevaría entre patas.
+  const avatarImgWrap = hero.querySelector("#profile-avatar-img");
   getAvatarUrl(player.id).then((url) => {
-    if (!url || !avatarWrap) return;
-    avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+    if (!url || !avatarImgWrap) return;
+    avatarImgWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:${PROFILE_AVATAR_SIZE}px;height:${PROFILE_AVATAR_SIZE}px;font-size:${PROFILE_AVATAR_SIZE * 0.4}px;">`;
     addAchievementMedal({
       icon: "fa-solid fa-camera",
       label: "Selfie!",
@@ -781,7 +830,7 @@ export function renderJugadorDetalle(container, playerId) {
   // Mismos botones Sí/No que la tarjeta "Próximo juego" de Resumen
   // (wireRsvp, importado de ahí) — así se puede cambiar la asistencia sin
   // salir del perfil.
-  if (getCurrentPlayerId() === player.id && SCHEDULE.length > 0) {
+  if (isOwnProfile && SCHEDULE.length > 0) {
     const g = SCHEDULE[0];
     const summaryEl = document.createElement("div");
     summaryEl.className = "leader-card player-standalone-card";
@@ -794,28 +843,21 @@ export function renderJugadorDetalle(container, playerId) {
     wireRsvp(summaryEl, g.id);
   }
 
-  // ---- Estado de inscripción: solo visible con sesión iniciada ----
+  // ---- Medalla de inscripción (Rich kid/Moroso): solo con sesión iniciada ----
   //
-  // Misma regla que la columna "Pagó" en Roster (ver js/views/roster.js) —
-  // se comprueba getSession() (¿hay cuenta?), no getCurrentPlayerId(), para
-  // que también se vea antes de que el coach termine de vincular la cuenta
-  // en player_whitelist. Sin sesión, el badge ni se pide. El estado en sí ya
-  // no sale de Supabase, sino de DUES_PAID en js/data.js (ver getDuesForPlayer
-  // en js/db.js) — se mantiene el `if (getSession())` porque nada más pidió
-  // cambiar la visibilidad, solo de dónde sale el dato.
+  // El badge visual "Inscripción: Pagada/Sin pagar" que vivía aquí (esquina
+  // superior derecha) se quitó a petición expresa — el Debut lo reemplazó
+  // en ese lugar (ver arriba). Esto se queda solo para seguir agregando la
+  // medalla del Medallero, con la misma regla de siempre: se comprueba
+  // getSession() (¿hay cuenta?), no getCurrentPlayerId(), para que también
+  // se vea antes de que el coach termine de vincular la cuenta en
+  // player_whitelist.
   if (getSession()) {
     getDuesForPlayer(player.id).then((paid) => {
-      const badge = hero.querySelector("#dues-badge");
-      if (!badge) return;
-      // `paid` ya no puede salir null (no hay red de por medio), pero se
-      // deja el chequeo por si algún día vuelve a haber una fuente que sí
-      // pueda fallar.
+      // `paid` ya no puede salir null (no hay red de por medio, ver
+      // DUES_PAID en js/data.js), pero se deja el chequeo por si algún día
+      // vuelve a haber una fuente que sí pueda fallar.
       if (paid === null) return;
-      badge.innerHTML = `
-        <span class="dues-badge-pill ${paid ? "stat-green" : "stat-red"}">
-          Inscripción: ${paid ? "Pagada" : "Sin pagar"}
-        </span>
-      `;
       addAchievementMedal(
         paid
           ? {
@@ -874,7 +916,7 @@ export function renderJugadorDetalle(container, playerId) {
   // de guardar (son 3 escrituras independientes a Supabase, no una sola),
   // solo el mostrar/ocultar se comparte. "Salir" ya no vive aquí — está en
   // el menú del botón de cuenta del header (ver js/auth.js).
-  if (getCurrentPlayerId() === player.id) {
+  if (isOwnProfile) {
     const slot = hero.querySelector("#profile-edit-slot");
     slot.innerHTML = `
       <button type="button" class="walkup-edit-btn" id="profile-edit-toggle">
@@ -883,7 +925,14 @@ export function renderJugadorDetalle(container, playerId) {
       <button type="button" class="walkup-edit-btn" id="share-profile-btn">
         <i class="fa-solid fa-share-nodes"></i> Compartir mi perfil
       </button>
-      <div id="profile-edit-panel" class="walkup-edit-form auth-form" hidden>
+      <div id="profile-edit-collapse" class="profile-edit-collapse">
+      <div id="profile-edit-panel" class="walkup-edit-form auth-form">
+        <div class="profile-edit-modal-header">
+          <h3>Editar perfil</h3>
+          <button type="button" class="profile-edit-close" id="profile-edit-close-btn" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
         <p class="profile-edit-heading">Foto de perfil</p>
         <label class="avatar-edit-label">
           <i class="fa-solid fa-camera"></i> Subir foto
@@ -911,6 +960,7 @@ export function renderJugadorDetalle(container, playerId) {
         <p class="auth-error" id="password-error" hidden></p>
         <p class="auth-ok" id="password-ok" hidden>Contraseña actualizada.</p>
         <button type="button" class="auth-submit" id="password-save-btn">Cambiar contraseña</button>
+      </div>
       </div>
     `;
 
@@ -941,6 +991,22 @@ export function renderJugadorDetalle(container, playerId) {
     // --- Foto de perfil ---
     const avatarInput = slot.querySelector("#avatar-input");
     const avatarError = slot.querySelector("#avatar-error");
+
+    // Overlay de cámara al pasar el mouse sobre tu propia foto (ver
+    // .profile-avatar-overlay en css/styles.css) — mismo <input type="file">
+    // de "Editar perfil" de arriba, solo un atajo más directo: no hace
+    // falta abrir el panel entero nada más para cambiar la foto. Enter/
+    // Space también lo activa (tabindex="0" en el HTML), para quien navega
+    // con teclado.
+    const avatarOverlay = hero.querySelector("#profile-avatar-overlay");
+    avatarOverlay?.addEventListener("click", () => avatarInput.click());
+    avatarOverlay?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        avatarInput.click();
+      }
+    });
+
     avatarInput.addEventListener("change", async () => {
       const file = avatarInput.files[0];
       if (!file) return;
@@ -956,7 +1022,7 @@ export function renderJugadorDetalle(container, playerId) {
         await uploadAvatar(player.id, toUpload);
         const url = await getAvatarUrl(player.id);
         if (url) {
-          avatarWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:120px;height:120px;font-size:48px;">`;
+          avatarImgWrap.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player.name)}" style="width:${PROFILE_AVATAR_SIZE}px;height:${PROFILE_AVATAR_SIZE}px;font-size:${PROFILE_AVATAR_SIZE * 0.4}px;">`;
         }
       } catch {
         avatarError.textContent = "No se pudo subir la foto — intenta de nuevo.";
@@ -965,6 +1031,20 @@ export function renderJugadorDetalle(container, playerId) {
         avatarInput.value = "";
       }
     });
+
+    // Confirma visualmente que sí se guardó — mismo patrón que "Compartir
+    // mi perfil" de arriba (cambia el texto del botón un momento). Sin
+    // esto, un guardado exitoso no se distinguía en nada de un clic que no
+    // hizo nada: la única señal visible era un mensaje de error, que solo
+    // aparece si algo SALE MAL — "Contraseña actualizada" (auth-ok) ya
+    // existía pero es texto chico debajo del botón, fácil de no notar.
+    function flashSaved(btn, label) {
+      const original = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-check"></i> ${label}`;
+      setTimeout(() => {
+        btn.innerHTML = original;
+      }, 1800);
+    }
 
     // --- Posiciones ---
     const posPicker = slot.querySelector("#position-picker");
@@ -1008,6 +1088,7 @@ export function renderJugadorDetalle(container, playerId) {
         currentPosition = joined;
         positionDisplay.innerHTML = renderPositionBadges(joined);
         posError.hidden = true;
+        flashSaved(posSaveBtn, "Guardado");
       } catch {
         posError.textContent = "No se pudo guardar — intenta de nuevo.";
         posError.hidden = false;
@@ -1040,6 +1121,7 @@ export function renderJugadorDetalle(container, playerId) {
         await setWalkup(player.id, saved);
         currentWalkup = saved;
         walkupDisplay.innerHTML = renderWalkup(saved);
+        flashSaved(walkupSaveBtn, "Guardado");
       } catch {
         walkupError.textContent = "No se pudo guardar — intenta de nuevo.";
         walkupError.hidden = false;
@@ -1067,6 +1149,7 @@ export function renderJugadorDetalle(container, playerId) {
         await changePassword(passwordInput.value);
         passwordOk.hidden = false;
         passwordInput.value = "";
+        flashSaved(passwordSaveBtn, "Cambiada");
       } catch {
         passwordError.textContent = "No se pudo cambiar — intenta de nuevo.";
         passwordError.hidden = false;
@@ -1076,9 +1159,23 @@ export function renderJugadorDetalle(container, playerId) {
     });
 
     // --- Un solo interruptor para las 3 secciones de arriba ---
+    //
+    // Antes esto era un panel que se abría empujando el resto de la tarjeta
+    // hacia abajo (con animación de grid-template-rows); a petición del
+    // usuario ahora es un popup/modal aparte (ver .profile-edit-collapse en
+    // css/styles.css) para no "recorrer" la tarjeta principal ni el
+    // Medallero de abajo. Se cierra con el botón X, tocando el fondo
+    // oscurecido, o Escape.
     const toggle = slot.querySelector("#profile-edit-toggle");
-    const panel = slot.querySelector("#profile-edit-panel");
-    toggle.addEventListener("click", () => {
+    const collapse = slot.querySelector("#profile-edit-collapse");
+    const closeBtn = slot.querySelector("#profile-edit-close-btn");
+    // Escape solo escucha mientras el modal está abierto (se agrega en
+    // openModal y se quita en closeModal) para no acumular un listener en
+    // `document` cada vez que se re-renderiza este perfil.
+    const onEscape = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    const openModal = () => {
       selectedPositions = currentPosition ? currentPosition.split("/").filter(Boolean) : [];
       syncPicker();
       posError.hidden = true;
@@ -1089,7 +1186,19 @@ export function renderJugadorDetalle(container, playerId) {
       passwordInput.value = "";
       passwordError.hidden = true;
       passwordOk.hidden = true;
-      panel.hidden = !panel.hidden;
+      collapse.classList.add("open");
+      document.body.classList.add("modal-open");
+      document.addEventListener("keydown", onEscape);
+    };
+    const closeModal = () => {
+      collapse.classList.remove("open");
+      document.body.classList.remove("modal-open");
+      document.removeEventListener("keydown", onEscape);
+    };
+    toggle.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    collapse.addEventListener("click", (e) => {
+      if (e.target === collapse) closeModal();
     });
   }
 
@@ -1106,8 +1215,8 @@ export function renderJugadorDetalle(container, playerId) {
   // rankean solo entre quienes tienen suficientes datos para que cuenten
   // (mismo filtro `qualified` que ya usa el leaderboard de Resumen para
   // AVG, y su equivalente para pitcheo/fildeo) — si no, alguien con una
-  // sola entrada perfecta se vería primero.
-  const isOwnProfile = getCurrentPlayerId() === player.id;
+  // sola entrada perfecta se vería primero. `isOwnProfile` ya se calculó
+  // arriba, junto con el resto de la tarjeta principal.
   const qualifiedBatters = battingList.filter((r) => r.qualified);
   const activePitchers = pitchingList.filter((r) => r.outs > 0);
   const activeFielders = fieldingList.filter((r) => r.PO + r.A + r.E > 0);

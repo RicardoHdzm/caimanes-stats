@@ -12,6 +12,7 @@ import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
+import { renderLogin } from "./views/login.js";
 import { initAuth, mountAuthControl, getCurrentPlayerId } from "./auth.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
@@ -27,6 +28,7 @@ const routes = {
   standing: renderStanding,
   alineacion: renderAlineacion,
   playlist: renderPlaylist,
+  login: renderLogin,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -53,6 +55,23 @@ const MORE_TABS = [
   // regresa el botón.
   // { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
 ];
+
+// Todo lo navegable en celular, para el panel de "Más" — ya no es solo las
+// 5 rutas que no caben en la barra de abajo: ahora es una pantalla completa
+// tipo "apps del celular" con TODO, incluidas Resumen/Mi Perfil/Roster/
+// Juegos/Standing (que ya están abajo, pero repetidas aquí no estorban y
+// así "Más" es de verdad un mapa completo del sitio). Se arma recorriendo
+// BOTTOM_TABS en vez de copiarlo a mano, para no desincronizarse si cambia
+// esa lista — mismo criterio (buscar "resumen" por tab, no por posición)
+// que ya usa buildBottomTabs() de abajo para insertar Mi Perfil.
+const APPS_GRID = [];
+for (const t of BOTTOM_TABS) {
+  APPS_GRID.push(t);
+  if (t.tab === "resumen") {
+    APPS_GRID.push({ tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" });
+  }
+}
+APPS_GRID.push(...MORE_TABS);
 
 const app = document.getElementById("app");
 const tabs = document.getElementById("tabs");
@@ -125,16 +144,36 @@ function buildBottomTabs() {
   moreBtn.className = "bottom-tab";
   moreBtn.dataset.tab = "more";
   moreBtn.setAttribute("aria-expanded", "false");
-  moreBtn.innerHTML = `<i class="fa-solid fa-ellipsis"></i><span>Más</span>`;
+  moreBtn.innerHTML = `<i class="fa-solid fa-ellipsis"></i><span>Menú</span>`;
   moreBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     toggleMoreSheet();
   });
   bottomTabs.appendChild(moreBtn);
 
-  moreSheet.innerHTML = MORE_TABS.map(
-    (t) => `<a href="${t.route}" data-tab="${t.tab}"><i class="fa-solid ${t.icon}"></i>${t.label}</a>`
-  ).join("");
+  // Pantalla completa tipo "apps del celular" (ver APPS_GRID arriba) — con
+  // encabezado y botón de cerrar porque, a diferencia del panelito chico de
+  // antes, ya no queda nada de la página debajo para tocar "afuera" y
+  // cerrarlo así.
+  moreSheet.innerHTML = `
+    <div class="more-sheet-header">
+      <h3>Menú</h3>
+      <button type="button" class="more-sheet-close" id="more-sheet-close-btn" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="more-sheet-grid">
+      ${APPS_GRID.map(
+        (t) => `
+        <a href="${t.route}" data-tab="${t.tab}"${t.tab === "mi-perfil" ? ' id="more-tile-mi-perfil" hidden' : ""}>
+          <span class="more-app-icon"><i class="fa-solid ${t.icon}"></i></span>
+          <span>${t.label}</span>
+        </a>
+      `
+      ).join("")}
+    </div>
+  `;
+  moreSheet.querySelector("#more-sheet-close-btn").addEventListener("click", () => toggleMoreSheet(false));
 }
 
 function toggleMoreSheet(forceOpen) {
@@ -143,8 +182,10 @@ function toggleMoreSheet(forceOpen) {
   bottomTabs.querySelector('[data-tab="more"]')?.setAttribute("aria-expanded", String(open));
 }
 
-// Tocar fuera del panel lo cierra — el panel mismo detiene la propagación
-// para que tocar un link adentro no cuente como "afuera".
+// Ya no hay "afuera" que tocar (es pantalla completa, ver CSS) — esto se
+// deja solo por si algún día vuelve a haber espacio alrededor; cerrar de
+// verdad es el botón de la X (ver #more-sheet-close-btn arriba) o navegar a
+// un tile (dispara render(), que ya cierra el panel más abajo).
 moreSheet.addEventListener("click", (e) => e.stopPropagation());
 document.addEventListener("click", () => toggleMoreSheet(false));
 
@@ -152,13 +193,13 @@ const MORE_TAB_IDS = new Set(MORE_TABS.map((t) => t.tab));
 
 function render() {
   const myId = getCurrentPlayerId();
-  miPerfilLink.hidden = !myId;
-  if (myId) miPerfilLink.href = `#/jugador/${myId}`;
-
-  const bottomMiPerfilLink = bottomTabs.querySelector('[data-tab="mi-perfil"]');
-  if (bottomMiPerfilLink) {
-    bottomMiPerfilLink.hidden = !myId;
-    if (myId) bottomMiPerfilLink.href = `#/jugador/${myId}`;
+  // Los 3 lugares donde puede aparecer "Mi Perfil" (nav de escritorio,
+  // barra de abajo, y ahora también el grid de "Más" — ver APPS_GRID
+  // arriba): mismo trato para los tres, oculto sin sesión.
+  for (const el of [miPerfilLink, bottomTabs.querySelector('[data-tab="mi-perfil"]'), moreSheet.querySelector('[data-tab="mi-perfil"]')]) {
+    if (!el) continue;
+    el.hidden = !myId;
+    if (myId) el.href = `#/jugador/${myId}`;
   }
 
   const route = currentRoute();

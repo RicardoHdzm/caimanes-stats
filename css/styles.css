@@ -850,45 +850,96 @@ body {
 
   /* El panel "Más" arranca oculto vía el atributo `hidden` del HTML — solo
      hace falta describir cómo se ve cuando JS se lo quita. Va ANTES que
-     .bottom-tabs en el DOM para apilarse encima sin z-index especial. */
+     .bottom-tabs en el DOM para apilarse encima sin z-index especial.
+     Pantalla completa tipo "apps del celular" (ver APPS_GRID en
+     js/main.js) — a propósito, en vez del panelito chico de antes: incluye
+     TODO lo navegable, no solo lo que no cabía en la barra de abajo. */
   .more-sheet:not([hidden]) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
+    display: flex;
+    flex-direction: column;
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-    z-index: 39;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 8px;
-    box-shadow: var(--shadow-raised);
+    inset: 0;
+    z-index: 45;
+    background: var(--bg);
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
   }
 
-  .more-sheet a {
+  .more-sheet-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .more-sheet-header h3 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: var(--text-xl);
+    color: var(--text);
+    margin: 0;
+  }
+
+  .more-sheet-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--text);
+    font-size: var(--text-lg);
+    cursor: pointer;
+  }
+
+  /* Grid de "apps" — 3 por renglón, ícono en su propio cuadro redondeado
+     arriba del nombre, como la pantalla de inicio de un celular. */
+  .more-sheet-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px 12px;
+  }
+
+  .more-sheet-grid a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     color: var(--text);
     text-decoration: none;
-    font-size: var(--text-sm);
-    font-weight: 600;
-  }
-
-  .more-sheet a:hover,
-  .more-sheet a.active {
-    background: var(--surface-alt);
-    color: var(--accent-text);
-  }
-
-  .more-sheet a i {
-    width: 18px;
     text-align: center;
-    color: var(--muted);
+  }
+
+  .more-app-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-size: 1.3rem;
+  }
+
+  .more-sheet-grid a.active .more-app-icon {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .more-sheet-grid a span:last-child {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .more-sheet-grid a.active span:last-child {
+    color: var(--accent-text);
   }
 }
 
@@ -975,35 +1026,23 @@ main h3::before {
   box-shadow: var(--shadow-raised);
 }
 
-/* Badge de estado de inscripción, esquina superior derecha del perfil (ver
-   js/views/jugador.js) — vacío y sin tamaño hasta que llega el dato (o para
-   siempre, si no hay sesión iniciada: ni se pide). */
-#dues-badge {
+/* Badge de Debut, esquina superior derecha del perfil (ver
+   js/views/jugador.js) — antes vivía aquí el estado de inscripción
+   ("Pagada"/"Sin pagar"), se quitó a petición expresa y Debut tomó su
+   lugar. Vacío y sin tamaño si el jugador no tiene `seasons` capturado
+   (renderDebut() regresa ""). margin:0 en el .debut-badge de adentro:
+   trae su propio margin (pensado para ir centrado en flujo normal, ver
+   más abajo), que aquí sobra. */
+#profile-debut-badge {
   position: absolute;
   top: 14px;
   right: 14px;
 }
 
-.dues-badge-pill {
-  display: inline-block;
-  white-space: nowrap;
+#profile-debut-badge .debut-badge {
+  margin: 0;
   padding: 5px 12px;
-  border-radius: var(--radius-pill);
   font-size: var(--text-2xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  border: 1px solid;
-}
-
-.dues-badge-pill.stat-green {
-  background: rgba(63, 181, 111, 0.12);
-  border-color: var(--win);
-}
-
-.dues-badge-pill.stat-red {
-  background: rgba(226, 90, 110, 0.12);
-  border-color: var(--accent-text);
 }
 
 @media (max-width: 640px) {
@@ -1011,16 +1050,17 @@ main h3::before {
      aquí se saca del position:absolute y se pone en flujo normal, arriba
      de la foto (ver #profile-avatar en js/views/jugador.js, justo después
      en el HTML). */
-  #dues-badge {
+  #profile-debut-badge {
     position: static;
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
   }
 
-  .dues-badge-pill {
-    padding: 4px 8px;
-    font-size: 8px;
+  #profile-debut-badge .debut-badge {
+    padding: 4px 9px;
+    font-size: 9px;
+    letter-spacing: 0.01em;
   }
 }
 
@@ -1096,6 +1136,252 @@ main h3::before {
   margin-top: 10px;
 }
 
+/* ---- Tarjeta principal del perfil de jugador (js/views/jugador.js) ----
+   Clase propia (no .game-hero — esa es la del detalle de un juego, otro
+   contenido): foto grande a la izquierda con nombre/posiciones/meta a la
+   derecha en escritorio; se apila y centra en móvil, como antes. */
+.profile-hero {
+  position: relative;
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 28px 26px;
+  margin: 16px 0 28px;
+  box-shadow: var(--shadow-raised);
+}
+
+.profile-hero-top {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* Foto + posiciones, una columna aparte a la izquierda — las posiciones
+   quedan pegadas al avatar (debajo, centradas) tanto en escritorio como en
+   móvil, a propósito. */
+.profile-avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Anillo rojo + glow alrededor de la foto — el "gap" antes del anillo es el
+   borde color --surface, así se ve como un aro separado de la foto en vez
+   de un borde pegado directo a la imagen. position:relative es para anclar
+   el overlay de cámara de abajo (solo existe en tu propio perfil). */
+.profile-avatar-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar-wrap .avatar {
+  border: 4px solid var(--accent);
+  box-shadow: 0 0 0 4px var(--surface), 0 10px 26px rgba(226, 32, 47, 0.4);
+}
+
+/* Overlay de cámara al pasar el mouse sobre tu propia foto — invisible
+   hasta el hover/focus, para no ensuciar la foto con un ícono todo el
+   tiempo. Solo existe en tu propio perfil (ver isOwnProfile en
+   js/views/jugador.js); el clic abre el mismo <input type="file"> que ya
+   usaba "Editar perfil", solo más directo. */
+.profile-avatar-overlay {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 1.6rem;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.profile-avatar-wrap:hover .profile-avatar-overlay,
+.profile-avatar-overlay:focus-visible {
+  opacity: 1;
+}
+
+/* Barra de progreso de asistencia ("9/10 juegos jugados") — reemplaza el
+   chip de texto plano de antes. */
+/* Esquina inferior derecha en escritorio (mismo truco que Debut arriba, ver
+   #profile-debut-badge) — position:relative de .profile-hero (el
+   antepasado) es lo que ancla esto, sin importar que .profile-attendance
+   viva varios niveles adentro (.profile-hero-top > .profile-hero-info). En
+   móvil se revierte a flujo normal, ver @media más abajo. */
+.profile-attendance {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  width: 200px;
+}
+
+.profile-attendance-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.profile-attendance-bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.profile-attendance-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+/* Posiciones junto al nombre — tamaño escalado a algo entre el pill
+   original (0.8rem) y el nombre (2rem): igual de grande se vería
+   desproporcionado para una píldora tan corta. */
+/* align-self:center (no baseline, que es lo que hereda de .profile-hero-name
+   de arriba) — una píldora rellena no tiene una "línea base" de texto que se
+   alinee bien con el nombre, se veía chueca. gap + margin:0 en vez del
+   margen chico de .pos-badge (pensado para su tamaño normal, se sentía
+   apretado ya en este tamaño más grande). */
+.profile-hero-name-positions {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  gap: 8px;
+}
+
+.profile-hero-name-positions .pos-badge {
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+.profile-hero-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.profile-hero-name {
+  font-family: var(--font-display);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  line-height: 1.15;
+}
+
+.profile-hero-number {
+  color: var(--accent-text);
+  font-style: italic;
+}
+
+.profile-hero-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.profile-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.profile-meta-chip i {
+  color: var(--accent);
+}
+
+.profile-meta-chip--mvp {
+  border-color: #f5b942;
+  color: #f5b942;
+  background: rgba(245, 185, 66, 0.12);
+}
+
+.profile-meta-chip--mvp i {
+  color: #f5b942;
+}
+
+/* renderWalkup() trae su propio centrado (pensado para .game-hero, con
+   text-align:center) — aquí la info va alineada a la izquierda, así que se
+   corrige nomás para este dentro del perfil. Debut ya no vive en
+   .profile-hero-info (se movió a la esquina, ver #profile-debut-badge más
+   arriba), así que se quita de esta regla. */
+.profile-hero-info .walkup {
+  margin-left: 0;
+  justify-content: flex-start;
+}
+
+@media (max-width: 640px) {
+  .profile-hero-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-hero-info {
+    align-items: center;
+  }
+
+  .profile-hero-name {
+    justify-content: center;
+    font-size: var(--text-2xl);
+  }
+
+  /* flex-basis:100% en un flex-wrap las manda a su propio renglón, debajo
+     del nombre, en vez de intentar quedarse en la misma línea (que en
+     escritorio sí cabe, pero en un nombre largo en celular no). */
+  .profile-hero-name-positions {
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .profile-hero-meta-row {
+    justify-content: center;
+  }
+
+  .profile-attendance {
+    position: static;
+    width: auto;
+    max-width: 260px;
+    margin: 12px auto 0;
+  }
+
+  .profile-attendance-label {
+    text-align: center;
+  }
+
+  .profile-hero-info .walkup {
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+  }
+}
+
 /* display:flex (no inline-flex) + width:fit-content + margin:auto en vez de
    depender del text-align:center del padre (.game-hero): un inline-flex es
    una caja de línea, así que dos de estos cabiendo uno junto al otro se
@@ -1159,6 +1445,16 @@ main h3::before {
    en la esquina (ver js/views/jugador.js MEDALLERO_HEADER()). */
 .medallero-card {
   position: relative;
+}
+
+/* Conteo "14/46" junto al título — normal (no mayúsculas ni tracking como
+   el resto del h3), en el rojo de acento para que se lea como un dato, no
+   como parte del label. */
+.medallero-count {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 700;
+  color: var(--accent-text);
 }
 
 /* Más espacio entre "Medallero" y la primera fila de medallas — .leader-card
@@ -1656,6 +1952,33 @@ main h3::before {
    son solo para las tarjetas de Resumen, no las de perfil. */
 .player-standalone-card {
   margin-bottom: 16px;
+}
+
+/* Página de login (#/login, ver js/views/login.js) — angosta y centrada a
+   propósito, un formulario no necesita el ancho completo de `main`
+   (1150px). El h2 es inline-block (ver regla global de h2) y se alinea a
+   la izquierda por default en todo el sitio; text-align:center en el
+   contenedor lo centra a él (la caja completa, con todo y su línea roja
+   de abajo) sin tocar ese estilo global en ninguna otra página. */
+.login-page {
+  text-align: center;
+}
+
+.login-card {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 32px 28px;
+  text-align: left;
+}
+
+.login-card .auth-form input {
+  padding: 10px 12px;
+}
+
+.login-card .auth-submit {
+  margin-top: 4px;
+  padding: 11px 0;
+  font-size: var(--text-md);
 }
 
 .leader-card:hover {
@@ -2596,8 +2919,71 @@ main h3::before {
 
 .walkup-edit-form {
   max-width: 320px;
-  margin: 14px auto 0;
+  margin: 0 auto;
   text-align: left;
+}
+
+/* "Editar perfil" es un popup aparte, no un panel que empuja el resto de
+   la tarjeta hacia abajo (así era antes, con la animación de
+   grid-template-rows) — se muestra sobre un fondo oscurecido, centrado, y
+   se cierra con la X, tocando el fondo, o Escape (ver profile-edit-toggle
+   en js/views/jugador.js). */
+.profile-edit-collapse {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.profile-edit-collapse.open {
+  display: flex;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.profile-edit-collapse > .walkup-edit-form {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-raised);
+  padding: 20px;
+}
+
+.profile-edit-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.profile-edit-modal-header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+
+.profile-edit-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.profile-edit-close:hover {
+  color: var(--text);
 }
 
 /* "Editar perfil" es un solo botón para las 3 secciones del panel de
@@ -2616,7 +3002,7 @@ main h3::before {
   padding-top: 16px;
 }
 
-.profile-edit-heading:first-child {
+.profile-edit-heading:first-of-type {
   border-top: none;
   padding-top: 0;
   margin-top: 0;

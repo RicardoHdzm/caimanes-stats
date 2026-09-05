@@ -198,22 +198,15 @@ function setPanelOpen(open) {
   toggle.setAttribute("aria-expanded", String(open));
 }
 
+// Antes era un botón que abría un desplegable con el formulario ahí mismo
+// (ver historial) — ahora "Iniciar sesión" es su propia página (#/login,
+// ver js/views/login.js), así que aquí solo hace falta un link normal.
 function loggedOutMarkup() {
   return `
-    <button type="button" class="auth-btn auth-btn-named" id="auth-toggle" aria-expanded="false" aria-label="Iniciar sesión">
+    <a href="#/login" class="auth-btn auth-btn-named" id="login-link" aria-label="Iniciar sesión">
       <i class="fa-solid fa-right-to-bracket"></i>
       <span class="auth-btn-name">Iniciar sesión</span>
-    </button>
-    <div class="auth-panel" id="auth-panel" hidden>
-      <h4>Iniciar sesión</h4>
-      <form id="auth-signin-form" class="auth-form">
-        <label>Correo<input type="email" name="email" required autocomplete="username"></label>
-        <label>Contraseña<input type="password" name="password" required autocomplete="current-password"></label>
-        <p class="auth-error" id="auth-error" hidden></p>
-        <button type="submit" class="auth-submit">Entrar</button>
-      </form>
-      <p class="auth-hint">¿No tienes cuenta? Pídesela al coach.</p>
-    </div>
+    </a>
   `;
 }
 
@@ -269,21 +262,6 @@ function wireAuthControl() {
   });
   panel?.addEventListener("click", (e) => e.stopPropagation());
 
-  const signinForm = containerEl.querySelector("#auth-signin-form");
-  signinForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const errorEl = containerEl.querySelector("#auth-error");
-    errorEl.hidden = true;
-    const { email, password } = Object.fromEntries(new FormData(signinForm));
-    try {
-      await signIn(email, password);
-      setPanelOpen(false);
-    } catch (err) {
-      errorEl.textContent = "Correo o contraseña incorrectos.";
-      errorEl.hidden = false;
-    }
-  });
-
   containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", async () => {
     await signOut();
     setPanelOpen(false);
@@ -292,4 +270,13 @@ function wireAuthControl() {
   // El link de "Ir a perfil" navega solo (es un <a href>) — esto nomás
   // cierra el panel para que no se quede abierto sobre la página nueva.
   containerEl.querySelector("#auth-profile-link")?.addEventListener("click", () => setPanelOpen(false));
+
+  // "Iniciar sesión" (solo existe deslogueado, ver loggedOutMarkup) guarda
+  // en qué página estabas ANTES de ir a #/login — la lee js/views/login.js
+  // al terminar, para regresarte ahí en vez de mandarte siempre a Resumen.
+  // Se lee location.hash aquí, ANTES de que el navegador procese el click
+  // del link (el listener corre primero), así que todavía es el hash VIEJO.
+  containerEl.querySelector("#login-link")?.addEventListener("click", () => {
+    sessionStorage.setItem("caimanes-login-return", location.hash || "#/resumen");
+  });
 }
