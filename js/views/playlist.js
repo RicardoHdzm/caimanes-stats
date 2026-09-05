@@ -7,6 +7,17 @@ import { PLAYERS } from "../data.js";
 import { heading, renderAvatar, renderWalkup } from "../ui.js";
 import { getAllWalkupOverrides } from "../db.js";
 
+// El placeholder de PLAYERS[].walkup en data.js ("Canción" / "Artista", sin
+// url) es el valor por default de quien todavía no ha puesto la suya — no
+// cuenta como canción real. Sin este filtro, la playlist se llenaría de
+// filas vacías tipo "Walkup Song: - Canción - Artista" para casi todo el
+// roster.
+function hasRealWalkup(walkup) {
+  if (!walkup?.title) return false;
+  if (walkup.title === "Canción" && walkup.artist === "Artista" && !walkup.url) return false;
+  return true;
+}
+
 function playlistRow(player, walkup) {
   return `
     <div class="playlist-row">
@@ -27,6 +38,30 @@ export function renderPlaylist(container) {
   subtitle.textContent = "Las canciones de entrada de todo el equipo, en un solo lugar.";
   container.appendChild(subtitle);
 
+  // Playlist real de Spotify con todas las canciones — el iframe viene tal
+  // cual del botón "Compartir > Insertar" de Spotify, solo envuelto en un
+  // contenedor propio para el margen.
+  const embedWrap = document.createElement("div");
+  embedWrap.className = "playlist-embed";
+  embedWrap.innerHTML = `
+    <iframe
+      data-testid="embed-iframe"
+      style="border-radius: 12px"
+      src="https://open.spotify.com/embed/playlist/0VxLvZORg84K42UUqv3a2i?utm_source=generator&si=511797c306f74d83"
+      width="100%"
+      height="352"
+      frameBorder="0"
+      allowfullscreen=""
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy"
+    ></iframe>
+  `;
+  container.appendChild(embedWrap);
+
+  const listHeading = document.createElement("h3");
+  listHeading.textContent = "Canción de cada quien";
+  container.appendChild(listHeading);
+
   const listEl = document.createElement("div");
   listEl.className = "playlist-list";
   container.appendChild(listEl);
@@ -35,8 +70,8 @@ export function renderPlaylist(container) {
   // con la mitad diciendo "sin canción todavía" sería puro ruido en una
   // playlist.
   function draw(walkupMap) {
-    const rows = PLAYERS.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter(
-      (r) => r.walkup?.title
+    const rows = PLAYERS.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
+      hasRealWalkup(r.walkup)
     );
     listEl.innerHTML =
       rows.length > 0

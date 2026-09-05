@@ -2871,6 +2871,15 @@ main h3::before {
 
 /* ---- playlist del equipo (js/views/playlist.js) ---- */
 
+.playlist-embed {
+  margin: 16px 0 24px;
+}
+
+.playlist-embed iframe {
+  display: block;
+  max-width: 100%;
+}
+
 .playlist-list {
   display: flex;
   flex-direction: column;
