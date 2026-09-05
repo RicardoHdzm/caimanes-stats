@@ -109,7 +109,19 @@ export async function initAuth() {
     if (document.visibilityState === "visible") {
       supabase.auth.startAutoRefresh();
       supabase.auth.getSession().then(async ({ data }) => {
+        // Antes esto avisaba SIEMPRE, así hubiera cambiado algo o no — un
+        // simple alt-tab de un segundo terminaba repintando toda la vista
+        // actual (y volviendo a pedir avatar/medallas/RSVP/comentarios a
+        // Supabase desde cero), lo que se sentía como que "los datos se
+        // desconectan" nada más cambiar de pestaña. Ahora solo avisa si la
+        // sesión de verdad cambió (se refrescó el token, se cerró sesión en
+        // otra pestaña, etc.) — que es el único caso real que justifica
+        // repintar. onAuthStateChange (arriba) ya cubre el refresh normal del
+        // token; esto es solo para detectar que se venció mientras la
+        // pestaña estaba oculta y el refresh automático no alcanzó a correr.
+        const changed = data.session?.access_token !== session?.access_token;
         session = data.session;
+        if (!changed) return;
         await resolvePlayerId();
         notifyChange();
       });

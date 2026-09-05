@@ -253,8 +253,26 @@ window.addEventListener("caimanes:auth-changed", render);
 // celular y se regresó) cubre ambos casos sin que nadie tenga que hacer
 // nada — mismo tratamiento que un cambio de sesión, no se toca el scroll.
 window.addEventListener("online", render);
+
+// Repintar en CUALQUIER cambio de pestaña (por chico que sea) resultó ser
+// peor que el problema que arreglaba: un alt-tab de un segundo, o abrir
+// otro programa encima por un momento, disparaba un repintado completo —
+// re-pidiendo avatar, medallas, RSVP, comentarios, todo desde cero a
+// Supabase — que se sentía como que "los datos se desconectan" nada más
+// cambiar de ventana. Solo vale la pena recuperarse así cuando la pestaña
+// estuvo oculta el tiempo suficiente para que la conexión realmente se
+// haya podido caer (celular bloqueado, cambio de app prolongado) — un
+// minuto es buen punto medio: cubre ese caso sin disparar en cada clic
+// fuera de la ventana.
+const STALE_AFTER_MS = 60_000;
+let hiddenAt = null;
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") render();
+  if (document.visibilityState === "hidden") {
+    hiddenAt = Date.now();
+    return;
+  }
+  if (hiddenAt !== null && Date.now() - hiddenAt > STALE_AFTER_MS) render();
+  hiddenAt = null;
 });
 
 render();
