@@ -1035,28 +1035,37 @@ main h3::before {
   }
 }
 
+/* Dos renglones apilados en vez de uno solo en fila: el nuestro siempre en
+   grande, el del rival (+ "VS") chico — arriba o abajo según quién abre la
+   entrada (ver teamsHtml en js/views/juego.js). */
 .game-hero-teams {
   font-family: var(--font-display);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  /* Más grande que en mobile (ver el override abajo) — en escritorio hay
-     de sobra ancho para que "Equipo vs Rival" se lea a mayor tamaño. */
-  font-size: var(--text-2xl);
-  font-weight: 700;
+  gap: 2px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--text);
 }
 
-.game-hero-vs {
-  font-family: var(--font-display);
-  color: var(--accent-text);
-  font-style: italic;
+.game-hero-team--us {
+  font-weight: 700;
+  /* Mismo tamaño que el marcador (.game-hero-score), a petición expresa —
+     ese no se achica en celular, así que este tampoco (envuelve a 2
+     líneas solo si de plano no cabe, en vez de encogerse). */
+  font-size: var(--text-4xl);
+  line-height: 1.05;
+}
+
+.game-hero-team--them {
   font-weight: 700;
   font-size: var(--text-md);
+}
+
+.game-hero-vs {
+  color: var(--accent-text);
+  font-weight: 800;
 }
 
 .game-hero-score {
@@ -1133,11 +1142,11 @@ main h3::before {
 }
 
 @media (max-width: 640px) {
-  /* El tamaño grande de .game-hero-teams es solo para escritorio — en
-     celular se queda como estaba (si no, "Equipo vs Rival" ya no cabe en
-     una sola línea). */
-  .game-hero-teams {
-    font-size: var(--text-xl);
+  /* El renglón nuestro se queda del tamaño del marcador también en
+     celular (ver .game-hero-team--us arriba) — solo el del rival se achica
+     un poco más aquí. */
+  .game-hero-team--them {
+    font-size: var(--text-sm);
   }
 }
 

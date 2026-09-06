@@ -333,14 +333,18 @@ export function renderJuegoDetalle(container, gameId) {
   back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver a juegos';
   container.appendChild(back);
 
-  // Quién abre la entrada va primero: `weCloseBatting === true` es nosotros
-  // cerrando (bateamos en la baja), o sea el rival abre; `false` es al
-  // revés, nosotros abrimos. Sin dato (null) se deja el orden de siempre
-  // (nosotros primero) — ver el comentario de weCloseBatting en data.js.
-  const teamsHtml =
-    game.weCloseBatting === true
-      ? `<span class="game-hero-opponent">${game.opponent}</span><span class="game-hero-vs">vs</span><span>${TEAM.name}</span>`
-      : `<span>${TEAM.name}</span><span class="game-hero-vs">vs</span><span class="game-hero-opponent">${game.opponent}</span>`;
+  // Quién abre la entrada va primero, en su propio renglón chico (+ "VS")
+  // — el nuestro siempre en grande, arriba si abrimos o abajo si cerramos.
+  // `weCloseBatting === true` es nosotros cerrando (bateamos en la baja), o
+  // sea el rival abre; `false` es al revés, nosotros abrimos. Sin dato
+  // (null) se deja el orden de siempre (nosotros arriba) — ver el
+  // comentario de weCloseBatting en data.js.
+  const usHtml = `<div class="game-hero-team--us">${TEAM.name}</div>`;
+  const themHtml = (vsAfter) =>
+    vsAfter
+      ? `<div class="game-hero-team--them">${game.opponent} <span class="game-hero-vs">VS</span></div>`
+      : `<div class="game-hero-team--them"><span class="game-hero-vs">VS</span> ${game.opponent}</div>`;
+  const teamsHtml = game.weCloseBatting === true ? themHtml(true) + usHtml : usHtml + themHtml(false);
 
   // Badge extra solo si el juego viene de PLAYOFFS (findGame arriba) — el
   // marcador de la serie se recalcula en vivo con playoffStatus() a partir
