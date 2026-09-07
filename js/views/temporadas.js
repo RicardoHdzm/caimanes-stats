@@ -23,7 +23,7 @@ function defaultSeason() {
 
 function seasonLabel(n) {
   const meta = SEASONS[n - 1];
-  return meta ? `${ordinalTemporada(n)} Temporada — ${meta.league}` : `${ordinalTemporada(n)} Temporada`;
+  return meta ? `${ordinalTemporada(n)} Temporada: ${meta.league}` : `${ordinalTemporada(n)} Temporada`;
 }
 
 // Mismo armazón "hero" que usa Resumen para Récord/Carreras/etc. (ver
