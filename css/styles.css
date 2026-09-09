@@ -3910,6 +3910,16 @@ button.mvp-vote-card:active {
    con el logo en negro. En tema claro se ven tal cual; en Eclipse y Luna
    (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
    necesidad de guardar una segunda versión de cada logo. */
+.footer-sponsors-title {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .footer-sponsors {
   display: flex;
   justify-content: center;

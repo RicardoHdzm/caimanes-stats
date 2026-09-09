@@ -199,17 +199,18 @@ export async function changePassword(newPassword) {
 // js/main.js.
 
 let containerEl = null;
-// admin.html (js/admin-dues.js) sí necesita poder loguearse desde ahí —
-// "sin rastro de login" es solo para la app normal (js/main.js), donde
-// ahora se hace en la pantalla de bienvenida (ver js/splash.js). Por eso
-// mountAuthControl() recibe explícito si este `el` debe mostrar el link.
-let showLoginLink = false;
+// "splash" (default, js/main.js): sin sesión, el link de abajo te regresa
+// a la pantalla de bienvenida (ver js/splash.js) para loguearte ahí — la
+// app normal no tiene su propio formulario. "inline" (admin.html, vía
+// js/admin-dues.js): esa página no tiene pantalla de bienvenida, así que
+// aquí sí hace falta el formulario completo, en el mismo lugar.
+let loginVariant = "splash";
 
 // Se llama una vez desde js/main.js/js/admin-dues.js al arrancar, y de
 // nuevo cada vez que cambia la sesión (ver onAuthStateChange arriba).
-export function mountAuthControl(el, { showLogin = false } = {}) {
+export function mountAuthControl(el, { loginVariant: variant = "splash" } = {}) {
   containerEl = el;
-  showLoginLink = showLogin;
+  loginVariant = variant;
   renderAuthControl();
 }
 
@@ -223,23 +224,29 @@ export function renderAuthControl() {
   wireAuthControl();
 }
 
-// Sin sesión, la app normal (js/main.js) ya no muestra nada aquí — el
-// login se hace en la pantalla de bienvenida antes de entrar (ver
-// js/splash.js, "Soy jugador"). admin.html (showLoginLink, ver
-// mountAuthControl) sigue necesitando poder loguearse desde su propio
-// header — es una página aparte, sin esa pantalla de bienvenida — así que
-// ahí sí se pinta un formulario chico, inline (no un link a una página:
-// admin.html no tiene router de rutas, solo de secciones, así que un link
-// a "otra página" nunca hubiera funcionado ahí).
+// Sin sesión: en la app normal (variant "splash") el login ya no tiene su
+// propio formulario aquí — este link nomás te regresa a la pantalla de
+// bienvenida (ver js/splash.js, "Soy jugador"), que es donde de verdad se
+// hace. admin.html (variant "inline", ver mountAuthControl) sí necesita el
+// formulario completo en el mismo lugar — es una página aparte, sin esa
+// pantalla de bienvenida, y sin router de rutas (solo de secciones), así
+// que un link a "otra página" nunca hubiera funcionado ahí.
 function loggedOutMarkup() {
-  if (!showLoginLink) return "";
+  if (loginVariant === "inline") {
+    return `
+      <form id="auth-login-form" class="auth-login-inline">
+        <input type="email" name="email" placeholder="Correo" required autocomplete="username">
+        <input type="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
+        <button type="submit" class="auth-btn auth-btn-icon" aria-label="Entrar"><i class="fa-solid fa-right-to-bracket"></i></button>
+      </form>
+      <p class="auth-error" id="auth-login-error" hidden></p>
+    `;
+  }
   return `
-    <form id="auth-login-form" class="auth-login-inline">
-      <input type="email" name="email" placeholder="Correo" required autocomplete="username">
-      <input type="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
-      <button type="submit" class="auth-btn auth-btn-icon" aria-label="Entrar"><i class="fa-solid fa-right-to-bracket"></i></button>
-    </form>
-    <p class="auth-error" id="auth-login-error" hidden></p>
+    <a href="#" class="auth-btn auth-btn-named" id="splash-login-link" aria-label="Iniciar sesión">
+      <i class="fa-solid fa-right-to-bracket"></i>
+      <span class="auth-btn-name">Iniciar sesión</span>
+    </a>
   `;
 }
 
@@ -278,8 +285,24 @@ function loggedInMarkup() {
 function wireAuthControl() {
   containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", () => signOut());
 
-  // Formulario inline de admin.html (ver loggedOutMarkup) — no existe
-  // cuando showLoginLink es false (la app normal).
+  // "Iniciar sesión" de la app normal (variant "splash", ver
+  // loggedOutMarkup) — te regresa a la pantalla de bienvenida, mismo
+  // mecanismo que signOut() de arriba: quita la marca de "ya elegiste algo
+  // esta sesión" y recarga a la portada, donde splash.js vuelve a mostrar
+  // los botones.
+  containerEl.querySelector("#splash-login-link")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    try {
+      sessionStorage.removeItem("caimanes-entered");
+    } catch {
+      // Ver notas de hasEntered()/markEntered() en js/splash.js — sin
+      // storage simplemente no se recuerda, pero igual redirige.
+    }
+    location.href = "./";
+  });
+
+  // Formulario inline de admin.html (ver loggedOutMarkup) — no existe en
+  // la app normal (variant "splash").
   const loginForm = containerEl.querySelector("#auth-login-form");
   if (loginForm) {
     const errorEl = containerEl.querySelector("#auth-login-error");

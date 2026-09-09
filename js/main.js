@@ -92,6 +92,10 @@ if (footerSponsors && SPONSORS.length > 0) {
   footerSponsors.innerHTML = SPONSORS.map(
     (s) => `<img class="footer-sponsor-logo" src="${s.logo}" alt="${s.name}" loading="lazy">`
   ).join("");
+  // El título ("Patrocinadores") arranca oculto en el HTML — solo tiene
+  // caso mostrarlo si de verdad hay logos que ponerle encima.
+  const footerSponsorsTitle = document.getElementById("footer-sponsors-title");
+  if (footerSponsorsTitle) footerSponsorsTitle.hidden = false;
 }
 
 function currentRoute() {
@@ -209,6 +213,10 @@ function buildBottomTabs() {
         <span class="more-app-icon"><i class="fa-solid fa-user-gear"></i></span>
         <span>Admin</span>
       </a>
+      <a href="#" id="more-tile-login">
+        <span class="more-app-icon"><i class="fa-solid fa-right-to-bracket"></i></span>
+        <span>Iniciar sesión</span>
+      </a>
       <button type="button" id="more-tile-logout" hidden>
         <span class="more-app-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
         <span>Cerrar sesión</span>
@@ -217,9 +225,18 @@ function buildBottomTabs() {
   `;
   moreSheet.querySelector("#more-sheet-close-btn").addEventListener("click", () => toggleMoreSheet(false));
 
-  // Sin "Iniciar sesión" aquí a propósito — el login ya no vive en la app
-  // normal, se hace en la pantalla de bienvenida antes de entrar (ver
-  // js/splash.js).
+  // "Iniciar sesión" del menú te regresa a la pantalla de bienvenida (ver
+  // js/splash.js) — mismo mecanismo que el link del header (ver
+  // wireAuthControl en js/auth.js): ya no hay un formulario propio aquí.
+  moreSheet.querySelector("#more-tile-login").addEventListener("click", (e) => {
+    e.preventDefault();
+    try {
+      sessionStorage.removeItem("caimanes-entered");
+    } catch {
+      // Sin storage no hay nada que limpiar, pero igual redirige.
+    }
+    location.href = "./";
+  });
   // Cierra el menú de inmediato en vez de esperar a que signOut() (async)
   // dispare el re-render por "caimanes:auth-changed" — mismo trato que el
   // botón de cerrar sesión del header (ver wireAuthControl en js/auth.js).
@@ -255,13 +272,15 @@ function render() {
     if (myId) el.href = `#/jugador/${myId}`;
   }
 
-  // Cerrar sesión y Admin (solo coach) en el menú de "apps" — mismo estado
-  // que ya calcula js/auth.js para el botón del header, nomás reflejado
-  // aquí también. Sin Supabase configurado no hay cuentas de ningún tipo,
-  // así que los dos se quedan ocultos siempre.
+  // Iniciar/Cerrar sesión y Admin (solo coach) en el menú de "apps" — mismo
+  // estado que ya calcula js/auth.js para el botón del header, nomás
+  // reflejado aquí también. Sin Supabase configurado no hay cuentas de
+  // ningún tipo, así que los tres se quedan ocultos siempre.
   const session = SUPABASE_CONFIGURED && getSession();
+  const loginTile = moreSheet.querySelector("#more-tile-login");
   const logoutTile = moreSheet.querySelector("#more-tile-logout");
   const adminTile = moreSheet.querySelector("#more-tile-admin");
+  if (loginTile) loginTile.hidden = !SUPABASE_CONFIGURED || !!session;
   if (logoutTile) logoutTile.hidden = !session;
   if (adminTile) adminTile.hidden = !session || !isCoach();
 
