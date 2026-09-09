@@ -85,10 +85,17 @@ export async function initAuth() {
   }
   notifyChange();
 
-  supabase.auth.onAuthStateChange(async (_event, newSession) => {
+  supabase.auth.onAuthStateChange(async (event, newSession) => {
     session = newSession;
     await resolvePlayerId();
     notifyChange();
+    // Volviste del correo de "olvidé mi contraseña" (ver resetPassword más
+    // abajo) — el cliente detecta el token de recuperación solo en la URL
+    // (detectSessionInUrl, default) y dispara esto. js/recovery.js escucha
+    // este evento para mostrar el formulario de contraseña nueva.
+    if (event === "PASSWORD_RECOVERY") {
+      window.dispatchEvent(new CustomEvent("caimanes:password-recovery"));
+    }
   });
 
   // El token de sesión expira cada cierto tiempo (típicamente 1 hora) y se
@@ -153,6 +160,35 @@ export async function signIn(email, password) {
   if (!supabase) throw new Error("Supabase no está configurado todavía.");
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
+}
+
+// "¿Olvidaste tu contraseña?" (ver js/splash.js y el formulario inline de
+// admin.html) — manda el correo de recuperación de Supabase. `redirectTo`
+// siempre apunta a la raíz del sitio (nunca a admin.html, aunque se pida
+// desde ahí): ahí es donde vive #recovery-gate (ver js/recovery.js), que
+// es quien de verdad atrapa el link y pide la contraseña nueva. OJO: esa
+// URL tiene que estar en la lista de "Redirect URLs" del proyecto de
+// Supabase (Authentication → URL Configuration) o el correo no va a
+// funcionar — es una config aparte, no algo que el código pueda forzar.
+export async function resetPassword(email) {
+  if (!supabase) throw new Error("Supabase no está configurado todavía.");
+  const redirectTo = new URL("./", location.href).href;
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
+// Un solo mensaje de error para los dos formularios de login (splash.js y
+// el inline de admin.html) — antes siempre decía "correo o contraseña
+// incorrectos" pasara lo que pasara, hasta si era un hipo de red o
+// Supabase frenando por demasiados intentos seguidos (nos pasó de verdad
+// probando esto: varios 429 seguidos). `error.status` es el código HTTP
+// que regresa gotrue (la parte de auth de Supabase); sin status del todo
+// es que ni siquiera hubo respuesta (sin señal, CORS, etc.).
+export function loginErrorMessage(error) {
+  const status = error?.status;
+  if (status === 429) return "Demasiados intentos seguidos — espera un momento y vuelve a intentar.";
+  if (!status) return "No se pudo conectar — revisa tu señal e intenta de nuevo.";
+  return "Correo o contraseña incorrectos.";
 }
 
 export async function signOut() {
@@ -239,6 +275,7 @@ function loggedOutMarkup() {
         <input type="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
         <button type="submit" class="auth-btn auth-btn-icon" aria-label="Entrar"><i class="fa-solid fa-right-to-bracket"></i></button>
       </form>
+      <button type="button" id="auth-forgot-btn" class="auth-forgot-link">¿Olvidaste tu contraseña?</button>
       <p class="auth-error" id="auth-login-error" hidden></p>
     `;
   }
@@ -314,10 +351,30 @@ function wireAuthControl() {
       const { email, password } = Object.fromEntries(new FormData(loginForm));
       try {
         await signIn(email, password);
-      } catch {
-        errorEl.textContent = "Correo o contraseña incorrectos.";
+      } catch (error) {
+        errorEl.textContent = loginErrorMessage(error);
         errorEl.hidden = false;
         submitBtn.disabled = false;
+      }
+    });
+
+    containerEl.querySelector("#auth-forgot-btn")?.addEventListener("click", async () => {
+      const email = loginForm.querySelector('[name="email"]').value.trim();
+      errorEl.hidden = true;
+      if (!email) {
+        errorEl.textContent = "Escribe tu correo arriba primero.";
+        errorEl.hidden = false;
+        return;
+      }
+      try {
+        await resetPassword(email);
+        errorEl.className = "auth-ok";
+        errorEl.textContent = "Te mandamos un correo para restablecer tu contraseña.";
+        errorEl.hidden = false;
+      } catch (error) {
+        errorEl.className = "auth-error";
+        errorEl.textContent = loginErrorMessage(error);
+        errorEl.hidden = false;
       }
     });
   }

@@ -71,6 +71,25 @@
     </div>
   </div>
 
+  <!-- Restablecer contraseña ("¿Olvidaste tu contraseña?" — ver
+       resetPassword en js/auth.js). Oculto por default: Supabase manda de
+       vuelta aquí con un token de recuperación en la URL, y js/recovery.js
+       lo destapa solo cuando de verdad hace falta. Sin video (mismo fondo
+       de respaldo que #splash-gate cuando el video no cargó) — esta
+       pantalla es rara, no necesita el mismo espectáculo. -->
+  <div id="recovery-gate" class="splash-gate" hidden>
+    <div class="splash-overlay"></div>
+    <div class="splash-content">
+      <img src="assets/logo.png" alt="Caimanes de Villas" class="splash-logo" />
+      <form id="recovery-form" class="splash-login-form">
+        <label>Nueva contraseña<input type="password" name="password" minlength="6" required autocomplete="new-password"></label>
+        <label>Confirmar contraseña<input type="password" name="password2" minlength="6" required autocomplete="new-password"></label>
+        <p class="splash-login-error" id="recovery-error" hidden></p>
+        <button type="submit" class="splash-btn splash-btn--accent">Guardar contraseña</button>
+      </form>
+    </div>
+  </div>
+
   <header class="topbar">
     <!-- Posicionado aparte del logo (ver .social-link) para poder anclarlo
          a la esquina sin que empuje el centrado del logo. -->

@@ -1,7 +1,7 @@
 import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
 import { playerName, gameResult, playoffStatus } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
-import { getCurrentPlayerId } from "../auth.js";
+import { getCurrentPlayerId, getSession } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
 
@@ -173,6 +173,20 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     hint.className = "subtitle";
     hint.textContent = "La votación de este juego ya cerró.";
     container.appendChild(hint);
+  }
+
+  // Mientras la votación sigue abierta, verla también requiere cuenta —
+  // a petición expresa (antes cualquiera veía los votos en vivo, aunque
+  // solo pudiera votar con sesión). Ya cerrada, el resultado final es
+  // público de siempre — mvpBadgeSlot ya se queda vacío mientras isLatest
+  // es true (ver displayLeaderId más abajo), así que no hace falta tocarlo
+  // aquí: solo evitamos pedir/pintar la boleta completa.
+  if (isLatest && !getSession()) {
+    const hint = document.createElement("p");
+    hint.className = "subtitle";
+    hint.textContent = "Inicia sesión para ver y votar por el MVP de este juego.";
+    container.appendChild(hint);
+    return;
   }
 
   const gridEl = document.createElement("div");

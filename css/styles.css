@@ -454,6 +454,28 @@ body {
   margin-top: 6px;
 }
 
+#auth-slot .auth-ok {
+  text-align: right;
+  margin-top: 6px;
+}
+
+.auth-forgot-link {
+  display: block;
+  margin-top: 4px;
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-forgot-link:hover {
+  color: var(--accent-text);
+}
+
 .auth-btn i {
   font-size: var(--text-2xl);
 }
@@ -4199,8 +4221,17 @@ a.comment-author:hover .comment-author-name {
   justify-content: center;
   overflow: hidden;
   /* Fondo de respaldo si el video no cargó (sin señal, se bloqueó, etc.) —
-     nunca se ve un hueco en blanco. */
+     nunca se ve un hueco en blanco. También es el fondo de #recovery-gate
+     (js/recovery.js), que no trae video. */
   background: linear-gradient(160deg, #0b0d10, #1a1f27);
+}
+
+/* #recovery-gate arranca oculto en el HTML — sin esto, el `display: flex`
+   de arriba le gana al `display: none` por default de `hidden` (mismo
+   patrón de bug ya visto en este archivo con .more-sheet-grid a[hidden]):
+   se vería siempre, tapando todo el sitio desde que carga la página. */
+.splash-gate[hidden] {
+  display: none;
 }
 
 .splash-video {
@@ -4332,7 +4363,14 @@ a.comment-author:hover .comment-author-name {
   margin: 0;
 }
 
-.splash-back-btn {
+.splash-login-ok {
+  color: #7fe0a6;
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.splash-back-btn,
+.splash-forgot-btn {
   background: none;
   border: none;
   color: rgba(255, 255, 255, 0.75);
@@ -4342,6 +4380,7 @@ a.comment-author:hover .comment-author-name {
   padding: 4px;
 }
 
-.splash-back-btn:hover {
+.splash-back-btn:hover,
+.splash-forgot-btn:hover {
   color: #fff;
 }

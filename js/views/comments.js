@@ -1,9 +1,10 @@
-// Comentarios en el detalle de un juego. Lectura pública; comentar requiere
-// cuenta vinculada a un jugador (cualquiera, no solo quien jugó ese juego).
-// Un comentario por jugador por juego — no se editan: para "cambiar" el
-// tuyo hay que borrarlo y escribir uno nuevo. El dueño puede borrar el
-// suyo; el coach puede borrar cualquiera (moderación). Cada comentario
-// tiene su propio like/unlike, uno por jugador (interruptor, no acumula).
+// Comentarios en el detalle de un juego. Leer y comentar requieren cuenta
+// vinculada a un jugador (cualquiera, no solo quien jugó ese juego) — a
+// petición expresa, la lectura ya no es pública. Un comentario por jugador
+// por juego — no se editan: para "cambiar" el tuyo hay que borrarlo y
+// escribir uno nuevo. El dueño puede borrar el suyo; el coach puede borrar
+// cualquiera (moderación). Cada comentario tiene su propio like/unlike,
+// uno por jugador (interruptor, no acumula).
 import { PLAYERS } from "../data.js";
 import { getCurrentPlayerId, isCoach } from "../auth.js";
 import { getComments, addComment, deleteComment, getCommentLikes, likeComment, unlikeComment, getAvatarUrl } from "../db.js";
@@ -175,8 +176,13 @@ export function renderComments(container, { contextType, contextId }) {
     }
   });
 
+  // Lectura exclusiva con sesión, a petición expresa (antes era pública) —
+  // sin cuenta ni se pide la lista a Supabase, se queda nomás con el
+  // aviso, igual que RSVP ("Inicia sesión para confirmar tu asistencia").
   if (!myId) {
+    listEl.innerHTML = '<p class="subtitle">Inicia sesión para ver los comentarios.</p>';
     formSlot.innerHTML = '<p class="auth-hint">Inicia sesión para comentar.</p>';
+    return;
   }
 
   refresh();

@@ -5,7 +5,7 @@
 // navegador (sessionStorage, no localStorage — vuelve a aparecer si cierras
 // la pestaña/navegador y regresas, o si cierras sesión — ver signOut() en
 // js/auth.js — pero no cada vez que navegas dentro del sitio).
-import { signIn, getSession } from "./auth.js";
+import { signIn, getSession, resetPassword, loginErrorMessage } from "./auth.js";
 
 const STORAGE_KEY = "caimanes-entered";
 
@@ -32,6 +32,16 @@ function markEntered() {
 export function initSplash() {
   const gate = document.getElementById("splash-gate");
   if (!gate) return;
+
+  // Volviendo del correo de "olvidé mi contraseña" — Supabase manda el
+  // token de recuperación en el hash de la URL (#access_token=...&type=
+  // recovery). Esa pantalla la atiende #recovery-gate (ver js/recovery.js);
+  // sin este chequeo se alcanzarían a ver las dos tapadas una encima de la
+  // otra un instante, mientras initAuth() todavía no detecta el token.
+  if (location.hash.includes("type=recovery")) {
+    gate.remove();
+    return;
+  }
 
   // Ya se eligió una opción esta sesión — se quita ANTES de que el
   // navegador llegue a pedir el video (por eso el <video> no trae `src`
@@ -88,6 +98,7 @@ export function initSplash() {
         <label>Contraseña<input type="password" name="password" required autocomplete="current-password"></label>
         <p class="splash-login-error" id="splash-login-error" hidden></p>
         <button type="submit" class="splash-btn splash-btn--accent">Entrar</button>
+        <button type="button" class="splash-forgot-btn" id="splash-forgot">¿Olvidaste tu contraseña?</button>
         <button type="button" class="splash-back-btn" id="splash-back">← Volver</button>
       </form>
     `;
@@ -103,12 +114,37 @@ export function initSplash() {
       try {
         await signIn(email, password);
         enter();
-      } catch {
-        errorEl.textContent = "Correo o contraseña incorrectos.";
+      } catch (error) {
+        errorEl.className = "splash-login-error";
+        errorEl.textContent = loginErrorMessage(error);
         errorEl.hidden = false;
         submitBtn.disabled = false;
       }
     });
+
+    // Manda el correo de recuperación de Supabase al que esté escrito
+    // arriba — no pide un campo aparte, reusa el de correo del login.
+    actions.querySelector("#splash-forgot").addEventListener("click", async () => {
+      const email = form.querySelector('[name="email"]').value.trim();
+      errorEl.hidden = true;
+      if (!email) {
+        errorEl.className = "splash-login-error";
+        errorEl.textContent = "Escribe tu correo arriba primero.";
+        errorEl.hidden = false;
+        return;
+      }
+      try {
+        await resetPassword(email);
+        errorEl.className = "splash-login-ok";
+        errorEl.textContent = "Te mandamos un correo para restablecer tu contraseña.";
+        errorEl.hidden = false;
+      } catch (error) {
+        errorEl.className = "splash-login-error";
+        errorEl.textContent = loginErrorMessage(error);
+        errorEl.hidden = false;
+      }
+    });
+
     actions.querySelector("#splash-back").addEventListener("click", showButtons);
   }
 

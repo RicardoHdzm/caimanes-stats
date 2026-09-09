@@ -17,6 +17,7 @@ import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
 import { initSplash } from "./splash.js";
+import { initRecovery } from "./recovery.js";
 
 const routes = {
   resumen: renderResumen,
@@ -306,6 +307,7 @@ function render() {
 buildBottomTabs();
 initTheme();
 initSplash();
+initRecovery();
 mountAuthControl(document.getElementById("auth-slot"));
 // Al cambiar de ruta (clic en un link, botón "atrás") se sube al tope —
 // sin esto, un link a mitad de una página larga (ej. el avatar de un
