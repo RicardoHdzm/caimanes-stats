@@ -1,7 +1,8 @@
-import { GAMES, PLAYOFFS, SEASONS, CURRENT_SEASON } from "../data.js";
+import { GAMES, PLAYOFFS, SEASONS, CURRENT_SEASON, STANDINGS, STANDINGS_HISTORY } from "../data.js";
 import { battingTotals, pitchingTotals, fieldingTotals, teamRecord, gameResult } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada } from "../ui.js";
 import { renderPlayoffEntry } from "./playoffs.js";
+import { renderStandingsTable } from "./standing.js";
 
 // "2026-07-21" -> "21 jul 2026" — chico a propósito, esta tabla es solo un
 // índice de juegos hacia su detalle real, no el box score.
@@ -98,6 +99,23 @@ export function renderTemporadas(container, seasonParam) {
     container.appendChild(h3);
     renderPlayoffEntry(container, playoffEntry);
   }
+
+  // ---- Tabla de posiciones ----
+  // La actual (STANDINGS) es la de la temporada en curso; una ya cerrada
+  // solo tiene tabla si se guardó a mano en STANDINGS_HISTORY antes de
+  // reemplazar STANDINGS con la de la temporada nueva (ver el checklist
+  // junto a CURRENT_SEASON en js/data.js) — de ahí el mensaje distinto
+  // cuando no hay una capturada.
+  const standingsHeading = document.createElement("h3");
+  standingsHeading.textContent = "Tabla de posiciones";
+  container.appendChild(standingsHeading);
+  renderStandingsTable(
+    container,
+    season === CURRENT_SEASON ? STANDINGS : STANDINGS_HISTORY[season],
+    season === CURRENT_SEASON
+      ? undefined
+      : "No se guardó la tabla de posiciones final de esta temporada."
+  );
 
   // ---- Bateo ----
   const battingHeading = document.createElement("h3");

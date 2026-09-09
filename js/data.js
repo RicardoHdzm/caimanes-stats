@@ -86,13 +86,21 @@ export const PLAYERS = [
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
 ];
 
-// Estado de pago de la inscripción de la temporada. Antes vivía en Supabase
-// (tabla player_dues, editable desde admin.html) — ahora se controla aquí
-// directo, a mano, como el resto de este archivo. Por default TODOS
-// cuentan como pagados; para marcar a alguien como pendiente, agrega su id
-// aquí con `false` (ej. "p7": false — no hace falta listar a los que sí
-// pagaron, ya es el default).
-export const DUES_PAID = {};
+// Estado de pago de la inscripción — un objeto por temporada (ver
+// CURRENT_SEASON arriba), para que "quién pagó la 9" no se mezcle ni
+// borre lo que se supo de la 8. Antes vivía en Supabase (tabla
+// player_dues, editable desde admin.html) — ahora se controla aquí
+// directo, a mano, como el resto de este archivo (getDuesMap/
+// getDuesForPlayer en js/db.js ya solo miran la temporada actual). Por
+// default TODOS cuentan como pagados; para marcar a alguien como
+// pendiente, agrega su id en la temporada que corresponda con `false`
+// (ej. "p7": false — no hace falta listar a los que sí pagaron, ya es el
+// default). Al abrir una temporada nueva, agrega una entrada vacía con el
+// número nuevo (ver el checklist junto a CURRENT_SEASON) — la anterior se
+// queda tal cual, como historial.
+export const DUES_PAID = {
+  8: {},
+};
 
 // Ids de jugadores que se lesionaron durante la temporada — a mano, no hay
 // ningún dato de lesiones en GAMES de donde sacarlo solo. Alimenta la
@@ -117,10 +125,17 @@ export const MANAGERS = ["p15"];
 // `season === CURRENT_SEASON`; GAMES completo (todas las temporadas) solo
 // lo usan el detalle de un juego puntual (link directo por id) y
 // "Temporadas anteriores" (js/views/temporadas.js). Al abrir una temporada
-// nueva: agrega una fila a SEASONS, sube TEAM.seasonsTotal (y
-// seasonsInLeague si sigue en la misma liga) y actualiza
-// TEAM.gamesInSeason al calendario nuevo — con eso CURRENT_SEASON avanza
-// solo, no hace falta tocar código.
+// nueva:
+//   1. Agrega una fila a SEASONS, sube TEAM.seasonsTotal (y
+//      seasonsInLeague si sigue en la misma liga) y actualiza
+//      TEAM.gamesInSeason al calendario nuevo — con eso CURRENT_SEASON
+//      avanza solo, no hace falta tocar más código.
+//   2. Copia el STANDINGS de ese momento (la tabla final de la temporada
+//      que cierra) a STANDINGS_HISTORY, con esa temporada como llave —
+//      si no, se pierde en cuanto pegues la tabla de la temporada nueva.
+//   3. Agrega una entrada nueva a DUES_PAID con el número de la temporada
+//      nueva (ver DUES_PAID más abajo) — la de la temporada que cierra se
+//      queda tal cual, como historial.
 //
 // `weCloseBatting` NO es una sede: en esta liga no hay local ni visitante,
 // todos juegan en el mismo campo. Es solo quién batea al final de cada
@@ -743,6 +758,19 @@ export const STANDINGS = {
   ],
 };
 
+// Tabla final de temporadas YA CERRADAS — STANDINGS (arriba) siempre es la
+// de la temporada actual y se sobreescribe con la nueva en cuanto empieza
+// otra, así que si no se guarda aquí ANTES de reemplazarla, se pierde para
+// siempre. Cuando cierre la temporada actual (ver el checklist de "abrir
+// temporada nueva" junto a CURRENT_SEASON): copia el STANDINGS de arriba
+// tal cual a una entrada nueva aquí, con la temporada como llave —
+// `js/views/temporadas.js` la usa para mostrar cómo terminó cada
+// temporada pasada en la liga.
+// export const STANDINGS_HISTORY = {
+//   8: { updated: "2026-09-20", teams: [ ...copia de STANDINGS... ] },
+// };
+export const STANDINGS_HISTORY = {};
+
 // Patrocinadores — se ven como una tira de logos al final de cada página
 // (ver #footer-sponsors en index.html, pintada por js/main.js). Cada
 // archivo debe ser un PNG transparente con el logo en NEGRO — en tema claro
@@ -752,5 +780,5 @@ export const STANDINGS = {
 // clicable.
 export const SPONSORS = [
   { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
-  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor02.png" },
+  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor002.png" },
 ];

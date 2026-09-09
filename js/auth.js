@@ -158,6 +158,18 @@ export async function signIn(email, password) {
 export async function signOut() {
   if (!supabase) return;
   await supabase.auth.signOut();
+  // Cerrar sesión te regresa a la pantalla de bienvenida (ver
+  // js/splash.js) — mismo storage key que usa initSplash() para saber si
+  // ya se entró esta sesión; quitarlo hace que vuelva a aparecer. Redirige
+  // (en vez de solo re-renderizar) porque el gate es un elemento estático
+  // de index.html que splash.js ya quitó del DOM al entrar — hace falta
+  // una carga fresca de la página para que vuelva a estar ahí.
+  try {
+    sessionStorage.removeItem("caimanes-entered");
+  } catch {
+    // Sin sessionStorage no hay nada que limpiar.
+  }
+  location.href = "./";
 }
 
 // Reintenta una vez tras un hipo de red — es un update (cambiar la
@@ -187,11 +199,17 @@ export async function changePassword(newPassword) {
 // js/main.js.
 
 let containerEl = null;
+// admin.html (js/admin-dues.js) sí necesita poder loguearse desde ahí —
+// "sin rastro de login" es solo para la app normal (js/main.js), donde
+// ahora se hace en la pantalla de bienvenida (ver js/splash.js). Por eso
+// mountAuthControl() recibe explícito si este `el` debe mostrar el link.
+let showLoginLink = false;
 
-// Se llama una vez desde js/main.js al arrancar, y de nuevo cada vez que
-// cambia la sesión (ver onAuthStateChange arriba).
-export function mountAuthControl(el) {
+// Se llama una vez desde js/main.js/js/admin-dues.js al arrancar, y de
+// nuevo cada vez que cambia la sesión (ver onAuthStateChange arriba).
+export function mountAuthControl(el, { showLogin = false } = {}) {
   containerEl = el;
+  showLoginLink = showLogin;
   renderAuthControl();
 }
 
@@ -205,15 +223,23 @@ export function renderAuthControl() {
   wireAuthControl();
 }
 
-// Antes era un botón que abría un desplegable con el formulario ahí mismo
-// (ver historial) — ahora "Iniciar sesión" es su propia página (#/login,
-// ver js/views/login.js), así que aquí solo hace falta un link normal.
+// Sin sesión, la app normal (js/main.js) ya no muestra nada aquí — el
+// login se hace en la pantalla de bienvenida antes de entrar (ver
+// js/splash.js, "Soy jugador"). admin.html (showLoginLink, ver
+// mountAuthControl) sigue necesitando poder loguearse desde su propio
+// header — es una página aparte, sin esa pantalla de bienvenida — así que
+// ahí sí se pinta un formulario chico, inline (no un link a una página:
+// admin.html no tiene router de rutas, solo de secciones, así que un link
+// a "otra página" nunca hubiera funcionado ahí).
 function loggedOutMarkup() {
+  if (!showLoginLink) return "";
   return `
-    <a href="#/login" class="auth-btn auth-btn-named" id="login-link" aria-label="Iniciar sesión">
-      <i class="fa-solid fa-right-to-bracket"></i>
-      <span class="auth-btn-name">Iniciar sesión</span>
-    </a>
+    <form id="auth-login-form" class="auth-login-inline">
+      <input type="email" name="email" placeholder="Correo" required autocomplete="username">
+      <input type="password" name="password" placeholder="Contraseña" required autocomplete="current-password">
+      <button type="submit" class="auth-btn auth-btn-icon" aria-label="Entrar"><i class="fa-solid fa-right-to-bracket"></i></button>
+    </form>
+    <p class="auth-error" id="auth-login-error" hidden></p>
   `;
 }
 
@@ -252,12 +278,24 @@ function loggedInMarkup() {
 function wireAuthControl() {
   containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", () => signOut());
 
-  // "Iniciar sesión" (solo existe deslogueado, ver loggedOutMarkup) guarda
-  // en qué página estabas ANTES de ir a #/login — la lee js/views/login.js
-  // al terminar, para regresarte ahí en vez de mandarte siempre a Resumen.
-  // Se lee location.hash aquí, ANTES de que el navegador procese el click
-  // del link (el listener corre primero), así que todavía es el hash VIEJO.
-  containerEl.querySelector("#login-link")?.addEventListener("click", () => {
-    sessionStorage.setItem("caimanes-login-return", location.hash || "#/resumen");
-  });
+  // Formulario inline de admin.html (ver loggedOutMarkup) — no existe
+  // cuando showLoginLink es false (la app normal).
+  const loginForm = containerEl.querySelector("#auth-login-form");
+  if (loginForm) {
+    const errorEl = containerEl.querySelector("#auth-login-error");
+    const submitBtn = loginForm.querySelector("button");
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.hidden = true;
+      submitBtn.disabled = true;
+      const { email, password } = Object.fromEntries(new FormData(loginForm));
+      try {
+        await signIn(email, password);
+      } catch {
+        errorEl.textContent = "Correo o contraseña incorrectos.";
+        errorEl.hidden = false;
+        submitBtn.disabled = false;
+      }
+    });
+  }
 }

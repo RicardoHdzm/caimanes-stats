@@ -423,6 +423,37 @@ body {
   border-color: var(--accent);
 }
 
+/* Login inline de admin.html (ver loggedOutMarkup en js/auth.js) — la app
+   normal ya no lo usa (login se hace en js/splash.js), pero admin.html no
+   tiene esa pantalla de bienvenida, así que aquí el formulario sigue
+   viviendo en el header. */
+.auth-login-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.auth-login-inline input {
+  width: 130px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+.auth-login-inline input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#auth-slot .auth-error {
+  text-align: right;
+  margin-top: 6px;
+}
+
 .auth-btn i {
   font-size: var(--text-2xl);
 }
@@ -2030,33 +2061,6 @@ main h3::before {
    son solo para las tarjetas de Resumen, no las de perfil. */
 .player-standalone-card {
   margin-bottom: 16px;
-}
-
-/* Página de login (#/login, ver js/views/login.js) — angosta y centrada a
-   propósito, un formulario no necesita el ancho completo de `main`
-   (1150px). El h2 es inline-block (ver regla global de h2) y se alinea a
-   la izquierda por default en todo el sitio; text-align:center en el
-   contenedor lo centra a él (la caja completa, con todo y su línea roja
-   de abajo) sin tocar ese estilo global en ninguna otra página. */
-.login-page {
-  text-align: center;
-}
-
-.login-card {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 32px 28px;
-  text-align: left;
-}
-
-.login-card .auth-form input {
-  padding: 10px 12px;
-}
-
-.login-card .auth-submit {
-  margin-top: 4px;
-  padding: 11px 0;
-  font-size: var(--text-md);
 }
 
 .leader-card:hover {
@@ -4172,3 +4176,162 @@ a.comment-author:hover .comment-author-name {
   border-color: var(--accent);
 }
 
+
+/* ---- Pantalla de bienvenida (#splash-gate en index.html, js/splash.js) ----
+   Video de fondo + logo + "Soy invitado"/"Soy jugador", tapando todo lo
+   demás (que ya renderizó normal por debajo) hasta que se elige una. */
+.splash-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Fondo de respaldo si el video no cargó (sin señal, se bloqueó, etc.) —
+     nunca se ve un hueco en blanco. */
+  background: linear-gradient(160deg, #0b0d10, #1a1f27);
+}
+
+.splash-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Atenuado azul marino, a petición expresa (antes negro liso) — sigue
+   siendo más oscuro hacia abajo, donde va el texto/botones, para que
+   tengan contraste sin importar qué tan clara sea esa parte del video. */
+.splash-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 20, 45, 0.55) 0%, rgba(6, 14, 32, 0.8) 100%);
+}
+
+.splash-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  padding: 24px;
+  text-align: center;
+}
+
+.splash-logo {
+  width: min(380px, 78vw);
+  height: auto;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+.splash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.splash-btn {
+  min-width: 180px;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-size: var(--text-md);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  border: 2px solid #fff;
+  background: none;
+  color: #fff;
+}
+
+.splash-btn:active {
+  transform: scale(0.97);
+}
+
+.splash-btn--accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.splash-btn:hover {
+  filter: brightness(1.15);
+}
+
+@media (max-width: 480px) {
+  .splash-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .splash-btn {
+    width: 100%;
+  }
+}
+
+/* Formulario de "Soy jugador" (ver showLogin en js/splash.js) — reemplaza
+   los botones en el mismo lugar. Colores fijos (no las variables de tema):
+   esta pantalla siempre es oscura, con o sin video, sin importar el tema
+   claro/oscuro que tenga elegido el sitio. */
+.splash-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(320px, 82vw);
+}
+
+.splash-login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: left;
+}
+
+.splash-login-form input {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: inherit;
+  font-size: var(--text-md);
+}
+
+.splash-login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.splash-login-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.splash-login-error {
+  color: #ff8a8a;
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.splash-back-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.splash-back-btn:hover {
+  color: #fff;
+}

@@ -8,7 +8,7 @@
 //
 // Al cambiar cualquier archivo del proyecto sube CACHE_VERSION: eso tira la
 // caché vieja completa y evita mezclas de versiones.
-const CACHE_VERSION = "v283";
+const CACHE_VERSION = "v287";
 const CACHE_NAME = `caimanes-${CACHE_VERSION}`;
 
 // Lo mínimo para que la app arranque estando offline desde cero.
@@ -26,6 +26,7 @@ const APP_SHELL = [
   "./js/auth.js",
   "./js/db.js",
   "./js/theme.js",
+  "./js/splash.js",
   "./js/views/resumen.js",
   "./js/views/roster.js",
   "./js/views/estadisticas.js",
@@ -38,7 +39,6 @@ const APP_SHELL = [
   "./js/views/juego.js",
   "./js/views/jugador.js",
   "./js/views/medallas.js",
-  "./js/views/login.js",
   "./js/views/calendario.js",
   "./js/views/standing.js",
   "./js/views/alineacion.js",
@@ -47,7 +47,7 @@ const APP_SHELL = [
   "./js/views/playlist.js",
   "./assets/logo.png",
   "./assets/sponsors/sponsor00.png",
-  "./assets/sponsors/sponsor02.png",
+  "./assets/sponsors/sponsor002.png",
   "./assets/fonts/barlow-condensed-600.woff2",
   "./assets/fonts/barlow-condensed-700.woff2",
   "./assets/fonts/barlow-condensed-700-italic.woff2",
@@ -118,6 +118,14 @@ self.addEventListener("fetch", (event) => {
   // Font Awesome viene de un CDN; se deja pasar sin tocar para no cachear
   // respuestas opacas de otro origen.
   if (url.origin !== self.location.origin) return;
+
+  // El video de la bienvenida (assets/video.mp4, ver index.html/js/splash.js)
+  // se deja pasar directo a la red, sin tocarlo: es pesado a propósito (no
+  // va en APP_SHELL, nadie lo descarga hasta que de veras se muestra la
+  // pantalla de bienvenida) y el navegador lo pide en pedazos (Range) para
+  // reproducirlo — cachear una respuesta 206 truena (Cache.put no acepta
+  // parciales), así que ni vale la pena intentarlo.
+  if (/\.(mp4|webm)$/i.test(url.pathname)) return;
 
   event.respondWith(isImageOrFont(request, url) ? cacheFirst(request) : networkFirst(request));
 });

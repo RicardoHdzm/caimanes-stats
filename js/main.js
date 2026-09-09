@@ -12,11 +12,11 @@ import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
-import { renderLogin } from "./views/login.js";
 import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut } from "./auth.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
+import { initSplash } from "./splash.js";
 
 const routes = {
   resumen: renderResumen,
@@ -28,7 +28,6 @@ const routes = {
   standing: renderStanding,
   alineacion: renderAlineacion,
   playlist: renderPlaylist,
-  login: renderLogin,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -210,10 +209,6 @@ function buildBottomTabs() {
         <span class="more-app-icon"><i class="fa-solid fa-user-gear"></i></span>
         <span>Admin</span>
       </a>
-      <a href="#/login" id="more-tile-login">
-        <span class="more-app-icon"><i class="fa-solid fa-right-to-bracket"></i></span>
-        <span>Iniciar sesión</span>
-      </a>
       <button type="button" id="more-tile-logout" hidden>
         <span class="more-app-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
         <span>Cerrar sesión</span>
@@ -222,14 +217,9 @@ function buildBottomTabs() {
   `;
   moreSheet.querySelector("#more-sheet-close-btn").addEventListener("click", () => toggleMoreSheet(false));
 
-  // "Iniciar sesión" del menú guarda en qué página estabas, igual que el
-  // link del header (ver wireAuthControl en js/auth.js) — así al terminar
-  // de loguearte regresas ahí en vez de a Resumen siempre. Se lee el hash
-  // ANTES de que el navegador procese el click del link, así que todavía
-  // es el hash VIEJO.
-  moreSheet.querySelector("#more-tile-login").addEventListener("click", () => {
-    sessionStorage.setItem("caimanes-login-return", location.hash || "#/resumen");
-  });
+  // Sin "Iniciar sesión" aquí a propósito — el login ya no vive en la app
+  // normal, se hace en la pantalla de bienvenida antes de entrar (ver
+  // js/splash.js).
   // Cierra el menú de inmediato en vez de esperar a que signOut() (async)
   // dispare el re-render por "caimanes:auth-changed" — mismo trato que el
   // botón de cerrar sesión del header (ver wireAuthControl en js/auth.js).
@@ -265,15 +255,13 @@ function render() {
     if (myId) el.href = `#/jugador/${myId}`;
   }
 
-  // Iniciar/Cerrar sesión y Admin (solo coach) en el menú de "apps" — mismo
-  // estado que ya calcula js/auth.js para el botón del header, nomás
-  // reflejado aquí también. Sin Supabase configurado no hay cuentas de
-  // ningún tipo, así que los tres se quedan ocultos siempre.
+  // Cerrar sesión y Admin (solo coach) en el menú de "apps" — mismo estado
+  // que ya calcula js/auth.js para el botón del header, nomás reflejado
+  // aquí también. Sin Supabase configurado no hay cuentas de ningún tipo,
+  // así que los dos se quedan ocultos siempre.
   const session = SUPABASE_CONFIGURED && getSession();
-  const loginTile = moreSheet.querySelector("#more-tile-login");
   const logoutTile = moreSheet.querySelector("#more-tile-logout");
   const adminTile = moreSheet.querySelector("#more-tile-admin");
-  if (loginTile) loginTile.hidden = !SUPABASE_CONFIGURED || !!session;
   if (logoutTile) logoutTile.hidden = !session;
   if (adminTile) adminTile.hidden = !session || !isCoach();
 
@@ -298,6 +286,7 @@ function render() {
 
 buildBottomTabs();
 initTheme();
+initSplash();
 mountAuthControl(document.getElementById("auth-slot"));
 // Al cambiar de ruta (clic en un link, botón "atrás") se sube al tope —
 // sin esto, un link a mitad de una página larga (ej. el avatar de un

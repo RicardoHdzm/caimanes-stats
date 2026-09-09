@@ -52,6 +52,25 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
+  <!-- Pantalla de bienvenida — solo la primera vez en la sesión del
+       navegador (ver js/splash.js). Sin `src` en el <video>: si ya
+       entraste esta sesión, splash.js lo quita del DOM ANTES de que el
+       navegador llegue a pedir el archivo (65MB, no vale la pena
+       descargarlo dos veces). Todo lo de abajo (header/nav/main/footer)
+       sigue renderizando normal por debajo, tapado hasta que se elige una
+       opción. -->
+  <div id="splash-gate" class="splash-gate">
+    <video class="splash-video" muted loop playsinline autoplay></video>
+    <div class="splash-overlay"></div>
+    <div class="splash-content">
+      <img src="assets/logo.png" alt="Caimanes de Villas" class="splash-logo" />
+      <!-- Vacío a propósito: js/splash.js arma aquí los botones o, al elegir
+           "Soy jugador", el formulario de inicio de sesión — todo el login
+           vive en esta pantalla ahora, no hay una página #/login aparte. -->
+      <div class="splash-actions" id="splash-actions"></div>
+    </div>
+  </div>
+
   <header class="topbar">
     <!-- Posicionado aparte del logo (ver .social-link) para poder anclarlo
          a la esquina sin que empuje el centrado del logo. -->

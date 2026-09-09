@@ -7,23 +7,27 @@ function formatDate(dateStr) {
   return text;
 }
 
-export function renderStanding(container) {
-  heading(container, "Tabla de posiciones");
-
-  const teams = STANDINGS.teams ?? [];
+// La tabla en sí, sin el <h2> — exportada para que "Temporadas anteriores"
+// (js/views/temporadas.js) también la use con STANDINGS_HISTORY[n] en vez
+// de STANDINGS (la de la temporada actual, ver js/data.js). `emptyMessage`
+// es distinto en cada caso: aquí siempre es "todavía no se ha capturado"
+// (puede llegar en cualquier momento); en una temporada ya cerrada el
+// mensaje correcto es otro (esa tabla ya no va a llegar).
+export function renderStandingsTable(container, standings, emptyMessage = "Todavía no se ha capturado la tabla de posiciones.") {
+  const teams = standings?.teams ?? [];
 
   if (teams.length === 0) {
     const p = document.createElement("p");
     p.className = "subtitle";
-    p.textContent = "Todavía no se ha capturado la tabla de posiciones.";
+    p.textContent = emptyMessage;
     container.appendChild(p);
     return;
   }
 
-  if (STANDINGS.updated) {
+  if (standings.updated) {
     const p = document.createElement("p");
     p.className = "subtitle";
-    p.textContent = `Como la publicó la liga al ${formatDate(STANDINGS.updated)}.`;
+    p.textContent = `Como la publicó la liga al ${formatDate(standings.updated)}.`;
     container.appendChild(p);
   }
 
@@ -50,4 +54,9 @@ export function renderStanding(container) {
   });
 
   renderGlossary(container, columns);
+}
+
+export function renderStanding(container) {
+  heading(container, "Tabla de posiciones");
+  renderStandingsTable(container, STANDINGS);
 }

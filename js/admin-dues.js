@@ -38,7 +38,11 @@ async function render() {
   listEl.innerHTML = PLAYERS.map((p) => rowMarkup(p, duesMap.get(p.id) ?? true)).join("");
 }
 
-mountAuthControl(document.getElementById("auth-slot"));
+// { showLogin: true }: admin.html no tiene la pantalla de bienvenida de
+// js/splash.js (esa es solo de la app normal) — aquí el login sigue
+// viviendo en el header, es la única forma de entrar (ver loggedOutMarkup
+// en js/auth.js).
+mountAuthControl(document.getElementById("auth-slot"), { showLogin: true });
 window.addEventListener("caimanes:auth-changed", render);
 render();
 initAuth();

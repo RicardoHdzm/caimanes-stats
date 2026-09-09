@@ -8,7 +8,7 @@
 // pagos); por ahora solo expone el cliente para que las próximas fases lo
 // reusen sin volver a importarlo cada una por su cuenta.
 import { getClient, getCurrentPlayerId } from "./auth.js";
-import { PLAYERS, DUES_PAID } from "./data.js";
+import { PLAYERS, DUES_PAID, CURRENT_SEASON } from "./data.js";
 
 export { getClient };
 
@@ -57,18 +57,24 @@ async function runMutation(mutationFn) {
 // ---- Estado de pago de inscripción ----
 //
 // Ya NO vive en Supabase (tabla player_dues) — ahora sale directo de
-// DUES_PAID en js/data.js, a petición expresa ("por ahora marca que todos
-// pagaron correctamente"). Estas dos funciones se quedan async y con la
-// misma forma de siempre (Map / boolean) para que roster.js, jugador.js y
-// medallas.js no tengan que cambiar nada — ya no pueden fallar ni regresar
-// `null` (no hay red de por medio), pero esos casos se dejan intactos en
-// quien llama por si algún día vuelve a haber una fuente que sí falle.
+// DUES_PAID en js/data.js (un objeto por temporada, ver CURRENT_SEASON),
+// a petición expresa ("por ahora marca que todos pagaron correctamente").
+// Estas dos funciones se quedan async y con la misma forma de siempre
+// (Map / boolean) para que roster.js, jugador.js y medallas.js no tengan
+// que cambiar nada — ya no pueden fallar ni regresar `null` (no hay red
+// de por medio), pero esos casos se dejan intactos en quien llama por si
+// algún día vuelve a haber una fuente que sí falle. Solo miran la
+// temporada ACTUAL a propósito — el estado de pago de una temporada
+// cerrada no se muestra en ningún lado hoy (ni Roster ni el perfil tienen
+// selector de temporada), se queda solo como historial en data.js.
 export async function getDuesMap() {
-  return new Map(PLAYERS.map((p) => [p.id, DUES_PAID[p.id] ?? true]));
+  const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
+  return new Map(PLAYERS.map((p) => [p.id, seasonDues[p.id] ?? true]));
 }
 
 export async function getDuesForPlayer(playerId) {
-  return DUES_PAID[playerId] ?? true;
+  const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
+  return seasonDues[playerId] ?? true;
 }
 
 // ---- RSVP a un juego programado (game_rsvps) ----
