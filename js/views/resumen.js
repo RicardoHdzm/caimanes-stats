@@ -13,7 +13,7 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
-import { getCurrentPlayerId } from "../auth.js";
+import { getCurrentPlayerId, getSession } from "../auth.js";
 import {
   getRsvps,
   setRsvp,
@@ -151,6 +151,23 @@ function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
   `;
 }
 
+// Mismo cascarón que teamLeaderCardHtml() de arriba cuando no hay datos
+// ("Sin datos todavía."), pero para una tarjeta exclusiva de cuentas con
+// sesión — usada por "Líder cervecero" (chiste del equipo, no una stat que
+// cualquiera visitante deba ver, a petición expresa).
+function lockedLeaderCardHtml(icon, title, message) {
+  return `
+    <div class="leader-card leader-card--hero">
+      <div class="leader-hero">
+        <div class="leader-hero-main">
+          <h3><i class="fa-solid ${icon}"></i>${title}</h3>
+          <p class="auth-hint">${message}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // Botones Sí/No (solo con cuenta vinculada a un jugador) dentro de la
 // tarjeta de "Próximo juego" — sin lista de quién ya confirmó, eso vive
 // en admin.html (ver js/admin-rsvp.js), no aquí. Se llama una vez por
@@ -226,55 +243,67 @@ export function renderResumen(container) {
   // Anuncios del equipo — solo se pintan si hay alguno (el coach los publica
   // desde admin.html, ver js/admin-announcements.js). Van antes que todo lo
   // demás porque son avisos, se quieren ver de inmediato al abrir la app.
+  // Exclusivos de cuentas con sesión iniciada, a petición expresa (igual
+  // que Comentarios y el medallero, ver js/views/comments.js y
+  // js/views/jugador.js) — sin cuenta ni se piden a Supabase.
   const announcementsSlot = document.createElement("div");
   container.appendChild(announcementsSlot);
 
-  async function refreshAnnouncements() {
-    const items = await getAnnouncements(3);
-    if (items.length === 0) {
-      announcementsSlot.innerHTML = "";
-      return;
-    }
-    const likes = await getAnnouncementLikes(items.map((a) => a.id));
-    const myId = getCurrentPlayerId();
-    const likeCounts = new Map();
-    const likedByMe = new Set();
-    for (const like of likes) {
-      likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
-      if (myId && like.player_id === myId) likedByMe.add(like.announcement_id);
-    }
-    const announcementsList = `<div class="announcements-list">${items
-      .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
-      .join("")}</div>`;
+  const myId = getCurrentPlayerId();
+
+  if (!myId) {
     announcementsSlot.innerHTML = `
       <div class="leader-card leader-card--hero announcements-card">
-        ${heroCardInnerHtml("fa-bullhorn", "Anuncios", "", announcementsList)}
+        ${heroCardInnerHtml("fa-bullhorn", "Anuncios", '<p class="auth-hint">Inicia sesión para ver los avisos del equipo.</p>')}
       </div>
     `;
-  }
-
-  // Delegado en announcementsSlot (nunca se reemplaza, solo su innerHTML en
-  // cada refresh) — mismo patrón que el like de comentarios en
-  // js/views/comments.js.
-  announcementsSlot.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".announcement-like-btn");
-    if (!btn || btn.disabled) return;
-    const id = Number(btn.dataset.announcement);
-    const alreadyLiked = btn.classList.contains("active");
-    btn.disabled = true;
-    try {
-      if (alreadyLiked) {
-        await unlikeAnnouncement(id);
-      } else {
-        await likeAnnouncement(id);
+  } else {
+    async function refreshAnnouncements() {
+      const items = await getAnnouncements(3);
+      if (items.length === 0) {
+        announcementsSlot.innerHTML = "";
+        return;
       }
-      await refreshAnnouncements();
-    } catch {
-      btn.disabled = false;
+      const likes = await getAnnouncementLikes(items.map((a) => a.id));
+      const likeCounts = new Map();
+      const likedByMe = new Set();
+      for (const like of likes) {
+        likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
+        if (myId && like.player_id === myId) likedByMe.add(like.announcement_id);
+      }
+      const announcementsList = `<div class="announcements-list">${items
+        .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
+        .join("")}</div>`;
+      announcementsSlot.innerHTML = `
+        <div class="leader-card leader-card--hero announcements-card">
+          ${heroCardInnerHtml("fa-bullhorn", "Anuncios", "", announcementsList)}
+        </div>
+      `;
     }
-  });
 
-  refreshAnnouncements();
+    // Delegado en announcementsSlot (nunca se reemplaza, solo su innerHTML
+    // en cada refresh) — mismo patrón que el like de comentarios en
+    // js/views/comments.js.
+    announcementsSlot.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".announcement-like-btn");
+      if (!btn || btn.disabled) return;
+      const id = Number(btn.dataset.announcement);
+      const alreadyLiked = btn.classList.contains("active");
+      btn.disabled = true;
+      try {
+        if (alreadyLiked) {
+          await unlikeAnnouncement(id);
+        } else {
+          await likeAnnouncement(id);
+        }
+        await refreshAnnouncements();
+      } catch {
+        btn.disabled = false;
+      }
+    });
+
+    refreshAnnouncements();
+  }
 
   // Mismas tarjetas "hero" que el resto de Resumen (ver heroCardShell) en
   // vez de .card/.card-icon — esas siguen usándose tal cual en otras
@@ -445,13 +474,17 @@ export function renderResumen(container) {
       valueOf: (p) => `${p.WHIP} WHIP`,
       detailOf: (p) => `${p.SO} K en ${p.IP} IP`,
     }) +
-    teamLeaderCardHtml({
-      icon: "fa-beer-mug-empty",
-      title: "Líder cervecero",
-      list: soSorted,
-      valueOf: (p) => `${p.SO * 12} botes`,
-      detailOf: (p) => `${p.SO} ponches`,
-    });
+    // Chiste del equipo, exclusivo de cuentas con sesión, a petición
+    // expresa — ver lockedLeaderCardHtml() arriba.
+    (getSession()
+      ? teamLeaderCardHtml({
+          icon: "fa-beer-mug-empty",
+          title: "Líder cervecero",
+          list: soSorted,
+          valueOf: (p) => `${p.SO * 12} botes`,
+          detailOf: (p) => `${p.SO} ponches`,
+        })
+      : lockedLeaderCardHtml("fa-beer-mug-empty", "Líder cervecero", "Inicia sesión para ver esta tarjeta."));
   container.appendChild(leadersRow);
   hydrateAvatars(leadersRow);
 

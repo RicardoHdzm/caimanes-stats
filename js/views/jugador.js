@@ -759,6 +759,10 @@ export function renderJugadorDetalle(container, playerId) {
   const games = currentSeasonGames();
   const played = gamesPlayedByPlayer(games).get(player.id) ?? 0;
   const isOwnProfile = getCurrentPlayerId() === player.id;
+  // Walkup song exclusiva de cuentas con sesión iniciada, a petición
+  // expresa (igual que el medallero, más abajo) — se calcula aquí porque
+  // hace falta ya para armar el hero.innerHTML de abajo.
+  const hasSession = !!getSession();
   // TEAM.gamesInSeason (no games.length): es el total de la temporada, no
   // solo los que ya se han capturado — así la barra de verdad avanza hacia
   // "toda la temporada", en vez de mostrar 100% apenas jugó todos los
@@ -790,7 +794,7 @@ export function renderJugadorDetalle(container, playerId) {
           <span>${escapeHtml(player.name)}</span>
           <span class="profile-hero-name-positions" id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
         </div>
-        <div id="walkup-display">${renderWalkup(player.walkup)}</div>
+        <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : '<span class="auth-hint">Inicia sesión para ver la canción de entrada.</span>'}</div>
         <div class="profile-attendance">
           <div class="profile-attendance-label">
             <span>${played}/${TEAM.gamesInSeason} juegos jugados</span>
@@ -813,8 +817,8 @@ export function renderJugadorDetalle(container, playerId) {
   // addAchievementMedal() de abajo sigue agregándole cosas después del
   // primer pintado, y cada vez hay que reordenar y volver a pintar la
   // tarjeta completa — no solo pegar la nueva al final — para que las de
-  // la misma categoría sigan juntas.
-  const hasSession = !!getSession();
+  // la misma categoría sigan juntas. hasSession ya se calculó arriba, para
+  // el walkup del hero.
   const achievementChips = hasSession ? renderAchievements(player) : [];
   let achievementsCard = null;
   if (!hasSession) {
@@ -1031,7 +1035,9 @@ export function renderJugadorDetalle(container, playerId) {
   getWalkupOverride(player.id).then((override) => {
     if (!override) return;
     currentWalkup = override;
-    walkupDisplay.innerHTML = renderWalkup(override);
+    // Sin sesión, #walkup-display ya trae el aviso de "Inicia sesión..."
+    // (ver arriba) — no lo pisa aunque llegue una canción personalizada.
+    if (hasSession) walkupDisplay.innerHTML = renderWalkup(override);
     addAchievementMedal({
       icon: "fa-solid fa-music",
       label: "Greatests Hits",
