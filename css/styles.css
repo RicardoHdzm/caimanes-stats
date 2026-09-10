@@ -4239,14 +4239,19 @@ a.comment-author-name:hover {
 
 /* El aviso lleva su contenido arriba (.feed-aviso-main) y las reacciones
    pegadas abajo; los demás ítems van con TODO centrado en el cuadrado
-   (contenido + reacciones como un solo bloque). */
+   (contenido + reacciones como un solo bloque). En escritorio el texto del
+   aviso también va centrado (en celular, donde la tarjeta ya no es cuadrada
+   y se lee más como un post, vuelve a la izquierda — ver @media 640). */
 .feed-item--aviso {
   justify-content: space-between;
 }
 
-/* Reacciones centradas en los ítems "de tile" (resultado/mvp/cumple), a la
-   izquierda en el aviso (que es más de "post"). */
-.feed-item:not(.feed-item--aviso) .reaction-bar {
+.feed-aviso-header {
+  justify-content: center;
+}
+
+/* Reacciones centradas en todas las tarjetas del feed. */
+.feed-item .reaction-bar {
   justify-content: center;
 }
 
@@ -4265,14 +4270,25 @@ a.comment-author-name:hover {
     aspect-ratio: auto;
     min-height: 92px;
   }
+
+  .feed-aviso-main {
+    text-align: left;
+  }
+
+  .feed-aviso-header {
+    justify-content: flex-start;
+  }
 }
 
-/* Aviso — tarjeta tipo "post" (logo + "Anuncio · fecha", título, cuerpo). */
+/* Aviso — tarjeta tipo "post" (logo + "Anuncio · fecha", título, cuerpo).
+   Texto centrado en escritorio (ver arriba, vuelve a la izquierda en
+   celular). */
 .feed-aviso-main {
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  text-align: center;
 }
 
 .feed-aviso-header {

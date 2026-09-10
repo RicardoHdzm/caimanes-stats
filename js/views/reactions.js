@@ -11,7 +11,7 @@
 import { getCurrentPlayerId } from "../auth.js";
 import { escapeHtml } from "../ui.js";
 
-export const REACTIONS = ["❤️", "🔥", "💪", "😂", "😢", "👏", "⚾", "🐊"];
+export const REACTIONS = ["❤️", "🔥", "💀", "⚾", "🐊"];
 
 // `rows` = filas de la tabla de reacciones que corresponda: { player_id,
 // reaction }. `itemId` va en data-id para que wireReactionBar() sepa a qué
