@@ -15,6 +15,13 @@ let supabase = null;
 let session = null;
 let playerId = null; // se resuelve aparte (rpc a Supabase), no viene en la sesión
 
+// Estado por default para css/styles.css (html[data-session="in"] da el look
+// "red social"): "out" desde ya, para que un invitado nunca alcance a ver
+// ese look aunque Supabase tarde en responder o ni cargue (initAuth() puede
+// rendirse en silencio sin señal, ver abajo). notifyChange() lo actualiza a
+// "in" en cuanto de verdad haya sesión.
+document.documentElement.dataset.session = "out";
+
 // Único correo con permiso de editar player_dues (estado de pago) — debe
 // coincidir EXACTO con el que usa la política "dues_write_coach_only" en
 // supabase/schema.sql. Si algún día cambia quién administra el sitio, hay

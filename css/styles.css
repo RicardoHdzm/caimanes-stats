@@ -4058,7 +4058,7 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   max-width: 100%;
   padding: 8px 14px;
   border-radius: 18px;
-  background: var(--surface-alt);
+  background: var(--surface-raised);
 }
 
 .comment-author-name {
