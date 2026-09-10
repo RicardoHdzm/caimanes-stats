@@ -4231,12 +4231,17 @@ a.comment-author-name:hover {
   box-shadow: var(--shadow-card);
 }
 
-/* El aviso es el único ítem "largo" (título + cuerpo + reacciones): su
-   contenido va desde arriba, no centrado, y el cuerpo se corta a unas
-   líneas para que quepa en el cuadrado (se lee completo tocando el aviso...
-   bueno, en Anuncios; aquí es un preview). */
+/* El aviso lleva su contenido arriba (.feed-aviso-main) y las reacciones
+   pegadas abajo; los demás ítems van con TODO centrado en el cuadrado
+   (contenido + reacciones como un solo bloque). */
 .feed-item--aviso {
-  justify-content: flex-start;
+  justify-content: space-between;
+}
+
+/* Reacciones centradas en los ítems "de tile" (resultado/mvp/cumple), a la
+   izquierda en el aviso (que es más de "post"). */
+.feed-item:not(.feed-item--aviso) .reaction-bar {
+  justify-content: center;
 }
 
 @media (max-width: 900px) {
@@ -4257,16 +4262,23 @@ a.comment-author-name:hover {
 }
 
 /* Aviso — tarjeta tipo "post" (logo + "Anuncio · fecha", título, cuerpo). */
+.feed-aviso-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .feed-aviso-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .feed-aviso-logo {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 7px;
   background: var(--surface-raised);
   padding: 3px;
@@ -4282,9 +4294,10 @@ a.comment-author-name:hover {
 }
 
 .feed-aviso-title {
-  margin: 0 0 2px;
-  font-size: var(--text-lg);
+  margin: 0 0 6px;
+  font-size: var(--text-xl);
   font-weight: 700;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
@@ -4292,17 +4305,22 @@ a.comment-author-name:hover {
   display: -webkit-box;
   margin: 0;
   font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--muted);
   overflow: hidden;
   overflow-wrap: anywhere;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
 }
 
-/* Resultado — icono de color (verde/rojo/gris) + "Ganamos vs X" + marcador. */
+/* Resultado — mini marcador: icono grande de color, "GANAMOS", el marcador
+   gigante y "vs Rival · fecha". Todo centrado, llena el cuadrado. */
 .feed-result {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 3px;
+  text-align: center;
   text-decoration: none;
   color: var(--text);
 }
@@ -4311,11 +4329,12 @@ a.comment-author-name:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  font-size: 1rem;
+  font-size: 1.3rem;
 }
 
 .feed-result-icon--win {
@@ -4333,21 +4352,26 @@ a.comment-author-name:hover {
   color: var(--muted);
 }
 
-.feed-result-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.feed-result-text strong {
-  font-size: var(--text-sm);
+.feed-result-verb {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
 }
 
 .feed-result-score {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 700;
-  font-size: var(--text-lg);
+  font-size: var(--text-4xl);
+  line-height: 1;
+  color: var(--text);
+}
+
+.feed-result-opp {
+  font-size: var(--text-xs);
   color: var(--muted);
 }
 
@@ -4356,29 +4380,49 @@ a.comment-author-name:hover {
   display: block;
 }
 
-/* Cumpleaños / MVP */
+/* Cumpleaños / MVP — avatar grande + etiqueta + nombre + subtítulo, en
+   columna centrada (mismo "tile" que el resultado). */
 .feed-cumple,
 .feed-mvp {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 3px;
+  text-align: center;
 }
 
-.feed-cumple p,
-.feed-mvp p {
-  margin: 0;
+.feed-cumple-label,
+.feed-mvp-label {
+  margin-top: 8px;
+  font-family: var(--font-display);
   font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
 }
 
-.feed-cumple a,
-.feed-mvp a {
+.feed-mvp-star {
+  color: #f5b942;
+}
+
+.feed-cumple-name,
+.feed-mvp-name {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: 1.1;
   color: var(--accent-text);
   text-decoration: none;
-  font-weight: 700;
 }
 
-.feed-cumple-emoji,
-.feed-mvp-star {
+.feed-cumple-sub,
+.feed-mvp-opp {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.feed-cumple-emoji {
   font-size: 1.1rem;
 }
 

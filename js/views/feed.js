@@ -43,6 +43,10 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
 }
 
+function shortDate(dateStr) {
+  return new Date(`${dateStr}T00:00:00`).toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+}
+
 // Avatar con el gancho [data-avatar] para que hydrateAvatars() lo reemplace
 // por la foto de Storage si existe (mismo patrón que Resumen).
 function avatarSlot(player, size) {
@@ -149,12 +153,14 @@ export function renderFeed(container) {
         date: a.created_at,
         kind: "aviso",
         html: `
-          <div class="feed-aviso-header">
-            <img class="feed-aviso-logo" src="assets/logo.png" alt="">
-            <span class="feed-aviso-meta">Anuncio · ${fmtDate(a.created_at)}</span>
+          <div class="feed-aviso-main">
+            <div class="feed-aviso-header">
+              <img class="feed-aviso-logo" src="assets/logo.png" alt="">
+              <span class="feed-aviso-meta">Anuncio · ${fmtDate(a.created_at)}</span>
+            </div>
+            ${a.title ? `<p class="feed-aviso-title">${escapeHtml(a.title)}</p>` : ""}
+            <p class="feed-aviso-body">${escapeHtml(a.body)}</p>
           </div>
-          ${a.title ? `<p class="feed-aviso-title">${escapeHtml(a.title)}</p>` : ""}
-          <p class="feed-aviso-body">${escapeHtml(a.body)}</p>
           ${reactionBarHtml(`aviso:${a.id}`, annRows(a.id), { canReact })}`,
       });
     }
@@ -170,8 +176,9 @@ export function renderFeed(container) {
         html: `
           <a class="feed-result" href="#/juegos/${g.id}">
             <span class="feed-result-icon feed-result-icon--${cls}"><i class="fa-solid fa-baseball"></i></span>
-            <span class="feed-result-text"><strong>${verb} vs ${escapeHtml(g.opponent ?? "rival")}</strong>
-              <span class="feed-result-score">${g.scoreUs}-${g.scoreThem}</span></span>
+            <span class="feed-result-verb">${verb}</span>
+            <span class="feed-result-score">${g.scoreUs}-${g.scoreThem}</span>
+            <span class="feed-result-opp">vs ${escapeHtml(g.opponent ?? "rival")}${g.date ? ` · ${shortDate(g.date)}` : ""}</span>
           </a>
           ${reactionBarHtml(`resultado:${g.id}`, feedRows(`resultado:${g.id}`), { canReact })}`,
       });
@@ -184,8 +191,10 @@ export function renderFeed(container) {
         kind: "cumple",
         html: `
           <div class="feed-cumple">
-            ${avatarSlot(b.player, 44)}
-            <p><span class="feed-cumple-emoji">🎂</span> Hoy cumple <a href="#/jugador/${b.player.id}">${escapeHtml(b.player.name)}</a></p>
+            ${avatarSlot(b.player, 64)}
+            <span class="feed-cumple-label"><span class="feed-cumple-emoji">🎂</span> Cumpleaños</span>
+            <a href="#/jugador/${b.player.id}" class="feed-cumple-name">${escapeHtml(b.player.name)}</a>
+            <span class="feed-cumple-sub">¡Felicítalo!</span>
           </div>
           ${reactionBarHtml(rid, feedRows(rid), { canReact })}`,
       });
@@ -201,8 +210,10 @@ export function renderFeed(container) {
         kind: "mvp",
         html: `
           <div class="feed-mvp">
-            ${avatarSlot(mvp.player, 44)}
-            <p><span class="feed-mvp-star">⭐</span> <a href="#/jugador/${mvp.player.id}">${escapeHtml(mvp.player.name)}</a> fue el MVP vs ${escapeHtml(mvp.game.opponent ?? "rival")}</p>
+            ${avatarSlot(mvp.player, 64)}
+            <span class="feed-mvp-label"><span class="feed-mvp-star">⭐</span> MVP del juego</span>
+            <a href="#/jugador/${mvp.player.id}" class="feed-mvp-name">${escapeHtml(mvp.player.name)}</a>
+            <span class="feed-mvp-opp">vs ${escapeHtml(mvp.game.opponent ?? "rival")}</span>
           </div>
           ${reactionBarHtml(rid, feedRows(rid), { canReact })}`,
       });
