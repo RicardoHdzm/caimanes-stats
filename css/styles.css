@@ -4237,10 +4237,9 @@ a.comment-author-name:hover {
   box-shadow: var(--shadow-card);
 }
 
-/* El aviso va como los demás ítems: TODO centrado en el cuadrado (contenido
-   + reacciones como un solo bloque, centrado vertical y horizontalmente). En
-   celular, donde la tarjeta ya no es cuadrada y se lee más como un post, el
-   texto vuelve a la izquierda — ver @media 640. */
+/* El aviso va como los demás ítems del feed: TODO centrado (contenido +
+   reacciones como un solo bloque, centrado vertical y horizontalmente), en
+   escritorio y en celular. */
 .feed-aviso-header {
   justify-content: center;
 }
@@ -4266,18 +4265,15 @@ a.comment-author-name:hover {
     min-height: 92px;
   }
 
-  .feed-aviso-main {
-    text-align: left;
-  }
-
-  .feed-aviso-header {
-    justify-content: flex-start;
+  /* El cuerpo del aviso se recorta más para que la tarjeta quede de un
+     tamaño parecido a las demás del feed. */
+  .feed-aviso-body {
+    -webkit-line-clamp: 3;
   }
 }
 
 /* Aviso — tarjeta tipo "post" (logo + "Anuncio · fecha", título, cuerpo).
-   Texto centrado en escritorio (ver arriba, vuelve a la izquierda en
-   celular). */
+   Texto centrado, igual que las demás tarjetas del feed. */
 .feed-aviso-main {
   display: flex;
   flex-direction: column;
