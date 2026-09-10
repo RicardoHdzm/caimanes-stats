@@ -110,6 +110,11 @@ async function getAsyncLabels(player) {
   if (avatarUrl) labels.push("Selfie!");
   if (walkup) labels.push("Greatests Hits");
 
+  // player_profiles ya viene precargado (ver preloadProfiles) — se lee
+  // síncrono, o los dos campos o ninguno.
+  const prof = cachedProfile(player.id);
+  if (prof?.birthdayMonth && prof?.birthdayDay) labels.push("Cumpleañero");
+
   if (getSession()) {
     const paid = await getDuesForPlayer(player.id);
     if (paid === true) labels.push("Rich kid");
