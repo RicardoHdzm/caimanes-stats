@@ -306,8 +306,11 @@ create policy "avatars_update_own" on storage.objects
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = public.current_player_id());
 
 -- ============================================================================
--- FUNCIONES "RED SOCIAL" (agregadas después). Correr estos bloques también en
--- el SQL Editor si el proyecto ya existía — no se aplican solos.
+-- FUNCIONES "RED SOCIAL" (agregadas después — muro, reacciones, bio,
+-- cumpleaños). Si el proyecto YA existía, correr SOLO esta sección en el SQL
+-- Editor (de aquí hasta el final del archivo). `create table if not exists`,
+-- `add column if not exists` y el `drop policy if exists` de cada política
+-- hacen que sea seguro correrla varias veces sin errores de "ya existe".
 -- ============================================================================
 
 -- 11. Reacciones con emoji en comentarios y anuncios. Antes las tablas
@@ -320,11 +323,13 @@ create policy "avatars_update_own" on storage.objects
 alter table public.comment_likes      add column if not exists reaction text not null default '❤️';
 alter table public.announcement_likes add column if not exists reaction text not null default '❤️';
 
+drop policy if exists "comment_likes_update_own" on public.comment_likes;
 create policy "comment_likes_update_own" on public.comment_likes
   for update to authenticated
   using (player_id = public.current_player_id())
   with check (player_id = public.current_player_id());
 
+drop policy if exists "announcement_likes_update_own" on public.announcement_likes;
 create policy "announcement_likes_update_own" on public.announcement_likes
   for update to authenticated
   using (player_id = public.current_player_id())
@@ -346,13 +351,16 @@ create table if not exists public.player_profiles (
 );
 alter table public.player_profiles enable row level security;
 
+drop policy if exists "profiles_public_read" on public.player_profiles;
 create policy "profiles_public_read" on public.player_profiles
   for select using (true);
 
+drop policy if exists "profiles_insert_own" on public.player_profiles;
 create policy "profiles_insert_own" on public.player_profiles
   for insert to authenticated
   with check (player_id = public.current_player_id());
 
+drop policy if exists "profiles_update_own" on public.player_profiles;
 create policy "profiles_update_own" on public.player_profiles
   for update to authenticated
   using (player_id = public.current_player_id())
@@ -374,18 +382,22 @@ create table if not exists public.feed_reactions (
 );
 alter table public.feed_reactions enable row level security;
 
+drop policy if exists "feed_reactions_public_read" on public.feed_reactions;
 create policy "feed_reactions_public_read" on public.feed_reactions
   for select using (true);
 
+drop policy if exists "feed_reactions_insert_own" on public.feed_reactions;
 create policy "feed_reactions_insert_own" on public.feed_reactions
   for insert to authenticated
   with check (player_id = public.current_player_id());
 
+drop policy if exists "feed_reactions_update_own" on public.feed_reactions;
 create policy "feed_reactions_update_own" on public.feed_reactions
   for update to authenticated
   using (player_id = public.current_player_id())
   with check (player_id = public.current_player_id());
 
+drop policy if exists "feed_reactions_delete_own" on public.feed_reactions;
 create policy "feed_reactions_delete_own" on public.feed_reactions
   for delete to authenticated
   using (player_id = public.current_player_id());
