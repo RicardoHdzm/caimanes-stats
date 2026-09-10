@@ -170,11 +170,5 @@ export function renderComments(container, { contextType, contextId }) {
     }
   });
 
-  // Cierra el menú de emojis al tocar fuera de él.
-  listEl.addEventListener("click", (e) => {
-    if (e.target.closest(".reaction-add") || e.target.closest(".reaction-menu")) return;
-    for (const m of listEl.querySelectorAll(".reaction-menu:not([hidden])")) m.hidden = true;
-  });
-
   refresh();
 }

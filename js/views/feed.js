@@ -183,18 +183,22 @@ export function renderFeed(container) {
 
     for (const c of comments) {
       const player = playerById(c.player_id);
-      const nameHtml = player
-        ? `<a href="#/jugador/${player.id}">${escapeHtml(player.name)}</a>`
-        : escapeHtml(c.player_id);
+      // Sin envoltorio <a> en toda la tarjeta: adentro van el link del
+      // avatar y el del nombre (a[href] anidado en a[href] es HTML inválido
+      // — el navegador lo "arregla" partiendo el link y sale con el color
+      // morado de "visitado"). El nombre → perfil, "vs Rival" → el juego.
+      const authorHtml = player
+        ? `<a href="#/jugador/${player.id}" class="feed-comment-author">${escapeHtml(player.name)}</a>`
+        : `<span class="feed-comment-author">${escapeHtml(c.player_id)}</span>`;
       items.push({
         date: c.created_at,
         kind: "comentario",
         html: `
-          <a class="feed-comment" href="#/juegos/${c.context_id}">
+          <div class="feed-comment">
             ${avatarSlot(player, 36)}
-            <span class="feed-comment-text"><strong>${nameHtml}</strong> comentó en <em>vs ${escapeHtml(gameOpponent(c.context_id))}</em>
+            <span class="feed-comment-text">${authorHtml} comentó en <a href="#/juegos/${c.context_id}" class="feed-comment-game">vs ${escapeHtml(gameOpponent(c.context_id))}</a>
               <span class="feed-comment-body">«${escapeHtml(c.body)}»</span></span>
-          </a>`,
+          </div>`,
       });
     }
 
@@ -253,12 +257,6 @@ export function renderFeed(container) {
       else await clearFeedReaction(id);
       await refresh();
     },
-  });
-
-  // Cierra el menú de emojis al tocar fuera de él.
-  listEl.addEventListener("click", (e) => {
-    if (e.target.closest(".reaction-add") || e.target.closest(".reaction-menu")) return;
-    for (const m of listEl.querySelectorAll(".reaction-menu:not([hidden])")) m.hidden = true;
   });
 
   refresh();
