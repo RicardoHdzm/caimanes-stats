@@ -161,6 +161,14 @@ export function mvpCandidateIds(game) {
 // todavía) se queda vacío.
 function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) {
   const gameId = game.id;
+
+  // Mientras la votación sigue abierta, verla requiere cuenta — a petición
+  // expresa (antes cualquiera veía los votos en vivo, aunque solo pudiera
+  // votar con sesión). Sin sesión NO se pinta nada de esta sección (ni el
+  // encabezado), no se deja un "inicia sesión para ver". Ya cerrada
+  // (isLatest false), el resultado final es público de siempre.
+  if (isLatest && !getSession()) return;
+
   const heading3 = document.createElement("h3");
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo';
   container.appendChild(heading3);
@@ -173,20 +181,6 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     hint.className = "subtitle";
     hint.textContent = "La votación de este juego ya cerró.";
     container.appendChild(hint);
-  }
-
-  // Mientras la votación sigue abierta, verla también requiere cuenta —
-  // a petición expresa (antes cualquiera veía los votos en vivo, aunque
-  // solo pudiera votar con sesión). Ya cerrada, el resultado final es
-  // público de siempre — mvpBadgeSlot ya se queda vacío mientras isLatest
-  // es true (ver displayLeaderId más abajo), así que no hace falta tocarlo
-  // aquí: solo evitamos pedir/pintar la boleta completa.
-  if (isLatest && !getSession()) {
-    const hint = document.createElement("p");
-    hint.className = "subtitle";
-    hint.textContent = "Inicia sesión para ver y votar por el MVP de este juego.";
-    container.appendChild(hint);
-    return;
   }
 
   const gridEl = document.createElement("div");

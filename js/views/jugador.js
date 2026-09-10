@@ -794,7 +794,7 @@ export function renderJugadorDetalle(container, playerId) {
           <span>${escapeHtml(player.name)}</span>
           <span class="profile-hero-name-positions" id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
         </div>
-        <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : '<span class="auth-hint">Inicia sesión para ver la canción de entrada.</span>'}</div>
+        <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : ""}</div>
         <div class="profile-attendance">
           <div class="profile-attendance-label">
             <span>${played}/${TEAM.gamesInSeason} juegos jugados</span>
@@ -811,22 +811,18 @@ export function renderJugadorDetalle(container, playerId) {
   // Medallero exclusivo para cuentas con sesión iniciada (cualquier
   // jugador, no solo en su propio perfil) — a petición expresa: son logros
   // pensados para el equipo, no para cualquiera que le caiga al link
-  // público. Tarjeta aparte (no dentro de .game-hero) — solo si hay algo
-  // que mostrar, para no dejar un encabezado "Logros" vacío.
-  // `achievementChips` se queda vivo (no solo el HTML ya armado) porque
-  // addAchievementMedal() de abajo sigue agregándole cosas después del
-  // primer pintado, y cada vez hay que reordenar y volver a pintar la
+  // público. Sin sesión NO se pinta nada (ni el encabezado), no se deja un
+  // "inicia sesión para ver". Tarjeta aparte (no dentro de .game-hero) —
+  // solo si hay algo que mostrar, para no dejar un encabezado "Logros"
+  // vacío. `achievementChips` se queda vivo (no solo el HTML ya armado)
+  // porque addAchievementMedal() de abajo sigue agregándole cosas después
+  // del primer pintado, y cada vez hay que reordenar y volver a pintar la
   // tarjeta completa — no solo pegar la nueva al final — para que las de
   // la misma categoría sigan juntas. hasSession ya se calculó arriba, para
   // el walkup del hero.
   const achievementChips = hasSession ? renderAchievements(player) : [];
   let achievementsCard = null;
-  if (!hasSession) {
-    achievementsCard = document.createElement("div");
-    achievementsCard.className = "leader-card player-standalone-card medallero-card";
-    achievementsCard.innerHTML = `<h3><i class="fa-solid fa-medal"></i> Medallero</h3><p class="subtitle">Inicia sesión para ver el medallero.</p>`;
-    container.appendChild(achievementsCard);
-  } else if (achievementChips.length > 0) {
+  if (hasSession && achievementChips.length > 0) {
     achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card medallero-card";
     achievementsCard.innerHTML = `${MEDALLERO_HEADER(achievementChips.length)}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>${MEDALLERO_GUIDE_BTN(player.id)}`;
@@ -841,9 +837,8 @@ export function renderJugadorDetalle(container, playerId) {
   // .game-hero — para que quede en el mismo lugar de siempre, no importa
   // qué tanto se haya pintado ya debajo para cuando esto responda.
   function addAchievementMedal(chip) {
-    // Medallero exclusivo con sesión (ver arriba) — sin eso, achievementsCard
-    // ya está ocupada por el mensaje de "Inicia sesión...", que no tiene
-    // ".achievements-grid" adentro.
+    // Medallero exclusivo con sesión (ver arriba) — sin sesión no hay
+    // tarjeta que llenar.
     if (!hasSession) return;
     achievementChips.push(chip);
     if (!achievementsCard) {

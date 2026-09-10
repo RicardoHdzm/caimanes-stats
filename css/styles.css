@@ -1618,7 +1618,7 @@ main h3::before {
    ícono (ver .achievement-medal--* más abajo, es la señal de qué tipo de
    logro es cada uno). */
 .achievement-medal:hover .achievement-medal-icon {
-  transform: scale(1.08);
+  transform: translateY(-3px);
 }
 
 .achievement-medal-label {

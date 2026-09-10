@@ -56,6 +56,13 @@ function commentItem(c, likeCount, likedByMe, canLike, canDelete) {
 }
 
 export function renderComments(container, { contextType, contextId }) {
+  // Comentarios (leer y escribir) son exclusivos de cuentas con sesión, a
+  // petición expresa — sin cuenta la sección entera se omite: ni el
+  // encabezado se pinta, no se deja un "inicia sesión para ver".
+  const myId = getCurrentPlayerId();
+  if (!myId) return;
+  const coach = isCoach();
+
   const h3 = document.createElement("h3");
   h3.textContent = "Comentarios";
   container.appendChild(h3);
@@ -66,9 +73,6 @@ export function renderComments(container, { contextType, contextId }) {
 
   const formSlot = document.createElement("div");
   container.appendChild(formSlot);
-
-  const myId = getCurrentPlayerId();
-  const coach = isCoach();
 
   function renderForm() {
     formSlot.innerHTML = `
@@ -183,15 +187,6 @@ export function renderComments(container, { contextType, contextId }) {
       }
     }
   });
-
-  // Lectura exclusiva con sesión, a petición expresa (antes era pública) —
-  // sin cuenta ni se pide la lista a Supabase, se queda nomás con el
-  // aviso, igual que RSVP ("Inicia sesión para confirmar tu asistencia").
-  if (!myId) {
-    listEl.innerHTML = '<p class="subtitle">Inicia sesión para ver los comentarios.</p>';
-    formSlot.innerHTML = '<p class="auth-hint">Inicia sesión para comentar.</p>';
-    return;
-  }
 
   refresh();
 }

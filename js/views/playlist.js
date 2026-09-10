@@ -69,18 +69,13 @@ const TRACK_COLUMNS = [
 ];
 
 export function renderPlaylist(container) {
-  heading(container, "Playlist del equipo");
+  // Exclusiva de cuentas con sesión, a petición expresa — sin cuenta no se
+  // pinta nada (ni el encabezado). js/main.js ya esconde el link de la
+  // pestaña y manda a Inicio si se llega por URL directa sin sesión; este
+  // chequeo es el candado de respaldo.
+  if (!getSession()) return;
 
-  // Exclusiva con sesión, a petición expresa — sin cuenta ni se pide la
-  // lista de canciones personalizadas a Supabase, se queda nomás con el
-  // aviso (mismo patrón que Comentarios, ver js/views/comments.js).
-  if (!getSession()) {
-    const hint = document.createElement("p");
-    hint.className = "subtitle";
-    hint.textContent = "Inicia sesión para ver la playlist del equipo.";
-    container.appendChild(hint);
-    return;
-  }
+  heading(container, "Playlist del equipo");
 
   const tableEl = document.createElement("div");
   container.appendChild(tableEl);

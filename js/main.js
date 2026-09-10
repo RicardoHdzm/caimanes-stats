@@ -140,6 +140,17 @@ function currentRoute() {
   if (first === "bateo" || first === "pitcheo" || first === "fildeo") {
     return { tab: "estadisticas", render: (container) => renderEstadisticas(container, first) };
   }
+  // Playlist es exclusiva de cuentas con sesión (a petición expresa). El
+  // link ni aparece sin sesión (ver render() más abajo), pero si se llega
+  // por URL directa se manda a Inicio. getSession() puede tardar en
+  // resolver: si un jugador con sesión abre un link directo a #/playlist,
+  // el primer render() lo manda a Inicio y el re-render por
+  // "caimanes:auth-changed" ya lo deja ver la Playlist (el hash sigue
+  // siendo #/playlist).
+  if (first === "playlist" && !getSession()) {
+    return { tab: "resumen", render: routes.resumen };
+  }
+
   const tab = routes[first] ? first : "resumen";
   return { tab, render: routes[tab] };
 }
@@ -285,6 +296,14 @@ function render() {
   if (loginTile) loginTile.hidden = !SUPABASE_CONFIGURED || !!session;
   if (logoutTile) logoutTile.hidden = !session;
   if (adminTile) adminTile.hidden = !session || !isCoach();
+
+  // Playlist: pestaña exclusiva de cuentas con sesión (a petición expresa) —
+  // el link se esconde sin sesión, en la nav de escritorio y en el grid de
+  // "Más" (no está en la barra de abajo). currentRoute() ya manda a Inicio
+  // si se llega por URL directa.
+  for (const el of [tabs.querySelector('[data-route="playlist"]'), moreSheet.querySelector('[data-tab="playlist"]')]) {
+    if (el) el.hidden = !session;
+  }
 
   const route = currentRoute();
   toggleMoreSheet(false);
