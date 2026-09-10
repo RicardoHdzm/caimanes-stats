@@ -29,6 +29,7 @@ import {
   getAnnouncementLikes,
   getComments,
   getMvpVotes,
+  cachedProfile,
 } from "../db.js";
 import { renderAchievements, mvpCountsFromVotes } from "./jugador.js";
 
@@ -91,6 +92,7 @@ const CATALOG = [
   { kind: "social", icon: "fa-solid fa-thumbs-up", name: "Voter", how: "Votó por el MVP en al menos la mitad de los juegos de la temporada.", match: (l) => l === "Voter", async: true },
   { kind: "social", icon: "fa-solid fa-camera", name: "Selfie!", how: "Subió una foto de perfil personalizada.", match: (l) => l === "Selfie!", async: true },
   { kind: "social", icon: "fa-solid fa-music", name: "Greatests Hits", how: "Personalizó su canción de entrada (walkup song).", match: (l) => l === "Greatests Hits", async: true },
+  { kind: "social", icon: "fa-solid fa-cake-candles", name: "Cumpleañero", how: "Registró su cumpleaños (día y mes) en el perfil.", match: (l) => l === "Cumpleañero", async: true },
   // ---- Estado de inscripción ----
   { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true },
   { kind: "dues-unpaid", icon: "fa-solid fa-trash-can", name: "Moroso", how: "Todavía no paga la inscripción de la temporada.", match: (l) => l === "Moroso", async: true },

@@ -166,7 +166,7 @@ function sortedAchievementsHtml(chips) {
 // de ahí para no crear un import circular (medallas.js ya importa
 // renderAchievements de este archivo). Si se agrega o quita una medalla del
 // catálogo, hay que actualizar este número a mano también.
-const TOTAL_MEDALS = 50;
+const TOTAL_MEDALS = 51;
 
 function MEDALLERO_HEADER(count) {
   // El span envolvente mantiene "Medallero" y el conteo en el mismo
@@ -900,6 +900,19 @@ export function renderJugadorDetalle(container, playerId) {
       desc: "Subió una foto de perfil personalizada.",
     });
   });
+
+  // ---- "Cumpleañero": registró su cumpleaños en el perfil ----
+  //
+  // `profile` (player_profiles) ya se leyó SÍNCRONO arriba desde el cache
+  // precargado — o los dos campos, o ninguno (el guardado exige ambos).
+  if (profile?.birthdayMonth && profile?.birthdayDay) {
+    addAchievementMedal({
+      icon: "fa-solid fa-cake-candles",
+      label: "Cumpleañero",
+      kind: "social",
+      desc: "Registró su cumpleaños (día y mes) en el perfil.",
+    });
+  }
 
   // ---- "Superfan": le dio like a algún anuncio ----
   //
