@@ -40,7 +40,7 @@ const routes = {
 // Roster — el resto (Juegos y Standing incluidos) vive detrás de "Menú",
 // a petición expresa (antes Juegos/Standing también estaban aquí abajo).
 const BOTTOM_TABS = [
-  { tab: "inicio", route: "#/inicio", label: "Inicio", icon: "fa-house" },
+  { tab: "inicio", route: "#/inicio", label: "Feed", icon: "fa-house" },
   { tab: "roster", route: "#/roster", label: "Roster", icon: "fa-users" },
 ];
 
@@ -171,10 +171,22 @@ function buildBottomTabs() {
     a.innerHTML = `<i class="fa-solid ${t.icon}"></i><span>${t.label}</span>`;
     bottomTabs.appendChild(a);
 
-    // Mi Perfil va justo después de Inicio — mismo lugar que en la nav de
-    // escritorio (ver #nav-mi-perfil en index.html). Empieza oculta: render()
-    // le pone el href y la muestra en cuanto hay sesión iniciada.
+    // El Feed es exclusivo de cuentas con sesión; sin sesión, la primera
+    // pestaña de la barra es "Resumen" (las stats) — se arma aquí también,
+    // oculta, y render() muestra una u otra según la sesión.
     if (t.tab === "inicio") {
+      const resumen = document.createElement("a");
+      resumen.href = "#/resumen";
+      resumen.className = "bottom-tab";
+      resumen.id = "bottom-tab-resumen";
+      resumen.dataset.tab = "resumen";
+      resumen.hidden = true;
+      resumen.innerHTML = `<i class="fa-solid fa-chart-line"></i><span>Resumen</span>`;
+      bottomTabs.appendChild(resumen);
+
+      // Mi Perfil va justo después — mismo lugar que en la nav de escritorio
+      // (ver #nav-mi-perfil en index.html). Empieza oculta: render() le pone
+      // el href y la muestra en cuanto hay sesión iniciada.
       const miPerfil = document.createElement("a");
       miPerfil.href = "#";
       miPerfil.className = "bottom-tab";

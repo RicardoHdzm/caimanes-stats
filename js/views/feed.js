@@ -115,7 +115,7 @@ export function renderFeed(container) {
   // chequeo es el candado de respaldo.
   if (!getSession()) return;
 
-  heading(container, "Inicio");
+  heading(container, "Feed");
 
   const canReact = !!getCurrentPlayerId();
   const listEl = document.createElement("div");

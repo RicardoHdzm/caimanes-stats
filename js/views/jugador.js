@@ -908,7 +908,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (profile?.birthdayMonth && profile?.birthdayDay) {
     addAchievementMedal({
       icon: "fa-solid fa-cake-candles",
-      label: "Cumpleañero",
+      label: "HBD",
       kind: "social",
       desc: "Registró su cumpleaños (día y mes) en el perfil.",
     });
