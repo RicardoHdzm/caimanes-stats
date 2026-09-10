@@ -193,6 +193,9 @@ export function wireRsvp(cardEl, gameId) {
     renderActions(mine?.status ?? null);
   }
 
+  // Spinner mientras llega la primera respuesta — refresh() → renderActions()
+  // reemplaza el innerHTML al terminar.
+  actionsEl.appendChild(spinnerBlock());
   refresh();
 }
 
