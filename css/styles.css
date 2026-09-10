@@ -4327,6 +4327,16 @@ a.comment-author-name:hover {
      nunca se ve un hueco en blanco. También es el fondo de #recovery-gate
      (js/recovery.js), que no trae video. */
   background: linear-gradient(160deg, #0b0d10, #1a1f27);
+  transition: opacity 0.4s ease;
+}
+
+/* Al entrar (login OK o "Soy invitado", ver enter() en js/splash.js) el gate
+   se desvanece en vez de desaparecer de golpe — la app ya está pintada
+   debajo. pointer-events:none deja pasar los clics a la app durante el
+   fundido. js/splash.js lo quita del DOM cuando termina la transición. */
+.splash-gate--leaving {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* #recovery-gate arranca oculto en el HTML — sin esto, el `display: flex`
