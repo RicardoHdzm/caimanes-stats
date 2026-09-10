@@ -143,18 +143,19 @@ function currentRoute() {
   if (first === "bateo" || first === "pitcheo" || first === "fildeo") {
     return { tab: "estadisticas", render: (container) => renderEstadisticas(container, first) };
   }
-  // Playlist es exclusiva de cuentas con sesión (a petición expresa). El
-  // link ni aparece sin sesión (ver render() más abajo), pero si se llega
-  // por URL directa se manda a Inicio. getSession() puede tardar en
-  // resolver: si un jugador con sesión abre un link directo a #/playlist,
-  // el primer render() lo manda a Inicio y el re-render por
-  // "caimanes:auth-changed" ya lo deja ver la Playlist (el hash sigue
-  // siendo #/playlist).
-  if (first === "playlist" && !getSession()) {
-    return { tab: "inicio", render: routes.inicio };
+  const tab = routes[first] ? first : "inicio";
+
+  // Inicio (el feed, js/views/feed.js) y Playlist son exclusivos de cuentas
+  // con sesión, a petición expresa. Sin sesión el invitado ve el Resumen de
+  // stats en lugar del feed — y para él "Inicio" ES ese resumen (por eso el
+  // tab se queda en "inicio", para que resalte en la nav). getSession()
+  // puede tardar en resolver: el primer render() sin sesión cae al Resumen,
+  // y el re-render por "caimanes:auth-changed" ya muestra el feed real
+  // cuando la sesión resuelve.
+  if ((tab === "inicio" || tab === "playlist") && !getSession()) {
+    return { tab: "inicio", render: routes.resumen };
   }
 
-  const tab = routes[first] ? first : "inicio";
   return { tab, render: routes[tab] };
 }
 
@@ -300,6 +301,13 @@ function render() {
   // "Más" (no está en la barra de abajo). currentRoute() ya manda a Inicio
   // si se llega por URL directa.
   for (const el of [tabs.querySelector('[data-route="playlist"]'), moreSheet.querySelector('[data-tab="playlist"]')]) {
+    if (el) el.hidden = !session;
+  }
+
+  // "Resumen" (las stats) — para un invitado es un duplicado: su "Inicio" ya
+  // muestra el Resumen (el feed es exclusivo de cuenta, ver currentRoute).
+  // Así que ese link separado solo se muestra con sesión iniciada.
+  for (const el of [tabs.querySelector('[data-route="resumen"]'), moreSheet.querySelector('[data-tab="resumen"]')]) {
     if (el) el.hidden = !session;
   }
 

@@ -1,14 +1,15 @@
 // Muro / feed de Inicio: una lista cronológica de lo que pasa en el equipo.
-// Reemplazó a la antigua pestaña "Inicio" — las stats (Récord, Líderes,
-// Récords de temporada...) se movieron a la pestaña "Resumen", ver
-// js/views/resumen.js y el routing en js/main.js.
+// EXCLUSIVO de cuentas con sesión (a petición expresa) — js/main.js manda
+// al Resumen a los invitados. Las stats que antes vivían en "Inicio"
+// (Récord, Líderes, Récords de temporada...) se movieron a la pestaña
+// "Resumen", ver js/views/resumen.js y el routing en js/main.js.
 //
 // Ítems del feed, mezclados y ordenados por fecha (más nuevo arriba):
-//   - aviso       (announcements, solo con sesión)   + reacciones
-//   - resultado   (GAMES + PLAYOFFS de data.js)       + reacciones, link al detalle
-//   - comentario  (getRecentComments, solo con sesión) link al juego
-//   - cumple      (player_profiles + fecha de hoy)    + reacciones
-//   - mvp         (1: el juego cerrado más reciente)   + reacciones, link al juego
+//   - aviso       (announcements)                + reacciones
+//   - resultado   (GAMES + PLAYOFFS de data.js)  + reacciones, link al detalle
+//   - comentario  (getRecentComments)            link al juego
+//   - cumple      (player_profiles + fecha de hoy) + reacciones
+//   - mvp         (1: el juego cerrado más reciente) + reacciones, link al juego
 //
 // Las reacciones de los avisos usan la tabla announcement_likes (id
 // "aviso:<n>"); las de cumple/resultado/mvp usan feed_reactions (id
@@ -111,6 +112,11 @@ async function recentMvp() {
 }
 
 export function renderFeed(container) {
+  // El feed es exclusivo de cuentas con sesión, a petición expresa.
+  // js/main.js ya manda al Resumen a los invitados (ver currentRoute); este
+  // chequeo es el candado de respaldo.
+  if (!getSession()) return;
+
   heading(container, "Inicio");
 
   const canReact = !!getCurrentPlayerId();
@@ -119,12 +125,10 @@ export function renderFeed(container) {
   container.appendChild(listEl);
 
   async function refresh() {
-    const withSession = !!getSession();
-
-    // 1. Fuentes.
+    // 1. Fuentes (el feed es de solo-sesión, ver el guard de arriba).
     const [announcements, comments, mvp] = await Promise.all([
-      withSession ? getAnnouncements(20) : Promise.resolve([]),
-      withSession ? getRecentComments(20) : Promise.resolve([]),
+      getAnnouncements(20),
+      getRecentComments(20),
       recentMvp(),
     ]);
     const games = recentGames();
