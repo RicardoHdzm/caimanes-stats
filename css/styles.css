@@ -517,6 +517,21 @@ body {
   font-size: var(--text-lg);
 }
 
+/* El chip de sesión iniciada (foto + número + nombre, ver loggedInMarkup en
+   js/auth.js) va SIN el recuadro rojo redondeado que lo encierra — solo la
+   foto y el texto, a petición expresa. El botón "Iniciar sesión"
+   (logged-out, también .auth-btn-named pero SIN .auth-btn-in) sí conserva
+   su recuadro. */
+.auth-btn-in.auth-btn-named {
+  border: none;
+  background: none;
+  padding: 4px 4px;
+}
+
+.auth-btn-in.auth-btn-named:hover {
+  border-color: transparent;
+}
+
 .auth-btn-name {
   font-family: var(--font-body);
   font-size: var(--text-sm);

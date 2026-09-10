@@ -792,7 +792,7 @@ export function renderJugadorDetalle(container, playerId) {
         <div class="profile-hero-name">
           <span class="profile-hero-number">#${player.number ?? "-"}</span>
           <span>${escapeHtml(player.name)}</span>
-          <span class="profile-hero-name-positions" id="position-display">${player.position ? renderPositionBadges(player.position) : ""}</span>
+          <span class="profile-hero-name-positions" id="position-display"></span>
         </div>
         <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : ""}</div>
         <div class="profile-attendance">
@@ -1017,12 +1017,17 @@ export function renderJugadorDetalle(container, playerId) {
   // generador de alineación mezclan player_positions sobre PLAYERS antes de
   // usar la posición (ver js/views/roster.js, js/views/alineacion.js y
   // js/lineup-tool.js).
+  // #position-display arranca vacío (ver el hero.innerHTML de arriba) y se
+  // llena UNA sola vez, con la posición personalizada del perfil si existe
+  // o con la de data.js si no — a petición expresa, para que no se vea
+  // "cambiar" de una a otra (mismo criterio que Roster, ver
+  // js/views/roster.js). Sin señal getPositionOverride() ya cae de vuelta a
+  // la de data.js.
   let currentPosition = player.position ?? "";
   const positionDisplay = hero.querySelector("#position-display");
   getPositionOverride(player.id).then((override) => {
-    if (!override) return;
-    currentPosition = override;
-    positionDisplay.innerHTML = renderPositionBadges(override);
+    currentPosition = override ?? player.position ?? "";
+    positionDisplay.innerHTML = currentPosition ? renderPositionBadges(currentPosition) : "";
   });
 
   let currentWalkup = player.walkup ?? null;

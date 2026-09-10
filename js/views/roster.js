@@ -1,6 +1,6 @@
 import { PLAYERS, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, renderPositionBadges, spinnerBlock } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, getAllPositionOverrides } from "../db.js";
 
@@ -78,12 +78,7 @@ export function renderRoster(container) {
   // getSession() (¿hay cuenta?), no getCurrentPlayerId() (¿a qué jugador
   // corresponde esa cuenta?) — alguien puede tener cuenta antes de que el
   // coach termine de vincularla en player_whitelist, y aun así debe poder
-  // verla. `duesMap` arranca vacío y se llena aparte (abajo) porque viene
-  // de una consulta a Supabase, no de data.js; el `render` la lee por
-  // closure, así que cuando llegue el dato real solo hace falta volver a
-  // llamar draw() para que se refleje.
-  // null hasta que getDuesMap() resuelva (abajo) — mientras tanto la celda
-  // se pinta neutral, no roja (ver renderDuesCell).
+  // verla.
   let duesMap = null;
   const loggedIn = !!getSession();
   if (loggedIn) {
@@ -96,6 +91,7 @@ export function renderRoster(container) {
   }
 
   const tableEl = document.createElement("div");
+  tableEl.appendChild(spinnerBlock());
   container.appendChild(tableEl);
 
   let activeGroup = "ALL";
@@ -125,27 +121,22 @@ export function renderRoster(container) {
     draw();
   });
 
-  draw();
-
-  if (loggedIn) {
-    getDuesMap().then((map) => {
+  // Se espera a las posiciones personalizadas (y a la inscripción) ANTES del
+  // primer draw() — a petición expresa: las posiciones que cada quien eligió
+  // en su perfil (player_positions) son las definitivas, y no debe verse
+  // cómo la tabla "cambia" de las de data.js a esas un instante después.
+  // Mientras tanto, spinner (ver tableEl arriba). getDuesMap() sale de
+  // DUES_PAID en data.js, así que resuelve al toque; getAllPositionOverrides()
+  // sí consulta a Supabase (con reintentos, ver runQuery en js/db.js).
+  Promise.all([getAllPositionOverrides(), loggedIn ? getDuesMap() : Promise.resolve(null)]).then(
+    ([overrides, map]) => {
+      for (const row of rows) {
+        if (overrides.has(row.id)) row.position = overrides.get(row.id);
+      }
       duesMap = map;
       draw();
-    });
-  }
-
-  // Posiciones personalizadas: lectura pública (a diferencia de
-  // "Inscripción", no depende de sesión). Reemplazan `row.position` de
-  // quien haya editado la suya — la columna Pos y el filtro rápido de
-  // arriba usan ese mismo campo, así que ambos quedan al día con un solo
-  // draw().
-  getAllPositionOverrides().then((overrides) => {
-    if (overrides.size === 0) return;
-    for (const row of rows) {
-      if (overrides.has(row.id)) row.position = overrides.get(row.id);
     }
-    draw();
-  });
+  );
 
   renderGlossary(container, columns);
 }

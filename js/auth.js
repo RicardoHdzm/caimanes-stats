@@ -228,16 +228,23 @@ export function loginErrorMessage(error) {
 // carga fresca para que vuelva a estar ahí. Mismo storage key que usa
 // initSplash() para saber si ya se entró esta sesión; quitarlo hace que
 // vuelva a aparecer.
+function showPageVeil() {
+  const veil = document.createElement("div");
+  veil.className = "page-veil";
+  document.body.appendChild(veil);
+  requestAnimationFrame(() => veil.classList.add("page-veil--on"));
+}
+
+// "Iniciar sesión" (te regresa a la bienvenida a loguearte ahí) — no hay
+// sesión que cerrar, solo se quita la marca de "ya entré esta sesión" y se
+// recarga. El velo es solo para que no se sienta un corte seco.
 export function leaveToSplash() {
   try {
     sessionStorage.removeItem("caimanes-entered");
   } catch {
     // Sin sessionStorage no hay nada que limpiar; igual recarga.
   }
-  const veil = document.createElement("div");
-  veil.className = "page-veil";
-  document.body.appendChild(veil);
-  requestAnimationFrame(() => veil.classList.add("page-veil--on"));
+  showPageVeil();
   // El fundido dura 0.28s (ver .page-veil en css/styles.css); se recarga un
   // pelín después para que se alcance a ver completo.
   setTimeout(() => {
@@ -247,11 +254,37 @@ export function leaveToSplash() {
 
 export async function signOut() {
   if (!supabase) return;
-  // No se espera la respuesta del servidor: signOut() borra el token local
-  // de inmediato (y la recarga de leaveToSplash ya arranca sin sesión).
-  // Esperar la red solo haría que "cerrar sesión" se sienta lento sin señal.
-  supabase.auth.signOut().catch(() => {});
-  leaveToSplash();
+  showPageVeil();
+  // `scope: "local"` NO hace la llamada de red a /logout — solo borra el
+  // token guardado, que es lo único que importa para volver a la bienvenida.
+  // Con el scope global (el default) y sin await, si la red estaba lenta el
+  // token local no alcanzaba a borrarse antes de la recarga y "cerrar
+  // sesión" te regresaba con la sesión TODAVÍA activa ("a veces no me deja
+  // cerrar sesión"). Ahora se espera, y como no hay red de por medio es
+  // instantáneo aunque no haya señal.
+  try {
+    await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // Ni así; se limpia igual lo local a mano abajo, por si el cliente dejó
+    // el token colgado.
+    try {
+      for (const key of Object.keys(localStorage)) {
+        if (key.startsWith("sb-") && key.includes("-auth-token")) localStorage.removeItem(key);
+      }
+    } catch {
+      // Sin localStorage no hay nada que forzar.
+    }
+  }
+  try {
+    sessionStorage.removeItem("caimanes-entered");
+  } catch {
+    // Ver leaveToSplash().
+  }
+  // Un respiro para que el velo alcance a subir (el signOut local de arriba
+  // es casi instantáneo).
+  setTimeout(() => {
+    location.href = "./";
+  }, 280);
 }
 
 // Reintenta una vez tras un hipo de red — es un update (cambiar la
