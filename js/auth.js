@@ -9,6 +9,7 @@
 // iniciar sesión y, ya adentro, cambiar su contraseña.
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { PLAYERS } from "./data.js";
+import { renderAvatar } from "./ui.js";
 
 let supabase = null;
 let session = null;
@@ -33,7 +34,16 @@ export function isCoach() {
 // header aquí (no en cada llamador): así ningún caso — la sesión inicial
 // recuperada al abrir la página, un login, un logout — se olvida de
 // refrescarlo.
+//
+// `document.documentElement.dataset.session` ("in"/"out") es el mismo
+// truco que ya usa el tema (ver document.documentElement.dataset.theme en
+// js/theme.js): un solo interruptor en el <html> que css/styles.css lee
+// con `html[data-session="in"] ...` para dar un look más "red social" a
+// quien tiene sesión iniciada, sin que cada vista tenga que preguntar
+// getSession() por su cuenta — a petición expresa, ese look nunca debe
+// filtrarse a un invitado.
 function notifyChange() {
+  document.documentElement.dataset.session = session ? "in" : "out";
   renderAuthControl();
   window.dispatchEvent(new CustomEvent("caimanes:auth-changed"));
 }
@@ -293,8 +303,16 @@ function loggedInMarkup() {
   // vincular todavía (falta la fila en player_whitelist) no hay a qué
   // perfil mandarte, así que se queda como una etiqueta fija — el `title`
   // explica por qué en vez del texto que antes vivía en el panel.
+  // Chip con tu foto (o iniciales) junto al nombre — foto fija de data.js
+  // nomás, sin la personalizada de Storage: js/auth.js no puede importar
+  // getAvatarUrl() de js/db.js (import circular, db.js ya importa de
+  // aquí — ver el comentario de changePassword() más abajo). La foto
+  // subida a Storage sí se refleja aquí, pero la hidrata js/main.js desde
+  // afuera (mismo patrón que hydrateAvatars() en otras vistas) en cuanto
+  // dispara "caimanes:auth-changed".
   const pill = player
     ? `<a href="#/jugador/${playerId}" class="auth-btn auth-btn-in auth-btn-named" aria-label="Ir a tu perfil">
+         <span class="auth-btn-avatar" data-avatar="${playerId}">${renderAvatar(player, 28)}</span>
          <span class="auth-btn-name">#${player.number ?? "-"} - ${player.name}</span>
        </a>`
     : `<span class="auth-btn auth-btn-in auth-btn-named" title="Tu cuenta todavía no está vinculada a un jugador — pídeselo al coach.">

@@ -15,33 +15,41 @@ function formatDate(iso) {
   return date.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
 }
 
+// Formato "burbuja de chat" (Instagram/Facebook), no la caja con borde de
+// antes: avatar a la izquierda, nombre + texto dentro de una burbuja
+// redondeada a la derecha, y like/borrar como texto chico DEBAJO de la
+// burbuja (el "Me gusta · Responder" de Instagram) — a petición expresa, el
+// sitio se ve más "red social" con sesión iniciada (esta sección ya es
+// exclusiva de cuenta, ver renderComments() más abajo, así que no hace
+// falta condicionar nada aquí).
 function commentItem(c, likeCount, likedByMe, canLike, canDelete) {
   const player = PLAYERS.find((p) => p.id === c.player_id);
-  // Mismo lenguaje visual que .playlist-player (js/views/playlist.js):
-  // avatar chico + nombre, link al perfil. Sin jugador que resolver (dato
-  // huérfano) se queda como el texto plano de antes, sin avatar ni link.
-  // El span con data-avatar-player es el gancho para reemplazar esto por la
-  // foto subida a Storage, si tiene una — ver el .then(getAvatarUrl) en
-  // refresh() más abajo. Sin eso, se queda con lo de siempre (foto fija de
-  // data.js o iniciales).
-  const author = player
-    ? `<a href="#/jugador/${player.id}" class="comment-author">
-         <span data-avatar-player="${player.id}">${renderAvatar(player, 28)}</span>
-         <span class="comment-author-name">${escapeHtml(player.name)}</span>
-       </a>`
-    : `<span class="comment-author"><span class="comment-author-name">${escapeHtml(c.player_id)}</span></span>`;
+  // Sin jugador que resolver (dato huérfano) se queda sin avatar ni link,
+  // mismo criterio que antes. El span con data-avatar-player es el gancho
+  // para reemplazar esto por la foto subida a Storage, si tiene una — ver
+  // el .then(getAvatarUrl) en refresh() más abajo. Sin eso, se queda con lo
+  // de siempre (foto fija de data.js o iniciales).
+  const avatar = player
+    ? `<a href="#/jugador/${player.id}" class="comment-avatar" data-avatar-player="${player.id}">${renderAvatar(player, 36)}</a>`
+    : `<span class="comment-avatar"></span>`;
+  const authorName = player
+    ? `<a href="#/jugador/${player.id}" class="comment-author-name">${escapeHtml(player.name)}</a>`
+    : `<span class="comment-author-name">${escapeHtml(c.player_id)}</span>`;
   return `
     <div class="comment-item">
-      <div class="comment-meta">
-        ${author}
-        <span class="comment-date">${formatDate(c.created_at)}</span>
-      </div>
-      <p class="comment-body">${escapeHtml(c.body)}</p>
-      <div class="comment-actions">
-        <button type="button" class="comment-like-btn${likedByMe ? " active" : ""}" data-comment="${c.id}"${canLike ? "" : " disabled"}>
-          <i class="fa-solid fa-heart"></i> <span class="comment-like-count">${likeCount}</span>
-        </button>
-        ${canDelete ? `<button type="button" class="comment-delete-btn" data-delete="${c.id}"><i class="fa-solid fa-trash"></i> Borrar</button>` : ""}
+      ${avatar}
+      <div class="comment-main">
+        <div class="comment-bubble">
+          ${authorName}
+          <p class="comment-body">${escapeHtml(c.body)}</p>
+        </div>
+        <div class="comment-actions">
+          <span class="comment-date">${formatDate(c.created_at)}</span>
+          <button type="button" class="comment-like-btn${likedByMe ? " active" : ""}" data-comment="${c.id}"${canLike ? "" : " disabled"}>
+            <i class="fa-solid fa-heart"></i> <span class="comment-like-count">${likeCount}</span>
+          </button>
+          ${canDelete ? `<button type="button" class="comment-delete-btn" data-delete="${c.id}">Borrar</button>` : ""}
+        </div>
       </div>
     </div>
   `;
@@ -125,7 +133,7 @@ export function renderComments(container, { contextType, contextId }) {
         const slot = listEl.querySelector(`[data-avatar-player="${c.player_id}"]`);
         if (!slot) return;
         const player = PLAYERS.find((p) => p.id === c.player_id);
-        slot.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player?.name ?? c.player_id)}" style="width:28px;height:28px;font-size:11.2px;">`;
+        slot.innerHTML = `<img class="avatar" src="${url}" alt="${escapeHtml(player?.name ?? c.player_id)}" style="width:36px;height:36px;font-size:14.4px;">`;
       });
     }
 

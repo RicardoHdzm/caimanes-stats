@@ -524,6 +524,25 @@ body {
   white-space: nowrap;
 }
 
+/* Foto (o iniciales) junto a tu nombre en el pill del header — ver
+   loggedInMarkup() en js/auth.js. Este chip solo existe con sesión
+   iniciada (nunca se pinta para un invitado), así que su anillo de acento
+   va directo aquí, sin condicionarlo a html[data-session="in"] — a
+   diferencia de los avatares públicos (Líderes/Récords de Resumen, ver más
+   abajo), que si necesitan esa condición porque también los ve un
+   invitado. Más delgado que el de esos (2px, no 3px): a 28px un anillo de
+   3px+3px (box-sizing: border-box, ver la regla `*` al principio de este
+   archivo) se comería casi un cuarto de la foto. */
+.auth-btn-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.auth-btn-avatar .avatar {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
 /* Fila de controles con sesión iniciada: el pill con tu nombre (link
    directo a tu perfil) + botones redondos aparte para Admin (solo coach) y
    Cerrar sesión — ya no hay panel desplegable (ver loggedInMarkup en
@@ -1590,6 +1609,16 @@ main h3::before {
   border-radius: 50%;
   font-size: 1.3rem;
   flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+/* Ya se ve como una historia destacada de Instagram (círculo + label
+   debajo) — este medallero es exclusivo de cuenta de por sí, así que basta
+   un toque sutil de interacción, sin tocar el color por categoría de cada
+   ícono (ver .achievement-medal--* más abajo, es la señal de qué tipo de
+   logro es cada uno). */
+.achievement-medal:hover .achievement-medal-icon {
+  transform: scale(1.08);
 }
 
 .achievement-medal-label {
@@ -2929,18 +2958,33 @@ main h3::before {
   gap: 12px;
 }
 
+/* Esquinas más redondeadas + elevación al hover — look de "tarjeta de
+   post" en vez de la caja plana de antes (a petición expresa, la playlist
+   ya es exclusiva de cuenta, ver renderPlaylist() en js/views/playlist.js,
+   así que este look no se condiciona a html[data-session]). */
 .playlist-card {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 14px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 18px;
   background: var(--surface-alt);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.playlist-card:hover {
+  box-shadow: var(--shadow-raised);
+  transform: translateY(-2px);
 }
 
 .playlist-card-avatar {
   flex-shrink: 0;
+}
+
+.playlist-card-avatar .avatar {
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 0 3px var(--surface);
 }
 
 .playlist-card-body {
@@ -3681,6 +3725,22 @@ button.mvp-vote-card:active {
   box-shadow: var(--shadow-card);
 }
 
+/* ---- Look "red social" con sesión iniciada ----
+   html[data-session] lo pone js/auth.js (notifyChange()) en cada cambio de
+   sesión — mismo truco que ya usa el tema (document.documentElement.
+   dataset.theme, ver js/theme.js). Con sesión, estos avatares PÚBLICOS
+   (Líderes/Récords de Resumen, y el chip del header — ver .leader-hero-
+   avatar, .record-hero-avatar(-group) y .auth-btn-avatar arriba/abajo)
+   cambian su anillo neutro de siempre por uno del acento del sitio, mismo
+   truco de borde+box-shadow que ya usaban — no se inventa nada nuevo. Sin
+   sesión (invitado) no cambia nada. */
+html[data-session="in"] .leader-hero-avatar .avatar,
+html[data-session="in"] .record-hero-avatar .avatar,
+html[data-session="in"] .record-hero-avatar-group .avatar {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--surface), var(--shadow-card);
+}
+
 .avatar-more {
   width: 40px;
   height: 40px;
@@ -3971,125 +4031,111 @@ button.mvp-vote-card:active {
   margin-bottom: 14px;
 }
 
+/* Burbuja de chat (Instagram/Facebook), no la caja con borde de antes —
+   avatar a la izquierda, nombre + texto dentro de una burbuja redondeada a
+   la derecha, like/borrar como texto chico DEBAJO de la burbuja (ver
+   commentItem() en js/views/comments.js). Los comentarios ya son
+   exclusivos de cuenta (ver renderComments()), así que este look no se
+   condiciona a html[data-session] — un invitado nunca llega a verlo. */
 .comment-item {
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+  display: block;
+}
+
+.comment-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-bubble {
+  display: inline-block;
+  max-width: 100%;
+  padding: 8px 14px;
+  border-radius: 18px;
   background: var(--surface-alt);
 }
 
-.comment-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 4px;
-}
-
-/* Avatar + nombre en línea — sin jugador que resolver (dato huérfano, ver
-   commentItem en js/views/comments.js) no es un link, pero conserva el
-   mismo layout para no saltar de línea distinto. */
-.comment-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: var(--text);
-}
-
 .comment-author-name {
+  display: block;
   font-weight: 700;
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
+  color: var(--text);
+  text-decoration: none;
 }
 
-a.comment-author:hover .comment-author-name {
+a.comment-author-name:hover {
   color: var(--accent-text);
 }
 
-.comment-date {
-  color: var(--muted);
-  font-size: var(--text-xs);
-  flex-shrink: 0;
-}
-
 .comment-body {
-  margin: 0 0 8px;
+  margin: 2px 0 0;
   font-size: var(--text-sm);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-/* Interruptor de like — el corazón se rellena de rojo (currentColor hereda
-   el color del texto, ya en --accent-text cuando está activo) sin
-   necesitar dos íconos distintos (fa-regular/fa-solid), que Font Awesome
-   Free no siempre trae ambos. Compartido entre comentarios (js/views/
-   comments.js) y anuncios (js/views/resumen.js) — mismo interruptor, mismo
-   look, dos contextos. */
-.comment-like-btn,
-.announcement-like-btn {
+/* Fila de acciones bajo la burbuja — texto chico, sin bordes ni pills (el
+   "Me gusta · 2 h · Borrar" de Instagram), a diferencia del pill con borde
+   que sigue usando el like de Avisos (ver .announcement-like-btn más
+   abajo, otro contexto con su propio look de "post"). */
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 0 14px;
+}
+
+.comment-date {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+/* El corazón se rellena de rojo (currentColor hereda el color del texto,
+   ya en --accent-text cuando está activo) sin necesitar dos íconos
+   distintos (fa-regular/fa-solid), que Font Awesome Free no siempre trae
+   ambos. */
+.comment-like-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  gap: 4px;
+  padding: 0;
+  border: none;
   background: none;
   color: var(--muted);
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
   font-weight: 700;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 
-.comment-like-btn:disabled,
-.announcement-like-btn:disabled {
+.comment-like-btn:disabled {
   cursor: default;
 }
 
 .comment-like-btn:not(:disabled):hover,
-.announcement-like-btn:not(:disabled):hover {
-  border-color: var(--accent-text);
+.comment-like-btn.active {
   color: var(--accent-text);
 }
 
-.comment-like-btn.active,
-.announcement-like-btn.active {
-  border-color: var(--accent-text);
-  color: var(--accent-text);
-}
-
-.announcement-like-btn {
-  margin-top: 12px;
-}
-
-.comment-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Separado del like a propósito (empujado al extremo derecho): borrar es
-   irreversible y no debe quedar a un click accidental de distancia. */
+/* Borrar es irreversible y no debe verse tan disponible como dar like —
+   mismo texto chico sin borde, pero se pone rojo hasta el hover. */
 .comment-delete-btn {
-  margin-left: auto;
-}
-
-/* Mismo look que el like, pero se pone rojo hasta el hover — borrar es
-   irreversible y no debe verse tan disponible como dar like. */
-.comment-delete-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  padding: 0;
+  border: none;
   background: none;
   color: var(--muted);
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
   font-weight: 700;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 
 .comment-delete-btn:disabled {
@@ -4098,7 +4144,6 @@ a.comment-author:hover .comment-author-name {
 }
 
 .comment-delete-btn:not(:disabled):hover {
-  border-color: var(--accent);
   color: var(--accent);
 }
 
@@ -4144,7 +4189,7 @@ a.comment-author:hover .comment-author-name {
 }
 
 .announcement-item {
-  padding: 8px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
   font-size: var(--text-sm);
 }
@@ -4154,13 +4199,31 @@ a.comment-author:hover .comment-author-name {
   padding-top: 0;
 }
 
+/* Encabezado de "post" (logo + fecha) — el título "Anuncios" ya va una sola
+   vez arriba de toda la lista (ver heroCardInnerHtml en resumen.js), así
+   que aquí no se repite, solo la identidad + cuándo. */
+.announcement-post-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.announcement-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  padding: 3px;
+  object-fit: contain;
+}
+
 .announcement-date {
-  display: block;
   color: var(--muted);
   font-size: var(--text-2xs);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  margin-bottom: 2px;
 }
 
 /* Doble clase (.leader-card .announcement-*) para ganarle en especificidad
@@ -4181,6 +4244,46 @@ a.comment-author:hover .comment-author-name {
   font-weight: 400;
   font-style: normal;
   overflow-wrap: anywhere;
+}
+
+/* Pie del post — barra de "Me gusta" de ancho completo con borde superior,
+   como el pie de un post de Facebook, en vez del pill chico de antes (ese
+   look lo conserva otro contexto de like, ver .comment-like-btn más
+   arriba). */
+.announcement-post-footer {
+  margin-top: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.announcement-like-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.announcement-like-btn:disabled {
+  cursor: default;
+}
+
+.announcement-like-btn:not(:disabled):hover {
+  background: var(--surface-raised);
+}
+
+.announcement-like-btn.active {
+  color: var(--accent-text);
 }
 
 /* ---- Foto de perfil personalizada ---- */

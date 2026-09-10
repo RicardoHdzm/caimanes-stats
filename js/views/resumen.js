@@ -217,17 +217,29 @@ function formatAnnouncementDate(iso) {
   return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
 }
 
-// canLike = hay sesión vinculada a un jugador. El contador se ve siempre,
-// con o sin cuenta (lectura pública); solo dar/quitar like requiere cuenta.
+// Formato "post de Facebook" (Instagram/Facebook, a petición expresa): un
+// encabezado propio (logo del equipo + fecha, el título "Anuncios" ya va
+// una sola vez arriba de toda la lista, ver heroCardInnerHtml() en
+// refreshAnnouncements()) y un pie con la barra de "Me gusta" de ancho
+// completo, en vez del pill chico de antes. canLike = hay sesión vinculada
+// a un jugador. El contador se ve siempre, con o sin cuenta (lectura
+// pública); solo dar/quitar like requiere cuenta. Esta sección ya es
+// exclusiva de cuenta (ver renderResumen() más abajo), así que este look
+// no se condiciona a html[data-session] — un invitado nunca la ve.
 function announcementItem(a, likeCount, likedByMe, canLike) {
   return `
     <div class="announcement-item">
-      <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
+      <div class="announcement-post-header">
+        <img class="announcement-avatar" src="assets/logo.png" alt="">
+        <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
+      </div>
       ${a.title ? `<p class="announcement-title">${escapeHtml(a.title)}</p>` : ""}
       <p class="announcement-body">${escapeHtml(a.body)}</p>
-      <button type="button" class="announcement-like-btn${likedByMe ? " active" : ""}" data-announcement="${a.id}"${canLike ? "" : " disabled"}>
-        <i class="fa-solid fa-heart"></i> <span class="announcement-like-count">${likeCount}</span>
-      </button>
+      <div class="announcement-post-footer">
+        <button type="button" class="announcement-like-btn${likedByMe ? " active" : ""}" data-announcement="${a.id}"${canLike ? "" : " disabled"}>
+          <i class="fa-solid fa-heart"></i> Me gusta <span class="announcement-like-count">${likeCount}</span>
+        </button>
+      </div>
     </div>
   `;
 }

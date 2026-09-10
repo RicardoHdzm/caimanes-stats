@@ -13,6 +13,7 @@ import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
 import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut } from "./auth.js";
+import { getAvatarUrl } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada } from "./ui.js";
 import { initTheme } from "./theme.js";
@@ -324,6 +325,26 @@ window.addEventListener("hashchange", () => {
 // se resuelve el player_id) — la vista actual se repinta con el estado
 // nuevo, mismo tratamiento que un cambio de hash.
 window.addEventListener("caimanes:auth-changed", render);
+
+// Foto personalizada de Storage para el chip de tu cuenta en el header (ver
+// loggedInMarkup() en js/auth.js) — mismo "pinta fijo, luego hidrata" que ya
+// usan hydrateAvatars() en resumen.js/playlist.js/comments.js/jugador.js.
+// Aparte de render(): el chip vive en #auth-slot (fuera de `app`), que
+// renderAuthControl() ya repinta solo en cada cambio de sesión — esto nomás
+// lo completa cuando sí hay foto en Storage. js/auth.js no puede llamar a
+// getAvatarUrl() directo (import circular con js/db.js, ver el comentario
+// junto a loggedInMarkup()), por eso vive aquí.
+function hydrateAuthAvatar() {
+  const id = getCurrentPlayerId();
+  if (!id) return;
+  const slot = document.querySelector(`#auth-slot [data-avatar="${id}"]`);
+  if (!slot) return;
+  getAvatarUrl(id).then((url) => {
+    if (!url) return;
+    slot.innerHTML = `<img class="avatar" src="${url}" alt="" style="width:28px;height:28px;font-size:11.2px;">`;
+  });
+}
+window.addEventListener("caimanes:auth-changed", hydrateAuthAvatar);
 
 // Cada vista pide sus datos de Supabase UNA sola vez, al pintarse (avatares,
 // anuncios, RSVP, comentarios...) — runQuery/runMutation en js/db.js ya
