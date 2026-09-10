@@ -28,6 +28,8 @@ import {
   setWalkup,
   cachedPositionOverride,
   setPosition,
+  cachedProfile,
+  setProfile,
   getDuesForPlayer,
   getAvatarUrl,
   uploadAvatar,
@@ -63,6 +65,18 @@ function toTitleCase(text) {
 // `seasons` en data.js (opcional, igual que photo/walkup). El debut es la
 // más chica de la lista, no necesariamente la primera temporada del
 // equipo: alguien pudo haber entrado después.
+const MONTHS_ES = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+// Chip "🎂 15 de marzo" — solo día y mes (player_profiles no guarda año).
+// `profile` puede ser null.
+function renderBirthday(profile) {
+  if (!profile?.birthdayMonth || !profile?.birthdayDay) return "";
+  return `<span class="profile-meta-chip"><i class="fa-solid fa-cake-candles"></i> ${profile.birthdayDay} de ${MONTHS_ES[profile.birthdayMonth - 1]}</span>`;
+}
+
 function renderDebut(seasons) {
   if (!seasons || seasons.length === 0) return "";
   const debut = Math.min(...seasons);
@@ -767,6 +781,10 @@ export function renderJugadorDetalle(container, playerId) {
   // data.js — se lee SÍNCRONO para que el hero salga con la correcta desde
   // el primer render, sin swap (a petición expresa).
   let currentPosition = cachedPositionOverride(player.id) ?? player.position ?? "";
+  // Bio + cumpleaños del perfil social (player_profiles), ya precargados
+  // (ver preloadProfiles) — se leen SÍNCRONO, sin swap. `profile` puede ser
+  // null (nadie lo ha llenado); `.bio` string vacío, mes/día null.
+  const profile = cachedProfile(player.id);
   // TEAM.gamesInSeason (no games.length): es el total de la temporada, no
   // solo los que ya se han capturado — así la barra de verdad avanza hacia
   // "toda la temporada", en vez de mostrar 100% apenas jugó todos los
@@ -798,6 +816,8 @@ export function renderJugadorDetalle(container, playerId) {
           <span>${escapeHtml(player.name)}</span>
           <span class="profile-hero-name-positions" id="position-display">${currentPosition ? renderPositionBadges(currentPosition) : ""}</span>
         </div>
+        <p class="profile-bio" id="profile-bio"${profile?.bio ? "" : " hidden"}>${profile?.bio ? escapeHtml(profile.bio) : ""}</p>
+        <div class="profile-hero-meta-row" id="profile-birthday-slot">${renderBirthday(profile)}</div>
         <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : ""}</div>
         <div class="profile-attendance">
           <div class="profile-attendance-label">
@@ -1020,6 +1040,12 @@ export function renderJugadorDetalle(container, playerId) {
   // la correcta desde el primer render — sin swap, a petición expresa.
   const positionDisplay = hero.querySelector("#position-display");
 
+  // Estado de bio/cumpleaños en vivo (ver "Estado y cumpleaños" en el panel
+  // de editar) — arranca del cache precargado.
+  let currentProfile = profile ? { ...profile } : { bio: "", birthdayMonth: null, birthdayDay: null };
+  const bioDisplay = hero.querySelector("#profile-bio");
+  const birthdaySlot = hero.querySelector("#profile-birthday-slot");
+
   let currentWalkup = player.walkup ?? null;
   const walkupDisplay = hero.querySelector("#walkup-display");
   getWalkupOverride(player.id).then((override) => {
@@ -1082,6 +1108,25 @@ export function renderJugadorDetalle(container, playerId) {
         <label>Link (Spotify, YouTube...)<input type="url" id="walkup-url-input" maxlength="500"></label>
         <p class="auth-error" id="walkup-error" hidden></p>
         <button type="button" class="auth-submit" id="walkup-save-btn">Guardar canción</button>
+
+        <p class="profile-edit-heading">Estado y cumpleaños</p>
+        <label>Estado / bio<textarea id="bio-input" maxlength="160" rows="2" placeholder="Algo corto sobre ti..."></textarea></label>
+        <div class="bday-inputs">
+          <label>Día
+            <select id="bday-day-input">
+              <option value="">—</option>
+              ${Array.from({ length: 31 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("")}
+            </select>
+          </label>
+          <label>Mes
+            <select id="bday-month-input">
+              <option value="">—</option>
+              ${MONTHS_ES.map((mo, i) => `<option value="${i + 1}">${mo.charAt(0).toUpperCase() + mo.slice(1)}</option>`).join("")}
+            </select>
+          </label>
+        </div>
+        <p class="auth-error" id="profile-error" hidden></p>
+        <button type="button" class="auth-submit" id="profile-save-btn">Guardar estado</button>
 
         <p class="profile-edit-heading">Contraseña</p>
         <label>Nueva contraseña<input type="password" id="password-input" minlength="6" autocomplete="new-password"></label>
@@ -1263,6 +1308,40 @@ export function renderJugadorDetalle(container, playerId) {
       }
     });
 
+    // --- Estado y cumpleaños ---
+    const bioInput = slot.querySelector("#bio-input");
+    const bdayDayInput = slot.querySelector("#bday-day-input");
+    const bdayMonthInput = slot.querySelector("#bday-month-input");
+    const profileError = slot.querySelector("#profile-error");
+    const profileSaveBtn = slot.querySelector("#profile-save-btn");
+
+    profileSaveBtn.addEventListener("click", async () => {
+      profileError.hidden = true;
+      const day = Number(bdayDayInput.value) || null;
+      const month = Number(bdayMonthInput.value) || null;
+      // Cumpleaños: o los dos, o ninguno.
+      if ((day && !month) || (!day && month)) {
+        profileError.textContent = "Para el cumpleaños elige día Y mes.";
+        profileError.hidden = false;
+        return;
+      }
+      const saved = { bio: bioInput.value.trim(), birthdayMonth: month, birthdayDay: day };
+      profileSaveBtn.disabled = true;
+      try {
+        await setProfile(saved);
+        currentProfile = saved;
+        bioDisplay.textContent = saved.bio;
+        bioDisplay.hidden = !saved.bio;
+        birthdaySlot.innerHTML = renderBirthday(saved);
+        flashSaved(profileSaveBtn, "Guardado");
+      } catch {
+        profileError.textContent = "No se pudo guardar — intenta de nuevo.";
+        profileError.hidden = false;
+      } finally {
+        profileSaveBtn.disabled = false;
+      }
+    });
+
     // --- Contraseña ---
     const passwordInput = slot.querySelector("#password-input");
     const passwordError = slot.querySelector("#password-error");
@@ -1316,6 +1395,10 @@ export function renderJugadorDetalle(container, playerId) {
       walkupArtistInput.value = currentWalkup?.artist ?? "";
       walkupUrlInput.value = currentWalkup?.url ?? "";
       walkupError.hidden = true;
+      bioInput.value = currentProfile.bio ?? "";
+      bdayDayInput.value = currentProfile.birthdayDay ?? "";
+      bdayMonthInput.value = currentProfile.birthdayMonth ?? "";
+      profileError.hidden = true;
       passwordInput.value = "";
       passwordError.hidden = true;
       passwordOk.hidden = true;

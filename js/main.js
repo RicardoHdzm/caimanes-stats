@@ -1,4 +1,5 @@
 import { TEAM, SPONSORS } from "./data.js";
+import { renderFeed } from "./views/feed.js";
 import { renderResumen } from "./views/resumen.js";
 import { renderRoster } from "./views/roster.js";
 import { renderEstadisticas } from "./views/estadisticas.js";
@@ -21,6 +22,7 @@ import { initSplash } from "./splash.js";
 import { initRecovery } from "./recovery.js";
 
 const routes = {
+  inicio: renderFeed,
   resumen: renderResumen,
   roster: renderRoster,
   estadisticas: renderEstadisticas,
@@ -38,7 +40,7 @@ const routes = {
 // Roster — el resto (Juegos y Standing incluidos) vive detrás de "Menú",
 // a petición expresa (antes Juegos/Standing también estaban aquí abajo).
 const BOTTOM_TABS = [
-  { tab: "resumen", route: "#/resumen", label: "Inicio", icon: "fa-house" },
+  { tab: "inicio", route: "#/inicio", label: "Inicio", icon: "fa-house" },
   { tab: "roster", route: "#/roster", label: "Roster", icon: "fa-users" },
 ];
 
@@ -47,6 +49,7 @@ const BOTTOM_TABS = [
 // luego lo de playoffs/stats (consulta más ocasional) y las herramientas
 // extra (Alineación, Playlist) al final.
 const MORE_TABS = [
+  { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
@@ -68,7 +71,7 @@ const MORE_TABS = [
 const APPS_GRID = [];
 for (const t of BOTTOM_TABS) {
   APPS_GRID.push(t);
-  if (t.tab === "resumen") {
+  if (t.tab === "inicio") {
     APPS_GRID.push({ tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" });
   }
 }
@@ -148,10 +151,10 @@ function currentRoute() {
   // "caimanes:auth-changed" ya lo deja ver la Playlist (el hash sigue
   // siendo #/playlist).
   if (first === "playlist" && !getSession()) {
-    return { tab: "resumen", render: routes.resumen };
+    return { tab: "inicio", render: routes.inicio };
   }
 
-  const tab = routes[first] ? first : "resumen";
+  const tab = routes[first] ? first : "inicio";
   return { tab, render: routes[tab] };
 }
 
@@ -167,10 +170,10 @@ function buildBottomTabs() {
     a.innerHTML = `<i class="fa-solid ${t.icon}"></i><span>${t.label}</span>`;
     bottomTabs.appendChild(a);
 
-    // Mi Perfil va justo después de Resumen — mismo lugar que en la nav de
+    // Mi Perfil va justo después de Inicio — mismo lugar que en la nav de
     // escritorio (ver #nav-mi-perfil en index.html). Empieza oculta: render()
     // le pone el href y la muestra en cuanto hay sesión iniciada.
-    if (t.tab === "resumen") {
+    if (t.tab === "inicio") {
       const miPerfil = document.createElement("a");
       miPerfil.href = "#";
       miPerfil.className = "bottom-tab";

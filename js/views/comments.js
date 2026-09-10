@@ -9,6 +9,7 @@ import { PLAYERS } from "../data.js";
 import { getCurrentPlayerId, isCoach } from "../auth.js";
 import { getComments, addComment, deleteComment, getCommentLikes, likeComment, unlikeComment, getAvatarUrl } from "../db.js";
 import { escapeHtml, renderAvatar } from "../ui.js";
+import { reactionBarHtml, wireReactionBar } from "./reactions.js";
 
 function formatDate(iso) {
   const date = new Date(iso);
@@ -22,7 +23,7 @@ function formatDate(iso) {
 // sitio se ve más "red social" con sesión iniciada (esta sección ya es
 // exclusiva de cuenta, ver renderComments() más abajo, así que no hace
 // falta condicionar nada aquí).
-function commentItem(c, likeCount, likedByMe, canLike, canDelete) {
+function commentItem(c, reactionRows, canReact, canDelete) {
   const player = PLAYERS.find((p) => p.id === c.player_id);
   // Sin jugador que resolver (dato huérfano) se queda sin avatar ni link,
   // mismo criterio que antes. El span con data-avatar-player es el gancho
@@ -45,9 +46,7 @@ function commentItem(c, likeCount, likedByMe, canLike, canDelete) {
         </div>
         <div class="comment-actions">
           <span class="comment-date">${formatDate(c.created_at)}</span>
-          <button type="button" class="comment-like-btn${likedByMe ? " active" : ""}" data-comment="${c.id}"${canLike ? "" : " disabled"}>
-            <i class="fa-solid fa-heart"></i> <span class="comment-like-count">${likeCount}</span>
-          </button>
+          ${reactionBarHtml(c.id, reactionRows, { canReact })}
           ${canDelete ? `<button type="button" class="comment-delete-btn" data-delete="${c.id}">Borrar</button>` : ""}
         </div>
       </div>
@@ -104,25 +103,16 @@ export function renderComments(container, { contextType, contextId }) {
   async function refresh() {
     const comments = await getComments(contextType, contextId);
     const likes = await getCommentLikes(comments.map((c) => c.id));
-    const likeCounts = new Map();
-    const likedByMe = new Set();
+    const rowsByComment = new Map();
     for (const like of likes) {
-      likeCounts.set(like.comment_id, (likeCounts.get(like.comment_id) ?? 0) + 1);
-      if (myId && like.player_id === myId) likedByMe.add(like.comment_id);
+      if (!rowsByComment.has(like.comment_id)) rowsByComment.set(like.comment_id, []);
+      rowsByComment.get(like.comment_id).push({ player_id: like.player_id, reaction: like.reaction });
     }
 
     listEl.innerHTML =
       comments.length > 0
         ? comments
-            .map((c) =>
-              commentItem(
-                c,
-                likeCounts.get(c.id) ?? 0,
-                likedByMe.has(c.id),
-                !!myId,
-                coach || c.player_id === myId
-              )
-            )
+            .map((c) => commentItem(c, rowsByComment.get(c.id) ?? [], !!myId, coach || c.player_id === myId))
             .join("")
         : '<p class="subtitle">Sin comentarios todavía.</p>';
 
@@ -153,42 +143,38 @@ export function renderComments(container, { contextType, contextId }) {
     }
   }
 
-  // Delegado en listEl (nunca se reemplaza, solo su innerHTML) para que
-  // siga funcionando después de cada refresh() — un listener puesto
-  // directo en cada botón se perdería en cuanto la lista se repinte.
-  listEl.addEventListener("click", async (e) => {
-    const likeBtn = e.target.closest(".comment-like-btn");
-    if (likeBtn && !likeBtn.disabled) {
-      const commentId = Number(likeBtn.dataset.comment);
-      const alreadyLiked = likeBtn.classList.contains("active");
-      likeBtn.disabled = true;
-      try {
-        if (alreadyLiked) {
-          await unlikeComment(commentId);
-        } else {
-          await likeComment(commentId);
-        }
-        await refresh();
-      } catch {
-        likeBtn.disabled = false;
-      }
-      return;
-    }
+  // Reacciones — delegado en listEl (nunca se reemplaza, solo su innerHTML),
+  // así sigue vivo después de cada refresh().
+  wireReactionBar(listEl, {
+    onSet: async (id, emoji) => {
+      await likeComment(Number(id), emoji);
+      await refresh();
+    },
+    onClear: async (id) => {
+      await unlikeComment(Number(id));
+      await refresh();
+    },
+  });
 
+  // Borrar comentario — delegado en el mismo contenedor.
+  listEl.addEventListener("click", async (e) => {
     const deleteBtn = e.target.closest(".comment-delete-btn");
-    if (deleteBtn) {
-      if (!confirm("¿Borrar este comentario?")) return;
-      deleteBtn.disabled = true;
-      try {
-        await deleteComment(Number(deleteBtn.dataset.delete));
-        await refresh();
-      } catch {
-        deleteBtn.disabled = false;
-      }
+    if (!deleteBtn) return;
+    if (!confirm("¿Borrar este comentario?")) return;
+    deleteBtn.disabled = true;
+    try {
+      await deleteComment(Number(deleteBtn.dataset.delete));
+      await refresh();
+    } catch {
+      deleteBtn.disabled = false;
     }
   });
 
-  // El velo de carga a pantalla completa (ver runQuery en js/db.js) cubre
-  // mientras llega la primera respuesta.
+  // Cierra el menú de emojis al tocar fuera de él.
+  listEl.addEventListener("click", (e) => {
+    if (e.target.closest(".reaction-add") || e.target.closest(".reaction-menu")) return;
+    for (const m of listEl.querySelectorAll(".reaction-menu:not([hidden])")) m.hidden = true;
+  });
+
   refresh();
 }

@@ -14,15 +14,7 @@ import {
 } from "../stats.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
 import { getCurrentPlayerId, getSession } from "../auth.js";
-import {
-  getRsvps,
-  setRsvp,
-  getAnnouncements,
-  getAnnouncementLikes,
-  likeAnnouncement,
-  unlikeAnnouncement,
-  getAvatarUrl,
-} from "../db.js";
+import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -196,37 +188,6 @@ export function wireRsvp(cardEl, gameId) {
   refresh();
 }
 
-function formatAnnouncementDate(iso) {
-  return new Date(iso).toLocaleDateString("es-MX", { day: "numeric", month: "long" });
-}
-
-// Formato "post de Facebook" (Instagram/Facebook, a petición expresa): un
-// encabezado propio (logo del equipo + fecha, el título "Anuncios" ya va
-// una sola vez arriba de toda la lista, ver heroCardInnerHtml() en
-// refreshAnnouncements()) y un pie con la barra de "Me gusta" de ancho
-// completo, en vez del pill chico de antes. canLike = hay sesión vinculada
-// a un jugador. El contador se ve siempre, con o sin cuenta (lectura
-// pública); solo dar/quitar like requiere cuenta. Esta sección ya es
-// exclusiva de cuenta (ver renderResumen() más abajo), así que este look
-// no se condiciona a html[data-session] — un invitado nunca la ve.
-function announcementItem(a, likeCount, likedByMe, canLike) {
-  return `
-    <div class="announcement-item">
-      <div class="announcement-post-header">
-        <img class="announcement-avatar" src="assets/logo.png" alt="">
-        <span class="announcement-date">${formatAnnouncementDate(a.created_at)}</span>
-      </div>
-      ${a.title ? `<p class="announcement-title">${escapeHtml(a.title)}</p>` : ""}
-      <p class="announcement-body">${escapeHtml(a.body)}</p>
-      <div class="announcement-post-footer">
-        <button type="button" class="announcement-like-btn${likedByMe ? " active" : ""}" data-announcement="${a.id}"${canLike ? "" : " disabled"}>
-          <i class="fa-solid fa-heart"></i> Me gusta <span class="announcement-like-count">${likeCount}</span>
-        </button>
-      </div>
-    </div>
-  `;
-}
-
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
@@ -235,65 +196,9 @@ export function renderResumen(container) {
   // temporada" (ver currentSeasonGames en js/stats.js).
   const games = currentSeasonGames();
 
-  const myId = getCurrentPlayerId();
-
-  // Anuncios del equipo — solo se pintan si hay alguno (el coach los publica
-  // desde admin.html, ver js/admin-announcements.js). Van antes que todo lo
-  // demás porque son avisos, se quieren ver de inmediato al abrir la app.
-  // Exclusivos de cuentas con sesión iniciada, a petición expresa (igual
-  // que Comentarios y el medallero, ver js/views/comments.js y
-  // js/views/jugador.js) — sin cuenta ni se pinta la sección (ni un slot
-  // vacío), no se deja un "inicia sesión para ver".
-  if (myId) {
-    const announcementsSlot = document.createElement("div");
-    container.appendChild(announcementsSlot);
-
-    async function refreshAnnouncements() {
-      const items = await getAnnouncements(3);
-      if (items.length === 0) {
-        announcementsSlot.innerHTML = "";
-        return;
-      }
-      const likes = await getAnnouncementLikes(items.map((a) => a.id));
-      const likeCounts = new Map();
-      const likedByMe = new Set();
-      for (const like of likes) {
-        likeCounts.set(like.announcement_id, (likeCounts.get(like.announcement_id) ?? 0) + 1);
-        if (myId && like.player_id === myId) likedByMe.add(like.announcement_id);
-      }
-      const announcementsList = `<div class="announcements-list">${items
-        .map((a) => announcementItem(a, likeCounts.get(a.id) ?? 0, likedByMe.has(a.id), !!myId))
-        .join("")}</div>`;
-      announcementsSlot.innerHTML = `
-        <div class="leader-card leader-card--hero announcements-card">
-          ${heroCardInnerHtml("fa-bullhorn", "Anuncios", "", announcementsList)}
-        </div>
-      `;
-    }
-
-    // Delegado en announcementsSlot (nunca se reemplaza, solo su innerHTML
-    // en cada refresh) — mismo patrón que el like de comentarios en
-    // js/views/comments.js.
-    announcementsSlot.addEventListener("click", async (e) => {
-      const btn = e.target.closest(".announcement-like-btn");
-      if (!btn || btn.disabled) return;
-      const id = Number(btn.dataset.announcement);
-      const alreadyLiked = btn.classList.contains("active");
-      btn.disabled = true;
-      try {
-        if (alreadyLiked) {
-          await unlikeAnnouncement(id);
-        } else {
-          await likeAnnouncement(id);
-        }
-        await refreshAnnouncements();
-      } catch {
-        btn.disabled = false;
-      }
-    });
-
-    refreshAnnouncements();
-  }
+  // Los anuncios del equipo ya NO viven aquí — se movieron al muro de Inicio
+  // (ver js/views/feed.js). Esta pestaña ("Resumen") quedó solo con las
+  // stats.
 
   // Mismas tarjetas "hero" que el resto de Resumen (ver heroCardShell) en
   // vez de .card/.card-icon — esas siguen usándose tal cual en otras
