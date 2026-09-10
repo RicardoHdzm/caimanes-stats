@@ -294,36 +294,57 @@ export async function deleteComment(commentId) {
   if (error) throw error;
 }
 
-// ---- Likes de comentarios (comment_likes) ----
-//
-// Lectura pública (el conteo se ve con o sin sesión). Dar/quitar like
-// requiere cuenta — un like por jugador por comentario (la llave primaria
-// lo garantiza; dar like de nuevo no acumula, es un interruptor).
-
-// Todos los likes de un conjunto de comentarios de una sola consulta — para
-// no pedirlos uno por uno al pintar la lista completa. [] si no hay
-// comentarios que consultar o si Supabase no está configurado.
-export async function getCommentLikes(commentIds) {
+// Últimos comentarios de TODOS los juegos, para el feed de Inicio (ver
+// js/views/feed.js). Los comentarios son de solo-cuenta, así que feed.js
+// solo llama esto con sesión.
+export async function getRecentComments(limit = 20) {
   const client = getClient();
-  if (!client || commentIds.length === 0) return [];
+  if (!client) return [];
   const { data, error } = await runQuery(() =>
-    client.from("comment_likes").select("comment_id, player_id").in("comment_id", commentIds)
+    client
+      .from("comments")
+      .select("id, context_id, player_id, body, created_at")
+      .eq("context_type", "game")
+      .order("created_at", { ascending: false })
+      .limit(limit)
   );
   return error || !data ? [] : data;
 }
 
-export async function likeComment(commentId) {
+// ---- Reacciones de comentarios (comment_likes) ----
+//
+// Lectura pública (los conteos se ven con o sin sesión). Reaccionar requiere
+// cuenta — UNA reacción por jugador por comentario (la llave primaria lo
+// garantiza). Cambiar de emoji = upsert de la misma fila; quitarla = borrar
+// la fila. Emojis válidos: ver REACTIONS en js/views/reactions.js.
+
+// Todas las reacciones de un conjunto de comentarios de una sola consulta.
+// Cada fila trae { comment_id, player_id, reaction }.
+export async function getCommentLikes(commentIds) {
+  const client = getClient();
+  if (!client || commentIds.length === 0) return [];
+  const { data, error } = await runQuery(() =>
+    client.from("comment_likes").select("comment_id, player_id, reaction").in("comment_id", commentIds)
+  );
+  return error || !data ? [] : data;
+}
+
+export async function likeComment(commentId, reaction) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
-  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para dar like.");
-  const { error } = await client.from("comment_likes").insert({ comment_id: commentId, player_id: playerId });
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para reaccionar.");
+  const { error } = await runMutation(() =>
+    client
+      .from("comment_likes")
+      .upsert({ comment_id: commentId, player_id: playerId, reaction }, { onConflict: "comment_id,player_id" })
+  );
   if (error) throw error;
 }
 
 export async function unlikeComment(commentId) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
-  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar la reacción.");
   const { error } = await runMutation(() =>
     client.from("comment_likes").delete().eq("comment_id", commentId).eq("player_id", playerId)
   );
@@ -361,33 +382,129 @@ export async function deleteAnnouncement(id) {
 
 // ---- Reacciones a anuncios (announcement_likes) ----
 //
-// Mismo patrón que los likes de comentarios (arriba): lectura pública, un
-// like por jugador por anuncio (interruptor, no acumula).
+// Mismo patrón que las reacciones de comentarios (arriba): lectura pública,
+// UNA reacción por jugador por anuncio, cambiar = upsert, quitar = delete.
 export async function getAnnouncementLikes(announcementIds) {
   const client = getClient();
   if (!client || announcementIds.length === 0) return [];
   const { data, error } = await runQuery(() =>
-    client.from("announcement_likes").select("announcement_id, player_id").in("announcement_id", announcementIds)
+    client.from("announcement_likes").select("announcement_id, player_id, reaction").in("announcement_id", announcementIds)
   );
   return error || !data ? [] : data;
 }
 
-export async function likeAnnouncement(announcementId) {
+export async function likeAnnouncement(announcementId, reaction) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
-  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para dar like.");
-  const { error } = await client.from("announcement_likes").insert({ announcement_id: announcementId, player_id: playerId });
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para reaccionar.");
+  const { error } = await runMutation(() =>
+    client
+      .from("announcement_likes")
+      .upsert({ announcement_id: announcementId, player_id: playerId, reaction }, { onConflict: "announcement_id,player_id" })
+  );
   if (error) throw error;
 }
 
 export async function unlikeAnnouncement(announcementId) {
   const client = getClient();
   const playerId = getCurrentPlayerId();
-  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar el like.");
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar la reacción.");
   const { error } = await runMutation(() =>
     client.from("announcement_likes").delete().eq("announcement_id", announcementId).eq("player_id", playerId)
   );
   if (error) throw error;
+}
+
+// ---- Reacciones de ítems del feed que no son comentario ni anuncio
+//      (feed_reactions: cumpleaños, resultados, MVP...) ----
+//
+// `itemId` es un id sintético que arma js/views/feed.js (ej. "bday:p15:2026").
+// Mismo patrón: lectura pública, una por jugador, cambiar = upsert, quitar =
+// delete.
+export async function getFeedReactions(itemIds) {
+  const client = getClient();
+  if (!client || itemIds.length === 0) return [];
+  const { data, error } = await runQuery(() =>
+    client.from("feed_reactions").select("item_id, player_id, reaction").in("item_id", itemIds)
+  );
+  return error || !data ? [] : data;
+}
+
+export async function setFeedReaction(itemId, reaction) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para reaccionar.");
+  const { error } = await runMutation(() =>
+    client.from("feed_reactions").upsert({ item_id: itemId, player_id: playerId, reaction }, { onConflict: "item_id,player_id" })
+  );
+  if (error) throw error;
+}
+
+export async function clearFeedReaction(itemId) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador para quitar la reacción.");
+  const { error } = await runMutation(() =>
+    client.from("feed_reactions").delete().eq("item_id", itemId).eq("player_id", playerId)
+  );
+  if (error) throw error;
+}
+
+// ---- Perfil social del jugador: bio + cumpleaños (player_profiles) ----
+//
+// Lo edita cada jugador en "Editar perfil". Lectura pública, escritura del
+// propio jugador — mismo patrón que player_walkups / player_positions.
+// Cache + preload como las posiciones (ver preloadOverrides arriba): el
+// feed y el perfil lo leen SÍNCRONO. null = todavía no se precargó.
+let profilesCache = null;
+
+export async function getAllProfiles() {
+  const client = getClient();
+  if (!client) return new Map();
+  const { data, error } = await runQuery(() =>
+    client.from("player_profiles").select("player_id, bio, birthday_month, birthday_day")
+  );
+  if (error || !data) return new Map();
+  return new Map(
+    data.map((row) => [
+      row.player_id,
+      { bio: row.bio ?? "", birthdayMonth: row.birthday_month ?? null, birthdayDay: row.birthday_day ?? null },
+    ])
+  );
+}
+
+export async function preloadProfiles() {
+  profilesCache = await getAllProfiles();
+}
+
+export function cachedProfiles() {
+  return profilesCache ?? new Map();
+}
+
+export function cachedProfile(playerId) {
+  return profilesCache?.get(playerId) ?? null;
+}
+
+export async function setProfile({ bio, birthdayMonth, birthdayDay }) {
+  const client = getClient();
+  const playerId = getCurrentPlayerId();
+  if (!client || !playerId) throw new Error("Necesitas una cuenta vinculada a un jugador.");
+  const row = {
+    player_id: playerId,
+    bio: bio || null,
+    birthday_month: birthdayMonth || null,
+    birthday_day: birthdayDay || null,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await runMutation(() => client.from("player_profiles").upsert(row, { onConflict: "player_id" }));
+  if (error) throw error;
+  if (profilesCache) {
+    profilesCache.set(playerId, {
+      bio: bio || "",
+      birthdayMonth: birthdayMonth || null,
+      birthdayDay: birthdayDay || null,
+    });
+  }
 }
 
 // ---- Foto de perfil personalizada (Storage, bucket "avatars") ----

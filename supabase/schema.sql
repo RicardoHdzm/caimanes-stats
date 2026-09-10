@@ -304,3 +304,90 @@ create policy "avatars_insert_own" on storage.objects
 create policy "avatars_update_own" on storage.objects
   for update to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = public.current_player_id());
+
+-- ============================================================================
+-- FUNCIONES "RED SOCIAL" (agregadas después). Correr estos bloques también en
+-- el SQL Editor si el proyecto ya existía — no se aplican solos.
+-- ============================================================================
+
+-- 11. Reacciones con emoji en comentarios y anuncios. Antes las tablas
+--     comment_likes (6b) y announcement_likes (9b) eran un simple "like"
+--     (❤️) sin más; ahora cada fila guarda QUÉ emoji puso el jugador.
+--     Sigue siendo UNA reacción por jugador por ítem (la llave primaria lo
+--     garantiza) — cambiar de emoji es un UPDATE de la misma fila (por eso
+--     la política de update nueva), quitarla es borrar la fila. Emojis
+--     válidos en la UI: ver REACTIONS en js/views/reactions.js.
+alter table public.comment_likes      add column if not exists reaction text not null default '❤️';
+alter table public.announcement_likes add column if not exists reaction text not null default '❤️';
+
+create policy "comment_likes_update_own" on public.comment_likes
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+
+create policy "announcement_likes_update_own" on public.announcement_likes
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+
+grant update on public.comment_likes to anon, authenticated;
+grant update on public.announcement_likes to anon, authenticated;
+
+-- 12. Perfil social del jugador: "estado"/bio y cumpleaños (solo día y mes,
+--     sin año). Lo edita cada jugador en "Editar perfil" — mismo patrón que
+--     player_walkups (4) / player_positions (7): lectura pública, escritura
+--     solo del propio jugador. Sin fila = ese jugador no ha puesto nada.
+create table if not exists public.player_profiles (
+  player_id text primary key,
+  bio text check (char_length(bio) <= 160),
+  birthday_month int check (birthday_month between 1 and 12),
+  birthday_day int check (birthday_day between 1 and 31),
+  updated_at timestamptz not null default now()
+);
+alter table public.player_profiles enable row level security;
+
+create policy "profiles_public_read" on public.player_profiles
+  for select using (true);
+
+create policy "profiles_insert_own" on public.player_profiles
+  for insert to authenticated
+  with check (player_id = public.current_player_id());
+
+create policy "profiles_update_own" on public.player_profiles
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+
+grant select, insert, update on public.player_profiles to anon, authenticated;
+
+-- 13. Reacciones a ítems del feed que NO son comentario ni anuncio
+--     (cumpleaños, resultados de juego, MVP...). `item_id` es un id
+--     sintético que arma js/views/feed.js, ej. "bday:p15:2026" o "game:g9".
+--     Mismo patrón de siempre: lectura pública, una reacción por jugador
+--     por ítem, cambiar = update, quitar = delete.
+create table if not exists public.feed_reactions (
+  item_id text not null,
+  player_id text not null,
+  reaction text not null default '❤️',
+  created_at timestamptz not null default now(),
+  primary key (item_id, player_id)
+);
+alter table public.feed_reactions enable row level security;
+
+create policy "feed_reactions_public_read" on public.feed_reactions
+  for select using (true);
+
+create policy "feed_reactions_insert_own" on public.feed_reactions
+  for insert to authenticated
+  with check (player_id = public.current_player_id());
+
+create policy "feed_reactions_update_own" on public.feed_reactions
+  for update to authenticated
+  using (player_id = public.current_player_id())
+  with check (player_id = public.current_player_id());
+
+create policy "feed_reactions_delete_own" on public.feed_reactions
+  for delete to authenticated
+  using (player_id = public.current_player_id());
+
+grant select, insert, update, delete on public.feed_reactions to anon, authenticated;

@@ -12,7 +12,7 @@
 // regresas, o si cierras sesión — ver signOut() en js/auth.js — pero no cada
 // vez que navegas dentro del sitio).
 import { signIn, getSession, resetPassword, loginErrorMessage } from "./auth.js";
-import { preloadOverrides } from "./db.js";
+import { preloadOverrides, preloadProfiles } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 
 const STORAGE_KEY = "caimanes-entered";
@@ -87,10 +87,11 @@ export function initSplash(onEnter) {
 
   // Quita el gate (con un fundido corto) y arranca la app. Antes, mostrando
   // el spinner, espera a: (1) que la sesión se resuelva, y (2) que se
-  // precarguen las posiciones personalizadas del roster — así la app se
-  // revela ya completa, sin que se vea "cargar" nada entre pestañas (a
-  // petición expresa). Las dos esperas tienen su propio tope de tiempo: sin
-  // señal, se entra igual y la app cae de vuelta a los datos de data.js.
+  // precarguen las posiciones personalizadas del roster y los perfiles
+  // (bio/cumpleaños, para el feed y el perfil) — así la app se revela ya
+  // completa, sin que se vea "cargar" nada entre pestañas (a petición
+  // expresa). Las esperas tienen su propio tope de tiempo: sin señal, se
+  // entra igual y la app cae de vuelta a los datos de data.js.
   async function enterApp() {
     if (entering) return;
     entering = true;
@@ -98,7 +99,7 @@ export function initSplash(onEnter) {
     showLoading();
     await waitForAuth();
     await Promise.race([
-      preloadOverrides().catch(() => {}),
+      Promise.all([preloadOverrides(), preloadProfiles()]).catch(() => {}),
       new Promise((resolve) => setTimeout(resolve, 2000)),
     ]);
     onEnter?.();
