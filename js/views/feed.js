@@ -168,7 +168,7 @@ export function renderFeed(container) {
     for (const g of games) {
       const tied = g.scoreUs === g.scoreThem;
       const won = g.scoreUs > g.scoreThem;
-      const verb = tied ? "Empatamos" : won ? "Ganamos" : "Perdimos";
+      const verb = tied ? "Empate" : won ? "Victoria" : "Derrota";
       const cls = tied ? "tie" : won ? "win" : "loss";
       items.push({
         date: `${g.date}T12:00:00`,
