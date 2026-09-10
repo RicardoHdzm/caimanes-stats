@@ -4207,23 +4207,23 @@ a.comment-author-name:hover {
 }
 
 /* ---- Muro / feed de Inicio (js/views/feed.js) ----
-   Cuadrícula de 3 columnas en escritorio (a petición expresa; mismos cortes
-   que .playlist-grid: 2 en tablet, 1 en celular). align-items:start para que
-   cada tarjeta tome su alto natural en vez de estirarse al más alto de la
-   fila. */
+   Cuadrícula de 3 columnas en escritorio, tarjetas CUADRADAS (aspect-ratio 1,
+   a petición expresa). Mismos cortes que .playlist-grid: 2 en tablet, 1 en
+   celular — ahí las tarjetas dejan de ser cuadradas (a lo ancho de la
+   pantalla un cuadrado sería enorme) y toman su alto natural. */
 .feed {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
-  align-items: start;
 }
 
 .feed-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 108px;
+  aspect-ratio: 1 / 1;
   justify-content: center;
+  overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -4232,7 +4232,9 @@ a.comment-author-name:hover {
 }
 
 /* El aviso es el único ítem "largo" (título + cuerpo + reacciones): su
-   contenido va desde arriba, no centrado. */
+   contenido va desde arriba, no centrado, y el cuerpo se corta a unas
+   líneas para que quepa en el cuadrado (se lee completo tocando el aviso...
+   bueno, en Anuncios; aquí es un preview). */
 .feed-item--aviso {
   justify-content: flex-start;
 }
@@ -4246,6 +4248,11 @@ a.comment-author-name:hover {
 @media (max-width: 640px) {
   .feed {
     grid-template-columns: 1fr;
+  }
+
+  .feed-item {
+    aspect-ratio: auto;
+    min-height: 92px;
   }
 }
 
@@ -4282,10 +4289,13 @@ a.comment-author-name:hover {
 }
 
 .feed-aviso-body {
+  display: -webkit-box;
   margin: 0;
   font-size: var(--text-sm);
-  white-space: pre-wrap;
+  overflow: hidden;
   overflow-wrap: anywhere;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
 }
 
 /* Resultado — icono de color (verde/rojo/gris) + "Ganamos vs X" + marcador. */
@@ -4341,49 +4351,9 @@ a.comment-author-name:hover {
   color: var(--muted);
 }
 
-/* Comentario — avatar + "Fulano comentó en vs Rival: «…»". */
-.feed-comment {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  color: var(--text);
-}
-
 .feed-avatar {
   flex-shrink: 0;
   display: block;
-}
-
-.feed-comment-text {
-  font-size: var(--text-sm);
-  min-width: 0;
-}
-
-/* El nombre (→ perfil) y "vs Rival" (→ el juego). Color explícito para que
-   no salgan azul/morado de link visitado. */
-.feed-comment-author {
-  color: var(--text);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.feed-comment-game {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.feed-comment-author:hover,
-.feed-comment-game:hover {
-  color: var(--accent-text);
-}
-
-.feed-comment-body {
-  display: -webkit-box;
-  margin-top: 2px;
-  color: var(--muted);
-  overflow: hidden;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
 /* Cumpleaños / MVP */

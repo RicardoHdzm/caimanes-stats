@@ -22,7 +22,6 @@ import {
   getAnnouncementLikes,
   likeAnnouncement,
   unlikeAnnouncement,
-  getRecentComments,
   getFeedReactions,
   setFeedReaction,
   clearFeedReaction,
@@ -32,17 +31,12 @@ import {
 } from "../db.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
 import { reactionBarHtml, wireReactionBar } from "./reactions.js";
-import { findGame } from "./juego.js";
 
 const MAX_ITEMS = 30;
-const RECENT_RESULTS = 10;
+const RECENT_RESULTS = 12;
 
 function playerById(id) {
   return PLAYERS.find((p) => p.id === id) ?? null;
-}
-
-function gameOpponent(gameId) {
-  return findGame(gameId).game?.opponent ?? "el rival";
 }
 
 function fmtDate(iso) {
@@ -125,12 +119,10 @@ export function renderFeed(container) {
   container.appendChild(listEl);
 
   async function refresh() {
-    // 1. Fuentes (el feed es de solo-sesión, ver el guard de arriba).
-    const [announcements, comments, mvp] = await Promise.all([
-      getAnnouncements(20),
-      getRecentComments(20),
-      recentMvp(),
-    ]);
+    // 1. Fuentes (el feed es de solo-sesión, ver el guard de arriba). Los
+    // comentarios NO van en el feed (a petición expresa) — se leen en el
+    // detalle de cada juego.
+    const [announcements, mvp] = await Promise.all([getAnnouncements(20), recentMvp()]);
     const games = recentGames();
     const birthdays = todaysBirthdays();
 
@@ -182,27 +174,6 @@ export function renderFeed(container) {
               <span class="feed-result-score">${g.scoreUs}-${g.scoreThem}</span></span>
           </a>
           ${reactionBarHtml(`resultado:${g.id}`, feedRows(`resultado:${g.id}`), { canReact })}`,
-      });
-    }
-
-    for (const c of comments) {
-      const player = playerById(c.player_id);
-      // Sin envoltorio <a> en toda la tarjeta: adentro van el link del
-      // avatar y el del nombre (a[href] anidado en a[href] es HTML inválido
-      // — el navegador lo "arregla" partiendo el link y sale con el color
-      // morado de "visitado"). El nombre → perfil, "vs Rival" → el juego.
-      const authorHtml = player
-        ? `<a href="#/jugador/${player.id}" class="feed-comment-author">${escapeHtml(player.name)}</a>`
-        : `<span class="feed-comment-author">${escapeHtml(c.player_id)}</span>`;
-      items.push({
-        date: c.created_at,
-        kind: "comentario",
-        html: `
-          <div class="feed-comment">
-            ${avatarSlot(player, 36)}
-            <span class="feed-comment-text">${authorHtml} comentó en <a href="#/juegos/${c.context_id}" class="feed-comment-game">vs ${escapeHtml(gameOpponent(c.context_id))}</a>
-              <span class="feed-comment-body">«${escapeHtml(c.body)}»</span></span>
-          </div>`,
       });
     }
 
