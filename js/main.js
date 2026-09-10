@@ -145,15 +145,15 @@ function currentRoute() {
   }
   const tab = routes[first] ? first : "inicio";
 
-  // Inicio (el feed, js/views/feed.js) y Playlist son exclusivos de cuentas
-  // con sesión, a petición expresa. Sin sesión el invitado ve el Resumen de
-  // stats en lugar del feed — y para él "Inicio" ES ese resumen (por eso el
-  // tab se queda en "inicio", para que resalte en la nav). getSession()
-  // puede tardar en resolver: el primer render() sin sesión cae al Resumen,
-  // y el re-render por "caimanes:auth-changed" ya muestra el feed real
-  // cuando la sesión resuelve.
+  // El Feed (js/views/feed.js) y la Playlist son exclusivos de cuentas con
+  // sesión, a petición expresa. Sin sesión, sus links no aparecen (ver
+  // render) y el invitado cae en el Resumen de stats, que es su portada
+  // (tab "resumen" para que resalte). getSession() puede tardar en
+  // resolver: el primer render() sin sesión cae al Resumen, y el re-render
+  // por "caimanes:auth-changed" ya muestra el Feed real cuando la sesión
+  // resuelve.
   if ((tab === "inicio" || tab === "playlist") && !getSession()) {
-    return { tab: "inicio", render: routes.resumen };
+    return { tab: "resumen", render: routes.resumen };
   }
 
   return { tab, render: routes[tab] };
@@ -308,19 +308,27 @@ function render() {
   if (logoutTile) logoutTile.hidden = !session;
   if (adminTile) adminTile.hidden = !session || !isCoach();
 
-  // Playlist: pestaña exclusiva de cuentas con sesión (a petición expresa) —
-  // el link se esconde sin sesión, en la nav de escritorio y en el grid de
-  // "Más" (no está en la barra de abajo). currentRoute() ya manda a Inicio
-  // si se llega por URL directa.
-  for (const el of [tabs.querySelector('[data-route="playlist"]'), moreSheet.querySelector('[data-tab="playlist"]')]) {
+  // Playlist y Feed: pestañas exclusivas de cuentas con sesión (a petición
+  // expresa) — sus links se esconden sin sesión (nav de escritorio, barra de
+  // abajo y grid de "Más"). currentRoute() ya manda al Resumen si se llega
+  // por URL directa.
+  for (const el of [
+    tabs.querySelector('[data-route="playlist"]'),
+    moreSheet.querySelector('[data-tab="playlist"]'),
+    tabs.querySelector('[data-route="inicio"]'),
+    bottomTabs.querySelector('[data-tab="inicio"]'),
+    moreSheet.querySelector('[data-tab="inicio"]'),
+  ]) {
     if (el) el.hidden = !session;
   }
 
-  // "Resumen" (las stats) — para un invitado es un duplicado: su "Inicio" ya
-  // muestra el Resumen (el feed es exclusivo de cuenta, ver currentRoute).
-  // Así que ese link separado solo se muestra con sesión iniciada.
+  // Sin sesión, la primera pestaña de la barra de abajo es "Resumen" en vez
+  // del Feed (que es la portada del invitado). En la nav de escritorio y el
+  // grid de "Más", "Resumen" se muestra siempre.
+  const resumenBottom = bottomTabs.querySelector("#bottom-tab-resumen");
+  if (resumenBottom) resumenBottom.hidden = !!session;
   for (const el of [tabs.querySelector('[data-route="resumen"]'), moreSheet.querySelector('[data-tab="resumen"]')]) {
-    if (el) el.hidden = !session;
+    if (el) el.hidden = false;
   }
 
   const route = currentRoute();
@@ -330,9 +338,17 @@ function render() {
     link.classList.toggle("active", link.dataset.route === route.tab);
   }
 
+  // "resumen" está en MORE_TABS (cuenta para "Menú") PERO también tiene su
+  // propia pestaña en la barra cuando no hay sesión (ver buildBottomTabs) —
+  // en ese caso resalta esa, no "Menú".
+  const resumenIsOwnBottomTab = resumenBottom && !resumenBottom.hidden;
   for (const el of bottomTabs.querySelectorAll("[data-tab]")) {
-    const isMore = el.dataset.tab === "more";
-    el.classList.toggle("active", isMore ? MORE_TAB_IDS.has(route.tab) : el.dataset.tab === route.tab);
+    const t = el.dataset.tab;
+    const active =
+      t === "more"
+        ? MORE_TAB_IDS.has(route.tab) && !(route.tab === "resumen" && resumenIsOwnBottomTab)
+        : t === route.tab;
+    el.classList.toggle("active", active);
   }
   for (const link of moreSheet.querySelectorAll("a")) {
     link.classList.toggle("active", link.dataset.tab === route.tab);

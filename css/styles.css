@@ -4207,14 +4207,20 @@ a.comment-author-name:hover {
 }
 
 /* ---- Muro / feed de Inicio (js/views/feed.js) ----
-   Cuadrícula de 3 columnas en escritorio, tarjetas CUADRADAS (aspect-ratio 1,
-   a petición expresa). Mismos cortes que .playlist-grid: 2 en tablet, 1 en
-   celular — ahí las tarjetas dejan de ser cuadradas (a lo ancho de la
+   Cuadrícula de 4 columnas en escritorio, tarjetas CUADRADAS (aspect-ratio 1,
+   a petición expresa). Va bajando: 3 en escritorio angosto, 2 en tablet, 1
+   en celular — ahí las tarjetas dejan de ser cuadradas (a lo ancho de la
    pantalla un cuadrado sería enorme) y toman su alto natural. */
 .feed {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .feed {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .feed-item {
