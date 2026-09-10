@@ -2,7 +2,7 @@ import { PLAYERS, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
-import { getDuesMap, getAllPositionOverrides } from "../db.js";
+import { getDuesMap, cachedPositionOverrides } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -40,8 +40,14 @@ export function renderRoster(container) {
   heading(container, "Roster");
 
   const played = gamesPlayedByPlayer(currentSeasonGames());
+  // Posiciones personalizadas ya precargadas (durante la pantalla de
+  // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que la
+  // tabla salga con las del perfil desde el primer render, sin swap. Sin
+  // precarga (o sin señal), el Map viene vacío y se usa la de data.js.
+  const positionOverrides = cachedPositionOverrides();
   const rows = PLAYERS.map((p) => ({
     ...p,
+    position: positionOverrides.get(p.id) ?? p.position,
     gamesPlayed: played.get(p.id) ?? 0,
   }));
 
@@ -120,22 +126,16 @@ export function renderRoster(container) {
     draw();
   });
 
-  // Se espera a las posiciones personalizadas (y a la inscripción) ANTES del
-  // primer draw() — a petición expresa: las posiciones que cada quien eligió
-  // en su perfil (player_positions) son las definitivas, y no debe verse
-  // cómo la tabla "cambia" de las de data.js a esas un instante después.
-  // Mientras tanto, spinner (ver tableEl arriba). getDuesMap() sale de
-  // DUES_PAID en data.js, así que resuelve al toque; getAllPositionOverrides()
-  // sí consulta a Supabase (con reintentos, ver runQuery en js/db.js).
-  Promise.all([getAllPositionOverrides(), loggedIn ? getDuesMap() : Promise.resolve(null)]).then(
-    ([overrides, map]) => {
-      for (const row of rows) {
-        if (overrides.has(row.id)) row.position = overrides.get(row.id);
-      }
+  // Las posiciones ya vienen del cache precargado (ver rows arriba), así que
+  // se dibuja de una. La inscripción (getDuesMap) sale de DUES_PAID en
+  // data.js — resuelve en el mismo tick, imperceptible.
+  draw();
+  if (loggedIn) {
+    getDuesMap().then((map) => {
       duesMap = map;
       draw();
-    }
-  );
+    });
+  }
 
   renderGlossary(container, columns);
 }

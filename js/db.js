@@ -9,7 +9,6 @@
 // reusen sin volver a importarlo cada una por su cuenta.
 import { getClient, getCurrentPlayerId } from "./auth.js";
 import { PLAYERS, DUES_PAID, CURRENT_SEASON } from "./data.js";
-import { beginPageLoad, endPageLoad } from "./ui.js";
 
 export { getClient };
 
@@ -25,24 +24,14 @@ export { getClient };
 // que usa el cliente de Supabase en cada consulta). Solo para lecturas —
 // las escrituras (insert/upsert) no se reintentan aquí, podrían duplicar
 // algo si la primera sí llegó a pasar y solo se perdió la respuesta.
-// beginPageLoad/endPageLoad (js/ui.js) muestran el velo de carga a pantalla
-// completa mientras haya CUALQUIER lectura en vuelo — así el "loading" cubre
-// toda la página sin que cada vista tenga que pedirlo (a petición expresa).
-// Solo lecturas: las escrituras (runMutation) tienen su propio feedback en
-// el botón que las dispara, un velo encima sería demasiado.
 async function runQuery(queryFn) {
-  beginPageLoad();
-  try {
-    let result = await queryFn();
-    for (const delay of [800, 2000]) {
-      if (!result.error) break;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      result = await queryFn();
-    }
-    return result;
-  } finally {
-    endPageLoad();
+  let result = await queryFn();
+  for (const delay of [800, 2000]) {
+    if (!result.error) break;
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    result = await queryFn();
   }
+  return result;
 }
 
 // Mismo reintento que runQuery, pero para escrituras — solo se usa en las
@@ -187,6 +176,29 @@ export async function getAllPositionOverrides() {
   return new Map(data.map((row) => [row.player_id, row.position]));
 }
 
+// Cache en memoria de las posiciones personalizadas (player_positions). Lo
+// llena UNA vez preloadOverrides() durante la pantalla de bienvenida
+// ("Entrando…", ver enterApp en js/splash.js). Roster, el perfil y la
+// alineación lo leen SÍNCRONO en su primer render — así las posiciones que
+// cada quien eligió en su perfil se muestran desde el inicio, sin que se
+// vea "cargar" y cambiar de las de data.js a esas (a petición expresa).
+// null = todavía no se precargó; un Map (aunque sea vacío) = ya se hizo.
+let positionOverridesCache = null;
+
+export async function preloadOverrides() {
+  positionOverridesCache = await getAllPositionOverrides();
+}
+
+// Map playerId -> position ya precargado. Map vacío si aún no se precargó o
+// no hay ninguno — la vista cae de vuelta a la posición de data.js.
+export function cachedPositionOverrides() {
+  return positionOverridesCache ?? new Map();
+}
+
+export function cachedPositionOverride(playerId) {
+  return positionOverridesCache?.get(playerId) ?? null;
+}
+
 // Upsert de las posiciones del propio jugador. Tira si quien llama no es
 // ese jugador — RLS lo bloquea allá, no aquí.
 export async function setPosition(playerId, position) {
@@ -196,6 +208,9 @@ export async function setPosition(playerId, position) {
     client.from("player_positions").upsert({ player_id: playerId, position, updated_at: new Date().toISOString() })
   );
   if (error) throw error;
+  // Mantener el cache al día — si no, al navegar a Roster/alineación después
+  // de cambiar tu posición seguiría saliendo la vieja hasta recargar.
+  if (positionOverridesCache) positionOverridesCache.set(playerId, position);
 }
 
 // ---- Canción de entrada personalizada (player_walkups) ----

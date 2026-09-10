@@ -246,44 +246,64 @@ export function leaveToSplash() {
   }
   showPageVeil();
   // El fundido dura 0.28s (ver .page-veil en css/styles.css); se recarga un
-  // pelín después para que se alcance a ver completo.
+  // pelín después para que se alcance a ver completo. Mismo motivo que en
+  // signOut() para usar reload() y quitar el hash antes: `location.href =
+  // "./"` no recarga si ya estás en la raíz sin hash.
   setTimeout(() => {
-    location.href = "./";
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {
+      // history bloqueado — reload() recarga igual.
+    }
+    location.reload();
   }, 320);
 }
 
 export async function signOut() {
-  if (!supabase) return;
   showPageVeil();
-  // `scope: "local"` NO hace la llamada de red a /logout — solo borra el
-  // token guardado, que es lo único que importa para volver a la bienvenida.
-  // Con el scope global (el default) y sin await, si la red estaba lenta el
-  // token local no alcanzaba a borrarse antes de la recarga y "cerrar
-  // sesión" te regresaba con la sesión TODAVÍA activa ("a veces no me deja
-  // cerrar sesión"). Ahora se espera, y como no hay red de por medio es
-  // instantáneo aunque no haya señal.
+
+  // Borrar el token a mano y SÍNCRONO — NO depender de que
+  // supabase.auth.signOut() (async, y a veces se traba esperando el lock
+  // "sb-...-auth-token" del navegador si hay otra pestaña o un refresh en
+  // curso) lo alcance a hacer antes de la recarga. Esto es lo que de verdad
+  // impide que la pantalla de bienvenida te vuelva a auto-entrar con la
+  // sesión vieja ("a veces no me deja cerrar sesión"). Se borra TODA la
+  // llave que empieza con "sb-" (el token, sus trozos si venía partido, y
+  // cualquier otro estado del cliente) — nada más del sitio usa ese prefijo.
   try {
-    await supabase.auth.signOut({ scope: "local" });
-  } catch {
-    // Ni así; se limpia igual lo local a mano abajo, por si el cliente dejó
-    // el token colgado.
-    try {
-      for (const key of Object.keys(localStorage)) {
-        if (key.startsWith("sb-") && key.includes("-auth-token")) localStorage.removeItem(key);
-      }
-    } catch {
-      // Sin localStorage no hay nada que forzar.
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith("sb-")) localStorage.removeItem(key);
     }
+  } catch {
+    // Sin localStorage no hay token que borrar.
   }
   try {
     sessionStorage.removeItem("caimanes-entered");
   } catch {
     // Ver leaveToSplash().
   }
-  // Un respiro para que el velo alcance a subir (el signOut local de arriba
-  // es casi instantáneo).
+
+  // Best-effort: avísale al servidor sin esperar la respuesta (ya no
+  // bloquea nada).
+  try {
+    supabase?.auth.signOut({ scope: "local" }).catch(() => {});
+  } catch {
+    // Cliente no listo; el token local ya se borró arriba, es lo que importa.
+  }
+
+  // location.reload() (no `location.href = "./"`): si ya estás en la raíz
+  // sin hash, asignar "./" NO recarga en varios navegadores — y sin recarga
+  // el #splash-gate (que splash.js ya quitó del DOM al entrar) no vuelve, y
+  // te quedas en la app como si nada hubiera pasado. reload() siempre
+  // recarga. Se quita el hash antes para caer en Inicio, no en la pestaña
+  // donde estabas. Con un respiro para que el velo alcance a subir.
   setTimeout(() => {
-    location.href = "./";
+    try {
+      history.replaceState(null, "", location.pathname + location.search);
+    } catch {
+      // history bloqueado (raro) — reload() igual recarga, solo conserva el hash.
+    }
+    location.reload();
   }, 280);
 }
 

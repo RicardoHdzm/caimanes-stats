@@ -4585,8 +4585,7 @@ a.comment-author-name:hover {
 
 /* ---- Spinner reutilizable ----
    Aro que gira; toma el tamaño de `font-size` y el color de `currentColor`,
-   así sirve igual dentro de un botón, la pantalla de bienvenida o el velo
-   de carga a pantalla completa. */
+   así sirve igual dentro de un botón o en la pantalla de bienvenida. */
 .spinner {
   display: inline-block;
   width: 1em;
@@ -4596,34 +4595,6 @@ a.comment-author-name:hover {
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   vertical-align: -0.15em;
-}
-
-/* Cargando a PANTALLA COMPLETA (ver beginPageLoad/endPageLoad en js/ui.js,
-   que dispara runQuery en js/db.js con cada lectura de Supabase en vuelo) —
-   a petición expresa, el "loading" cubre toda la página, no un hueco
-   suelto. Fondo oscuro casi opaco + spinner al centro, mismo lenguaje que
-   la pantalla de bienvenida para que "entrar" y "cargar" se sientan
-   continuos. pointer-events:none — es solo visual, no bloquea navegar. */
-.page-loading {
-  position: fixed;
-  inset: 0;
-  z-index: 550;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(8, 11, 16, 0.88);
-  color: rgba(255, 255, 255, 0.9);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
-
-.page-loading--on {
-  opacity: 1;
-}
-
-.page-loading .spinner {
-  font-size: 2.4rem;
 }
 
 /* En la pantalla de bienvenida ("Entrando…", ver enterApp() en
@@ -4646,8 +4617,7 @@ a.comment-author-name:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .splash-gate,
-  .page-veil,
-  .page-loading {
+  .page-veil {
     transition: none;
   }
 

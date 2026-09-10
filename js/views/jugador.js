@@ -26,7 +26,7 @@ import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
 import {
   getWalkupOverride,
   setWalkup,
-  getPositionOverride,
+  cachedPositionOverride,
   setPosition,
   getDuesForPlayer,
   getAvatarUrl,
@@ -763,6 +763,10 @@ export function renderJugadorDetalle(container, playerId) {
   // expresa (igual que el medallero, más abajo) — se calcula aquí porque
   // hace falta ya para armar el hero.innerHTML de abajo.
   const hasSession = !!getSession();
+  // Posición del perfil ya precargada (ver preloadOverrides) o la de
+  // data.js — se lee SÍNCRONO para que el hero salga con la correcta desde
+  // el primer render, sin swap (a petición expresa).
+  let currentPosition = cachedPositionOverride(player.id) ?? player.position ?? "";
   // TEAM.gamesInSeason (no games.length): es el total de la temporada, no
   // solo los que ya se han capturado — así la barra de verdad avanza hacia
   // "toda la temporada", en vez de mostrar 100% apenas jugó todos los
@@ -792,7 +796,7 @@ export function renderJugadorDetalle(container, playerId) {
         <div class="profile-hero-name">
           <span class="profile-hero-number">#${player.number ?? "-"}</span>
           <span>${escapeHtml(player.name)}</span>
-          <span class="profile-hero-name-positions" id="position-display"></span>
+          <span class="profile-hero-name-positions" id="position-display">${currentPosition ? renderPositionBadges(currentPosition) : ""}</span>
         </div>
         <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : ""}</div>
         <div class="profile-attendance">
@@ -1009,26 +1013,12 @@ export function renderJugadorDetalle(container, playerId) {
 
   // ---- Posiciones registradas y canción de entrada: valores de arranque ----
   //
-  // `player.position`/`player.walkup` (data.js) se pintan primero, sin
-  // esperar a nadie; si el jugador ya los personalizó, las filas en
-  // player_positions/player_walkups los reemplazan en cuanto llegan
-  // (progresivo, no bloquean el primer pintado). Las posiciones, a
-  // diferencia de la canción, SÍ alimentan más cosas — Roster y el
-  // generador de alineación mezclan player_positions sobre PLAYERS antes de
-  // usar la posición (ver js/views/roster.js, js/views/alineacion.js y
-  // js/lineup-tool.js).
-  // #position-display arranca vacío (ver el hero.innerHTML de arriba) y se
-  // llena UNA sola vez, con la posición personalizada del perfil si existe
-  // o con la de data.js si no — a petición expresa, para que no se vea
-  // "cambiar" de una a otra (mismo criterio que Roster, ver
-  // js/views/roster.js). Sin señal getPositionOverride() ya cae de vuelta a
-  // la de data.js.
-  let currentPosition = player.position ?? "";
+  // La CANCIÓN (walkup) se pinta primero con la de data.js y, si el jugador
+  // la personalizó, la fila de player_walkups la reemplaza en cuanto llega
+  // (progresivo). Las POSICIONES no: ya se resolvieron síncrono arriba
+  // (currentPosition, del cache precargado) y #position-display salió con
+  // la correcta desde el primer render — sin swap, a petición expresa.
   const positionDisplay = hero.querySelector("#position-display");
-  getPositionOverride(player.id).then((override) => {
-    currentPosition = override ?? player.position ?? "";
-    positionDisplay.innerHTML = currentPosition ? renderPositionBadges(currentPosition) : "";
-  });
 
   let currentWalkup = player.walkup ?? null;
   const walkupDisplay = hero.querySelector("#walkup-display");
