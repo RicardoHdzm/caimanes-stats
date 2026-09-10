@@ -89,7 +89,16 @@ async function bootAuth() {
 // también falla, se rinde en silencio — sin red no hay nada más que hacer,
 // pero al menos ya no depende de la mala suerte de un solo intento.
 export async function initAuth() {
-  if (!SUPABASE_CONFIGURED) return;
+  // "caimanes:auth-ready" = la sesión ya se resolvió lo que se iba a
+  // resolver (haya sesión, no haya, o haya fallado la red / no esté
+  // configurado Supabase). Se dispara SIEMPRE, una sola vez — js/splash.js
+  // lo espera para no revelar la app a medio cargar (ver enterApp()).
+  const announceReady = () => window.dispatchEvent(new CustomEvent("caimanes:auth-ready"));
+
+  if (!SUPABASE_CONFIGURED) {
+    announceReady();
+    return;
+  }
   try {
     await bootAuth();
   } catch {
@@ -97,10 +106,12 @@ export async function initAuth() {
     try {
       await bootAuth();
     } catch {
+      announceReady();
       return;
     }
   }
   notifyChange();
+  announceReady();
 
   supabase.auth.onAuthStateChange(async (event, newSession) => {
     session = newSession;

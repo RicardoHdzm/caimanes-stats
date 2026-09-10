@@ -295,3 +295,13 @@ export function heading(container, text, subtitle) {
     container.appendChild(p);
   }
 }
+
+// Spinner centrado para ocupar el hueco de una sección mientras carga sus
+// datos de Supabase (comentarios, avisos, RSVP...). `.spinner`/`.spinner-block`
+// viven en css/styles.css. `label` es opcional.
+export function spinnerBlock(label = "") {
+  const el = document.createElement("div");
+  el.className = "spinner-block";
+  el.innerHTML = `<span class="spinner" aria-hidden="true"></span>${label ? `<span>${escapeHtml(label)}</span>` : ""}`;
+  return el;
+}

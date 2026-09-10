@@ -321,9 +321,20 @@ function render() {
 
 buildBottomTabs();
 initTheme();
-initSplash();
 initRecovery();
 mountAuthControl(document.getElementById("auth-slot"));
+
+// La app NO se pinta hasta que la pantalla de bienvenida (js/splash.js)
+// llama a startApp() — antes de eso #app queda vacío, la bienvenida es una
+// pantalla independiente, no un overlay sobre el sitio ya pintado. Los
+// listeners de abajo que repintan no hacen nada hasta entonces.
+let appStarted = false;
+function startApp() {
+  if (appStarted) return;
+  appStarted = true;
+  render();
+}
+
 // Al cambiar de ruta (clic en un link, botón "atrás") se sube al tope —
 // sin esto, un link a mitad de una página larga (ej. el avatar de un
 // jugador en Resumen) deja la página nueva scrolleada a la mitad, en vez de
@@ -332,13 +343,16 @@ mountAuthControl(document.getElementById("auth-slot"));
 // sesión (ver más abajo), y ahí sí se quiere mantener el scroll donde
 // estaba.
 window.addEventListener("hashchange", () => {
+  if (!appStarted) return;
   render();
   window.scrollTo(0, 0);
 });
 // Se dispara desde js/auth.js cada vez que cambia la sesión (login, logout,
 // se resuelve el player_id) — la vista actual se repinta con el estado
 // nuevo, mismo tratamiento que un cambio de hash.
-window.addEventListener("caimanes:auth-changed", render);
+window.addEventListener("caimanes:auth-changed", () => {
+  if (appStarted) render();
+});
 
 // Foto personalizada de Storage para el chip de tu cuenta en el header (ver
 // loggedInMarkup() en js/auth.js) — mismo "pinta fijo, luego hidrata" que ya
@@ -372,7 +386,9 @@ window.addEventListener("caimanes:auth-changed", hydrateAuthAvatar);
 // pestaña vuelve a estar visible (se minimizó, se cambió de app en el
 // celular y se regresó) cubre ambos casos sin que nadie tenga que hacer
 // nada — mismo tratamiento que un cambio de sesión, no se toca el scroll.
-window.addEventListener("online", render);
+window.addEventListener("online", () => {
+  if (appStarted) render();
+});
 
 // Repintar en CUALQUIER cambio de pestaña (por chico que sea) resultó ser
 // peor que el problema que arreglaba: un alt-tab de un segundo, o abrir
@@ -391,15 +407,18 @@ document.addEventListener("visibilitychange", () => {
     hiddenAt = Date.now();
     return;
   }
-  if (hiddenAt !== null && Date.now() - hiddenAt > STALE_AFTER_MS) render();
+  if (appStarted && hiddenAt !== null && Date.now() - hiddenAt > STALE_AFTER_MS) render();
   hiddenAt = null;
 });
 
-render();
-// No se espera a que termine para pintar la primera vez: initAuth() resuelve
-// la sesión de forma async y avisa por "caimanes:auth-changed" cuando esté
-// lista, así la app no se queda en blanco esperando red.
+// initAuth() resuelve la sesión de forma async (import del cliente de
+// Supabase por CDN + getSession + RPC) y avisa por "caimanes:auth-ready"
+// cuando termina. initSplash() espera ese aviso (con un tope de tiempo)
+// antes de llamar startApp(), así la app arranca ya con la sesión resuelta
+// en vez de aparecer a medio poblar. Se lanzan en este orden pero corren en
+// paralelo.
 initAuth();
+initSplash(startApp);
 
 // Service worker: deja abrir la página sin señal (en el campo casi nunca hay
 // datos). Si falla el registro la app sigue funcionando normal, solo pierde

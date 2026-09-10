@@ -35,11 +35,12 @@ export function initRecovery() {
     submitBtn.disabled = true;
     try {
       await changePassword(password);
-      gate.remove();
-      // Quita el token de recuperación de la URL — si no, se queda ahí
-      // colgado después de guardar (y una recarga volvería a intentar
-      // "recuperar" con un token ya usado).
-      history.replaceState(null, "", location.pathname + location.search);
+      // Recarga limpia a la portada (sin el token de recuperación en la
+      // URL): ya quedaste con sesión, así que el flujo normal de la
+      // bienvenida (js/splash.js) te auto-entra. Recargar en vez de solo
+      // quitar el gate porque ahora la app no se pinta hasta "entrar" (ver
+      // startApp() en js/main.js) — este gate se mostró en su lugar.
+      location.href = "./";
     } catch {
       errorEl.textContent = "No se pudo guardar — intenta de nuevo.";
       errorEl.hidden = false;

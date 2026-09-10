@@ -8,7 +8,7 @@
 import { PLAYERS } from "../data.js";
 import { getCurrentPlayerId, isCoach } from "../auth.js";
 import { getComments, addComment, deleteComment, getCommentLikes, likeComment, unlikeComment, getAvatarUrl } from "../db.js";
-import { escapeHtml, renderAvatar } from "../ui.js";
+import { escapeHtml, renderAvatar, spinnerBlock } from "../ui.js";
 
 function formatDate(iso) {
   const date = new Date(iso);
@@ -188,5 +188,8 @@ export function renderComments(container, { contextType, contextId }) {
     }
   });
 
+  // Spinner mientras llega la primera respuesta de Supabase — refresh()
+  // reemplaza el innerHTML de listEl al terminar.
+  listEl.appendChild(spinnerBlock("Cargando comentarios…"));
   refresh();
 }
