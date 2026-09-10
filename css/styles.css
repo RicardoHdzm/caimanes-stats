@@ -4497,3 +4497,86 @@ a.comment-author-name:hover {
 .splash-forgot-btn:hover {
   color: #fff;
 }
+
+/* Al swapear los botones <-> el formulario en la pantalla de bienvenida
+   (ver showButtons()/showLogin() en js/splash.js) el contenido nuevo entra
+   con un fundido corto en vez de aparecer de golpe. */
+#splash-actions > * {
+  animation: splash-actions-in 0.28s ease backwards;
+}
+
+@keyframes splash-actions-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- Transiciones de sesión (login / logout) ---- */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Spinner en el botón mientras corre `await signIn()` — el texto se vuelve
+   transparente y un aro gira en su lugar (ver el submit de showLogin() en
+   js/splash.js y el form inline de js/auth.js). */
+.splash-btn.is-loading,
+.auth-btn.is-loading {
+  color: transparent;
+  pointer-events: none;
+  position: relative;
+}
+
+.splash-btn.is-loading > i,
+.auth-btn.is-loading > i {
+  visibility: hidden;
+}
+
+.splash-btn.is-loading::after,
+.auth-btn.is-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* Velo de salida: cerrar sesión (o "Iniciar sesión", que te regresa a la
+   pantalla de bienvenida) cubre todo con un fundido rápido antes de la
+   recarga, para que no se sienta un corte seco. Fondo oscuro fijo (no
+   var(--bg)) porque el destino SIEMPRE es la portada oscura, sin importar
+   el tema — así el fundido va directo hacia ella. Ver leaveToSplash() en
+   js/auth.js. */
+.page-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0b0d10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.page-veil--on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-gate,
+  .page-veil {
+    transition: none;
+  }
+
+  #splash-actions > * {
+    animation: none;
+  }
+}

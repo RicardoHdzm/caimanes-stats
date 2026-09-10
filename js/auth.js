@@ -208,21 +208,39 @@ export function loginErrorMessage(error) {
   return "Correo o contraseña incorrectos.";
 }
 
-export async function signOut() {
-  if (!supabase) return;
-  await supabase.auth.signOut();
-  // Cerrar sesión te regresa a la pantalla de bienvenida (ver
-  // js/splash.js) — mismo storage key que usa initSplash() para saber si
-  // ya se entró esta sesión; quitarlo hace que vuelva a aparecer. Redirige
-  // (en vez de solo re-renderizar) porque el gate es un elemento estático
-  // de index.html que splash.js ya quitó del DOM al entrar — hace falta
-  // una carga fresca de la página para que vuelva a estar ahí.
+// Salida de la app hacia la pantalla de bienvenida — la usan "Cerrar
+// sesión" (signOut, abajo) y "Iniciar sesión" (que también te regresa a la
+// bienvenida a loguearte ahí). Un velo cubre todo con un fundido rápido
+// ANTES de la recarga, para que no se sienta un corte seco. Se recarga (en
+// vez de solo re-renderizar) porque #splash-gate es un elemento estático de
+// index.html que splash.js ya quitó del DOM al entrar — hace falta una
+// carga fresca para que vuelva a estar ahí. Mismo storage key que usa
+// initSplash() para saber si ya se entró esta sesión; quitarlo hace que
+// vuelva a aparecer.
+export function leaveToSplash() {
   try {
     sessionStorage.removeItem("caimanes-entered");
   } catch {
-    // Sin sessionStorage no hay nada que limpiar.
+    // Sin sessionStorage no hay nada que limpiar; igual recarga.
   }
-  location.href = "./";
+  const veil = document.createElement("div");
+  veil.className = "page-veil";
+  document.body.appendChild(veil);
+  requestAnimationFrame(() => veil.classList.add("page-veil--on"));
+  // El fundido dura 0.28s (ver .page-veil en css/styles.css); se recarga un
+  // pelín después para que se alcance a ver completo.
+  setTimeout(() => {
+    location.href = "./";
+  }, 320);
+}
+
+export async function signOut() {
+  if (!supabase) return;
+  // No se espera la respuesta del servidor: signOut() borra el token local
+  // de inmediato (y la recarga de leaveToSplash ya arranca sin sesión).
+  // Esperar la red solo haría que "cerrar sesión" se sienta lento sin señal.
+  supabase.auth.signOut().catch(() => {});
+  leaveToSplash();
 }
 
 // Reintenta una vez tras un hipo de red — es un update (cambiar la
@@ -348,19 +366,11 @@ function wireAuthControl() {
   containerEl.querySelector("#auth-signout-btn")?.addEventListener("click", () => signOut());
 
   // "Iniciar sesión" de la app normal (variant "splash", ver
-  // loggedOutMarkup) — te regresa a la pantalla de bienvenida, mismo
-  // mecanismo que signOut() de arriba: quita la marca de "ya elegiste algo
-  // esta sesión" y recarga a la portada, donde splash.js vuelve a mostrar
-  // los botones.
+  // loggedOutMarkup) — te regresa a la pantalla de bienvenida a loguearte
+  // ahí (mismo velo de salida que signOut, ver leaveToSplash arriba).
   containerEl.querySelector("#splash-login-link")?.addEventListener("click", (e) => {
     e.preventDefault();
-    try {
-      sessionStorage.removeItem("caimanes-entered");
-    } catch {
-      // Ver notas de hasEntered()/markEntered() en js/splash.js — sin
-      // storage simplemente no se recuerda, pero igual redirige.
-    }
-    location.href = "./";
+    leaveToSplash();
   });
 
   // Formulario inline de admin.html (ver loggedOutMarkup) — no existe en
@@ -373,13 +383,17 @@ function wireAuthControl() {
       e.preventDefault();
       errorEl.hidden = true;
       submitBtn.disabled = true;
+      submitBtn.classList.add("is-loading");
       const { email, password } = Object.fromEntries(new FormData(loginForm));
       try {
         await signIn(email, password);
+        // Éxito: onAuthStateChange repinta el header solo; el spinner se va
+        // con el re-render, no hace falta quitarlo a mano.
       } catch (error) {
+        submitBtn.classList.remove("is-loading");
+        submitBtn.disabled = false;
         errorEl.textContent = loginErrorMessage(error);
         errorEl.hidden = false;
-        submitBtn.disabled = false;
       }
     });
 

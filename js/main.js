@@ -12,7 +12,7 @@ import { renderPlaylist } from "./views/playlist.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
-import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut } from "./auth.js";
+import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut, leaveToSplash } from "./auth.js";
 import { getAvatarUrl } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada } from "./ui.js";
@@ -239,16 +239,11 @@ function buildBottomTabs() {
   moreSheet.querySelector("#more-sheet-close-btn").addEventListener("click", () => toggleMoreSheet(false));
 
   // "Iniciar sesión" del menú te regresa a la pantalla de bienvenida (ver
-  // js/splash.js) — mismo mecanismo que el link del header (ver
-  // wireAuthControl en js/auth.js): ya no hay un formulario propio aquí.
+  // js/splash.js) — mismo mecanismo (y mismo velo de salida) que el link
+  // del header, ver leaveToSplash() en js/auth.js.
   moreSheet.querySelector("#more-tile-login").addEventListener("click", (e) => {
     e.preventDefault();
-    try {
-      sessionStorage.removeItem("caimanes-entered");
-    } catch {
-      // Sin storage no hay nada que limpiar, pero igual redirige.
-    }
-    location.href = "./";
+    leaveToSplash();
   });
   // Cierra el menú de inmediato en vez de esperar a que signOut() (async)
   // dispare el re-render por "caimanes:auth-changed" — mismo trato que el

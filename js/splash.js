@@ -56,9 +56,21 @@ export function initSplash() {
 
   const actions = gate.querySelector("#splash-actions");
 
+  // La app ya está pintada debajo del gate — al entrar se desvanece en vez
+  // de desaparecer de golpe (ver .splash-gate--leaving en css/styles.css).
+  // `leaving` evita que showButtons() de abajo repinte los botones si la
+  // sesión se resolvió justo cuando se iba a pintar (raro pero posible).
+  let leaving = false;
   function enter() {
+    if (leaving) return;
+    leaving = true;
     markEntered();
-    gate.remove();
+    gate.classList.add("splash-gate--leaving");
+    const done = () => gate.remove();
+    gate.addEventListener("transitionend", done, { once: true });
+    // Respaldo por si transitionend no dispara (prefers-reduced-motion
+    // apaga la transición, ver css/styles.css).
+    setTimeout(done, 500);
   }
 
   // Supabase recuerda tu sesión entre visitas (sobrevive cerrar el
@@ -110,15 +122,17 @@ export function initSplash() {
       e.preventDefault();
       errorEl.hidden = true;
       submitBtn.disabled = true;
+      submitBtn.classList.add("is-loading");
       const { email, password } = Object.fromEntries(new FormData(form));
       try {
         await signIn(email, password);
         enter();
       } catch (error) {
+        submitBtn.classList.remove("is-loading");
+        submitBtn.disabled = false;
         errorEl.className = "splash-login-error";
         errorEl.textContent = loginErrorMessage(error);
         errorEl.hidden = false;
-        submitBtn.disabled = false;
       }
     });
 
@@ -148,8 +162,8 @@ export function initSplash() {
     actions.querySelector("#splash-back").addEventListener("click", showButtons);
   }
 
-  // Si skipIfAlreadySignedIn() de arriba ya alcanzó a quitar el gate (sesión
-  // ya resuelta y activa desde el primer chequeo), no hay nada más que
-  // pintar.
-  if (gate.isConnected) showButtons();
+  // Si skipIfAlreadySignedIn() de arriba ya alcanzó a quitar el gate (o a
+  // arrancar su fundido de salida — ver `leaving` en enter()), no hay nada
+  // más que pintar.
+  if (gate.isConnected && !leaving) showButtons();
 }
