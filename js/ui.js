@@ -296,12 +296,55 @@ export function heading(container, text, subtitle) {
   }
 }
 
-// Spinner centrado para ocupar el hueco de una sección mientras carga sus
-// datos de Supabase (comentarios, avisos, RSVP...). `.spinner`/`.spinner-block`
-// viven en css/styles.css. `label` es opcional.
-export function spinnerBlock(label = "") {
-  const el = document.createElement("div");
-  el.className = "spinner-block";
-  el.innerHTML = `<span class="spinner" aria-hidden="true"></span>${label ? `<span>${escapeHtml(label)}</span>` : ""}`;
-  return el;
+// ---- Cargando a pantalla completa ----
+//
+// A petición expresa, el "loading" cubre TODA la página, no un hueco suelto.
+// Un velo (.page-loading en css/styles.css) con un spinner al centro que se
+// muestra mientras haya lecturas de Supabase en vuelo — runQuery en
+// js/db.js llama beginPageLoad()/endPageLoad() solo, así que ninguna vista
+// tiene que preocuparse por esto. Retardo de 120ms antes de mostrarlo: una
+// lectura rápida (cacheada, buena señal) no alcanza a disparar el velo.
+let pageLoads = 0;
+let pageLoadEl = null;
+let pageLoadShowTimer = null;
+let pageLoadHideTimer = null;
+
+function pageLoadShow() {
+  if (pageLoadEl) return;
+  pageLoadEl = document.createElement("div");
+  pageLoadEl.className = "page-loading";
+  pageLoadEl.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
+  document.body.appendChild(pageLoadEl);
+  requestAnimationFrame(() => pageLoadEl?.classList.add("page-loading--on"));
+}
+
+function pageLoadHide() {
+  clearTimeout(pageLoadShowTimer);
+  pageLoadShowTimer = null;
+  if (!pageLoadEl) return;
+  const el = pageLoadEl;
+  pageLoadEl = null;
+  el.classList.remove("page-loading--on");
+  pageLoadHideTimer = setTimeout(() => el.remove(), 250);
+}
+
+export function beginPageLoad() {
+  pageLoads += 1;
+  clearTimeout(pageLoadHideTimer);
+  if (!pageLoadShowTimer && !pageLoadEl) {
+    pageLoadShowTimer = setTimeout(pageLoadShow, 120);
+  }
+  // Seguro: nunca dejar la página tapada si una promesa se cuelga (runQuery
+  // ya se rinde en ~3s; esto es el cinturón por si acaso).
+  setTimeout(() => {
+    if (pageLoads > 0) {
+      pageLoads = 0;
+      pageLoadHide();
+    }
+  }, 12000);
+}
+
+export function endPageLoad() {
+  pageLoads = Math.max(0, pageLoads - 1);
+  if (pageLoads === 0) pageLoadHide();
 }

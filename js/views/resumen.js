@@ -12,7 +12,7 @@ import {
   minPlateAppearances,
   seasonRecords,
 } from "../stats.js";
-import { heading, escapeHtml, renderAvatar, spinnerBlock } from "../ui.js";
+import { heading, escapeHtml, renderAvatar } from "../ui.js";
 import { getCurrentPlayerId, getSession } from "../auth.js";
 import {
   getRsvps,
@@ -193,9 +193,6 @@ export function wireRsvp(cardEl, gameId) {
     renderActions(mine?.status ?? null);
   }
 
-  // Spinner mientras llega la primera respuesta — refresh() → renderActions()
-  // reemplaza el innerHTML al terminar.
-  actionsEl.appendChild(spinnerBlock());
   refresh();
 }
 
@@ -273,10 +270,6 @@ export function renderResumen(container) {
         </div>
       `;
     }
-
-    // Spinner mientras llega la primera respuesta — refreshAnnouncements()
-    // reemplaza el innerHTML (o lo deja vacío si no hay anuncios).
-    announcementsSlot.appendChild(spinnerBlock());
 
     // Delegado en announcementsSlot (nunca se reemplaza, solo su innerHTML
     // en cada refresh) — mismo patrón que el like de comentarios en

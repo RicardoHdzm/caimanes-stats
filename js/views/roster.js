@@ -1,6 +1,6 @@
 import { PLAYERS, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, renderPositionBadges, spinnerBlock } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, getAllPositionOverrides } from "../db.js";
 
@@ -91,7 +91,6 @@ export function renderRoster(container) {
   }
 
   const tableEl = document.createElement("div");
-  tableEl.appendChild(spinnerBlock());
   container.appendChild(tableEl);
 
   let activeGroup = "ALL";

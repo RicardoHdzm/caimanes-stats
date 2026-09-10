@@ -9,6 +9,7 @@
 // reusen sin volver a importarlo cada una por su cuenta.
 import { getClient, getCurrentPlayerId } from "./auth.js";
 import { PLAYERS, DUES_PAID, CURRENT_SEASON } from "./data.js";
+import { beginPageLoad, endPageLoad } from "./ui.js";
 
 export { getClient };
 
@@ -24,14 +25,24 @@ export { getClient };
 // que usa el cliente de Supabase en cada consulta). Solo para lecturas —
 // las escrituras (insert/upsert) no se reintentan aquí, podrían duplicar
 // algo si la primera sí llegó a pasar y solo se perdió la respuesta.
+// beginPageLoad/endPageLoad (js/ui.js) muestran el velo de carga a pantalla
+// completa mientras haya CUALQUIER lectura en vuelo — así el "loading" cubre
+// toda la página sin que cada vista tenga que pedirlo (a petición expresa).
+// Solo lecturas: las escrituras (runMutation) tienen su propio feedback en
+// el botón que las dispara, un velo encima sería demasiado.
 async function runQuery(queryFn) {
-  let result = await queryFn();
-  for (const delay of [800, 2000]) {
-    if (!result.error) break;
-    await new Promise((resolve) => setTimeout(resolve, delay));
-    result = await queryFn();
+  beginPageLoad();
+  try {
+    let result = await queryFn();
+    for (const delay of [800, 2000]) {
+      if (!result.error) break;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      result = await queryFn();
+    }
+    return result;
+  } finally {
+    endPageLoad();
   }
-  return result;
 }
 
 // Mismo reintento que runQuery, pero para escrituras — solo se usa en las
@@ -386,18 +397,34 @@ export async function unlikeAnnouncement(announcementId) {
 // primero — barato, sin firmar nada — para no romper el fallback a
 // iniciales ni la medalla "Selfie!" (ambos dependen de null = "no tiene
 // foto").
+// Cache en memoria por sesión: getAvatarUrl() se llama en montón (Resumen,
+// Roster, Playlist, Comentarios, perfiles...) y muchas veces para el mismo
+// jugador al navegar de un lado a otro. Sin esto, cada visita a Resumen
+// vuelve a consultar Storage por los ~15 avatares y dispara el velo de
+// carga (ver runQuery). Se limpia la entrada del jugador cuando sube una
+// foto nueva (uploadAvatar, abajo). Un error de red NO se cachea, para que
+// reintente a la siguiente.
+const avatarUrlCache = new Map();
+
 export async function getAvatarUrl(playerId) {
+  if (avatarUrlCache.has(playerId)) return avatarUrlCache.get(playerId);
   const client = getClient();
   if (!client) return null;
   const { data, error } = await runQuery(() => client.storage.from("avatars").list(playerId, { search: "avatar" }));
-  if (error || !data || data.length === 0) return null;
+  if (error) return null;
+  if (!data || data.length === 0) {
+    avatarUrlCache.set(playerId, null);
+    return null;
+  }
   const publicUrl = client.storage.from("avatars").getPublicUrl(`${playerId}/avatar`).data.publicUrl;
   // "?v=" con la fecha real de modificación (no aleatorio): mismo archivo =
   // misma URL = el navegador la cachea entre visitas; si alguien sube una
   // foto nueva (mismo nombre, se sobreescribe), `updated_at` cambia y con
   // él la URL, así que se pide fresca en vez de servir la vieja cacheada.
   const version = data[0]?.updated_at ? new Date(data[0].updated_at).getTime() : null;
-  return version ? `${publicUrl}?v=${version}` : publicUrl;
+  const url = version ? `${publicUrl}?v=${version}` : publicUrl;
+  avatarUrlCache.set(playerId, url);
+  return url;
 }
 
 // Tira si quien llama no es ese jugador — RLS lo bloquea allá (la política
@@ -410,4 +437,8 @@ export async function uploadAvatar(playerId, file) {
     client.storage.from("avatars").upload(`${playerId}/avatar`, file, { upsert: true, contentType: file.type })
   );
   if (error) throw error;
+  // La próxima getAvatarUrl() de este jugador que se pida fresca (ver el
+  // cache arriba) — si no, seguiría mostrando la iniciales/foto vieja hasta
+  // recargar.
+  avatarUrlCache.delete(playerId);
 }

@@ -539,12 +539,18 @@ body {
   white-space: nowrap;
 }
 
-/* Foto (o iniciales) junto a tu nombre en el pill del header — ver
-   loggedInMarkup() en js/auth.js. Sin anillo, a petición expresa: la foto
-   tal cual. */
+/* Foto (o iniciales) junto a tu nombre en el header — ver loggedInMarkup()
+   en js/auth.js. La foto SÍ lleva su borde rojo (a petición expresa); lo
+   que se quitó fue el recuadro rojo que envolvía a foto + número + nombre
+   juntos (ver .auth-btn-in.auth-btn-named arriba). */
 .auth-btn-avatar {
   display: inline-flex;
   flex-shrink: 0;
+}
+
+.auth-btn-avatar .avatar {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 2px var(--surface);
 }
 
 /* Fila de controles con sesión iniciada: el pill con tu nombre (link
@@ -4577,10 +4583,10 @@ a.comment-author-name:hover {
   pointer-events: auto;
 }
 
-/* ---- Spinner reutilizable (ver spinnerBlock() en js/ui.js) ----
+/* ---- Spinner reutilizable ----
    Aro que gira; toma el tamaño de `font-size` y el color de `currentColor`,
-   así sirve igual dentro de un botón, una tarjeta o la pantalla de
-   bienvenida. */
+   así sirve igual dentro de un botón, la pantalla de bienvenida o el velo
+   de carga a pantalla completa. */
 .spinner {
   display: inline-block;
   width: 1em;
@@ -4592,20 +4598,32 @@ a.comment-author-name:hover {
   vertical-align: -0.15em;
 }
 
-/* Spinner centrado que ocupa el hueco de una sección mientras carga sus
-   datos de Supabase (comentarios, avisos, RSVP...). */
-.spinner-block {
+/* Cargando a PANTALLA COMPLETA (ver beginPageLoad/endPageLoad en js/ui.js,
+   que dispara runQuery en js/db.js con cada lectura de Supabase en vuelo) —
+   a petición expresa, el "loading" cubre toda la página, no un hueco
+   suelto. Fondo oscuro casi opaco + spinner al centro, mismo lenguaje que
+   la pantalla de bienvenida para que "entrar" y "cargar" se sientan
+   continuos. pointer-events:none — es solo visual, no bloquea navegar. */
+.page-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 550;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 24px 12px;
-  color: var(--muted);
-  font-size: var(--text-sm);
+  background: rgba(8, 11, 16, 0.88);
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
-.spinner-block .spinner {
-  font-size: 1.1rem;
+.page-loading--on {
+  opacity: 1;
+}
+
+.page-loading .spinner {
+  font-size: 2.4rem;
 }
 
 /* En la pantalla de bienvenida ("Entrando…", ver enterApp() en
@@ -4628,7 +4646,8 @@ a.comment-author-name:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .splash-gate,
-  .page-veil {
+  .page-veil,
+  .page-loading {
     transition: none;
   }
 

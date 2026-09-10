@@ -185,7 +185,6 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
 
   const gridEl = document.createElement("div");
   gridEl.className = "mvp-vote-grid";
-  gridEl.innerHTML = '<div class="spinner-block" style="grid-column:1/-1"><span class="spinner" aria-hidden="true"></span><span>Cargando votos…</span></div>';
   container.appendChild(gridEl);
 
   const candidateIds = rankParticipants(game, participantIds);
