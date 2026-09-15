@@ -669,6 +669,47 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
   },
+    {
+    id: "g10",
+    season: 8,
+    date: "2026-09-14",
+    time: "21:00",
+    opponent: "D Backs",
+    weCloseBatting: true,
+    scoreUs: 8,
+    scoreThem: 7,
+    batting: [
+      { playerId: "p6", order: 1, position: "C", AB: 4, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p18", order: 2, position: "SS", AB: 4, H: 2, "2B": 0, "3B": 1, HR: 0, HRC: 1, RBI: 3, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p5", order: 3, position: "LF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 1, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p12", order: 4, position: "1B", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 1, SB: 0 },
+      { playerId: "p15", order: 5, position: "3B", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p7", order: 6, position: "JD", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p13", order: 7, position: "RF", AB: 3, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p4", order: 8, position: "CF", AB: 3, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p9", order: 9, position: "2B", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p11", order: 10, position: "JC", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+    ],
+    pitching: [
+      { playerId: "p16", IP: 5, H: 8, R: 6, ER: 0, BB: 1, SO: 0, HR: 2, decision: "" },
+      { playerId: "p14", IP: 2, H: 4, R: 1, ER: 0, BB: 0, SO: 0, HR: 0, decision: "W" },
+    ],
+    fielding: [
+      { playerId: "p16", PO: 1, A: 0, E: 0 },
+      { playerId: "p15", PO: 1, A: 2, E: 1 },
+      { playerId: "p18", PO: 1, A: 2, E: 1 },
+      { playerId: "p9", PO: 1, A: 1, E: 1 },
+      { playerId: "p12", PO: 3, A: 0, E: 0 },
+      { playerId: "p5", PO: 2, A: 0, E: 1 },
+      { playerId: "p4", PO: 2, A: 0, E: 1 },
+      { playerId: "p13", PO: 1, A: 0, E: 0 },
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+    ],
+    outs: [
+    ],
+    substitutions: [
+    ],
+  },
 ];
 
 // Juegos de PLAYOFFS — solo temporadas que llegaron a esta fase tienen
