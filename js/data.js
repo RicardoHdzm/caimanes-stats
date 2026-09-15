@@ -669,7 +669,8 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
   },
-    {
+      // Reemplaza el bloque completo del juego "g10" en GAMES por esto:
+  {
     id: "g10",
     season: 8,
     date: "2026-09-14",
@@ -706,6 +707,16 @@ export const GAMES = [
       { playerId: "p6", PO: 0, A: 0, E: 0 },
     ],
     outs: [
+      { playerId: "p6", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p18", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p5", GO: 0, FO: 3, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p12", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p15", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p7", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p4", GO: 0, FO: 3, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p13", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p9", GO: 0, FO: 5, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p11", GO: 2, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
     ],
     substitutions: [
     ],
