@@ -669,7 +669,7 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/4588638278067791",
   },
-      // Reemplaza el bloque completo del juego "g10" en GAMES por esto:
+    // Reemplaza el bloque completo del juego "g10" en GAMES por esto:
   {
     id: "g10",
     season: 8,
@@ -682,7 +682,7 @@ export const GAMES = [
     batting: [
       { playerId: "p6", order: 1, position: "C", AB: 4, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
       { playerId: "p18", order: 2, position: "SS", AB: 4, H: 2, "2B": 0, "3B": 1, HR: 0, HRC: 1, RBI: 3, R: 2, BB: 0, SO: 0, SB: 0 },
-      { playerId: "p5", order: 3, position: "LF", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 1, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p5", order: 3, position: "LF", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 1, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 2 },
       { playerId: "p12", order: 4, position: "1B", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 1, SB: 0 },
       { playerId: "p15", order: 5, position: "3B", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 2 },
       { playerId: "p7", order: 6, position: "JD", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
@@ -692,8 +692,8 @@ export const GAMES = [
       { playerId: "p11", order: 10, position: "JC", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
     ],
     pitching: [
-      { playerId: "p16", IP: 5, H: 8, R: 6, ER: 0, BB: 1, SO: 0, HR: 2, decision: "" },
-      { playerId: "p14", IP: 2, H: 4, R: 1, ER: 0, BB: 0, SO: 0, HR: 0, decision: "W" },
+      { playerId: "p16", IP: 5, H: 8, R: 6, ER: 0, BB: 0, SO: 0, HR: 2, decision: "" },
+      { playerId: "p14", IP: 2, H: 4, R: 1, ER: 0, BB: 1, SO: 0, HR: 0, decision: "W" },
     ],
     fielding: [
       { playerId: "p16", PO: 1, A: 0, E: 0 },
