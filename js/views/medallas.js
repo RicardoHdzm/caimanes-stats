@@ -20,7 +20,7 @@
 import { PLAYERS } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId, getSession } from "../auth.js";
-import { rankAmong, currentSeasonGames } from "../stats.js";
+import { rankAmong, seasonStatGames } from "../stats.js";
 import {
   getAvatarUrl,
   getWalkupOverride,
@@ -127,8 +127,8 @@ async function getAsyncLabels(player) {
     if (likes.some((l) => l.player_id === player.id)) labels.push("Superfan");
   }
 
-  // Solo la temporada actual — ver currentSeasonGames en js/stats.js.
-  const games = currentSeasonGames();
+  // Temporada actual, regular + playoffs — ver seasonStatGames en js/stats.js.
+  const games = seasonStatGames();
   if (games.length > 0) {
     const perGameComments = await Promise.all(games.map((g) => getComments("game", g.id)));
     const gamesCommented = perGameComments.filter((comments) => comments.some((c) => c.player_id === player.id)).length;

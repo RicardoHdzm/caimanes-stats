@@ -1,5 +1,5 @@
 import { GAMES, PLAYOFFS, SEASONS, CURRENT_SEASON, STANDINGS, STANDINGS_HISTORY } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, teamRecord, gameResult } from "../stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, teamRecord, gameResult, seasonStatGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada } from "../ui.js";
 import { renderPlayoffEntry } from "./playoffs.js";
 import { renderStandingsTable } from "./standing.js";
@@ -137,7 +137,7 @@ export function renderTemporadas(container, seasonParam) {
   container.appendChild(battingEl);
   renderSortableTable(battingEl, {
     columns: battingColumns,
-    rows: battingTotals(games),
+    rows: battingTotals(seasonStatGames(season)),
     defaultSort: "AVG",
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;
@@ -162,7 +162,7 @@ export function renderTemporadas(container, seasonParam) {
   container.appendChild(pitchingEl);
   renderSortableTable(pitchingEl, {
     columns: pitchingColumns,
-    rows: pitchingTotals(games),
+    rows: pitchingTotals(seasonStatGames(season)),
     defaultSort: "ERA",
     defaultDir: 1,
     onRowClick: (row) => {
@@ -187,7 +187,7 @@ export function renderTemporadas(container, seasonParam) {
   container.appendChild(fieldingEl);
   renderSortableTable(fieldingEl, {
     columns: fieldingColumns,
-    rows: fieldingTotals(games),
+    rows: fieldingTotals(seasonStatGames(season)),
     defaultSort: "FPCT",
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;

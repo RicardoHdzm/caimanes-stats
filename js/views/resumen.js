@@ -192,10 +192,13 @@ export function wireRsvp(cardEl, gameId) {
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
-  // Solo juegos de la temporada actual — un juego de una temporada pasada
-  // (o de playoffs, aparte en PLAYOFFS) no debe mezclarse con "esta
-  // temporada" (ver currentSeasonGames en js/stats.js).
+  // `games`: solo temporada regular actual — récord, rachas y forma del
+  // equipo (lo que cuenta para la tabla de la liga). `statGames`: regular +
+  // playoffs — stats de equipo, líderes y récords de jugadores (los
+  // playoffs también cuentan para los números de cada jugador). Ver
+  // currentSeasonGames / seasonStatGames en js/stats.js.
   const games = currentSeasonGames();
+  const statGames = seasonStatGames();
 
   // Los anuncios del equipo ya NO viven aquí — se movieron al muro de Inicio
   // (ver js/views/feed.js). Esta pestaña ("Resumen") quedó solo con las

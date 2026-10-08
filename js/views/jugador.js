@@ -1,6 +1,7 @@
 import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
 import {
   currentSeasonGames,
+  seasonStatGames,
   battingTotals,
   pitchingTotals,
   fieldingTotals,
@@ -284,11 +285,11 @@ export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
 // condición de logro por separado y desincronizarse con el tiempo.
 export function renderAchievements(player) {
   const chips = [];
-  // Solo la temporada actual — ver currentSeasonGames en js/stats.js. Las
+  // Temporada actual, regular + playoffs — ver seasonStatGames en js/stats.js. Las
   // medallas de trayectoria/perfil de abajo (Caimaneggs, Veteran, Bon
   // voyage, Manager, Fragile) no usan `games` — esas se quedan siempre en
   // el medallero, sin importar la temporada.
-  const games = currentSeasonGames();
+  const games = seasonStatGames();
   // Agrega la medalla de podiumChip() (arriba) solo si el jugador de verdad
   // quedó en el top 3 — evita repetir el `if (chip) chips.push(chip)` en
   // cada estadística de abajo.
@@ -768,10 +769,10 @@ export function renderJugadorDetalle(container, playerId) {
   back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver al roster';
   container.appendChild(back);
 
-  // Solo la temporada actual — ver currentSeasonGames en js/stats.js. Los
-  // playoffs viven aparte en PLAYOFFS, así que no se cuelan aquí tampoco.
-  const games = currentSeasonGames();
-  const played = gamesPlayedByPlayer(games).get(player.id) ?? 0;
+  // Temporada actual, regular + playoffs (ver seasonStatGames en
+  // js/stats.js) — la asistencia (`played`) cuenta solo temporada regular.
+  const games = seasonStatGames();
+  const played = gamesPlayedByPlayer(currentSeasonGames()).get(player.id) ?? 0;
   const isOwnProfile = getCurrentPlayerId() === player.id;
   // Walkup song exclusiva de cuentas con sesión iniciada, a petición
   // expresa (igual que el medallero, más abajo) — se calcula aquí porque
