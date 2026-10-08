@@ -150,6 +150,13 @@ export function initSplash(onEnter) {
   if (video) video.src = "assets/video.mp4";
 
   function showButtons() {
+    // Sin Supabase (pausado o sin configurar) no hay login posible: un solo
+    // botón para entrar como invitado.
+    if (!SUPABASE_CONFIGURED) {
+      actions.innerHTML = `<button type="button" class="splash-btn splash-btn--accent" id="splash-guest">Entrar</button>`;
+      actions.querySelector("#splash-guest").addEventListener("click", enterApp);
+      return;
+    }
     actions.innerHTML = `
       <button type="button" class="splash-btn splash-btn--accent" id="splash-player">Soy jugador</button>
       <button type="button" class="splash-btn" id="splash-guest">Soy invitado</button>

@@ -6,6 +6,7 @@
 import { PLAYERS } from "./data.js";
 import { initAuth, mountAuthControl, isCoach } from "./auth.js";
 import { getDuesMap } from "./db.js";
+import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 
 const gate = document.getElementById("admin-gate");
 const protectedEl = document.getElementById("admin-protected");
@@ -26,7 +27,9 @@ function rowMarkup(player, paid) {
 }
 
 async function render() {
-  if (!isCoach()) {
+  // Con Supabase pausado no hay forma de iniciar sesión, así que el candado
+  // se levanta (ver SUPABASE_PAUSED en js/supabase-config.js).
+  if (SUPABASE_CONFIGURED && !isCoach()) {
     protectedEl.hidden = true;
     gate.hidden = false;
     return;

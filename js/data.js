@@ -777,7 +777,7 @@ export const PLAYOFFS = [];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
 // calcula desde GAMES, porque ahí solo están nuestros juegos y aquí van los
-// 18 equipos. Hay que actualizarla a mano cada vez que la liga la publique.
+// equipos de toda la liga. Hay que actualizarla a mano cada vez que la liga la publique.
 //   pos: lugar en la tabla (lo decide la liga, con sus propios criterios de
 //        desempate, por eso se guarda y no se recalcula)
 //   JJ: juegos jugados · JG: ganados · JE: empatados · JP: perdidos
@@ -787,26 +787,25 @@ export const PLAYOFFS = [];
 //       los nombres a su manera y un cambio de su lado dejaría de marcarnos
 //       sin que nada avise.
 export const STANDINGS = {
-  updated: "2026-08-20", // fecha de corte de esta tabla
+  updated: "2026-10-05", // fecha de corte de esta tabla — final de temporada regular
   teams: [
-    { pos: 1, team: "Ni Parientes Somos", JJ: 6, JG: 6, JE: 0, JP: 0, CF: 46, CC: 34 },
-    { pos: 2, team: "Parkers", JJ: 6, JG: 5, JE: 0, JP: 1, CF: 97, CC: 59 },
-    { pos: 3, team: "Jolinos", JJ: 7, JG: 5, JE: 0, JP: 2, CF: 68, CC: 64 },
-    { pos: 4, team: "Los Camarones", JJ: 6, JG: 4, JE: 0, JP: 2, CF: 68, CC: 45 },
-    { pos: 5, team: "Caimanes de Villas", JJ: 7, JG: 4, JE: 0, JP: 3, CF: 105, CC: 81, us: true },
-    { pos: 6, team: "Caguamigos", JJ: 4, JG: 3, JE: 0, JP: 1, CF: 42, CC: 27 },
-    { pos: 7, team: "Padres de Sandiego", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 65, CC: 53 },
-    { pos: 8, team: "Gallos", JJ: 6, JG: 3, JE: 0, JP: 3, CF: 71, CC: 83 },
-    { pos: 9, team: "D Backs", JJ: 4, JG: 2, JE: 0, JP: 2, CF: 33, CC: 47 },
-    { pos: 10, team: "Rockin Roll", JJ: 6, JG: 2, JE: 0, JP: 4, CF: 60, CC: 65 },
-    { pos: 11, team: "Bronx", JJ: 6, JG: 2, JE: 0, JP: 4, CF: 52, CC: 92 },
-    { pos: 12, team: "Soja Sushi", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 30, CC: 41 },
-    { pos: 13, team: "Bandidos", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 17, CC: 43 },
-    { pos: 14, team: "Primos", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 47, CC: 45 },
-    { pos: 15, team: "Tamagochis", JJ: 4, JG: 1, JE: 0, JP: 3, CF: 43, CC: 51 },
-    { pos: 16, team: "Sox", JJ: 5, JG: 1, JE: 0, JP: 4, CF: 39, CC: 53 },
-    { pos: 17, team: "Muñekos", JJ: 6, JG: 1, JE: 0, JP: 5, CF: 62, CC: 84 },
-    { pos: 18, team: "Pichichi Blue Jeys", JJ: 7, JG: 0, JE: 0, JP: 7, CF: 36, CC: 99 },
+    { pos: 1, team: "Ni Parientes Somos", JJ: 10, JG: 9, JE: 0, JP: 1, CF: 101, CC: 68 },
+    { pos: 2, team: "Caguamigos", JJ: 10, JG: 8, JE: 0, JP: 2, CF: 102, CC: 72 },
+    { pos: 3, team: "Jolinos", JJ: 10, JG: 7, JE: 0, JP: 3, CF: 90, CC: 84 },
+    { pos: 4, team: "Los Camarones", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 98, CC: 76 },
+    { pos: 5, team: "Parkers", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 129, CC: 105 },
+    { pos: 6, team: "Caimanes de Villas", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 123, us: true },
+    { pos: 7, team: "Gallos", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 131 },
+    { pos: 8, team: "Tamagochis", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 111, CC: 111 },
+    { pos: 9, team: "Bandidos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 93, CC: 91 },
+    { pos: 10, team: "Padres de Sandiego", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 106, CC: 107 },
+    { pos: 11, team: "Primos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 125, CC: 91 },
+    { pos: 12, team: "D Backs", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 84, CC: 100 },
+    { pos: 13, team: "Rockin Roll", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 113, CC: 112 },
+    { pos: 14, team: "Muñekos", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 112, CC: 121 },
+    { pos: 15, team: "Bronx", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 86, CC: 161 },
+    { pos: 16, team: "Sox", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 88, CC: 101 },
+    { pos: 17, team: "Pichichi Blue Jeys", JJ: 10, JG: 1, JE: 0, JP: 9, CF: 52, CC: 114 },
   ],
 };
 

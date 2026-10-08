@@ -16,4 +16,11 @@ export const SUPABASE_ANON_KEY =
 // Mientras no se llenen los valores de arriba, auth.js no intenta conectarse
 // (evita un error confuso de red en cuanto abras el sitio antes de terminar
 // la Fase 0 del proyecto).
-export const SUPABASE_CONFIGURED = !SUPABASE_URL.includes("TU-PROYECTO");
+//
+// SUPABASE_PAUSED = true mientras el proyecto esté PAUSADO en Supabase: el
+// sitio ni intenta conectarse (no hay login, todos entran como invitado, se
+// ocultan las secciones de solo-cuenta) y admin.html se abre sin pedir
+// sesión — su candado es solo de UI y no hay con qué iniciarla. Al
+// reactivar el proyecto, regrésalo a false.
+export const SUPABASE_PAUSED = true;
+export const SUPABASE_CONFIGURED = !SUPABASE_PAUSED && !SUPABASE_URL.includes("TU-PROYECTO");
