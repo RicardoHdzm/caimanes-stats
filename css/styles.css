@@ -4835,3 +4835,23 @@ a.comment-author-name:hover {
     animation: none;
   }
 }
+
+/* Etiqueta "Playoffs" junto al rival en las tablas juego por juego del
+   perfil (ver opponentColumn en js/views/jugador.js) — mismo dorado que el
+   badge de playoffs del detalle de un juego (.game-hero-playoff-badge). */
+.playoff-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(160deg, #ffd76a, #d4a017);
+  color: #4a3200;
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  vertical-align: middle;
+}

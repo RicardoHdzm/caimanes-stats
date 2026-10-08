@@ -11,11 +11,11 @@
         "-File",
         ".claude/static-server.ps1",
         "-Port",
-        "5180",
+        "5181",
         "-Root",
         "."
       ],
-      "port": 5180
+      "port": 5181
     }
   ]
 }

@@ -1585,6 +1585,15 @@ export function renderJugadorDetalle(container, playerId) {
 
   const gamesSorted = [...games].sort((a, b) => a.date.localeCompare(b.date));
 
+  // Columna "Rival" de las tablas juego por juego: los juegos de playoffs
+  // (seasonStatGames los marca con `playoff`) llevan una etiqueta dorada.
+  const opponentColumn = {
+    key: "opponent",
+    label: "Rival",
+    render: (value, row) =>
+      `${escapeHtml(value ?? "")}${row.playoff ? ' <span class="playoff-tag"><i class="fa-solid fa-trophy"></i> Playoffs</span>' : ""}`,
+  };
+
   // ---- Bateo juego por juego ----
   const battingRows = [];
   for (const game of gamesSorted) {
@@ -1594,6 +1603,7 @@ export function renderJugadorDetalle(container, playerId) {
       gameId: game.id,
       date: game.date,
       opponent: game.opponent,
+      playoff: !!game.playoff,
       AB: line.AB ?? 0,
       H: line.H ?? 0,
       "2B": line["2B"] ?? 0,
@@ -1630,6 +1640,7 @@ export function renderJugadorDetalle(container, playerId) {
       gameId: game.id,
       date: game.date,
       opponent: game.opponent,
+      playoff: !!game.playoff,
       SO,
       GO,
       FO,
@@ -1661,7 +1672,7 @@ export function renderJugadorDetalle(container, playerId) {
         label: row.date.slice(5).replace("-", "/"),
         gameAvg,
         cumulativeAvg,
-        tooltip: `${row.date} vs ${row.opponent} — ${row.H} de ${row.AB} (AVG ${formatAvg(row.H, row.AB)}) · acumulado ${formatAvg(cumulativeH, cumulativeAB)}`,
+        tooltip: `${row.date} vs ${row.opponent}${row.playoff ? " (playoffs)" : ""} — ${row.H} de ${row.AB} (AVG ${formatAvg(row.H, row.AB)}) · acumulado ${formatAvg(cumulativeH, cumulativeAB)}`,
       };
     });
 
@@ -1675,7 +1686,7 @@ export function renderJugadorDetalle(container, playerId) {
 
     const battingColumns = [
       { key: "date", label: "Fecha", sticky: true },
-      { key: "opponent", label: "Rival" },
+      opponentColumn,
       { key: "AB", label: "AB", full: "Turnos al bat", numeric: true },
       { key: "H", label: "H", full: "Hits", numeric: true },
       { key: "2B", label: "2B", full: "Dobles", numeric: true },
@@ -1711,7 +1722,7 @@ export function renderJugadorDetalle(container, playerId) {
 
     const outsColumns = [
       { key: "date", label: "Fecha", sticky: true },
-      { key: "opponent", label: "Rival" },
+      opponentColumn,
       { key: "SO", label: "SO", full: "Ponches", numeric: true, render: (v) => coloredStat(v, "stat-red") },
       { key: "GO", label: "GO", full: "Out por rodado", numeric: true },
       { key: "FO", label: "FO", full: "Out por elevado", numeric: true },
@@ -1745,6 +1756,7 @@ export function renderJugadorDetalle(container, playerId) {
       gameId: game.id,
       date: game.date,
       opponent: game.opponent,
+      playoff: !!game.playoff,
       IP: line.IP ?? 0,
       H: line.H ?? 0,
       R: line.R ?? 0,
@@ -1763,7 +1775,7 @@ export function renderJugadorDetalle(container, playerId) {
 
     const pitchingColumns = [
       { key: "date", label: "Fecha", sticky: true },
-      { key: "opponent", label: "Rival" },
+      opponentColumn,
       { key: "IP", label: "IP", full: "Entradas lanzadas", numeric: true },
       { key: "H", label: "H", full: "Hits permitidos", numeric: true },
       { key: "R", label: "R", full: "Carreras permitidas", numeric: true },
@@ -1797,6 +1809,7 @@ export function renderJugadorDetalle(container, playerId) {
       gameId: game.id,
       date: game.date,
       opponent: game.opponent,
+      playoff: !!game.playoff,
       PO: line.PO ?? 0,
       A: line.A ?? 0,
       E: line.E ?? 0,
@@ -1810,7 +1823,7 @@ export function renderJugadorDetalle(container, playerId) {
 
     const fieldingColumns = [
       { key: "date", label: "Fecha", sticky: true },
-      { key: "opponent", label: "Rival" },
+      opponentColumn,
       { key: "PO", label: "PO", full: "Outs realizados", numeric: true },
       { key: "A", label: "A", full: "Asistencias", numeric: true },
       { key: "E", label: "E", full: "Errores", numeric: true },
