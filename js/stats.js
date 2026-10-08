@@ -1,7 +1,7 @@
 import { PLAYERS, GAMES, PLAYOFFS, CURRENT_SEASON } from "./data.js";
 
 // Solo los juegos de TEMPORADA REGULAR de la temporada actual — lo que usan
-// el récord del equipo, la lista de Juegos, el Calendario y los juegos
+// el récord del equipo, el Calendario y los juegos
 // jugados para tener derecho a playoffs. Para stats de jugadores (que SÍ
 // cuentan los playoffs) usa seasonStatGames() de abajo. El detalle de un
 // juego puntual (link directo por id) y "Temporadas anteriores"

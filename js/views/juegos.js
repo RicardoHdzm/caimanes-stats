@@ -1,6 +1,6 @@
 import { SCHEDULE } from "../data.js";
-import { currentSeasonGames, gameResult } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary } from "../ui.js";
+import { seasonStatGames, gameResult } from "../stats.js";
+import { heading, renderSortableTable, renderGlossary, escapeHtml } from "../ui.js";
 
 const RESULT_BADGE = {
   W: '<span class="badge badge-win"><i class="fa-solid fa-check"></i> W</span>',
@@ -35,13 +35,16 @@ export function renderJuegos(container) {
   resultsHeading.textContent = "Resultados (clic en un juego para ver el detalle)";
   container.appendChild(resultsHeading);
 
-  const rows = currentSeasonGames().map((g) => {
+  // Temporada regular + playoffs de la temporada actual (seasonStatGames
+  // marca los de playoffs con `playoff`, que llevan su etiqueta dorada).
+  const rows = seasonStatGames().map((g) => {
     const known = g.scoreUs != null && g.scoreThem != null;
     return {
       id: g.id,
       date: g.date,
       time: g.time ?? "",
       opponent: g.opponent,
+      playoff: !!g.playoff,
       // No es una sede: en esta liga no hay local/visitante, solo en qué
       // parte de la entrada bateamos. Cerrar bateando = batear en la parte
       // baja; si cierra el rival, nosotros bateamos en la alta.
@@ -57,7 +60,12 @@ export function renderJuegos(container) {
   const resultColumns = [
     { key: "date", label: "Fecha", sticky: true },
     { key: "time", label: "Hora" },
-    { key: "opponent", label: "Rival" },
+    {
+      key: "opponent",
+      label: "Rival",
+      render: (value, row) =>
+        `${escapeHtml(value ?? "")}${row.playoff ? ' <span class="playoff-tag"><i class="fa-solid fa-trophy"></i> Playoffs</span>' : ""}`,
+    },
     { key: "close", label: "Entrada", full: "Parte de la entrada en que bateamos — baja = cerramos, alta = abrimos" },
     { key: "score", label: "Marcador" },
     { key: "result", label: "Resultado", render: (value) => RESULT_BADGE[value] ?? UNKNOWN_BADGE },
