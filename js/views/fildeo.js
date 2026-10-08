@@ -1,4 +1,4 @@
-import { fieldingTotals, currentSeasonGames } from "../stats.js";
+import { fieldingTotals, seasonStatGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 
@@ -19,7 +19,7 @@ export function renderFildeo(container) {
 
   renderSortableTable(tableEl, {
     columns,
-    rows: fieldingTotals(currentSeasonGames()),
+    rows: fieldingTotals(seasonStatGames()),
     defaultSort: "FPCT",
     onRowClick: (row) => {
       location.hash = `#/jugador/${row.playerId}`;

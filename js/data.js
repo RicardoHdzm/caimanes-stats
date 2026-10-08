@@ -795,7 +795,7 @@ export const PLAYOFFS = [
               { playerId: "p10", order: 10, position: "JC", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 0 },
             ],
             pitching: [
-              { playerId: "p16", IP: 5, H: 13, R: 7, ER: 0, BB: 0, SO: 1, HR: 0, decision: "" },
+              { playerId: "p16", IP: 5, H: 13, R: 7, ER: 0, BB: 0, SO: 1, HR: 0, decision: "L" },
               { playerId: "p14", IP: 2, H: 9, R: 5, ER: 0, BB: 1, SO: 0, HR: 1, decision: "" },
             ],
             fielding: [

@@ -1,6 +1,7 @@
 import { SCHEDULE, TEAM, PLAYERS } from "../data.js";
 import {
   currentSeasonGames,
+  seasonStatGames,
   teamRecord,
   battingTotals,
   pitchingTotals,
@@ -287,9 +288,9 @@ export function renderResumen(container) {
 
   if (bottomRow.children.length > 0) container.appendChild(bottomRow);
 
-  const teamBat = teamBattingTotals(games);
-  const teamPit = teamPitchingTotals(games);
-  const teamFld = teamFieldingTotals(games);
+  const teamBat = teamBattingTotals(statGames);
+  const teamPit = teamPitchingTotals(statGames);
+  const teamFld = teamFieldingTotals(statGames);
 
   const teamHeading = document.createElement("h3");
   teamHeading.textContent = "Stats de equipo";
@@ -312,10 +313,10 @@ export function renderResumen(container) {
     heroCardShell("fa-shield", "Fildeo de equipo", `<span class="leader-hero-value">${teamFld.FPCT}</span>`);
   container.appendChild(teamRow);
 
-  const battingList = battingTotals(games);
+  const battingList = battingTotals(statGames);
   // El líder de promedio solo sale de entre los que llegan al mínimo de
   // apariciones al plato; los demás siguen en la tabla de bateo completa.
-  const minPA = minPlateAppearances(games);
+  const minPA = minPlateAppearances(statGames);
   const batSorted = battingList.filter((p) => p.qualified).sort((a, b) => Number(b.AVG) - Number(a.AVG));
   const hrSorted = [...battingList].sort((a, b) => (b.HR - a.HR) || (b.HRC - a.HRC));
   const rbiSorted = [...battingList].sort((a, b) => b.RBI - a.RBI);
@@ -324,7 +325,7 @@ export function renderResumen(container) {
   // se captura en data.js — siempre saldría 0.00 para todos y el "líder"
   // sería un empate sin sentido. WHIP (bases por bolas + hits, por entrada)
   // no depende de ER, así que sí refleja algo real.
-  const pitSorted = pitchingTotals(games)
+  const pitSorted = pitchingTotals(statGames)
     .filter((p) => p.outs > 0)
     .sort((a, b) => Number(a.WHIP) - Number(b.WHIP));
   const soSorted = [...battingList].sort((a, b) => b.SO - a.SO);
@@ -384,7 +385,7 @@ export function renderResumen(container) {
   hydrateAvatars(leadersRow);
 
   // ---- Récords de temporada ----
-  const records = seasonRecords(games);
+  const records = seasonRecords(statGames);
   if (records.length > 0) {
     const recordsHeading = document.createElement("h3");
     recordsHeading.textContent = "Récords de la temporada";

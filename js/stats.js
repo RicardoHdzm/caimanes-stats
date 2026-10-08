@@ -1,13 +1,39 @@
-import { PLAYERS, GAMES, CURRENT_SEASON } from "./data.js";
+import { PLAYERS, GAMES, PLAYOFFS, CURRENT_SEASON } from "./data.js";
 
-// Solo los juegos de la temporada actual — lo que usan Resumen, Bateo,
-// Pitcheo, Fildeo, medallas, etc. para que un juego de una temporada
-// pasada (o de playoffs, que viven aparte en PLAYOFFS) no se mezcle con
-// "esta temporada". El detalle de un juego puntual (link directo por id) y
-// "Temporadas anteriores" (js/views/temporadas.js) siguen usando GAMES
-// completo a propósito, filtrando por su propio número de temporada.
+// Solo los juegos de TEMPORADA REGULAR de la temporada actual — lo que usan
+// el récord del equipo, la lista de Juegos, el Calendario y los juegos
+// jugados para tener derecho a playoffs. Para stats de jugadores (que SÍ
+// cuentan los playoffs) usa seasonStatGames() de abajo. El detalle de un
+// juego puntual (link directo por id) y "Temporadas anteriores"
+// (js/views/temporadas.js) siguen usando GAMES completo a propósito,
+// filtrando por su propio número de temporada.
 export function currentSeasonGames(games = GAMES) {
   return games.filter((g) => g.season === CURRENT_SEASON);
+}
+
+// Juegos de playoffs de una temporada, aplanados (ronda → juegos). Los
+// juegos de PLAYOFFS no traen `season` propio (lo hereda la entrada), así
+// que se les pone en una copia para que se comporten como los de GAMES.
+export function playoffGamesOf(season) {
+  return PLAYOFFS.filter((e) => e.season === season).flatMap((e) =>
+    e.rounds.flatMap((r) => (r.games ?? []).map((g) => ({ ...g, season, playoff: true })))
+  );
+}
+
+// Todos los juegos de todas las temporadas, regulares + playoffs (para
+// stats de carrera, como la alineación sugerida de js/lineup.js).
+export function allStatGames() {
+  const seasons = [...new Set(PLAYOFFS.map((e) => e.season))];
+  return [...GAMES, ...seasons.flatMap(playoffGamesOf)];
+}
+
+// Temporada regular + playoffs de una temporada (la actual por default) —
+// lo que usan las stats de jugadores (Bateo, Pitcheo, Fildeo, perfil,
+// medallas, líderes...): los playoffs también cuentan para los números de
+// cada jugador, a petición expresa. El récord del equipo NO (ese es el de
+// la tabla de la liga) — ver currentSeasonGames() arriba.
+export function seasonStatGames(season = CURRENT_SEASON) {
+  return [...GAMES.filter((g) => g.season === season), ...playoffGamesOf(season)];
 }
 
 // ---- helpers de entradas pitcheadas (notación .1 = 1 out, .2 = 2 outs) ----

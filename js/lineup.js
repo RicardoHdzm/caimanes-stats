@@ -2,8 +2,7 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { GAMES } from "./data.js";
-import { battingTotals, playerName } from "./stats.js";
+import { battingTotals, playerName, allStatGames } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
 
@@ -252,7 +251,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     return;
   }
 
-  const statsById = new Map(battingTotals(GAMES).map((r) => [r.playerId, r]));
+  const statsById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
   const assignment = gamePositionById
     ? assignDefenseByChoice(roster, gamePositionById, statsById)
     : assignDefense(roster, statsById);

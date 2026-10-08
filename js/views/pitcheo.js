@@ -1,4 +1,4 @@
-import { pitchingTotals, currentSeasonGames } from "../stats.js";
+import { pitchingTotals, seasonStatGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 
@@ -27,7 +27,7 @@ export function renderPitcheo(container) {
 
   renderSortableTable(tableEl, {
     columns,
-    rows: pitchingTotals(currentSeasonGames()),
+    rows: pitchingTotals(seasonStatGames()),
     defaultSort: "ERA",
     defaultDir: 1,
     onRowClick: (row) => {

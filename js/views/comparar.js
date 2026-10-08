@@ -1,6 +1,6 @@
 import { PLAYERS } from "../data.js";
 import {
-  currentSeasonGames,
+  seasonStatGames,
   battingTotals,
   pitchingTotals,
   fieldingTotals,
@@ -148,7 +148,7 @@ function comparisonBody(leftId, rightId) {
   const right = PLAYERS.find((p) => p.id === rightId);
   if (!left || !right) return "";
 
-  const games = currentSeasonGames();
+  const games = seasonStatGames();
   const batting = battingTotals(games);
   const pitching = pitchingTotals(games);
   const fielding = fieldingTotals(games);
