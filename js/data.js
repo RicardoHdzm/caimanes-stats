@@ -792,7 +792,7 @@ export const PLAYOFFS = [
               { playerId: "p6", order: 7, position: "C", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 2 },
               { playerId: "p13", order: 8, position: "RF", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
               { playerId: "p4", order: 9, position: "JD", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
-              { playerId: "p10", order: 10, position: "JC", AB: 2, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p10", order: 10, position: "JC", AB: 3, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 0 },
             ],
             pitching: [
               { playerId: "p16", IP: 5, H: 13, R: 7, ER: 0, BB: 0, SO: 1, HR: 0, decision: "" },
