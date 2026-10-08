@@ -780,7 +780,7 @@ export const PLAYOFFS = [
             time: "19:00",
             opponent: "Jolinos",
             weCloseBatting: true,
-            scoreUs: 6,
+            scoreUs: 5,
             scoreThem: 12,
             batting: [
               { playerId: "p1", order: 1, position: "CF", AB: 4, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
