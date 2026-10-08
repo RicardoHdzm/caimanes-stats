@@ -11,8 +11,8 @@ export const TEAM = {
   seasonsInLeague: 4, // temporadas jugando en esta liga
   seasonsTotal: 8, // temporadas del equipo en total
   gamesInSeason: 10, // juegos de temporada regular, sin contar playoffs
-  leaguePosition: 5, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
-  leagueTeams: 18, // total de equipos en la liga
+  leaguePosition: 6, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
+  leagueTeams: 17, // total de equipos en la liga
 };
 
 // Historial de temporadas del equipo, una entrada por temporada (índice 0 =
@@ -765,7 +765,71 @@ export const GAMES = [
 //     ],
 //   },
 // ];
-export const PLAYOFFS = [];
+export const PLAYOFFS = [
+  {
+    season: 8,
+    rounds: [
+      {
+        name: "Cuartos de Final",
+        opponent: "Jolinos",
+        isFinal: false,
+        games: [
+          {
+            id: "g11",
+            date: "2026-10-05",
+            time: "19:00",
+            opponent: "Jolinos",
+            weCloseBatting: true,
+            scoreUs: 6,
+            scoreThem: 12,
+            batting: [
+              { playerId: "p1", order: 1, position: "CF", AB: 4, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p18", order: 2, position: "SS", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p5", order: 3, position: "LF", AB: 2, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p12", order: 4, position: "1B", AB: 3, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 1, SB: 0 },
+              { playerId: "p3", order: 5, position: "2B", AB: 3, H: 1, "2B": 0, "3B": 1, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p15", order: 6, position: "3B", AB: 3, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+              { playerId: "p6", order: 7, position: "C", AB: 3, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 2 },
+              { playerId: "p13", order: 8, position: "RF", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+              { playerId: "p4", order: 9, position: "JD", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+              { playerId: "p10", order: 10, position: "JC", AB: 2, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 0 },
+            ],
+            pitching: [
+              { playerId: "p16", IP: 5, H: 13, R: 7, ER: 0, BB: 0, SO: 1, HR: 0, decision: "" },
+              { playerId: "p14", IP: 2, H: 9, R: 5, ER: 0, BB: 1, SO: 0, HR: 1, decision: "" },
+            ],
+            fielding: [
+              { playerId: "p16", PO: 0, A: 1, E: 0 },
+              { playerId: "p6", PO: 1, A: 0, E: 0 },
+              { playerId: "p12", PO: 2, A: 0, E: 1 },
+              { playerId: "p3", PO: 1, A: 3, E: 2 },
+              { playerId: "p15", PO: 1, A: 0, E: 3 },
+              { playerId: "p18", PO: 5, A: 1, E: 0 },
+              { playerId: "p5", PO: 4, A: 0, E: 1 },
+              { playerId: "p1", PO: 1, A: 0, E: 0 },
+              { playerId: "p13", PO: 0, A: 0, E: 1 },
+              { playerId: "p4", PO: 2, A: 0, E: 0 },
+              { playerId: "p14", PO: 0, A: 0, E: 0 },
+            ],
+            outs: [
+              { playerId: "p1", GO: 0, FO: 4, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p18", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p5", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 1 },
+              { playerId: "p12", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p3", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p15", GO: 2, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p6", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p13", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p4", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+              { playerId: "p10", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+            ],
+            substitutions: [],
+          },
+        ],
+      },
+    ],
+  },
+];
 
 // Próximos juegos (todavía sin jugar, sin marcador).
  export const SCHEDULE = [
