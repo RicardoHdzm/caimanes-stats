@@ -895,5 +895,6 @@ export const STANDINGS_HISTORY = {};
 // clicable.
 export const SPONSORS = [
   { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
-  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor002.png" },
+  { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png" },
+  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png" },
 ];
