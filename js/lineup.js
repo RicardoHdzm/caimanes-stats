@@ -47,6 +47,11 @@ export function registeredFieldPositions(player) {
 //    cuando dos jugadores comparten la misma posición principal).
 // 2) las posiciones que quedaron vacías se llenan con posiciones secundarias
 //    disponibles, resolviendo primero las que tengan menos candidatos.
+//
+// Todo esto corre en DOS rondas: primero solo con los regulares (más de la
+// mitad de los juegos, ver byRegularThenOps) y luego, para las posiciones
+// que sigan vacías, con el resto. Así un regular que tiene la posición como
+// secundaria le gana el lugar a un no-regular que la tiene como principal.
 export function assignDefense(roster, statsById) {
   const used = new Set();
   const assignment = {};
@@ -55,35 +60,44 @@ export function assignDefense(roster, statsById) {
     return statsById.get(p.id) ?? emptyStats(p.id);
   }
 
-  for (const pos of DEFENSE_POSITIONS) {
-    const candidates = roster
-      .filter((p) => primaryPosition(p) === pos && !used.has(p.id))
-      .map(statsFor)
-      .sort(byRegularThenOps);
-    if (candidates.length > 0) {
-      assignment[pos] = candidates[0];
-      used.add(candidates[0].playerId);
+  function fillWith(pool) {
+    for (const pos of DEFENSE_POSITIONS) {
+      if (assignment[pos]) continue;
+      const candidates = pool
+        .filter((p) => primaryPosition(p) === pos && !used.has(p.id))
+        .map(statsFor)
+        .sort(byRegularThenOps);
+      if (candidates.length > 0) {
+        assignment[pos] = candidates[0];
+        used.add(candidates[0].playerId);
+      }
+    }
+
+    const remaining = new Set(DEFENSE_POSITIONS.filter((pos) => !assignment[pos]));
+    while (remaining.size > 0) {
+      let bestPos = null;
+      let bestCandidates = null;
+      for (const pos of remaining) {
+        const candidates = pool
+          .filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
+          .map(statsFor)
+          .sort(byRegularThenOps);
+        if (bestCandidates === null || candidates.length < bestCandidates.length) {
+          bestPos = pos;
+          bestCandidates = candidates;
+        }
+      }
+      if (bestCandidates[0]) {
+        assignment[bestPos] = bestCandidates[0];
+        used.add(bestCandidates[0].playerId);
+      }
+      remaining.delete(bestPos);
     }
   }
 
-  const remaining = new Set(DEFENSE_POSITIONS.filter((pos) => !assignment[pos]));
-  while (remaining.size > 0) {
-    let bestPos = null;
-    let bestCandidates = null;
-    for (const pos of remaining) {
-      const candidates = roster
-        .filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
-        .map(statsFor)
-        .sort(byRegularThenOps);
-      if (bestCandidates === null || candidates.length < bestCandidates.length) {
-        bestPos = pos;
-        bestCandidates = candidates;
-      }
-    }
-    assignment[bestPos] = bestCandidates[0] ?? null;
-    if (bestCandidates[0]) used.add(bestCandidates[0].playerId);
-    remaining.delete(bestPos);
-  }
+  fillWith(roster.filter((p) => statsFor(p).regular));
+  fillWith(roster);
+  for (const pos of DEFENSE_POSITIONS) assignment[pos] ??= null;
   return assignment;
 }
 
