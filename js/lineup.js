@@ -48,7 +48,7 @@ export function assignDefense(roster, statsById) {
     const candidates = roster
       .filter((p) => primaryPosition(p) === pos && !used.has(p.id))
       .map(statsFor)
-      .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+      .sort(byRegularThenOps);
     if (candidates.length > 0) {
       assignment[pos] = candidates[0];
       used.add(candidates[0].playerId);
@@ -63,7 +63,7 @@ export function assignDefense(roster, statsById) {
       const candidates = roster
         .filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
         .map(statsFor)
-        .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+        .sort(byRegularThenOps);
       if (bestCandidates === null || candidates.length < bestCandidates.length) {
         bestPos = pos;
         bestCandidates = candidates;
@@ -101,7 +101,7 @@ export function assignDefenseByChoice(roster, gamePositionById, statsById) {
     const candidates = roster
       .filter((p) => gamePositionById.get(p.id) === pos && !used.has(p.id))
       .map(statsFor)
-      .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+      .sort(byRegularThenOps);
     if (candidates.length > 0) {
       assignment[pos] = candidates[0];
       used.add(candidates[0].playerId);
@@ -111,7 +111,7 @@ export function assignDefenseByChoice(roster, gamePositionById, statsById) {
   const flexible = roster
     .filter((p) => !gamePositionById.get(p.id) && !used.has(p.id))
     .map(statsFor)
-    .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+    .sort(byRegularThenOps);
 
   for (const pos of DEFENSE_POSITIONS) {
     if (assignment[pos]) continue;
@@ -179,14 +179,14 @@ export function buildLineupFromAssignment(roster, statsById, assignment, gamePos
       const explicit = roster
         .filter((p) => gamePositionById.get(p.id) === role && !usedIds.has(p.id))
         .map(statsFor)
-        .sort((a, b) => Number(b.OPS) - Number(a.OPS))[0];
+        .sort(byRegularThenOps)[0];
       if (explicit) return explicit;
     }
     return (
       roster
         .filter((p) => !usedIds.has(p.id))
         .map(statsFor)
-        .sort((a, b) => Number(b.OPS) - Number(a.OPS))[0] ?? null
+        .sort(byRegularThenOps)[0] ?? null
     );
   }
 
@@ -342,7 +342,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   const bench = roster
     .filter((p) => !playingIds.has(p.id))
     .map((p) => statsById.get(p.id) ?? emptyStats(p.id))
-    .sort((a, b) => Number(b.OPS) - Number(a.OPS));
+    .sort(byRegularThenOps);
 
   if (bench.length > 0) {
     const benchHeading = document.createElement("h3");
