@@ -1,7 +1,7 @@
 import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
 import { playerName, gameResult, playoffStatus } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
-import { getCurrentPlayerId, getSession } from "../auth.js";
+import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
 
@@ -162,12 +162,9 @@ export function mvpCandidateIds(game) {
 function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) {
   const gameId = game.id;
 
-  // Mientras la votación sigue abierta, verla requiere cuenta — a petición
-  // expresa (antes cualquiera veía los votos en vivo, aunque solo pudiera
-  // votar con sesión). Sin sesión NO se pinta nada de esta sección (ni el
-  // encabezado), no se deja un "inicia sesión para ver". Ya cerrada
-  // (isLatest false), el resultado final es público de siempre.
-  if (isLatest && !getSession()) return;
+  // Sección visible para TODOS, abierta o cerrada (a petición expresa) —
+  // votar sigue requiriendo cuenta de jugador: sin sesión las tarjetas
+  // salen como informativas (<div>, ver `interactive` en cardHtml).
 
   const heading3 = document.createElement("h3");
   heading3.innerHTML = '<i class="fa-solid fa-star"></i>MVP del equipo';
