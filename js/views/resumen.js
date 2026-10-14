@@ -14,7 +14,7 @@ import {
   seasonRecords,
 } from "../stats.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
-import { getCurrentPlayerId, getSession } from "../auth.js";
+import { getCurrentPlayerId } from "../auth.js";
 import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
 
 const FORM_CHIP = {
@@ -373,17 +373,15 @@ export function renderResumen(container) {
       valueOf: (p) => `${p.WHIP} WHIP`,
       detailOf: (p) => `${p.SO} K en ${p.IP} IP`,
     }) +
-    // Chiste del equipo, exclusivo de cuentas con sesión, a petición
-    // expresa — sin sesión la tarjeta no aparece (las otras 5 sí).
-    (getSession()
-      ? teamLeaderCardHtml({
-          icon: "fa-beer-mug-empty",
-          title: "Líder cervecero",
-          list: soSorted,
-          valueOf: (p) => `${p.SO * 12} botes`,
-          detailOf: (p) => `${p.SO} ponches`,
-        })
-      : "");
+    // Chiste del equipo — visible para todos (con o sin sesión), a
+    // petición expresa.
+    teamLeaderCardHtml({
+      icon: "fa-beer-mug-empty",
+      title: "Líder cervecero",
+      list: soSorted,
+      valueOf: (p) => `${p.SO * 12} botes`,
+      detailOf: (p) => `${p.SO} ponches`,
+    });
   container.appendChild(leadersRow);
   hydrateAvatars(leadersRow);
 

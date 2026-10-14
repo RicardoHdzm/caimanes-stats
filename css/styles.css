@@ -2820,6 +2820,25 @@ main h3::before {
   color: var(--accent);
 }
 
+/* Día de un juego de playoffs (ver buildEventsByDate en
+   js/views/calendario.js) — borde y trofeo con el mismo dorado del badge
+   de playoffs (.game-hero-playoff-badge / .playoff-tag). */
+.cal-day-playoff {
+  position: relative;
+  border-color: #d4a017;
+}
+
+.cal-playoff-icon {
+  color: #d4a017;
+  font-size: var(--text-xs);
+}
+
+.cal-day .cal-playoff-icon {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+}
+
 .cal-dot {
   display: inline-block;
   width: 8px;

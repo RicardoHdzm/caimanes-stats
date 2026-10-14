@@ -1,5 +1,5 @@
 import { SCHEDULE } from "../data.js";
-import { currentSeasonGames, gameResult } from "../stats.js";
+import { seasonStatGames, gameResult } from "../stats.js";
 import { heading } from "../ui.js";
 
 const MONTHS = [
@@ -20,9 +20,11 @@ function formatDate(d) {
 }
 
 // Un evento por fecha: juego jugado (con resultado) o juego programado.
+// Incluye los playoffs de la temporada actual (seasonStatGames los marca
+// con `playoff`) — su día lleva borde y trofeo dorados.
 function buildEventsByDate() {
   const map = new Map();
-  for (const g of currentSeasonGames()) {
+  for (const g of seasonStatGames()) {
     map.set(g.date, { type: "played", game: g });
   }
   for (const s of SCHEDULE) {
@@ -109,6 +111,10 @@ export function renderCalendario(container) {
       if (event?.type === "played") {
         const cls = RESULT_CLASS[gameResult(event.game)] ?? "cal-unknown";
         inner += `<span class="cal-dot ${cls}"></span><span class="cal-opponent">${event.game.opponent}</span>`;
+        if (event.game.playoff) {
+          cell.classList.add("cal-day-playoff");
+          inner += `<i class="fa-solid fa-trophy cal-playoff-icon" aria-label="Playoffs"></i>`;
+        }
         cell.classList.add("cal-clickable");
         cell.addEventListener("click", () => {
           location.hash = `#/juegos/${event.game.id}`;
@@ -136,6 +142,7 @@ export function renderCalendario(container) {
       <span><span class="cal-dot cal-loss"></span> Derrota</span>
       <span><span class="cal-dot cal-tie"></span> Empate</span>
       <span><span class="cal-dot cal-scheduled"></span> Programado</span>
+      <span><i class="fa-solid fa-trophy cal-playoff-icon"></i> Playoffs</span>
     `;
     wrap.appendChild(legend);
   }
