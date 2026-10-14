@@ -27,11 +27,15 @@ const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 // temporada pasada, sin duplicar este bloque.
 export function renderPlayoffEntry(container, entry) {
   const seasonStatus = playoffSeasonStatus(entry);
-  const info = SEASON_STATUS[seasonStatus.status];
-  const statusEl = document.createElement("div");
-  statusEl.className = `playoff-season-status ${info.cls}`;
-  statusEl.innerHTML = `<i class="fa-solid ${info.icon}"></i> ${info.label}`;
-  container.appendChild(statusEl);
+  // Sin badge de "Eliminados" (a petición expresa) — la serie perdida ya
+  // lo dice en su tarjeta. "En curso" y "¡Campeones!" sí se muestran.
+  if (seasonStatus.status !== "eliminados") {
+    const info = SEASON_STATUS[seasonStatus.status];
+    const statusEl = document.createElement("div");
+    statusEl.className = `playoff-season-status ${info.cls}`;
+    statusEl.innerHTML = `<i class="fa-solid ${info.icon}"></i> ${info.label}`;
+    container.appendChild(statusEl);
+  }
 
   for (const { round, ourWins, theirWins, status } of seasonStatus.rounds) {
     const games = round.games ?? [];
