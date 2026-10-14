@@ -2,7 +2,7 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, playerName, allStatGames } from "./stats.js";
+import { battingTotals, playerName, allStatGames, seasonStatGames, gamesPlayedByPlayer } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
 
@@ -14,7 +14,18 @@ export function positionsOf(value) {
 }
 
 function emptyStats(playerId) {
-  return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0 };
+  return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0, seasonGP: 0, regular: false };
+}
+
+// Criterio principal de TODA elección del motor (quién se queda con una
+// posición, JD/JC, orden de la banca): primero los "regulares" — jugaron
+// MÁS de la mitad de los juegos de la temporada hasta el momento (ver
+// `regular` en renderLineupResult) — y ya entre iguales, mejor OPS. A
+// petición expresa: alguien que casi no viene no le gana el lugar a uno
+// constante solo por un par de buenos juegos.
+function byRegularThenOps(a, b) {
+  if (a.regular !== b.regular) return a.regular ? -1 : 1;
+  return Number(b.OPS) - Number(a.OPS);
 }
 
 // La primera posición listada en el roster (ej. "SS" en "SS/LF/CF") es la
@@ -251,7 +262,19 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     return;
   }
 
-  const statsById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
+  // Stats de bateo de carrera (todas las temporadas) + juegos jugados de
+  // ESTA temporada (regular + playoffs) para el criterio de "regular" (ver
+  // byRegularThenOps): más de la mitad de los juegos jugados hasta hoy.
+  const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
+  const seasonGames = seasonStatGames();
+  const seasonPlayed = gamesPlayedByPlayer(seasonGames);
+  const statsById = new Map(
+    roster.map((p) => {
+      const seasonGP = seasonPlayed.get(p.id) ?? 0;
+      const base = careerById.get(p.id) ?? emptyStats(p.id);
+      return [p.id, { ...base, seasonGP, regular: seasonGP > seasonGames.length / 2 }];
+    })
+  );
   const assignment = gamePositionById
     ? assignDefenseByChoice(roster, gamePositionById, statsById)
     : assignDefense(roster, statsById);
@@ -272,6 +295,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     OPS: row.OPS,
     HR: row.HR,
     RBI: row.RBI,
+    JJ: row.seasonGP,
   }));
 
   // El pitcher no batea (batea el JD en su lugar), pero se muestra al final
@@ -289,6 +313,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
       OPS: pitcherStats.OPS,
       HR: pitcherStats.HR,
       RBI: pitcherStats.RBI,
+      JJ: pitcherStats.seasonGP,
     });
   }
 
@@ -302,6 +327,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
     { key: "HR", label: "HR", full: "Home runs", numeric: true },
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
+    { key: "JJ", label: "JJ", full: "Juegos jugados esta temporada", numeric: true },
   ];
 
   const orderEl = document.createElement("div");
@@ -329,7 +355,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
       <div class="card">
         <div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>
         <span class="card-value" style="font-size: 1.2rem;">${row ? row.name : "Sin jugador"}</span>
-        <span class="card-label">${row ? `OPS ${row.OPS}` : "No hay nadie disponible en esta posición"}</span>
+        <span class="card-label">${row ? `OPS ${row.OPS} · ${row.seasonGP} JJ` : "No hay nadie disponible en esta posición"}</span>
       </div>
     `;
   }).join("");
@@ -358,7 +384,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
           <div class="card">
             ${pos ? `<div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>` : ""}
             <span class="card-value" style="font-size: 1.1rem;">${row.name}</span>
-            <span class="card-label">OPS ${row.OPS}</span>
+            <span class="card-label">OPS ${row.OPS} · ${row.seasonGP} JJ</span>
           </div>
         `;
       })
