@@ -19,7 +19,7 @@ function emptyStats(playerId) {
 
 // Criterio principal de TODA elección del motor (quién se queda con una
 // posición, JD/JC, orden de la banca): primero los "regulares" — jugaron
-// MÁS de la mitad de los juegos de la temporada hasta el momento (ver
+// la MITAD O MÁS de los juegos de temporada regular hasta el momento (ver
 // `regular` en renderLineupResult) — y ya entre iguales, mejor OPS. A
 // petición expresa: alguien que casi no viene no le gana el lugar a uno
 // constante solo por un par de buenos juegos.
@@ -48,7 +48,7 @@ export function registeredFieldPositions(player) {
 // 2) las posiciones que quedaron vacías se llenan con posiciones secundarias
 //    disponibles, resolviendo primero las que tengan menos candidatos.
 //
-// Todo esto corre en DOS rondas: primero solo con los regulares (más de la
+// Todo esto corre en DOS rondas: primero solo con los regulares (mitad o más de
 // mitad de los juegos, ver byRegularThenOps) y luego, para las posiciones
 // que sigan vacías, con el resto. Así un regular que tiene la posición como
 // secundaria le gana el lugar a un no-regular que la tiene como principal.
@@ -278,8 +278,9 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
 
   // Stats de bateo de carrera (todas las temporadas) + juegos jugados de
   // ESTA temporada — solo temporada REGULAR, sin playoffs (a petición
-  // expresa) — para el criterio de "regular" (ver byRegularThenOps): más
-  // de la mitad de los juegos de temporada regular jugados hasta hoy.
+  // expresa) — para el criterio de "regular" (ver byRegularThenOps): la
+  // mitad o más de los juegos de temporada regular jugados hasta hoy (5 de
+  // 10 ya cuenta).
   const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
   const seasonGames = currentSeasonGames();
   const seasonPlayed = gamesPlayedByPlayer(seasonGames);
@@ -287,7 +288,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     roster.map((p) => {
       const seasonGP = seasonPlayed.get(p.id) ?? 0;
       const base = careerById.get(p.id) ?? emptyStats(p.id);
-      return [p.id, { ...base, seasonGP, regular: seasonGP > seasonGames.length / 2 }];
+      return [p.id, { ...base, seasonGP, regular: seasonGP >= seasonGames.length / 2 }];
     })
   );
   const assignment = gamePositionById
