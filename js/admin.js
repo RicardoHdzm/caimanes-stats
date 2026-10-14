@@ -494,10 +494,14 @@ document.getElementById("generate-game-btn").addEventListener("click", () => {
     const roundName = data.get("roundName").trim();
     const isFinal = data.get("isFinal") === "on";
     const seasonEntry = PLAYOFFS.find((p) => p.season === CURRENT_SEASON);
-    const round = seasonEntry?.rounds.find((r) => r.name === roundName);
+    // Sin distinguir mayúsculas ni acentos: "CUARTOS DE FINAL" y "Cuartos de
+    // Final" son la misma ronda — antes generaba una ronda nueva duplicada y
+    // la serie se partía en dos (cada una con 1 juego).
+    const normalize = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+    const round = seasonEntry?.rounds.find((r) => normalize(r.name) === normalize(roundName));
 
     if (round) {
-      lines.push(`  // Agrega este juego al arreglo "games" de la ronda "${roundName}" (temporada ${CURRENT_SEASON}) en PLAYOFFS:`);
+      lines.push(`  // Agrega este juego al arreglo "games" de la ronda "${round.name}" (temporada ${CURRENT_SEASON}) en PLAYOFFS:`);
       lines.push(indentBlock(gameBlock, 2));
     } else if (seasonEntry) {
       lines.push(`  // Agrega esta ronda al arreglo "rounds" de la temporada ${CURRENT_SEASON} en PLAYOFFS:`);
