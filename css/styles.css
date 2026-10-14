@@ -4067,9 +4067,14 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   margin-bottom: 18px;
 }
 
+/* max-width + object-fit: un logo muy horizontal (ej. Valpro, 6:1) a 46px
+   de alto mediría ~300px y opacaría a los demás — así se topa y se
+   achica sin deformarse. */
 .footer-sponsor-logo {
   height: 46px;
   width: auto;
+  max-width: 150px;
+  object-fit: contain;
   opacity: 0.85;
   filter: invert(1);
 }
