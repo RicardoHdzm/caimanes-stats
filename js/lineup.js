@@ -48,8 +48,8 @@ export function registeredFieldPositions(player) {
 // 2) las posiciones que quedaron vacías se llenan con posiciones secundarias
 //    disponibles, resolviendo primero las que tengan menos candidatos.
 //
-// Todo esto corre en DOS rondas: primero solo con los regulares (mitad o más de
-// mitad de los juegos, ver byRegularThenOps) y luego, para las posiciones
+// Todo esto corre en DOS rondas: primero solo con los regulares (la mitad
+// o más de los juegos, ver byRegularThenOps) y luego, para las posiciones
 // que sigan vacías, con el resto. Así un regular que tiene la posición como
 // secundaria le gana el lugar a un no-regular que la tiene como principal.
 export function assignDefense(roster, statsById) {
