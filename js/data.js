@@ -623,7 +623,7 @@ export const GAMES = [
     date: "2026-09-01",
     time: "19:00",
     opponent: "Los Primos",
-    mvp: "p6", // Edwyn Pompa
+    mvp: "p5", // Christopher Felix
     weCloseBatting: false,
     scoreUs: 19,
     scoreThem: 17,
@@ -685,6 +685,7 @@ export const GAMES = [
     date: "2026-09-14",
     time: "21:00",
     opponent: "D Backs",
+    mvp: "p5", // Christopher Felix
     weCloseBatting: true,
     scoreUs: 8,
     scoreThem: 7,
