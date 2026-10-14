@@ -4067,9 +4067,9 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   margin-bottom: 18px;
 }
 
-/* max-width + object-fit: un logo muy horizontal (ej. Valpro, 6:1) a 46px
-   de alto mediría ~300px y opacaría a los demás — así se topa y se
-   achica sin deformarse. */
+/* Tamaño de arranque nomás — al cargar, fitSponsorLogo() en js/main.js le
+   recorta el margen transparente y le pone alto/ancho de área pareja.
+   max-width + object-fit por si eso no corre (logo muy horizontal). */
 .footer-sponsor-logo {
   height: 46px;
   width: auto;
