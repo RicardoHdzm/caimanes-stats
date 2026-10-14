@@ -2,7 +2,7 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, playerName, allStatGames, seasonStatGames, gamesPlayedByPlayer } from "./stats.js";
+import { battingTotals, playerName, allStatGames, currentSeasonGames, gamesPlayedByPlayer } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
 
@@ -277,10 +277,11 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   }
 
   // Stats de bateo de carrera (todas las temporadas) + juegos jugados de
-  // ESTA temporada (regular + playoffs) para el criterio de "regular" (ver
-  // byRegularThenOps): más de la mitad de los juegos jugados hasta hoy.
+  // ESTA temporada — solo temporada REGULAR, sin playoffs (a petición
+  // expresa) — para el criterio de "regular" (ver byRegularThenOps): más
+  // de la mitad de los juegos de temporada regular jugados hasta hoy.
   const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
-  const seasonGames = seasonStatGames();
+  const seasonGames = currentSeasonGames();
   const seasonPlayed = gamesPlayedByPlayer(seasonGames);
   const statsById = new Map(
     roster.map((p) => {
@@ -341,7 +342,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
     { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
     { key: "HR", label: "HR", full: "Home runs", numeric: true },
     { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
-    { key: "JJ", label: "JJ", full: "Juegos jugados esta temporada", numeric: true },
+    { key: "JJ", label: "JJ", full: "Juegos jugados en temporada regular", numeric: true },
   ];
 
   const orderEl = document.createElement("div");
