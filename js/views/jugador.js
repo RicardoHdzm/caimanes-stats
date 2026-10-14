@@ -266,6 +266,13 @@ export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
   const counts = new Map();
   perGameVotes.forEach((votes, i) => {
     const game = games[i];
+    // MVP OFICIAL de data.js (campo `mvp`): manda sobre el voto, y cuenta
+    // aunque sea el juego más reciente — mismo criterio que renderMvpVote
+    // en js/views/juego.js. Así se ve también con Supabase pausado.
+    if (game?.mvp) {
+      counts.set(game.mvp, (counts.get(game.mvp) ?? 0) + 1);
+      return;
+    }
     if (game && isLatestGame(game)) return;
     const candidateIds = game ? mvpCandidateIds(game) : null;
     const tally = new Map();
@@ -966,8 +973,8 @@ export function renderJugadorDetalle(container, playerId) {
       }
 
       // "Starboy" + el chip de "MVP x N" junto al nombre — los dos salen
-      // del MVP VOTADO (ver mvpCountsFromVotes más arriba), no de un dato
-      // fijo de data.js. Misma llamada de votos que "Voter" de arriba, no
+      // del MVP de cada juego (ver mvpCountsFromVotes más arriba): el
+      // oficial de data.js si lo hay, si no el votado. Misma llamada de votos que "Voter" de arriba, no
       // hace falta pedirla dos veces.
       const mvpCounts = mvpCountsFromVotes(perGame, games);
       const myMvpCount = mvpCounts.get(player.id) ?? 0;

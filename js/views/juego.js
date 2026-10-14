@@ -161,6 +161,11 @@ export function mvpCandidateIds(game) {
 // todavía) se queda vacío.
 function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) {
   const gameId = game.id;
+  // MVP OFICIAL capturado en data.js (campo `mvp` del juego): manda sobre
+  // el voto y cierra la votación de este juego aunque sea el más reciente
+  // (así también se ve con Supabase pausado).
+  const officialMvp = game.mvp ?? null;
+  if (officialMvp) isLatest = false;
 
   // Sección visible para TODOS, abierta o cerrada (a petición expresa) —
   // votar sigue requiriendo cuenta de jugador: sin sesión las tarjetas
@@ -185,6 +190,9 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
   container.appendChild(gridEl);
 
   const candidateIds = rankParticipants(game, participantIds);
+  // El MVP oficial siempre sale en la boleta, aunque no haya quedado en el
+  // top por números.
+  if (officialMvp && !candidateIds.includes(officialMvp)) candidateIds.push(officialMvp);
   const pitchingByPlayer = new Map((game.pitching ?? []).map((l) => [l.playerId, l]));
 
   function cardHtml(playerId, voteCount, myVote, myId, isLeader) {
@@ -198,11 +206,12 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     const interactive = isLatest && !!myId && participantIds.has(myId) && playerId !== myId;
     const tag = interactive ? "button" : "div";
     const attrs = interactive ? `type="button" data-vote-for="${playerId}"` : "";
-    const countBadge =
-      voteCount > 0
-        ? isLeader
-          ? `<span class="mvp-vote-count mvp-vote-count--leader" title="Va ganando la votación"><i class="fa-solid fa-star"></i></span>`
-          : `<span class="mvp-vote-count">${voteCount}</span>`
+    // La estrella del MVP sale aunque no haya votos (MVP oficial de
+    // data.js con Supabase pausado, ver officialMvp arriba).
+    const countBadge = isLeader
+      ? `<span class="mvp-vote-count mvp-vote-count--leader" title="MVP del juego"><i class="fa-solid fa-star"></i></span>`
+      : voteCount > 0
+        ? `<span class="mvp-vote-count">${voteCount}</span>`
         : "";
     // Decisión de pitcheo (si tuvo) — sin esto, un cerrador que entró a la
     // boleta solo por su Salvamento se vería con puros ceros, sin ninguna
@@ -283,7 +292,7 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
     // el número de votos se ve normal en la tarjeta de quien va ganando,
     // pero sin adelantar quién es el MVP: eso solo se revela al cerrar,
     // cuando llega un juego más reciente y este deja de aceptar votos.
-    const displayLeaderId = isLatest ? null : leaderId;
+    const displayLeaderId = officialMvp ?? (isLatest ? null : leaderId);
 
     gridEl.innerHTML = candidateIds
       .map((id) => cardHtml(id, counts.get(id) ?? 0, myVote, myId, id === displayLeaderId))

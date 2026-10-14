@@ -100,6 +100,11 @@ async function recentMvp() {
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(1)[0];
   if (!closed) return null;
+  // MVP oficial de data.js (campo `mvp`) manda sobre el voto.
+  if (closed.mvp) {
+    const official = playerById(closed.mvp);
+    return official ? { game: closed, player: official } : null;
+  }
   const votes = await getMvpVotes(closed.id);
   if (votes.length === 0) return null;
   const tally = new Map();
