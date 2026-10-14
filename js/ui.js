@@ -246,10 +246,19 @@ function walkupIcon(parsedUrl) {
   return WALKUP_PLATFORMS.find((p) => p.match.test(host))?.icon ?? "fa-solid fa-music";
 }
 
+// El placeholder de PLAYERS[].walkup en data.js ("Canción" / "Artista", sin
+// url) es el valor por default de quien todavía no tiene la suya — no
+// cuenta como canción real (ni en el perfil ni en la Playlist).
+export function hasRealWalkup(walkup) {
+  if (!walkup?.title) return false;
+  if (walkup.title === "Canción" && walkup.artist === "Artista" && !walkup.url) return false;
+  return true;
+}
+
 // Canción de entrada (walk-up song): la que suena cuando el jugador va al
-// bat. Sin `walkup.title` no se pinta nada.
+// bat. Sin canción real (ver hasRealWalkup) no se pinta nada.
 export function renderWalkup(walkup) {
-  if (!walkup?.title) return "";
+  if (!hasRealWalkup(walkup)) return "";
 
   const parsed = safeWalkupUrl(walkup.url);
   const icon = walkupIcon(parsed);

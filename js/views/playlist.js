@@ -1,23 +1,13 @@
 // Playlist del equipo: todas las canciones de entrada (walk-up songs) en un
-// solo lugar. Exclusiva de cuentas con sesión iniciada, a petición expresa
-// (igual que la canción de cada quien en su perfil, ver js/views/jugador.js)
-// — mismo dato, aquí nomás juntado. Progresivo, como el resto del sitio:
-// primero pinta con lo fijo de data.js, y en cuanto llegan las
-// personalizadas de Supabase (getAllWalkupOverrides) se repinta con esas.
+// solo lugar. Pública (antes era solo con sesión; sin Supabase ya no hay
+// cuentas) — mismo dato que la canción de cada quien en su perfil (ver
+// js/views/jugador.js), aquí nomás juntado. Progresivo, como el resto del
+// sitio: primero pinta con lo fijo de data.js, y si llegan personalizadas
+// de Supabase (getAllWalkupOverrides) se repinta con esas. Solo salen las
+// canciones reales (ver hasRealWalkup en js/ui.js).
 import { PLAYERS } from "../data.js";
-import { heading, renderAvatar, renderSortableTable, escapeHtml, safeWalkupUrl } from "../ui.js";
+import { heading, renderAvatar, renderSortableTable, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
-import { getSession } from "../auth.js";
-
-// El placeholder de PLAYERS[].walkup en data.js ("Canción" / "Artista", sin
-// url) es el valor por default de quien todavía no ha puesto la suya — no
-// cuenta como canción real. Sin este filtro, la playlist se llenaría de
-// filas/tarjetas vacías tipo "Canción" / "Artista" para casi todo el roster.
-function hasRealWalkup(walkup) {
-  if (!walkup?.title) return false;
-  if (walkup.title === "Canción" && walkup.artist === "Artista" && !walkup.url) return false;
-  return true;
-}
 
 // El link real de Spotify/YouTube/etc. si hay uno válido; sin link, el
 // botón se ve pero no hace nada (no hay a dónde mandarlo). Compartido entre
@@ -69,12 +59,6 @@ const TRACK_COLUMNS = [
 ];
 
 export function renderPlaylist(container) {
-  // Exclusiva de cuentas con sesión, a petición expresa — sin cuenta no se
-  // pinta nada (ni el encabezado). js/main.js ya esconde el link de la
-  // pestaña y manda a Inicio si se llega por URL directa sin sesión; este
-  // chequeo es el candado de respaldo.
-  if (!getSession()) return;
-
   heading(container, "Playlist del equipo");
 
   const tableEl = document.createElement("div");

@@ -145,14 +145,14 @@ function currentRoute() {
   }
   const tab = routes[first] ? first : "inicio";
 
-  // El Feed (js/views/feed.js) y la Playlist son exclusivos de cuentas con
-  // sesión, a petición expresa. Sin sesión, sus links no aparecen (ver
+  // El Feed (js/views/feed.js) es exclusivo de cuentas con sesión, a
+  // petición expresa. Sin sesión, su link no aparece (ver
   // render) y el invitado cae en el Resumen de stats, que es su portada
   // (tab "resumen" para que resalte). getSession() puede tardar en
   // resolver: el primer render() sin sesión cae al Resumen, y el re-render
   // por "caimanes:auth-changed" ya muestra el Feed real cuando la sesión
   // resuelve.
-  if ((tab === "inicio" || tab === "playlist") && !getSession()) {
+  if (tab === "inicio" && !getSession()) {
     return { tab: "resumen", render: routes.resumen };
   }
 
@@ -308,13 +308,11 @@ function render() {
   if (logoutTile) logoutTile.hidden = !session;
   if (adminTile) adminTile.hidden = !session || !isCoach();
 
-  // Playlist y Feed: pestañas exclusivas de cuentas con sesión (a petición
-  // expresa) — sus links se esconden sin sesión (nav de escritorio, barra de
-  // abajo y grid de "Más"). currentRoute() ya manda al Resumen si se llega
-  // por URL directa.
+  // Feed: pestaña exclusiva de cuentas con sesión (a petición expresa) —
+  // sus links se esconden sin sesión (nav de escritorio, barra de abajo y
+  // grid de "Más"). currentRoute() ya manda al Resumen si se llega por URL
+  // directa. La Playlist ya es pública.
   for (const el of [
-    tabs.querySelector('[data-route="playlist"]'),
-    moreSheet.querySelector('[data-tab="playlist"]'),
     tabs.querySelector('[data-route="inicio"]'),
     bottomTabs.querySelector('[data-tab="inicio"]'),
     moreSheet.querySelector('[data-tab="inicio"]'),

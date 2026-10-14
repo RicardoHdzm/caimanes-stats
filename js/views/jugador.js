@@ -781,10 +781,6 @@ export function renderJugadorDetalle(container, playerId) {
   const games = seasonStatGames();
   const played = gamesPlayedByPlayer(currentSeasonGames()).get(player.id) ?? 0;
   const isOwnProfile = getCurrentPlayerId() === player.id;
-  // Walkup song exclusiva de cuentas con sesión iniciada, a petición
-  // expresa (igual que el medallero, más abajo) — se calcula aquí porque
-  // hace falta ya para armar el hero.innerHTML de abajo.
-  const hasSession = !!getSession();
   // Posición del perfil ya precargada (ver preloadOverrides) o la de
   // data.js — se lee SÍNCRONO para que el hero salga con la correcta desde
   // el primer render, sin swap (a petición expresa).
@@ -826,7 +822,7 @@ export function renderJugadorDetalle(container, playerId) {
         </div>
         <p class="profile-bio" id="profile-bio"${profile?.bio ? "" : " hidden"}>${profile?.bio ? escapeHtml(profile.bio) : ""}</p>
         <div class="profile-hero-meta-row" id="profile-birthday-slot">${renderBirthday(profile)}</div>
-        <div id="walkup-display">${hasSession ? renderWalkup(player.walkup) : ""}</div>
+        <div id="walkup-display">${renderWalkup(player.walkup)}</div>
         <div class="profile-attendance">
           <div class="profile-attendance-label">
             <span>${played}/${TEAM.gamesInSeason} juegos jugados</span>
@@ -1066,9 +1062,7 @@ export function renderJugadorDetalle(container, playerId) {
   getWalkupOverride(player.id).then((override) => {
     if (!override) return;
     currentWalkup = override;
-    // Sin sesión, #walkup-display ya trae el aviso de "Inicia sesión..."
-    // (ver arriba) — no lo pisa aunque llegue una canción personalizada.
-    if (hasSession) walkupDisplay.innerHTML = renderWalkup(override);
+    walkupDisplay.innerHTML = renderWalkup(override);
     addAchievementMedal({
       icon: "fa-solid fa-music",
       label: "Greatests Hits",
