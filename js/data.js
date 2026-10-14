@@ -206,9 +206,10 @@ export const MANAGERS = ["p15"];
 //       { inning: 5, type: "campo", playerOut: "p1", playerIn: "p3", position: "SS" },
 //     ],
 //     replayUrl: "https://youtube.com/...", // opcional, link al video del juego
-//     // Ya no hay campo `mvp` aquí — el MVP de cada juego (y de la
-//     // temporada, medalla "Starboy") sale solo del voto del equipo en
-//     // Supabase (mvp_votes), no se captura a mano.
+//     mvp: "p3", // opcional — MVP OFICIAL del juego. Si está, manda sobre
+//     //   el voto del equipo en Supabase (mvp_votes) y cierra la votación
+//     //   de ese juego; sin él, el MVP sale del voto. Cuenta para el badge
+//     //   del juego, el "MVP x N" del perfil y la medalla "Starboy".
 //   },
 // ];
 export const GAMES = [
@@ -253,6 +254,7 @@ export const GAMES = [
     date: "2026-06-25",
     time: "19:00",
     opponent: "Muñekos",
+    mvp: "p12", // Luis Fernando Lugo
     weCloseBatting: false,
     scoreUs: 16,
     scoreThem: 17,
@@ -300,6 +302,7 @@ export const GAMES = [
     date: "2026-07-10",
     time: "19:00",
     opponent: "Bronx",
+    mvp: "p10", // Enrique Muñoz
     weCloseBatting: false,
     scoreUs: 27,
     scoreThem: 12,
@@ -352,6 +355,7 @@ export const GAMES = [
     date: "2026-07-21",
     time: "21:00",
     opponent: "Los Pichichis",
+    mvp: "p14", // Ricardo Santoyo
     weCloseBatting: true,
     scoreUs: 17,
     scoreThem: 7,
@@ -391,6 +395,7 @@ export const GAMES = [
     date: "2026-07-28",
     time: "19:00",
     opponent: "Tamagochis",
+    mvp: "p14", // Ricardo Santoyo
     weCloseBatting: true,
     scoreUs: 17,
     scoreThem: 15,
@@ -442,6 +447,7 @@ export const GAMES = [
     date: "2026-08-14",
     time: "19:00",
     opponent: "Jolinos",
+    mvp: "p12", // Luis Fernando Lugo
     weCloseBatting: true,
     scoreUs: 13,
     scoreThem: 16,
@@ -501,6 +507,7 @@ export const GAMES = [
     date: "2026-08-20",
     time: "19:00",
     opponent: "Sox",
+    mvp: "p19", // Xico Espinoza
     weCloseBatting: true,
     scoreUs: 10,
     scoreThem: 9,
@@ -558,6 +565,7 @@ export const GAMES = [
     date: "2026-08-27",
     time: "21:00",
     opponent: "Rockin' Roll",
+    mvp: "p3", // Omar Ramirez
     weCloseBatting: false,
     scoreUs: 2,
     scoreThem: 17,
@@ -615,6 +623,7 @@ export const GAMES = [
     date: "2026-09-01",
     time: "19:00",
     opponent: "Los Primos",
+    mvp: "p6", // Edwyn Pompa
     weCloseBatting: false,
     scoreUs: 19,
     scoreThem: 17,
@@ -779,6 +788,7 @@ export const PLAYOFFS = [
             date: "2026-10-05",
             time: "19:00",
             opponent: "Jolinos",
+            mvp: "p18", // Javier Urquiza
             weCloseBatting: true,
             scoreUs: 5,
             scoreThem: 12,
@@ -830,6 +840,7 @@ export const PLAYOFFS = [
             date: "2026-10-13",
             time: "21:00",
             opponent: "Jolinos",
+            mvp: "p5", // Christopher Felix
             weCloseBatting: false,
             scoreUs: 7,
             scoreThem: 10,
