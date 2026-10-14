@@ -96,11 +96,12 @@ document.getElementById("footer-year").textContent = new Date().getFullYear();
 // Los logos vienen de todas formas (cuadrados, 6:1, con mucho margen
 // transparente...), así que a la misma altura se ven disparejos. Al cargar
 // cada uno: (1) se recorta su margen transparente (canvas, mismo origen) y
-// (2) se le da un tamaño de ÁREA visual pareja en vez de altura pareja —
-// un logo ancho queda más bajito y uno cuadrado más alto, y todos "pesan"
-// parecido. SPONSOR_LOGO_MAX_H topa a los cuadrados.
-const SPONSOR_LOGO_AREA = 3400; // px²
-const SPONSOR_LOGO_MAX_H = 56;
+// (2) se le da un tamaño de peso visual parejo en vez de altura pareja —
+// un logo ancho queda más bajito y uno cuadrado más alto. Alto = BASE /
+// proporción^0.6 (con 0.5 sería área idéntica; 0.6 encoge un poco más a
+// los muy horizontales, que por ser letras gruesas "pesan" más).
+const SPONSOR_LOGO_BASE_H = 56; // alto de un logo cuadrado
+const SPONSOR_LOGO_EXPONENT = 0.6;
 
 function fitSponsorLogo(img) {
   if (img.dataset.fitted) return;
@@ -140,7 +141,8 @@ function fitSponsorLogo(img) {
     // nomás con el tamaño parejo de abajo.
   }
   const ratio = box.w / box.h;
-  const height = Math.min(Math.sqrt(SPONSOR_LOGO_AREA / ratio), SPONSOR_LOGO_MAX_H);
+  const height = Math.min(SPONSOR_LOGO_BASE_H / ratio ** SPONSOR_LOGO_EXPONENT, SPONSOR_LOGO_BASE_H);
+  img.style.maxWidth = "none";
   img.style.height = `${height.toFixed(1)}px`;
   img.style.width = `${(height * ratio).toFixed(1)}px`;
 }
