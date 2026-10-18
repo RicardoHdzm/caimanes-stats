@@ -1,4 +1,4 @@
-import { PLAYERS, TEAM } from "../data.js";
+import { ROSTER, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
 import { getSession, getCurrentPlayerId } from "../auth.js";
@@ -45,7 +45,7 @@ export function renderRoster(container) {
   // tabla salga con las del perfil desde el primer render, sin swap. Sin
   // precarga (o sin señal), el Map viene vacío y se usa la de data.js.
   const positionOverrides = cachedPositionOverrides();
-  const rows = PLAYERS.map((p) => ({
+  const rows = ROSTER.map((p) => ({
     ...p,
     position: positionOverrides.get(p.id) ?? p.position,
     gamesPlayed: played.get(p.id) ?? 0,

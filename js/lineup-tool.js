@@ -1,4 +1,4 @@
-import { PLAYERS } from "./data.js";
+import { ROSTER } from "./data.js";
 import { DEFENSE_POSITIONS, registeredFieldPositions, renderLineupResult } from "./lineup.js";
 import { initAuth } from "./auth.js";
 import { getAllPositionOverrides } from "./db.js";
@@ -17,7 +17,7 @@ await initAuth();
 // nada más en esta página compitiendo por pintar primero (a diferencia del
 // SPA, aquí no hay un primer pintado instantáneo que proteger).
 const positionOverrides = await getAllPositionOverrides();
-const roster = PLAYERS.map((p) => (positionOverrides.has(p.id) ? { ...p, position: positionOverrides.get(p.id) } : p)).sort(
+const roster = ROSTER.map((p) => (positionOverrides.has(p.id) ? { ...p, position: positionOverrides.get(p.id) } : p)).sort(
   (a, b) => a.name.localeCompare(b.name, "es")
 );
 const entries = []; // { player, checkbox, select }

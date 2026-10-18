@@ -5,7 +5,7 @@
 // sitio: primero pinta con lo fijo de data.js, y si llegan personalizadas
 // de Supabase (getAllWalkupOverrides) se repinta con esas. Solo salen las
 // canciones reales (ver hasRealWalkup en js/ui.js).
-import { PLAYERS } from "../data.js";
+import { ROSTER } from "../data.js";
 import { heading, renderAvatar, renderSortableTable, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
 
@@ -76,7 +76,7 @@ export function renderPlaylist(container) {
   // con la mitad diciendo "sin canción todavía" sería puro ruido en una
   // playlist.
   function draw(walkupMap) {
-    const rows = PLAYERS.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
+    const rows = ROSTER.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
       hasRealWalkup(r.walkup)
     );
 

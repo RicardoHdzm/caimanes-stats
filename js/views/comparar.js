@@ -1,4 +1,4 @@
-import { PLAYERS } from "../data.js";
+import { PLAYERS, ROSTER } from "../data.js";
 import {
   seasonStatGames,
   battingTotals,
@@ -65,7 +65,7 @@ const OUTS_ROWS = [
 ];
 
 function playerSelect(id, selectedId) {
-  const options = PLAYERS.map(
+  const options = ROSTER.map(
     (p) => `<option value="${p.id}"${p.id === selectedId ? " selected" : ""}>${p.number != null ? `#${p.number} · ` : ""}${p.name}</option>`
   ).join("");
   return `<select class="compare-select" id="${id}">${options}</select>`;
@@ -201,7 +201,7 @@ export function renderComparar(container, leftId, rightId) {
     return;
   }
 
-  if (PLAYERS.length < 2) {
+  if (ROSTER.length < 2) {
     const p = document.createElement("p");
     p.className = "subtitle";
     p.textContent = "Se necesitan al menos dos jugadores en el roster para comparar.";
@@ -215,9 +215,9 @@ export function renderComparar(container, leftId, rightId) {
   function draw(wantedLeft, wantedRight) {
     // Sin selección explícita arranca con los dos primeros del roster; así la
     // sección nunca aparece vacía.
-    const left = PLAYERS.find((p) => p.id === wantedLeft) ?? PLAYERS[0];
+    const left = PLAYERS.find((p) => p.id === wantedLeft) ?? ROSTER[0];
     const right =
-      PLAYERS.find((p) => p.id === wantedRight) ?? PLAYERS.find((p) => p.id !== left.id) ?? PLAYERS[1];
+      PLAYERS.find((p) => p.id === wantedRight) ?? ROSTER.find((p) => p.id !== left.id) ?? ROSTER[1];
 
     wrap.innerHTML = `
       <div class="compare-picker">

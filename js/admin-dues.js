@@ -3,7 +3,7 @@
 // candado de UI, no de seguridad real: admin.js nunca escribe en Supabase
 // (solo genera texto para pegar a mano en data.js) — y el estado de pago
 // (ver abajo) tampoco escribe nada, ya no depende de Supabase en absoluto.
-import { PLAYERS } from "./data.js";
+import { ROSTER } from "./data.js";
 import { initAuth, mountAuthControl, isCoach } from "./auth.js";
 import { getDuesMap } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
@@ -38,7 +38,7 @@ async function render() {
   protectedEl.hidden = false;
 
   const duesMap = await getDuesMap();
-  listEl.innerHTML = PLAYERS.map((p) => rowMarkup(p, duesMap.get(p.id) ?? true)).join("");
+  listEl.innerHTML = ROSTER.map((p) => rowMarkup(p, duesMap.get(p.id) ?? true)).join("");
 }
 
 // { loginVariant: "inline" }: admin.html no tiene la pantalla de

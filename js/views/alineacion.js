@@ -1,4 +1,4 @@
-import { PLAYERS } from "../data.js";
+import { ROSTER } from "../data.js";
 import { heading } from "../ui.js";
 import { renderLineupResult } from "../lineup.js";
 import { renderComparar } from "./comparar.js";
@@ -23,8 +23,8 @@ export function renderAlineacion(container, compareLeft, compareRight) {
   // precarga/señal, el Map viene vacío y se usa la de data.js.
   const overrides = cachedPositionOverrides();
   const players = overrides.size
-    ? PLAYERS.map((p) => (overrides.has(p.id) ? { ...p, position: overrides.get(p.id) } : p))
-    : PLAYERS;
+    ? ROSTER.map((p) => (overrides.has(p.id) ? { ...p, position: overrides.get(p.id) } : p))
+    : ROSTER;
   renderLineupResult(resultEl, players);
 
   renderComparar(container, compareLeft, compareRight);

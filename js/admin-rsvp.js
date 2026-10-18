@@ -7,7 +7,7 @@
 // (ver js/admin-dues.js). game_rsvps además es de lectura pública por RLS
 // (igual que en Resumen), así que ni siquiera hace falta sesión para leerla
 // — solo para verla, que ya lo resuelve el contenedor.
-import { SCHEDULE, PLAYERS } from "./data.js";
+import { SCHEDULE, ROSTER } from "./data.js";
 import { getRsvps } from "./db.js";
 
 const contentEl = document.getElementById("admin-rsvp-content");
@@ -29,9 +29,9 @@ async function renderGame(game) {
   const rows = await getRsvps(game.id);
   const yesIds = new Set(rows.filter((r) => r.status === "yes").map((r) => r.player_id));
   const noIds = new Set(rows.filter((r) => r.status === "no").map((r) => r.player_id));
-  const yes = PLAYERS.filter((p) => yesIds.has(p.id));
-  const no = PLAYERS.filter((p) => noIds.has(p.id));
-  const pending = PLAYERS.filter((p) => !yesIds.has(p.id) && !noIds.has(p.id));
+  const yes = ROSTER.filter((p) => yesIds.has(p.id));
+  const no = ROSTER.filter((p) => noIds.has(p.id));
+  const pending = ROSTER.filter((p) => !yesIds.has(p.id) && !noIds.has(p.id));
 
   const el = document.getElementById(`rsvp-admin-${game.id}`);
   if (!el) return;

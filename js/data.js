@@ -65,27 +65,36 @@ export const CURRENT_SEASON = TEAM.seasonsTotal;
 // (checkboxes, sin editar esto a mano). Si no lo sabes, omite el campo y no
 // se muestra nada (igual que photo/walkup).
 export const PLAYERS = [
-  { id: "p1", number: 23, name: "Axel Medina", position: "CF/LF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
+  { id: "p1", number: 23, name: "Axel Medina", position: "CF/LF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
   { id: "p2", number: 7, name: "Carlos Baez", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8] },
-  { id: "p3", number: 21, name: "Omar Ramirez", position: "2B/CF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p4", number: 33, name: "Carlos Borboa", position: "RF/CF/LF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p5", number: 44, name: "Christopher Felix", position: "2B/CF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
-  { id: "p6", number: 93, name: "Edwyn Pompa", position: "C/LF/CF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
-  { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8] },
-  { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
-  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
-  { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [3, 4, 5, 6, 7, 8] },
-  { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8] },
-  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 3, 4, 5, 6, 7, 8] },
-  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8] },
-  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8] },
-  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 8] },
+  { id: "p3", number: 21, name: "Omar Ramirez", position: "2B/CF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p4", number: 33, name: "Carlos Borboa", position: "RF/CF/LF", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p5", number: 44, name: "Christopher Felix", position: "2B/CF/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8, 9] },
+  { id: "p6", number: 93, name: "Edwyn Pompa", position: "C/LF/CF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8, 9] },
+  { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8, 9] },
+  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8, 9] },
+  { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [3, 4, 5, 6, 7, 8, 9] },
+  { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p14", number: 10, name: "Ricardo Santoyo", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p15", number: 24, name: "Ricardo Hernández", position: "3B/LF/CF", walkup: { title: "Goteo", artist: "Duki", url: "https://open.spotify.com/intl-es/track/1EoEU4HY57qaITp06TkC6B" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p16", number: 8, name: "Ruben Perez", position: "P", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p17", number: 99, name: "Teddy Sainz", position: "RF/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8, 9] },
+  { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 8, 9] },
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8] },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
 ];
+
+// Roster de la temporada ACTUAL: los de PLAYERS que traen CURRENT_SEASON en
+// su `seasons`. Es lo que usan Roster, Alineación, lineup/, Comparar,
+// Playlist y el estado de pago del Admin. Quien ya no juega se queda en
+// PLAYERS (sus juegos y su perfil siguen existiendo — Temporadas
+// anteriores, links directos), nomás no sale aquí. Al abrir temporada
+// nueva, agrega el número nuevo al `seasons` de quien sí siga (o márcalo
+// en Admin → Temporadas).
+export const ROSTER = PLAYERS.filter((p) => p.seasons?.includes(CURRENT_SEASON));
 
 // Estado de pago de la inscripción — un objeto por temporada (ver
 // CURRENT_SEASON arriba), para que "quién pagó la 9" no se mezcle ni
