@@ -36,6 +36,60 @@ export function seasonStatGames(season = CURRENT_SEASON) {
   return [...GAMES.filter((g) => g.season === season), ...playoffGamesOf(season)];
 }
 
+// ---- Posiciones que se MUESTRAN de cada jugador ----
+//
+// A petición expresa, las posiciones que salen en Roster/perfil/Comparar
+// ya no son fijas: se actualizan solas con las que MÁS ha jugado cada quien
+// en la temporada actual (regular + playoffs), máximo 3. Cada juego cuenta
+// una vez por posición, sumando: su `position` en `batting` (solo las 9 de
+// campo — JD/JC no), "P" si aparece en `pitching`, y la posición de una
+// sustitución "campo" en la que entró. Empates: primero las del orden
+// registrado (data.js / perfil), luego el orden de campo. Sin juegos esta
+// temporada (arranque de temporada) se muestran las registradas.
+const FIELD_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
+const MAX_SHOWN_POSITIONS = 3;
+
+export function playedPositionCounts(games) {
+  const counts = new Map(); // playerId -> Map(posición -> juegos)
+  for (const game of games) {
+    const seen = new Set();
+    const add = (playerId, pos) => {
+      if (!playerId || !FIELD_POSITIONS.includes(pos)) return;
+      const key = `${playerId}|${pos}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      if (!counts.has(playerId)) counts.set(playerId, new Map());
+      const m = counts.get(playerId);
+      m.set(pos, (m.get(pos) ?? 0) + 1);
+    };
+    for (const line of game.batting ?? []) add(line.playerId, line.position);
+    for (const line of game.pitching ?? []) add(line.playerId, "P");
+    for (const sub of game.substitutions ?? []) if (sub.type === "campo") add(sub.playerIn, sub.position);
+  }
+  return counts;
+}
+
+// Se calcula una sola vez por carga de página (GAMES no cambia en vivo).
+let currentSeasonPositionCounts = null;
+
+// "2B/CF/SS" para mostrar — `registered` es la cadena registrada (override
+// del perfil o la de data.js), que se usa para desempatar y como respaldo.
+export function displayPositions(playerId, registered = "") {
+  currentSeasonPositionCounts ??= playedPositionCounts(seasonStatGames());
+  const counts = currentSeasonPositionCounts.get(playerId);
+  if (!counts || counts.size === 0) return registered ?? "";
+  const regOrder = (registered ?? "").split("/").map((v) => v.trim());
+  const tieRank = (pos) => {
+    const i = regOrder.indexOf(pos);
+    return i >= 0 ? i : 100 + FIELD_POSITIONS.indexOf(pos);
+  };
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || tieRank(a[0]) - tieRank(b[0]))
+    .slice(0, MAX_SHOWN_POSITIONS)
+    .map(([pos]) => pos)
+    .join("/");
+}
+
 // ---- helpers de entradas pitcheadas (notación .1 = 1 out, .2 = 2 outs) ----
 export function ipToOuts(ip) {
   const whole = Math.floor(ip);
