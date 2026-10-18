@@ -19,7 +19,7 @@
 // de generarla sola sin duplicar la lógica de cálculo en sentido inverso.
 import { PLAYERS } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
-import { getCurrentPlayerId, getSession } from "../auth.js";
+import { getCurrentPlayerId } from "../auth.js";
 import { rankAmong, seasonStatGames } from "../stats.js";
 import {
   getAvatarUrl,

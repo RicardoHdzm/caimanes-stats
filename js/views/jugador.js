@@ -23,7 +23,7 @@ import {
   ordinalTemporada,
 } from "../ui.js";
 import { renderTrendChart } from "../charts.js";
-import { getCurrentPlayerId, getSession, changePassword } from "../auth.js";
+import { getCurrentPlayerId, changePassword } from "../auth.js";
 import {
   getWalkupOverride,
   setWalkup,

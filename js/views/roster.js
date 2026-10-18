@@ -1,7 +1,7 @@
 import { ROSTER, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
-import { getSession, getCurrentPlayerId } from "../auth.js";
+import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
