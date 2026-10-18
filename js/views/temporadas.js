@@ -74,12 +74,12 @@ function renderMvpSummary(container, statGames) {
   });
 }
 
-// Top 9 de la temporada: mejor OPS entre los que jugaron la MITAD O MÁS de
+// Top 5 de la temporada: mejor OPS entre los que jugaron la MITAD O MÁS de
 // los juegos de la temporada — contando playoffs (a petición expresa), igual
 // que los números (OPS, HR...). Ojo: la sugerencia de alineación usa solo
 // temporada regular para su criterio de "regular" (ver byRegularThenOps en
 // js/lineup.js) — aquí no.
-function renderTopNine(container, statGames) {
+function renderTopFive(container, statGames) {
   const played = gamesPlayedByPlayer(statGames);
   const minGames = statGames.length / 2;
   const mvpCounts = new Map();
@@ -89,11 +89,11 @@ function renderTopNine(container, statGames) {
     // Empate de OPS: gana quien tiene más turnos al bat (un 1.000 en 19 AB
     // pesa más que uno en 2).
     .sort((a, b) => Number(b.OPS) - Number(a.OPS) || b.AB - a.AB)
-    .slice(0, 9)
+    .slice(0, 5)
     .map((r, i) => ({ ...r, rank: i + 1, JJ: played.get(r.playerId) ?? 0, MVP: mvpCounts.get(r.playerId) ?? 0 }));
   if (top.length === 0) return;
 
-  sectionHeading(container, "fa-ranking-star", "Top 9 de la temporada");
+  sectionHeading(container, "fa-ranking-star", "Top 5 de la temporada");
   const columns = [
     { key: "rank", label: "#", numeric: true, sticky: true },
     { key: "name", label: "Jugador", sticky: true },
@@ -211,7 +211,7 @@ export function renderTemporadas(container, seasonParam, tabParam) {
 
   // Pestañas para no mostrar todo de una (a petición expresa), cada una con
   // lo que va relacionado: Resumen (las tarjetas de Resumen a como quedaron)
-  // · Destacados (MVPs, top 9, medallas) · Liga (playoffs + tabla de
+  // · Destacados (MVPs, top 5, medallas) · Liga (playoffs + tabla de
   // posiciones) · Estadísticas (bateo, pitcheo, fildeo) · Juegos. Mismo
   // selector que la pestaña Estadísticas (.stats-switcher). Se pinta todo de
   // una vez y solo se muestra/oculta cada panel; la pestaña elegida va en la
@@ -266,9 +266,9 @@ export function renderTemporadas(container, seasonParam, tabParam) {
     gamesInSeason: isCurrent ? TEAM.gamesInSeason : games.length,
   });
 
-  // ---- Resumen: MVPs, top 9 y medallas ----
+  // ---- Resumen: MVPs, top 5 y medallas ----
   renderMvpSummary(panels.destacados, statGames);
-  renderTopNine(panels.destacados, statGames);
+  renderTopFive(panels.destacados, statGames);
   renderSeasonMedals(panels.destacados, statGames);
 
   // ---- Playoffs de esa temporada, si los hubo ----
