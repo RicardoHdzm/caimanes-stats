@@ -4957,9 +4957,3 @@ a.comment-author-name:hover {
     font-size: 1.15rem;
   }
 }
-
-/* Separa la tarjeta "Más veces MVP" de la tabla de MVPs juego por juego
-   (ver renderMvpSummary en js/views/temporadas.js). */
-.mvp-summary-row {
-  margin-bottom: 22px;
-}

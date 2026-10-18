@@ -12,7 +12,7 @@ import {
 import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada, escapeHtml } from "../ui.js";
 import { renderPlayoffEntry } from "./playoffs.js";
 import { renderStandingsTable } from "./standing.js";
-import { renderSeasonCards, teamLeaderCardHtml, avatarSlot, hydrateAvatars } from "./resumen.js";
+import { renderSeasonCards, avatarSlot, hydrateAvatars } from "./resumen.js";
 import { renderAchievements, sortedAchievementsHtml } from "./jugador.js";
 
 // "2026-07-21" -> "21 jul 2026" — chico a propósito, esta tabla es solo un
@@ -45,30 +45,13 @@ function sectionHeading(container, icon, text) {
 }
 
 // MVPs de la temporada: el campo `mvp` de cada juego (MVP oficial, ver
-// GAMES en js/data.js) — tarjeta de líder (quién ganó más) + la lista
-// juego por juego. Sin ningún MVP capturado no se pinta nada.
+// GAMES en js/data.js) — la lista juego por juego. Sin ningún MVP
+// capturado no se pinta nada.
 function renderMvpSummary(container, statGames) {
   const withMvp = statGames.filter((g) => g.mvp).sort((a, b) => a.date.localeCompare(b.date));
   if (withMvp.length === 0) return;
 
-  const counts = new Map();
-  for (const g of withMvp) counts.set(g.mvp, (counts.get(g.mvp) ?? 0) + 1);
-  const ranking = [...counts.entries()]
-    .map(([playerId, mvp]) => ({ playerId, name: playerName(playerId), mvp }))
-    .sort((a, b) => b.mvp - a.mvp);
-
   sectionHeading(container, "fa-star", "MVPs de la temporada");
-  const row = document.createElement("div");
-  row.className = "leaders grid-2 tab-carousel mvp-summary-row";
-  row.innerHTML = teamLeaderCardHtml({
-    icon: "fa-star",
-    title: "Más veces MVP",
-    list: ranking,
-    valueOf: (p) => `${p.mvp} MVP${p.mvp === 1 ? "" : "s"}`,
-  });
-  container.appendChild(row);
-  hydrateAvatars(row);
-
   const tableEl = document.createElement("div");
   container.appendChild(tableEl);
   renderSortableTable(tableEl, {
@@ -92,12 +75,13 @@ function renderMvpSummary(container, statGames) {
 }
 
 // Top 5 de la temporada: mejor OPS entre los que jugaron la MITAD O MÁS de
-// los juegos de temporada regular — mismo criterio de "regular" que la
-// sugerencia de alineación (ver byRegularThenOps en js/lineup.js). Los
-// números (OPS, HR...) sí cuentan playoffs, igual que el resto de stats.
-function renderTopFive(container, games, statGames) {
-  const played = gamesPlayedByPlayer(games);
-  const minGames = games.length / 2;
+// los juegos de la temporada — contando playoffs (a petición expresa), igual
+// que los números (OPS, HR...). Ojo: la sugerencia de alineación usa solo
+// temporada regular para su criterio de "regular" (ver byRegularThenOps en
+// js/lineup.js) — aquí no.
+function renderTopFive(container, statGames) {
+  const played = gamesPlayedByPlayer(statGames);
+  const minGames = statGames.length / 2;
   const mvpCounts = new Map();
   for (const g of statGames) if (g.mvp) mvpCounts.set(g.mvp, (mvpCounts.get(g.mvp) ?? 0) + 1);
   const top = battingTotals(statGames)
@@ -111,7 +95,7 @@ function renderTopFive(container, games, statGames) {
   const columns = [
     { key: "rank", label: "#", numeric: true, sticky: true },
     { key: "name", label: "Jugador", sticky: true },
-    { key: "JJ", label: "JJ", full: "Juegos jugados en temporada regular", numeric: true },
+    { key: "JJ", label: "JJ", full: "Juegos jugados (temporada regular + playoffs)", numeric: true },
     { key: "AVG", label: "AVG", full: "Promedio de bateo", numeric: true },
     { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
     { key: "HR", label: "HR", full: "Home runs", numeric: true },
@@ -282,7 +266,7 @@ export function renderTemporadas(container, seasonParam, tabParam) {
 
   // ---- Resumen: MVPs, top 5 y medallas ----
   renderMvpSummary(panels.destacados, statGames);
-  renderTopFive(panels.destacados, games, statGames);
+  renderTopFive(panels.destacados, statGames);
   renderSeasonMedals(panels.destacados, statGames);
 
   // ---- Playoffs de esa temporada, si los hubo ----
