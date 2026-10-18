@@ -6,6 +6,7 @@ import {
   fieldingTotals,
   outsTotals,
   gamesPlayedByPlayer,
+  displayPositions,
 } from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
 import { getSession } from "../auth.js";
@@ -117,7 +118,7 @@ function playerHeader(player, played) {
       <span data-avatar="${player.id}">${renderAvatar(player, 72)}</span>
       <span class="compare-name">${player.name}</span>
       <span class="compare-number">#${player.number ?? "-"}</span>
-      <span class="compare-positions">${player.position ? renderPositionBadges(player.position) : ""}</span>
+      <span class="compare-positions">${displayPositions(player.id, player.position) ? renderPositionBadges(displayPositions(player.id, player.position)) : ""}</span>
       <span class="compare-games">${played} juego${played === 1 ? "" : "s"}</span>
     </div>
   `;

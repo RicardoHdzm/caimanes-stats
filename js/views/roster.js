@@ -1,5 +1,5 @@
 import { ROSTER, TEAM } from "../data.js";
-import { gamesPlayedByPlayer, currentSeasonGames } from "../stats.js";
+import { gamesPlayedByPlayer, currentSeasonGames, displayPositions } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
@@ -44,10 +44,13 @@ export function renderRoster(container) {
   // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que la
   // tabla salga con las del perfil desde el primer render, sin swap. Sin
   // precarga (o sin señal), el Map viene vacío y se usa la de data.js.
+  // Lo que se MUESTRA (y filtra) son las más jugadas esta temporada (ver
+  // displayPositions en js/stats.js); la registrada solo desempata y sirve
+  // de respaldo mientras no haya juegos.
   const positionOverrides = cachedPositionOverrides();
   const rows = ROSTER.map((p) => ({
     ...p,
-    position: positionOverrides.get(p.id) ?? p.position,
+    position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position),
     gamesPlayed: played.get(p.id) ?? 0,
   }));
 

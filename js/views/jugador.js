@@ -10,6 +10,7 @@ import {
   rankAmong,
   hitStreaks,
   attendanceStreaks,
+  displayPositions,
 } from "../stats.js";
 import {
   heading,
@@ -787,6 +788,13 @@ export function renderJugadorDetalle(container, playerId) {
   // data.js — se lee SÍNCRONO para que el hero salga con la correcta desde
   // el primer render, sin swap (a petición expresa).
   let currentPosition = cachedPositionOverride(player.id) ?? player.position ?? "";
+  // Lo que se MUESTRA son las más jugadas esta temporada (ver
+  // displayPositions en js/stats.js); currentPosition (la registrada) se
+  // sigue usando para el editor de posiciones y como respaldo.
+  const shownPositions = (registered) => {
+    const shown = displayPositions(player.id, registered);
+    return shown ? renderPositionBadges(shown) : "";
+  };
   // Bio + cumpleaños del perfil social (player_profiles), ya precargados
   // (ver preloadProfiles) — se leen SÍNCRONO, sin swap. `profile` puede ser
   // null (nadie lo ha llenado); `.bio` string vacío, mes/día null.
@@ -820,7 +828,7 @@ export function renderJugadorDetalle(container, playerId) {
         <div class="profile-hero-name">
           <span class="profile-hero-number">#${player.number ?? "-"}</span>
           <span>${escapeHtml(player.name)}</span>
-          <span class="profile-hero-name-positions" id="position-display">${currentPosition ? renderPositionBadges(currentPosition) : ""}</span>
+          <span class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</span>
         </div>
         <p class="profile-bio" id="profile-bio"${profile?.bio ? "" : " hidden"}>${profile?.bio ? escapeHtml(profile.bio) : ""}</p>
         <div class="profile-hero-meta-row" id="profile-birthday-slot">${renderBirthday(profile)}</div>
@@ -1268,7 +1276,7 @@ export function renderJugadorDetalle(container, playerId) {
       try {
         await setPosition(player.id, joined);
         currentPosition = joined;
-        positionDisplay.innerHTML = renderPositionBadges(joined);
+        positionDisplay.innerHTML = shownPositions(joined);
         posError.hidden = true;
         flashSaved(posSaveBtn, "Guardado");
       } catch {
