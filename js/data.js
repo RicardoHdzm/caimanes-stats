@@ -73,7 +73,7 @@ export const PLAYERS = [
   { id: "p6", number: 93, name: "Edwyn Pompa", position: "C/LF/CF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 7, 8, 9] },
   { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [6, 7, 8, 9] },
   { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
-  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8, 9] },
+  { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8] },
   { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
   { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 8, 9] },
   { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Canción", artist: "Artista" }, seasons: [3, 4, 5, 6, 7, 8, 9] },

@@ -56,6 +56,11 @@ export function renderRoster(container) {
   filterRow.innerHTML = POSITION_GROUPS.map(
     (g) => `<button type="button" class="pos-filter-chip${g.id === "ALL" ? " active" : ""}" data-group="${g.id}">${g.label}</button>`
   ).join("");
+  // Cuántos jugadores hay en el roster de la temporada (ROSTER, ver
+  // js/data.js) — al filtrar por posición dice "5 de 16".
+  const countEl = document.createElement("span");
+  countEl.className = "roster-count";
+  filterRow.appendChild(countEl);
   container.appendChild(filterRow);
 
   const columns = [
@@ -105,6 +110,10 @@ export function renderRoster(container) {
     const group = POSITION_GROUPS.find((g) => g.id === activeGroup) ?? POSITION_GROUPS[0];
     const filtered =
       group.id === "ALL" ? rows : rows.filter((row) => playerPositions(row).some((pos) => group.codes.includes(pos)));
+    countEl.textContent =
+      group.id === "ALL"
+        ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}`
+        : `${filtered.length} de ${rows.length} jugadores`;
 
     renderSortableTable(tableEl, {
       columns,

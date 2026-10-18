@@ -4957,3 +4957,13 @@ a.comment-author-name:hover {
     font-size: 1.15rem;
   }
 }
+
+/* Conteo de jugadores del roster (ver countEl en js/views/roster.js) — a la
+   derecha de los filtros de posición. */
+.roster-count {
+  margin-left: auto;
+  align-self: center;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
