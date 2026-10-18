@@ -29,11 +29,11 @@ function playerPositions(player) {
 // esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
 // a haber una fuente que pueda fallar; hoy nunca pasa.
 function renderDuesCell(playerId, duesMap) {
-  if (!duesMap) return '<i class="fa-solid fa-circle-question dues-icon dues-icon-unknown"></i>';
+  if (!duesMap) return '<span class="dues-icon dues-icon-unknown" title="Sin dato"><i class="fa-solid fa-question"></i></span>';
   const paid = duesMap.get(playerId) ?? false;
   return paid
-    ? '<i class="fa-solid fa-circle-check dues-icon dues-icon-paid"></i>'
-    : '<i class="fa-solid fa-circle-xmark dues-icon dues-icon-unpaid"></i>';
+    ? '<span class="dues-icon dues-icon-paid" title="Pagada"><i class="fa-solid fa-check"></i></span>'
+    : '<span class="dues-icon dues-icon-unpaid" title="Pendiente"><i class="fa-solid fa-xmark"></i></span>';
 }
 
 export function renderRoster(container) {

@@ -2569,21 +2569,37 @@ main h3::before {
 /* Columna "Inscripción" en Roster — un ícono, siempre de solo lectura
    (incluso para el coach: marcarla solo se puede desde admin.html, ver
    js/admin-dues.js). */
+/* Círculo con el mismo estilo que los .pos-badge (borde de color, fondo
+   translúcido del mismo color, ícono a color) — ver renderDuesCell en
+   js/views/roster.js. */
 .dues-icon {
-  font-size: 1.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-alt);
+  font-size: var(--text-xs);
 }
 
 .dues-icon-paid {
+  border-color: var(--win);
   color: var(--win);
+  background: color-mix(in srgb, var(--win) 12%, transparent);
 }
 
 .dues-icon-unpaid {
+  border-color: var(--accent-text);
   color: var(--accent-text);
+  background: color-mix(in srgb, var(--accent-text) 12%, transparent);
 }
 
 /* Ni verde ni rojo: todavía no se sabe (cargando, o la consulta falló
    incluso tras reintentar) — ver renderDuesCell en js/views/roster.js. */
 .dues-icon-unknown {
+  border-color: var(--muted);
   color: var(--muted);
 }
 
