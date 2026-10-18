@@ -110,7 +110,26 @@ export const ROSTER = PLAYERS.filter((p) => p.seasons?.includes(CURRENT_SEASON))
 // queda tal cual, como historial.
 export const DUES_PAID = {
   8: {},
-  9: {},
+  // Todos pendientes al arrancar la temporada — al pagar, borra su línea
+  // (o cámbiala a `true`).
+  9: {
+    p1: false, // Axel Medina
+    p3: false, // Omar Ramirez
+    p4: false, // Carlos Borboa
+    p5: false, // Christopher Felix
+    p6: false, // Edwyn Pompa
+    p7: false, // Francois Cardenas
+    p8: false, // Jorge Zazueta
+    p10: false, // Enrique Muñoz
+    p11: false, // Luis Lugo Bastidas
+    p12: false, // Luis Fernando Lugo
+    p13: false, // Luis Pompa
+    p14: false, // Ricardo Santoyo
+    p15: false, // Ricardo Hernández
+    p16: false, // Ruben Perez
+    p17: false, // Teddy Sainz
+    p18: false, // Javier Urquiza
+  },
 };
 
 // Ids de jugadores que se lesionaron durante la temporada — a mano, no hay
