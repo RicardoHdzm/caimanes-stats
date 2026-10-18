@@ -150,7 +150,7 @@ const KIND_ORDER = [
   "dues-unpaid",
 ];
 
-function sortedAchievementsHtml(chips) {
+export function sortedAchievementsHtml(chips) {
   return [...chips]
     .sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind))
     .map(achievementMedalHtml)
@@ -290,13 +290,15 @@ export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
 // Exportada para que js/views/medallas.js (la guía de medallas) pueda
 // reusar exactamente el mismo cálculo — sin esto tendría que duplicar cada
 // condición de logro por separado y desincronizarse con el tiempo.
-export function renderAchievements(player) {
+// `games` (opcional): la temporada a evaluar — por default la actual;
+// "Temporadas anteriores" (js/views/temporadas.js) pasa la de una ya
+// cerrada para mostrar las medallas con que terminó cada quien.
+export function renderAchievements(player, games = seasonStatGames()) {
   const chips = [];
   // Temporada actual, regular + playoffs — ver seasonStatGames en js/stats.js. Las
   // medallas de trayectoria/perfil de abajo (Caimaneggs, Veteran, Bon
   // voyage, Manager, Fragile) no usan `games` — esas se quedan siempre en
   // el medallero, sin importar la temporada.
-  const games = seasonStatGames();
   // Agrega la medalla de podiumChip() (arriba) solo si el jugador de verdad
   // quedó en el top 3 — evita repetir el `if (chip) chips.push(chip)` en
   // cada estadística de abajo.

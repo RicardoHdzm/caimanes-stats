@@ -37,7 +37,7 @@ function formatGameDate(dateStr) {
 // resuelve contra PLAYERS para sacar la foto real. También acepta jugadores
 // de PLAYERS tal cual (con `.id` en vez de `.playerId`), por si se vuelve a
 // necesitar para algo que no sea una fila de stats.
-function playerFor(row) {
+export function playerFor(row) {
   return PLAYERS.find((pl) => pl.id === (row.playerId ?? row.id)) ?? row;
 }
 
@@ -47,7 +47,7 @@ function playerFor(row) {
 // individual y el comparador (ver js/views/jugador.js,
 // js/views/comparar.js). Sin esto, un jugador con foto propia subida desde
 // su perfil seguiría viéndose con sus iniciales aquí en Resumen.
-function avatarSlot(player, size) {
+export function avatarSlot(player, size) {
   const id = player.id ?? player.playerId;
   return `<a class="avatar-slot" href="#/jugador/${id}" data-avatar="${id}" data-size="${size}">${renderAvatar(player, size)}</a>`;
 }
@@ -55,7 +55,7 @@ function avatarSlot(player, size) {
 // Reemplaza los avatares de siempre (foto de data.js o iniciales, ya
 // pintados) por la foto personalizada de Storage cuando exista — lectura
 // pública (ver getAvatarUrl en js/db.js), así que corre con o sin sesión.
-async function hydrateAvatars(root) {
+export async function hydrateAvatars(root) {
   const slots = [...root.querySelectorAll("[data-avatar]")];
   await Promise.all(
     slots.map(async (slot) => {
@@ -88,11 +88,11 @@ function heroCardInnerHtml(icon, title, mainHtml, bodyHtml = "") {
   `;
 }
 
-function heroCardShell(icon, title, mainHtml, bodyHtml = "") {
+export function heroCardShell(icon, title, mainHtml, bodyHtml = "") {
   return `<div class="leader-card leader-card--hero">${heroCardInnerHtml(icon, title, mainHtml, bodyHtml)}</div>`;
 }
 
-function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
+export function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note }) {
   const [first, second, third] = list;
   if (!first) {
     return `
@@ -192,18 +192,30 @@ export function wireRsvp(cardEl, gameId) {
 export function renderResumen(container) {
   heading(container, "Resumen de temporada");
 
-  // `games`: solo temporada regular actual — récord, rachas y forma del
-  // equipo (lo que cuenta para la tabla de la liga). `statGames`: regular +
-  // playoffs — stats de equipo, líderes y récords de jugadores (los
-  // playoffs también cuentan para los números de cada jugador). Ver
-  // currentSeasonGames / seasonStatGames en js/stats.js.
-  const games = currentSeasonGames();
-  const statGames = seasonStatGames();
-
   // Los anuncios del equipo ya NO viven aquí — se movieron al muro de Inicio
   // (ver js/views/feed.js). Esta pestaña ("Resumen") quedó solo con las
   // stats.
+  renderSeasonCards(container, {
+    games: currentSeasonGames(),
+    statGames: seasonStatGames(),
+    leaguePosition: TEAM.leaguePosition,
+    leagueTeams: TEAM.leagueTeams,
+    gamesInSeason: TEAM.gamesInSeason,
+  });
+}
 
+// Todas las tarjetas de Resumen (récord, rachas, stats de equipo, líderes,
+// récords) para UNA temporada — la usa Resumen con la actual y "Temporadas
+// anteriores" (js/views/temporadas.js) con una ya cerrada, a como quedó al
+// final (`final: true`: sin "Próximo juego", y las rachas se leen como
+// "final" en vez de "actual").
+//   games:     solo temporada regular — récord, rachas y forma del equipo
+//              (lo que cuenta para la tabla de la liga).
+//   statGames: regular + playoffs — stats de equipo, líderes y récords de
+//              jugadores (los playoffs también cuentan para los números de
+//              cada jugador). Ver currentSeasonGames / seasonStatGames en
+//              js/stats.js.
+export function renderSeasonCards(container, { games, statGames, leaguePosition, leagueTeams, gamesInSeason, final = false }) {
   // Mismas tarjetas "hero" que el resto de Resumen (ver heroCardShell) en
   // vez de .card/.card-icon — esas siguen usándose tal cual en otras
   // páginas (ver js/views/jugador.js, js/lineup.js), así que no se tocan;
@@ -217,8 +229,8 @@ export function renderResumen(container) {
     heroCardShell("fa-shield-halved", "Carreras permitidas", `<span class="leader-hero-value">${rec.RA}</span>`) +
     heroCardShell(
       "fa-ranking-star",
-      `Posición en la liga${TEAM.leagueTeams ? ` (de ${TEAM.leagueTeams})` : ""}`,
-      `<span class="leader-hero-value">${TEAM.leaguePosition ? `${TEAM.leaguePosition}°` : "—"}</span>`
+      `Posición en la liga${leagueTeams ? ` (de ${leagueTeams})` : ""}`,
+      `<span class="leader-hero-value">${leaguePosition ? `${leaguePosition}°` : "—"}</span>`
     );
   container.appendChild(cards);
 
@@ -227,8 +239,8 @@ export function renderResumen(container) {
 
   // El próximo juego va primero: es lo que más se consulta entre semana, y
   // en celular esta fila es un carrusel — lo importante debe estar a un
-  // deslizazo de distancia, no al final.
-  for (const g of SCHEDULE) {
+  // deslizazo de distancia, no al final. En una temporada cerrada no hay.
+  for (const g of final ? [] : SCHEDULE) {
     const next = document.createElement("div");
     next.className = "leader-card leader-card--hero";
     next.innerHTML = heroCardInnerHtml(
@@ -251,7 +263,7 @@ export function renderResumen(container) {
     streakCard.className = "leader-card leader-card--hero";
     streakCard.innerHTML = heroCardInnerHtml(
       STREAK_ICON[streak.type],
-      "Racha actual",
+      final ? "Racha final" : "Racha actual",
       `<span class="leader-hero-value">${streak.count}</span><span class="leader-hero-detail">${plural} seguida${streak.count === 1 ? "" : "s"}</span>`
     );
     bottomRow.appendChild(streakCard);
@@ -263,7 +275,7 @@ export function renderResumen(container) {
     form.className = "leader-card leader-card--hero";
     form.innerHTML = heroCardInnerHtml(
       "fa-clock-rotate-left",
-      "Racha reciente",
+      final ? "Últimos juegos" : "Racha reciente",
       "",
       `<div class="form-strip">
         ${recentGames
@@ -282,9 +294,9 @@ export function renderResumen(container) {
   gamesPlayedCard.innerHTML = heroCardInnerHtml(
     "fa-calendar-check",
     "Juegos jugados",
-    `<span class="leader-hero-value">${rec.G}/${TEAM.gamesInSeason}</span>`,
+    `<span class="leader-hero-value">${rec.G}/${gamesInSeason}</span>`,
     `<div class="progress-bar">
-      <div class="progress-fill" style="width: ${Math.min(100, (rec.G / TEAM.gamesInSeason) * 100)}%"></div>
+      <div class="progress-fill" style="width: ${gamesInSeason > 0 ? Math.min(100, (rec.G / gamesInSeason) * 100) : 0}%"></div>
     </div>`
   );
   bottomRow.appendChild(gamesPlayedCard);
@@ -386,7 +398,7 @@ export function renderResumen(container) {
   hydrateAvatars(leadersRow);
 
   // ---- Récords de temporada ----
-  const records = seasonRecords(statGames);
+  const records = seasonRecords(statGames, { final });
   if (records.length > 0) {
     const recordsHeading = document.createElement("h3");
     recordsHeading.textContent = "Récords de la temporada";

@@ -1,8 +1,19 @@
-import { GAMES, PLAYOFFS, SEASONS, CURRENT_SEASON, STANDINGS, STANDINGS_HISTORY } from "../data.js";
-import { battingTotals, pitchingTotals, fieldingTotals, teamRecord, gameResult, seasonStatGames } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada } from "../ui.js";
+import { GAMES, PLAYOFFS, SEASONS, CURRENT_SEASON, STANDINGS, STANDINGS_HISTORY, TEAM, PLAYERS } from "../data.js";
+import {
+  battingTotals,
+  pitchingTotals,
+  fieldingTotals,
+  gameResult,
+  seasonStatGames,
+  gamesPlayedByPlayer,
+  playerName,
+  rankAmong,
+} from "../stats.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada, escapeHtml } from "../ui.js";
 import { renderPlayoffEntry } from "./playoffs.js";
 import { renderStandingsTable } from "./standing.js";
+import { renderSeasonCards, teamLeaderCardHtml, avatarSlot, hydrateAvatars } from "./resumen.js";
+import { renderAchievements, sortedAchievementsHtml } from "./jugador.js";
 
 // "2026-07-21" -> "21 jul 2026" — chico a propósito, esta tabla es solo un
 // índice de juegos hacia su detalle real, no el box score.
@@ -27,22 +38,150 @@ function seasonLabel(n) {
   return meta ? `${ordinalTemporada(n)} Temporada: ${meta.league}` : `${ordinalTemporada(n)} Temporada`;
 }
 
-// Mismo armazón "hero" que usa Resumen para Récord/Carreras/etc. (ver
-// heroCardShell en js/views/resumen.js) — se duplica chico aquí en vez de
-// exportarlo, mismo criterio que ya usan formatGameDate y compañía en cada
-// vista.
-function heroCard(icon, title, value, detail) {
-  return `
-    <div class="leader-card leader-card--hero">
-      <div class="leader-hero">
-        <div class="leader-hero-main">
-          <h3><i class="fa-solid ${icon}"></i>${title}</h3>
-          <span class="leader-hero-value">${value}</span>
-          ${detail ? `<span class="leader-hero-detail">${detail}</span>` : ""}
+function sectionHeading(container, icon, text) {
+  const h3 = document.createElement("h3");
+  h3.innerHTML = `<i class="fa-solid ${icon}"></i> ${text}`;
+  container.appendChild(h3);
+}
+
+// MVPs de la temporada: el campo `mvp` de cada juego (MVP oficial, ver
+// GAMES en js/data.js) — tarjeta de líder (quién ganó más) + la lista
+// juego por juego. Sin ningún MVP capturado no se pinta nada.
+function renderMvpSummary(container, statGames) {
+  const withMvp = statGames.filter((g) => g.mvp).sort((a, b) => a.date.localeCompare(b.date));
+  if (withMvp.length === 0) return;
+
+  const counts = new Map();
+  for (const g of withMvp) counts.set(g.mvp, (counts.get(g.mvp) ?? 0) + 1);
+  const ranking = [...counts.entries()]
+    .map(([playerId, mvp]) => ({ playerId, name: playerName(playerId), mvp }))
+    .sort((a, b) => b.mvp - a.mvp);
+
+  sectionHeading(container, "fa-star", "MVPs de la temporada");
+  const row = document.createElement("div");
+  row.className = "leaders grid-2 tab-carousel";
+  row.innerHTML = teamLeaderCardHtml({
+    icon: "fa-star",
+    title: "Más veces MVP",
+    list: ranking,
+    valueOf: (p) => `${p.mvp} MVP${p.mvp === 1 ? "" : "s"}`,
+  });
+  container.appendChild(row);
+  hydrateAvatars(row);
+
+  const tableEl = document.createElement("div");
+  container.appendChild(tableEl);
+  renderSortableTable(tableEl, {
+    columns: [
+      { key: "date", label: "Fecha", sticky: true, render: (v) => formatShortDate(v) },
+      {
+        key: "opponent",
+        label: "Rival",
+        render: (v, row) =>
+          `${escapeHtml(v ?? "")}${row.playoff ? ' <span class="playoff-tag"><i class="fa-solid fa-trophy"></i> Playoffs</span>' : ""}`,
+      },
+      { key: "name", label: "MVP" },
+    ],
+    rows: withMvp.map((g) => ({ id: g.id, date: g.date, opponent: g.opponent, playoff: !!g.playoff, name: playerName(g.mvp) })),
+    defaultSort: "date",
+    defaultDir: 1,
+    onRowClick: (row) => {
+      location.hash = `#/juegos/${row.id}`;
+    },
+  });
+}
+
+// Top 5 de la temporada: mejor OPS entre los que jugaron la MITAD O MÁS de
+// los juegos de temporada regular — mismo criterio de "regular" que la
+// sugerencia de alineación (ver byRegularThenOps en js/lineup.js). Los
+// números (OPS, HR...) sí cuentan playoffs, igual que el resto de stats.
+function renderTopFive(container, games, statGames) {
+  const played = gamesPlayedByPlayer(games);
+  const minGames = games.length / 2;
+  const mvpCounts = new Map();
+  for (const g of statGames) if (g.mvp) mvpCounts.set(g.mvp, (mvpCounts.get(g.mvp) ?? 0) + 1);
+  const top = battingTotals(statGames)
+    .filter((r) => (played.get(r.playerId) ?? 0) >= minGames && r.AB > 0)
+    .sort((a, b) => Number(b.OPS) - Number(a.OPS))
+    .slice(0, 5)
+    .map((r, i) => ({ ...r, rank: i + 1, JJ: played.get(r.playerId) ?? 0, MVP: mvpCounts.get(r.playerId) ?? 0 }));
+  if (top.length === 0) return;
+
+  sectionHeading(container, "fa-ranking-star", "Top 5 de la temporada");
+  const columns = [
+    { key: "rank", label: "#", numeric: true, sticky: true },
+    { key: "name", label: "Jugador", sticky: true },
+    { key: "JJ", label: "JJ", full: "Juegos jugados en temporada regular", numeric: true },
+    { key: "AVG", label: "AVG", full: "Promedio de bateo", numeric: true },
+    { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
+    { key: "HR", label: "HR", full: "Home runs", numeric: true },
+    { key: "RBI", label: "RBI", full: "Impulsadas", numeric: true },
+    { key: "R", label: "R", full: "Carreras", numeric: true },
+    { key: "SB", label: "SB", full: "Bases robadas", numeric: true },
+    { key: "MVP", label: "MVP", full: "Veces MVP del juego", numeric: true },
+  ];
+  const tableEl = document.createElement("div");
+  container.appendChild(tableEl);
+  renderSortableTable(tableEl, {
+    columns,
+    rows: top,
+    defaultSort: "rank",
+    defaultDir: 1,
+    onRowClick: (row) => {
+      location.hash = `#/jugador/${row.playerId}`;
+    },
+  });
+}
+
+// Medallas de la temporada: las de cada jugador con los juegos de ESA
+// temporada (renderAchievements de js/views/jugador.js), sin las de
+// trayectoria/perfil que no dependen de la temporada (Veteran, Bon
+// voyage, Manager...) — se detectan corriendo el mismo cálculo sin juegos
+// y quitando lo que sale ahí. Starboy (top 3 en MVPs) se agrega aparte,
+// porque en el perfil sale de forma asíncrona.
+function renderSeasonMedals(container, statGames) {
+  const mvpCounts = new Map();
+  for (const g of statGames) if (g.mvp) mvpCounts.set(g.mvp, (mvpCounts.get(g.mvp) ?? 0) + 1);
+  const mvpList = [...mvpCounts.entries()].map(([playerId, mvpTotal]) => ({ playerId, mvpTotal }));
+  const PODIUM = { 1: "gold", 2: "silver", 3: "bronze" };
+
+  const rows = PLAYERS.map((player) => {
+    const timeless = new Set(renderAchievements(player, []).map((c) => c.label));
+    const chips = renderAchievements(player, statGames).filter((c) => !timeless.has(c.label));
+    const place = rankAmong(mvpList, player.id, "mvpTotal", "desc")?.place;
+    if (place && place <= 3) {
+      chips.push({
+        icon: "fa-solid fa-star",
+        label: "Starboy",
+        kind: PODIUM[place],
+        desc: `Premios MVP ganados esta temporada (${mvpCounts.get(player.id)}).`,
+      });
+    }
+    return { player, chips };
+  })
+    .filter((r) => r.chips.length > 0)
+    .sort((a, b) => b.chips.length - a.chips.length);
+  if (rows.length === 0) return;
+
+  sectionHeading(container, "fa-medal", "Medallas de la temporada");
+  const grid = document.createElement("div");
+  grid.className = "season-medals-grid";
+  grid.innerHTML = rows
+    .map(
+      ({ player, chips }) => `
+        <div class="leader-card season-medals-card">
+          <a class="season-medals-head" href="#/jugador/${player.id}">
+            ${avatarSlot(player, 40)}
+            <span class="season-medals-name">#${player.number ?? "-"} ${escapeHtml(player.name)}</span>
+            <span class="season-medals-count">${chips.length}</span>
+          </a>
+          <div class="achievements-grid">${sortedAchievementsHtml(chips)}</div>
         </div>
-      </div>
-    </div>
-  `;
+      `
+    )
+    .join("");
+  container.appendChild(grid);
+  hydrateAvatars(grid);
 }
 
 export function renderTemporadas(container, seasonParam) {
@@ -81,15 +220,29 @@ export function renderTemporadas(container, seasonParam) {
     return;
   }
 
-  // ---- Récord ----
-  const rec = teamRecord(games);
-  const recordRow = document.createElement("div");
-  recordRow.className = "leaders section-gap";
-  recordRow.innerHTML =
-    heroCard("fa-trophy", "Récord", `${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}`, `${rec.G} juego${rec.G === 1 ? "" : "s"}`) +
-    heroCard("fa-bolt", "Carreras anotadas", rec.RF) +
-    heroCard("fa-shield-halved", "Carreras permitidas", rec.RA);
-  container.appendChild(recordRow);
+  const statGames = seasonStatGames(season);
+  const isCurrent = season === CURRENT_SEASON;
+
+  // ---- Las mismas tarjetas de Resumen, a como quedaron al final ----
+  // (récord, rachas, stats de equipo, líderes, récords — ver
+  // renderSeasonCards en js/views/resumen.js). La posición en la liga sale
+  // de la tabla final guardada (STANDINGS_HISTORY, fila `us`).
+  const finalTable = isCurrent ? null : STANDINGS_HISTORY[season];
+  renderSeasonCards(container, {
+    games,
+    statGames,
+    final: !isCurrent,
+    leaguePosition: isCurrent ? TEAM.leaguePosition : finalTable?.teams.find((t) => t.us)?.pos ?? null,
+    leagueTeams: isCurrent ? TEAM.leagueTeams : finalTable?.teams.length ?? null,
+    // Una temporada cerrada ya jugó todos sus juegos: el total es lo que
+    // hay capturado (TEAM.gamesInSeason es solo el de la actual).
+    gamesInSeason: isCurrent ? TEAM.gamesInSeason : games.length,
+  });
+
+  // ---- Resumen: MVPs, top 5 y medallas ----
+  renderMvpSummary(container, statGames);
+  renderTopFive(container, games, statGames);
+  renderSeasonMedals(container, statGames);
 
   // ---- Playoffs de esa temporada, si los hubo ----
   const playoffEntry = PLAYOFFS.find((p) => p.season === season);

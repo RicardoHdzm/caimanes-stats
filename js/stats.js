@@ -453,7 +453,8 @@ export function hitStreaks(games = GAMES) {
 // particular. `runnersUp` trae hasta 2 renglones de 2do/3er lugar
 // ({ playerId?, name, value }) — sin `playerId` en los récords de equipo,
 // donde el 2do/3er lugar es otro juego, no otro jugador.
-export function seasonRecords(games = GAMES) {
+// `final: true` (temporada ya cerrada): ninguna racha "sigue activa".
+export function seasonRecords(games = GAMES, { final = false } = {}) {
   const records = [];
   const gameLabel = (g) => `vs ${g.opponent} · ${g.date}`;
 
@@ -542,10 +543,10 @@ export function seasonRecords(games = GAMES) {
       value: `${longest} juego${longest === 1 ? "" : "s"}`,
       detail: namesLabel(tied),
       note: solo
-        ? solo.active
+        ? solo.active && !final
           ? "Sigue activa"
           : "Ya terminó"
-        : `${tied.length} empatados${anyActive ? ", sigue activa" : ""}`,
+        : `${tied.length} empatados${anyActive && !final ? ", sigue activa" : ""}`,
       playerId: solo?.playerId,
       playerIds: tied.map((s) => s.playerId),
       runnersUp,

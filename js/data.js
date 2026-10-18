@@ -8,10 +8,10 @@ export const TEAM = {
   name: "Caimanes de Villas",
   season: "2026",
   league: "Liga Valle Alto",
-  seasonsInLeague: 4, // temporadas jugando en esta liga
-  seasonsTotal: 8, // temporadas del equipo en total
+  seasonsInLeague: 5, // temporadas jugando en esta liga
+  seasonsTotal: 9, // temporadas del equipo en total
   gamesInSeason: 10, // juegos de temporada regular, sin contar playoffs
-  leaguePosition: 6, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
+  leaguePosition: null, // lugar actual en la tabla de posiciones (null = aún no lo tienes)
   leagueTeams: 17, // total de equipos en la liga
 };
 
@@ -28,7 +28,8 @@ export const SEASONS = [
   { year: 2025, league: "Liga Valle Alto" }, // 5
   { year: 2025, league: "Liga Valle Alto" }, // 6
   { year: 2026, league: "Liga Valle Alto" }, // 7
-  { year: 2026, league: "Liga Valle Alto" }, // 8 (actual)
+  { year: 2026, league: "Liga Valle Alto" }, // 8
+  { year: 2026, league: "Liga Valle Alto" }, // 9 (actual)
 ];
 
 // La temporada actual — por convención, siempre SEASONS.length ===
@@ -100,6 +101,7 @@ export const PLAYERS = [
 // queda tal cual, como historial.
 export const DUES_PAID = {
   8: {},
+  9: {},
 };
 
 // Ids de jugadores que se lesionaron durante la temporada — a mano, no hay
@@ -910,26 +912,8 @@ export const PLAYOFFS = [
 //       los nombres a su manera y un cambio de su lado dejaría de marcarnos
 //       sin que nada avise.
 export const STANDINGS = {
-  updated: "2026-10-05", // fecha de corte de esta tabla — final de temporada regular
-  teams: [
-    { pos: 1, team: "Ni Parientes Somos", JJ: 10, JG: 9, JE: 0, JP: 1, CF: 101, CC: 68 },
-    { pos: 2, team: "Caguamigos", JJ: 10, JG: 8, JE: 0, JP: 2, CF: 102, CC: 72 },
-    { pos: 3, team: "Jolinos", JJ: 10, JG: 7, JE: 0, JP: 3, CF: 90, CC: 84 },
-    { pos: 4, team: "Los Camarones", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 98, CC: 76 },
-    { pos: 5, team: "Parkers", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 129, CC: 105 },
-    { pos: 6, team: "Caimanes de Villas", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 123, us: true },
-    { pos: 7, team: "Gallos", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 131 },
-    { pos: 8, team: "Tamagochis", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 111, CC: 111 },
-    { pos: 9, team: "Bandidos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 93, CC: 91 },
-    { pos: 10, team: "Padres de Sandiego", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 106, CC: 107 },
-    { pos: 11, team: "Primos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 125, CC: 91 },
-    { pos: 12, team: "D Backs", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 84, CC: 100 },
-    { pos: 13, team: "Rockin Roll", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 113, CC: 112 },
-    { pos: 14, team: "Muñekos", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 112, CC: 121 },
-    { pos: 15, team: "Bronx", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 86, CC: 161 },
-    { pos: 16, team: "Sox", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 88, CC: 101 },
-    { pos: 17, team: "Pichichi Blue Jeys", JJ: 10, JG: 1, JE: 0, JP: 9, CF: 52, CC: 114 },
-  ],
+  updated: null, // fecha de corte de esta tabla
+  teams: [],
 };
 
 // Tabla final de temporadas YA CERRADAS — STANDINGS (arriba) siempre es la
@@ -943,7 +927,30 @@ export const STANDINGS = {
 // export const STANDINGS_HISTORY = {
 //   8: { updated: "2026-09-20", teams: [ ...copia de STANDINGS... ] },
 // };
-export const STANDINGS_HISTORY = {};
+export const STANDINGS_HISTORY = {
+  8: {
+    updated: "2026-10-05", // fecha de corte de esta tabla — final de temporada regular
+    teams: [
+      { pos: 1, team: "Ni Parientes Somos", JJ: 10, JG: 9, JE: 0, JP: 1, CF: 101, CC: 68 },
+      { pos: 2, team: "Caguamigos", JJ: 10, JG: 8, JE: 0, JP: 2, CF: 102, CC: 72 },
+      { pos: 3, team: "Jolinos", JJ: 10, JG: 7, JE: 0, JP: 3, CF: 90, CC: 84 },
+      { pos: 4, team: "Los Camarones", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 98, CC: 76 },
+      { pos: 5, team: "Parkers", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 129, CC: 105 },
+      { pos: 6, team: "Caimanes de Villas", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 123, us: true },
+      { pos: 7, team: "Gallos", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 131 },
+      { pos: 8, team: "Tamagochis", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 111, CC: 111 },
+      { pos: 9, team: "Bandidos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 93, CC: 91 },
+      { pos: 10, team: "Padres de Sandiego", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 106, CC: 107 },
+      { pos: 11, team: "Primos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 125, CC: 91 },
+      { pos: 12, team: "D Backs", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 84, CC: 100 },
+      { pos: 13, team: "Rockin Roll", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 113, CC: 112 },
+      { pos: 14, team: "Muñekos", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 112, CC: 121 },
+      { pos: 15, team: "Bronx", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 86, CC: 161 },
+      { pos: 16, team: "Sox", JJ: 10, JG: 3, JE: 0, JP: 7, CF: 88, CC: 101 },
+      { pos: 17, team: "Pichichi Blue Jeys", JJ: 10, JG: 1, JE: 0, JP: 9, CF: 52, CC: 114 },
+    ],
+  },
+};
 
 // Patrocinadores — se ven como una tira de logos al final de cada página
 // (ver #footer-sponsors en index.html, pintada por js/main.js). Cada
