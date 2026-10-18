@@ -4897,17 +4897,28 @@ a.comment-author-name:hover {
   margin-bottom: 18px;
 }
 
+/* Foto · nombre · conteo: el nombre se estira (flex: 1) para mandar el
+   conteo a la orilla derecha, y una línea abajo separa el encabezado de
+   las medallas. */
 .season-medals-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--text);
-  text-decoration: none;
+  gap: 14px;
+  padding-bottom: 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 .season-medals-name {
   flex: 1;
+  min-width: 0;
   font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.season-medals-name:hover {
+  color: var(--accent-text);
 }
 
 .season-medals-count {
@@ -4945,4 +4956,10 @@ a.comment-author-name:hover {
     border-radius: 14px;
     font-size: 1.15rem;
   }
+}
+
+/* Separa la tarjeta "Más veces MVP" de la tabla de MVPs juego por juego
+   (ver renderMvpSummary en js/views/temporadas.js). */
+.mvp-summary-row {
+  margin-bottom: 22px;
 }

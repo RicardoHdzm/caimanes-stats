@@ -59,7 +59,7 @@ function renderMvpSummary(container, statGames) {
 
   sectionHeading(container, "fa-star", "MVPs de la temporada");
   const row = document.createElement("div");
-  row.className = "leaders grid-2 tab-carousel";
+  row.className = "leaders grid-2 tab-carousel mvp-summary-row";
   row.innerHTML = teamLeaderCardHtml({
     icon: "fa-star",
     title: "Más veces MVP",
@@ -170,11 +170,11 @@ function renderSeasonMedals(container, statGames) {
     .map(
       ({ player, chips }) => `
         <div class="leader-card season-medals-card">
-          <a class="season-medals-head" href="#/jugador/${player.id}">
+          <div class="season-medals-head">
             ${avatarSlot(player, 40)}
-            <span class="season-medals-name">#${player.number ?? "-"} ${escapeHtml(player.name)}</span>
-            <span class="season-medals-count">${chips.length}</span>
-          </a>
+            <a class="season-medals-name" href="#/jugador/${player.id}">#${player.number ?? "-"} ${escapeHtml(player.name)}</a>
+            <span class="season-medals-count" title="Medallas">${chips.length}</span>
+          </div>
           <div class="achievements-grid">${sortedAchievementsHtml(chips)}</div>
         </div>
       `
