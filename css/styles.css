@@ -2584,11 +2584,17 @@ main h3::before {
   font-size: var(--text-xs);
 }
 
-/* Sin esto el ícono hereda el line-height de la celda y queda un poco
-   arriba del centro del círculo. */
-.dues-icon i {
+/* ✓ / ✕ en SVG (ver DUES_SVG en js/views/roster.js) — trazo del color del
+   círculo, centrado exacto. */
+.dues-icon svg {
   display: block;
-  line-height: 1;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .dues-icon-paid {

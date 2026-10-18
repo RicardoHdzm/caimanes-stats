@@ -28,12 +28,21 @@ function playerPositions(player) {
 // no de Supabase, así que para cambiarlo hay que editar ese archivo, no
 // esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
 // a haber una fuente que pueda fallar; hoy nunca pasa.
+//
+// La ✓ / ✕ van en SVG (no ícono de Font Awesome): el glifo de la fuente
+// trae sus propias métricas y quedaba un pelo descentrado dentro del
+// círculo; dibujado en un viewBox de 12×12 queda exacto.
+const DUES_SVG = {
+  check: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3 5 8.7 9.5 3.6"/></svg>',
+  x: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.2 3.2 8.8 8.8M8.8 3.2 3.2 8.8"/></svg>',
+};
+
 function renderDuesCell(playerId, duesMap) {
-  if (!duesMap) return '<span class="dues-icon dues-icon-unknown" title="Sin dato"><i class="fa-solid fa-question"></i></span>';
+  if (!duesMap) return '<span class="dues-icon dues-icon-unknown" title="Sin dato">?</span>';
   const paid = duesMap.get(playerId) ?? false;
   return paid
-    ? '<span class="dues-icon dues-icon-paid" title="Pagada"><i class="fa-solid fa-check"></i></span>'
-    : '<span class="dues-icon dues-icon-unpaid" title="Pendiente"><i class="fa-solid fa-xmark"></i></span>';
+    ? `<span class="dues-icon dues-icon-paid" title="Pagada">${DUES_SVG.check}</span>`
+    : `<span class="dues-icon dues-icon-unpaid" title="Pendiente">${DUES_SVG.x}</span>`;
 }
 
 export function renderRoster(container) {
