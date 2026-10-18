@@ -2584,6 +2584,13 @@ main h3::before {
   font-size: var(--text-xs);
 }
 
+/* Sin esto el ícono hereda el line-height de la celda y queda un poco
+   arriba del centro del círculo. */
+.dues-icon i {
+  display: block;
+  line-height: 1;
+}
+
 .dues-icon-paid {
   border-color: var(--win);
   color: var(--win);
