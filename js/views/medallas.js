@@ -115,11 +115,10 @@ async function getAsyncLabels(player) {
   const prof = cachedProfile(player.id);
   if (prof?.birthdayMonth && prof?.birthdayDay) labels.push("HBD");
 
-  if (getSession()) {
-    const paid = await getDuesForPlayer(player.id);
-    if (paid === true) labels.push("Rich kid");
-    if (paid === false) labels.push("Moroso");
-  }
+  // Inscripción — pública, igual que en el Roster y el perfil.
+  const paid = await getDuesForPlayer(player.id);
+  if (paid === true) labels.push("Rich kid");
+  if (paid === false) labels.push("Moroso");
 
   const announcements = await getAnnouncements(1000);
   if (announcements.length > 0) {

@@ -84,22 +84,15 @@ export function renderRoster(container) {
     },
   ];
 
-  // La columna de inscripción solo se agrega con sesión iniciada — sin
-  // cuenta, el roster se ve exactamente igual que siempre. OJO: se usa
-  // getSession() (¿hay cuenta?), no getCurrentPlayerId() (¿a qué jugador
-  // corresponde esa cuenta?) — alguien puede tener cuenta antes de que el
-  // coach termine de vincularla en player_whitelist, y aun así debe poder
-  // verla.
+  // Columna de inscripción — visible para TODOS (con o sin sesión), a
+  // petición expresa. Sale de DUES_PAID en js/data.js (ver getDuesMap).
   let duesMap = null;
-  const loggedIn = !!getSession();
-  if (loggedIn) {
-    columns.push({
-      key: "paid",
-      label: "Inscripción",
-      full: "Inscripción de temporada pagada",
-      render: (_value, row) => renderDuesCell(row.id, duesMap),
-    });
-  }
+  columns.push({
+    key: "paid",
+    label: "Inscripción",
+    full: "Inscripción de temporada pagada",
+    render: (_value, row) => renderDuesCell(row.id, duesMap),
+  });
 
   const tableEl = document.createElement("div");
   container.appendChild(tableEl);
@@ -139,12 +132,10 @@ export function renderRoster(container) {
   // se dibuja de una. La inscripción (getDuesMap) sale de DUES_PAID en
   // data.js — resuelve en el mismo tick, imperceptible.
   draw();
-  if (loggedIn) {
-    getDuesMap().then((map) => {
-      duesMap = map;
-      draw();
-    });
-  }
+  getDuesMap().then((map) => {
+    duesMap = map;
+    draw();
+  });
 
   renderGlossary(container, columns);
 }

@@ -1011,16 +1011,14 @@ export function renderJugadorDetalle(container, playerId) {
     wireRsvp(summaryEl, g.id);
   }
 
-  // ---- Medalla de inscripción (Rich kid/Moroso): solo con sesión iniciada ----
+  // ---- Medalla de inscripción (Rich kid/Moroso): visible para todos ----
   //
   // El badge visual "Inscripción: Pagada/Sin pagar" que vivía aquí (esquina
   // superior derecha) se quitó a petición expresa — el Debut lo reemplazó
   // en ese lugar (ver arriba). Esto se queda solo para seguir agregando la
-  // medalla del Medallero, con la misma regla de siempre: se comprueba
-  // getSession() (¿hay cuenta?), no getCurrentPlayerId(), para que también
-  // se vea antes de que el coach termine de vincular la cuenta en
-  // player_whitelist.
-  if (getSession()) {
+  // medalla del Medallero. Pública (con o sin sesión), a petición expresa,
+  // igual que la columna de Inscripción del Roster.
+  {
     getDuesForPlayer(player.id).then((paid) => {
       // `paid` ya no puede salir null (no hay red de por medio, ver
       // DUES_PAID en js/data.js), pero se deja el chequeo por si algún día
