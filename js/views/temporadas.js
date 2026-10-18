@@ -184,7 +184,7 @@ function renderSeasonMedals(container, statGames) {
   hydrateAvatars(grid);
 }
 
-export function renderTemporadas(container, seasonParam) {
+export function renderTemporadas(container, seasonParam, tabParam) {
   heading(container, "Temporadas anteriores");
 
   const requested = Number(seasonParam);
@@ -223,12 +223,53 @@ export function renderTemporadas(container, seasonParam) {
   const statGames = seasonStatGames(season);
   const isCurrent = season === CURRENT_SEASON;
 
+  // Pestañas para no mostrar todo de una (a petición expresa), cada una con
+  // lo que va relacionado: Resumen (las tarjetas de Resumen a como quedaron)
+  // · Destacados (MVPs, top 5, medallas) · Liga (playoffs + tabla de
+  // posiciones) · Estadísticas (bateo, pitcheo, fildeo) · Juegos. Mismo
+  // selector que la pestaña Estadísticas (.stats-switcher). Se pinta todo de
+  // una vez y solo se muestra/oculta cada panel; la pestaña elegida va en la
+  // URL (#/temporadas/8/destacados) para poder compartirla.
+  const TABS = [
+    { id: "resumen", label: "Resumen", icon: "fa-chart-line" },
+    { id: "destacados", label: "Destacados", icon: "fa-star" },
+    { id: "liga", label: "Liga", icon: "fa-ranking-star" },
+    { id: "stats", label: "Estadísticas", icon: "fa-chart-simple" },
+    { id: "juegos", label: "Juegos", icon: "fa-baseball-bat-ball" },
+  ];
+  const switcher = document.createElement("div");
+  switcher.className = "stats-switcher temporada-tabs";
+  switcher.innerHTML = TABS.map(
+    (t) => `
+      <button type="button" class="stats-switcher-btn" data-tab="${t.id}">
+        <span class="stats-switcher-icon"><i class="fa-solid ${t.icon}"></i></span>
+        <span>${t.label}</span>
+      </button>
+    `
+  ).join("");
+  container.appendChild(switcher);
+  const panels = {};
+  for (const t of TABS) {
+    panels[t.id] = document.createElement("div");
+    panels[t.id].className = "temporada-panel";
+    container.appendChild(panels[t.id]);
+  }
+  function showTab(id) {
+    history.replaceState(null, "", `#/temporadas/${season}/${id}`);
+    for (const btn of switcher.querySelectorAll(".stats-switcher-btn")) btn.classList.toggle("active", btn.dataset.tab === id);
+    for (const t of TABS) panels[t.id].hidden = t.id !== id;
+  }
+  switcher.addEventListener("click", (e) => {
+    const btn = e.target.closest(".stats-switcher-btn");
+    if (btn && !btn.classList.contains("active")) showTab(btn.dataset.tab);
+  });
+
   // ---- Las mismas tarjetas de Resumen, a como quedaron al final ----
   // (récord, rachas, stats de equipo, líderes, récords — ver
   // renderSeasonCards en js/views/resumen.js). La posición en la liga sale
   // de la tabla final guardada (STANDINGS_HISTORY, fila `us`).
   const finalTable = isCurrent ? null : STANDINGS_HISTORY[season];
-  renderSeasonCards(container, {
+  renderSeasonCards(panels.resumen, {
     games,
     statGames,
     final: !isCurrent,
@@ -240,17 +281,17 @@ export function renderTemporadas(container, seasonParam) {
   });
 
   // ---- Resumen: MVPs, top 5 y medallas ----
-  renderMvpSummary(container, statGames);
-  renderTopFive(container, games, statGames);
-  renderSeasonMedals(container, statGames);
+  renderMvpSummary(panels.destacados, statGames);
+  renderTopFive(panels.destacados, games, statGames);
+  renderSeasonMedals(panels.destacados, statGames);
 
   // ---- Playoffs de esa temporada, si los hubo ----
   const playoffEntry = PLAYOFFS.find((p) => p.season === season);
   if (playoffEntry && playoffEntry.rounds.length > 0) {
     const h3 = document.createElement("h3");
     h3.innerHTML = '<i class="fa-solid fa-trophy"></i> Playoffs';
-    container.appendChild(h3);
-    renderPlayoffEntry(container, playoffEntry);
+    panels.liga.appendChild(h3);
+    renderPlayoffEntry(panels.liga, playoffEntry);
   }
 
   // ---- Tabla de posiciones ----
@@ -261,9 +302,9 @@ export function renderTemporadas(container, seasonParam) {
   // cuando no hay una capturada.
   const standingsHeading = document.createElement("h3");
   standingsHeading.textContent = "Tabla de posiciones";
-  container.appendChild(standingsHeading);
+  panels.liga.appendChild(standingsHeading);
   renderStandingsTable(
-    container,
+    panels.liga,
     season === CURRENT_SEASON ? STANDINGS : STANDINGS_HISTORY[season],
     season === CURRENT_SEASON
       ? undefined
@@ -273,7 +314,7 @@ export function renderTemporadas(container, seasonParam) {
   // ---- Bateo ----
   const battingHeading = document.createElement("h3");
   battingHeading.textContent = "Bateo";
-  container.appendChild(battingHeading);
+  panels.stats.appendChild(battingHeading);
   const battingColumns = [
     { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
@@ -287,7 +328,7 @@ export function renderTemporadas(container, seasonParam) {
     { key: "OPS", label: "OPS", full: "OBP + SLG", numeric: true },
   ];
   const battingEl = document.createElement("div");
-  container.appendChild(battingEl);
+  panels.stats.appendChild(battingEl);
   renderSortableTable(battingEl, {
     columns: battingColumns,
     rows: battingTotals(seasonStatGames(season)),
@@ -296,12 +337,12 @@ export function renderTemporadas(container, seasonParam) {
       location.hash = `#/jugador/${row.playerId}`;
     },
   });
-  renderGlossary(container, battingColumns);
+  renderGlossary(panels.stats, battingColumns);
 
   // ---- Pitcheo ----
   const pitchingHeading = document.createElement("h3");
   pitchingHeading.textContent = "Pitcheo";
-  container.appendChild(pitchingHeading);
+  panels.stats.appendChild(pitchingHeading);
   const pitchingColumns = [
     { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
@@ -312,7 +353,7 @@ export function renderTemporadas(container, seasonParam) {
     { key: "ERA", label: "ERA", full: "Efectividad", numeric: true },
   ];
   const pitchingEl = document.createElement("div");
-  container.appendChild(pitchingEl);
+  panels.stats.appendChild(pitchingEl);
   renderSortableTable(pitchingEl, {
     columns: pitchingColumns,
     rows: pitchingTotals(seasonStatGames(season)),
@@ -322,12 +363,12 @@ export function renderTemporadas(container, seasonParam) {
       location.hash = `#/jugador/${row.playerId}`;
     },
   });
-  renderGlossary(container, pitchingColumns);
+  renderGlossary(panels.stats, pitchingColumns);
 
   // ---- Fildeo ----
   const fieldingHeading = document.createElement("h3");
   fieldingHeading.textContent = "Fildeo";
-  container.appendChild(fieldingHeading);
+  panels.stats.appendChild(fieldingHeading);
   const fieldingColumns = [
     { key: "name", label: "Jugador", sticky: true },
     { key: "G", label: "J", full: "Juegos jugados", numeric: true },
@@ -337,7 +378,7 @@ export function renderTemporadas(container, seasonParam) {
     { key: "FPCT", label: "FPCT", full: "Porcentaje de fildeo", numeric: true },
   ];
   const fieldingEl = document.createElement("div");
-  container.appendChild(fieldingEl);
+  panels.stats.appendChild(fieldingEl);
   renderSortableTable(fieldingEl, {
     columns: fieldingColumns,
     rows: fieldingTotals(seasonStatGames(season)),
@@ -346,12 +387,12 @@ export function renderTemporadas(container, seasonParam) {
       location.hash = `#/jugador/${row.playerId}`;
     },
   });
-  renderGlossary(container, fieldingColumns);
+  renderGlossary(panels.stats, fieldingColumns);
 
   // ---- Juegos de la temporada ----
   const gamesHeading = document.createElement("h3");
   gamesHeading.textContent = "Juegos (clic en uno para ver el detalle)";
-  container.appendChild(gamesHeading);
+  panels.juegos.appendChild(gamesHeading);
   const gamesColumns = [
     // `date` se guarda como ISO (ordena bien como string) — formatShortDate
     // solo cambia cómo se VE, vía `render`, igual que coloredStat en otras
@@ -372,7 +413,7 @@ export function renderTemporadas(container, seasonParam) {
     };
   });
   const gamesEl = document.createElement("div");
-  container.appendChild(gamesEl);
+  panels.juegos.appendChild(gamesEl);
   renderSortableTable(gamesEl, {
     columns: gamesColumns,
     rows: gamesRows,
@@ -382,4 +423,6 @@ export function renderTemporadas(container, seasonParam) {
       location.hash = `#/juegos/${row.id}`;
     },
   });
+
+  showTab(TABS.some((t) => t.id === tabParam) ? tabParam : "resumen");
 }

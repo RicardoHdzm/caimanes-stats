@@ -190,7 +190,7 @@ function currentRoute() {
   // muestra la más reciente con juegos capturados, ver defaultSeason en
   // js/views/temporadas.js).
   if (first === "temporadas") {
-    return { tab: "temporadas", render: (container) => renderTemporadas(container, second) };
+    return { tab: "temporadas", render: (container) => renderTemporadas(container, second, third) };
   }
   // #/estadisticas/bateo — Bateo, Pitcheo y Fildeo unificados en una sola
   // pestaña con selector (ver js/views/estadisticas.js). Los links viejos

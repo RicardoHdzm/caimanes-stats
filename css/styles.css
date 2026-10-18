@@ -4925,3 +4925,24 @@ a.comment-author-name:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* Pestañas de "Temporadas anteriores" (ver TABS en js/views/temporadas.js)
+   — mismo selector que Estadísticas, pero son 5: en celular se achican
+   para que quepan en un solo renglón. */
+@media (max-width: 640px) {
+  .temporada-tabs {
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .temporada-tabs .stats-switcher-btn {
+    width: 64px;
+  }
+
+  .temporada-tabs .stats-switcher-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 1.15rem;
+  }
+}
