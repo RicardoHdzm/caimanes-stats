@@ -1,6 +1,7 @@
 import { ROSTER } from "./data.js";
 import { DEFENSE_POSITIONS, registeredFieldPositions, renderLineupResult } from "./lineup.js";
 import { initAuth } from "./auth.js";
+import { displayPositions } from "./stats.js";
 import { getAllPositionOverrides } from "./db.js";
 
 const listEl = document.getElementById("attendee-list");
@@ -17,9 +18,13 @@ await initAuth();
 // nada más en esta página compitiendo por pintar primero (a diferencia del
 // SPA, aquí no hay un primer pintado instantáneo que proteger).
 const positionOverrides = await getAllPositionOverrides();
-const roster = ROSTER.map((p) => (positionOverrides.has(p.id) ? { ...p, position: positionOverrides.get(p.id) } : p)).sort(
-  (a, b) => a.name.localeCompare(b.name, "es")
-);
+// `position` = las MÁS JUGADAS (ver displayPositions en js/stats.js) — la
+// del selector por default y las de "Más jugadas" salen de ahí; la
+// registrada queda en `registeredPosition`.
+const roster = ROSTER.map((p) => {
+  const registered = positionOverrides.get(p.id) ?? p.position ?? "";
+  return { ...p, registeredPosition: registered, position: displayPositions(p.id, registered) };
+}).sort((a, b) => a.name.localeCompare(b.name, "es"));
 const entries = []; // { player, checkbox, select }
 
 function updateCount() {
@@ -27,7 +32,7 @@ function updateCount() {
   countEl.textContent = `${n} de ${roster.length} seleccionados`;
 }
 
-// El selector de posición: primero sus posiciones registradas en el roster
+// El selector de posición: primero sus posiciones más jugadas
 // (lo más probable), luego el resto por si hoy juega en otro lado, y al
 // final "sin posición" para dejarle la decisión al algoritmo.
 function buildPositionSelect(player) {
@@ -39,7 +44,7 @@ function buildPositionSelect(player) {
 
   if (registered.length > 0) {
     const group = document.createElement("optgroup");
-    group.label = "Registradas";
+    group.label = "Más jugadas";
     for (const pos of registered) {
       const opt = document.createElement("option");
       opt.value = pos;

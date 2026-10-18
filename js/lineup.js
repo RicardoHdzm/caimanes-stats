@@ -97,6 +97,22 @@ export function assignDefense(roster, statsById) {
 
   fillWith(roster.filter((p) => statsFor(p).regular));
   fillWith(roster);
+
+  // Último recurso: `position` trae las posiciones MÁS JUGADAS (ver
+  // displayPositions en js/stats.js), que pueden ser solo 1 o 2 — si con
+  // eso alguna posición se quedó sin nadie, se intenta con las REGISTRADAS
+  // (`registeredPosition`, data.js/perfil) de quien siga libre.
+  for (const pos of DEFENSE_POSITIONS) {
+    if (assignment[pos]) continue;
+    const candidates = roster
+      .filter((p) => positionsOf(p.registeredPosition).includes(pos) && !used.has(p.id))
+      .map(statsFor)
+      .sort(byRegularThenOps);
+    if (candidates[0]) {
+      assignment[pos] = candidates[0];
+      used.add(candidates[0].playerId);
+    }
+  }
   for (const pos of DEFENSE_POSITIONS) assignment[pos] ??= null;
   return assignment;
 }
