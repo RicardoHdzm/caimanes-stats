@@ -89,6 +89,9 @@
   --radius-pill: 999px;
 
   --shadow-card: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+  /* Sombra del degradado de las tarjetas "hero" (.leader-hero /
+     .record-hero — líderes, récords, Resumen). */
+  --hero-shade: rgba(0, 0, 0, 0.35);
   --shadow-raised: 0 12px 28px -14px rgba(0, 0, 0, 0.7);
 
   /* Velo de las filas pares. A 0.015 la diferencia era de 2 niveles por
@@ -147,6 +150,9 @@
   --bg-glow: #ffffff;
 
   --shadow-card: 0 8px 20px -12px rgba(20, 24, 28, 0.18);
+  /* En claro el negro al 35% dejaba las tarjetas grises — apenas un toque
+     de gris azulado, que se lee como degradado sin ensuciar el blanco. */
+  --hero-shade: rgba(20, 40, 70, 0.07);
   --shadow-raised: 0 12px 28px -14px rgba(20, 24, 28, 0.22);
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
@@ -2253,7 +2259,7 @@ main h3::before {
   justify-content: space-between;
   gap: 10px;
   padding: 16px 16px 14px;
-  background: linear-gradient(160deg, rgba(0, 0, 0, 0.35) 0%, transparent 65%), var(--surface);
+  background: linear-gradient(160deg, var(--hero-shade) 0%, transparent 65%), var(--surface);
 }
 
 .leader-hero-main {
@@ -3751,7 +3757,7 @@ button.mvp-vote-card:active {
   justify-content: space-between;
   gap: 14px;
   padding: 16px 16px 14px;
-  background: linear-gradient(160deg, rgba(0, 0, 0, 0.35) 0%, transparent 65%), var(--surface);
+  background: linear-gradient(160deg, var(--hero-shade) 0%, transparent 65%), var(--surface);
 }
 
 /* Rojo, mismo estilo que el resto de tarjetas hero de Resumen. */
