@@ -45,7 +45,8 @@ export function seasonStatGames(season = CURRENT_SEASON) {
 // campo — JD/JC no), "P" si aparece en `pitching`, y la posición de una
 // sustitución "campo" en la que entró. Empates: primero las del orden
 // registrado (data.js / perfil), luego el orden de campo. Sin juegos esta
-// temporada (arranque de temporada) se muestran las registradas.
+// temporada (arranque de temporada) se usan los de la temporada anterior
+// en la que jugó (ver displayPositions).
 const FIELD_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 const MAX_SHOWN_POSITIONS = 3;
 
@@ -69,14 +70,25 @@ export function playedPositionCounts(games) {
   return counts;
 }
 
-// Se calcula una sola vez por carga de página (GAMES no cambia en vivo).
-let currentSeasonPositionCounts = null;
+// Conteos por temporada, de la actual hacia atrás — se calculan una sola vez
+// por carga de página (GAMES no cambia en vivo).
+const positionCountsBySeason = new Map();
+function positionCountsOf(season) {
+  if (!positionCountsBySeason.has(season)) positionCountsBySeason.set(season, playedPositionCounts(seasonStatGames(season)));
+  return positionCountsBySeason.get(season);
+}
 
 // "2B/CF/SS" para mostrar — `registered` es la cadena registrada (override
-// del perfil o la de data.js), que se usa para desempatar y como respaldo.
+// del perfil o la de data.js), que se usa para desempatar y como último
+// respaldo. Si el jugador todavía no juega esta temporada (arranque de
+// temporada), se toman las más jugadas de la temporada MÁS RECIENTE en la
+// que sí jugó; solo si nunca ha jugado un juego capturado se muestra la
+// registrada.
 export function displayPositions(playerId, registered = "") {
-  currentSeasonPositionCounts ??= playedPositionCounts(seasonStatGames());
-  const counts = currentSeasonPositionCounts.get(playerId);
+  let counts = null;
+  for (let season = CURRENT_SEASON; season >= 1 && !counts?.size; season--) {
+    counts = positionCountsOf(season).get(playerId) ?? null;
+  }
   if (!counts || counts.size === 0) return registered ?? "";
   const regOrder = (registered ?? "").split("/").map((v) => v.trim());
   const tieRank = (pos) => {
