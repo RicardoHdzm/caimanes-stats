@@ -113,12 +113,14 @@ function comparisonBlock(title, rows, leftStats, rightStats) {
 }
 
 function playerHeader(player, played) {
+  // Las más jugadas esta temporada (ver displayPositions en js/stats.js).
+  const positions = displayPositions(player.id, player.position);
   return `
     <div class="compare-player">
       <span data-avatar="${player.id}">${renderAvatar(player, 72)}</span>
       <span class="compare-name">${player.name}</span>
       <span class="compare-number">#${player.number ?? "-"}</span>
-      <span class="compare-positions">${displayPositions(player.id, player.position) ? renderPositionBadges(displayPositions(player.id, player.position)) : ""}</span>
+      <span class="compare-positions">${positions ? renderPositionBadges(positions) : ""}</span>
       <span class="compare-games">${played} juego${played === 1 ? "" : "s"}</span>
     </div>
   `;
