@@ -419,7 +419,7 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1036862952326417",
   },
-    {
+  {
     id: "g5",
     season: 8,
     date: "2026-07-28",
@@ -531,7 +531,7 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1756467548693744/",
   },
-    {
+  {
     id: "g7",
     season: 8,
     date: "2026-08-20",
@@ -921,7 +921,7 @@ export const PLAYOFFS = [
 ];
 
 // Próximos juegos (todavía sin jugar, sin marcador).
- export const SCHEDULE = [
+export const SCHEDULE = [
    // `time` es opcional: si no lo pones, solo se muestra la fecha.
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
    // { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
@@ -988,9 +988,9 @@ export const STANDINGS_HISTORY = {
 // css/styles.css). `url` es opcional: sin él, el logo se ve pero no es
 // clicable.
 export const SPONSORS = [
-  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
   { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png" },
+  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
   { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png" },
   { name: "Valpro", logo: "assets/sponsors/sponsor004.png" },
-  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
 ];
