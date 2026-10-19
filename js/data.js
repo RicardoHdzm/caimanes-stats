@@ -989,8 +989,8 @@ export const STANDINGS_HISTORY = {
 // clicable.
 export const SPONSORS = [
   { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png" },
-  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
-  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
   { name: "Valpro", logo: "assets/sponsors/sponsor004.png" },
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
+  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
   { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png" },
 ];
