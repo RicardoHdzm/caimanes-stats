@@ -85,6 +85,8 @@ export const PLAYERS = [
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [2, 3, 4, 5, 6, 8, 9] },
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [1, 8] },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [8] },
+  { id: "p21", number: 0, name: "Alberto Solis", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 9] },
+  { id: "p22", number: 0, name: "Octavio Rodriguez", position: "CF/2B/SS", walkup: { title: "Canción", artist: "Artista" }, seasons: [9] },
 ];
 
 // Roster de la temporada ACTUAL: los de PLAYERS que traen CURRENT_SEASON en
