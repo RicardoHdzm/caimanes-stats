@@ -131,6 +131,8 @@ export const DUES_PAID = {
     p16: false, // Ruben Perez
     p17: false, // Teddy Sainz
     p18: false, // Javier Urquiza
+    p21: false,
+    p22: false,
   },
 };
 
