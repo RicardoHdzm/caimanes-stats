@@ -88,6 +88,7 @@ export const PLAYERS = [
   { id: "p21", number: 0, name: "Alberto Solis", position: "RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [7, 9] },
   { id: "p22", number: 0, name: "Octavio Rodriguez", position: "CF", walkup: { title: "Canción", artist: "Artista" }, seasons: [9] },
   { id: "p23", number: 0, name: "Emanuel Ramos", position: "RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [9] },
+  { id: "p24", number: 0, name: "Alex", position: "RF", walkup: { title: "Canción", artist: "Artista" }, seasons: [9] },
 ];
 
 // Roster de la temporada ACTUAL: los de PLAYERS que traen CURRENT_SEASON en
@@ -134,6 +135,7 @@ export const DUES_PAID = {
     p21: false, // Alberto Solis
     p22: false, // Octavio Rodriguez
     p23: false, // Emanuel Corrales
+    p24: false, // Alex
   },
 };
 
