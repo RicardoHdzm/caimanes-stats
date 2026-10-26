@@ -979,7 +979,7 @@ export const STANDINGS_HISTORY = {
       { pos: 7, team: "Gallos", JJ: 10, JG: 6, JE: 0, JP: 4, CF: 134, CC: 131 },
       { pos: 8, team: "Tamagochis", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 111, CC: 111 },
       { pos: 9, team: "Bandidos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 93, CC: 91 },
-      { pos: 10, team: "Padres de Sandiego", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 106, CC: 107 },
+      { pos: 10, team: "Padres de San Diego", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 106, CC: 107 },
       { pos: 11, team: "Primos", JJ: 10, JG: 5, JE: 0, JP: 5, CF: 125, CC: 91 },
       { pos: 12, team: "D Backs", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 84, CC: 100 },
       { pos: 13, team: "Rockin Roll", JJ: 10, JG: 4, JE: 0, JP: 6, CF: 113, CC: 112 },
