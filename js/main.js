@@ -1,4 +1,5 @@
-import { TEAM, SPONSORS } from "./data.js";
+import { TEAM, SPONSORS, SCHEDULE } from "./data.js";
+import { renderHome } from "./views/home.js";
 import { renderFeed } from "./views/feed.js";
 import { renderResumen } from "./views/resumen.js";
 import { renderRoster } from "./views/roster.js";
@@ -17,12 +18,16 @@ import { renderMedallasGuide } from "./views/medallas.js";
 import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut, leaveToSplash } from "./auth.js";
 import { getAvatarUrl } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
-import { ordinalTemporada } from "./ui.js";
+import { ordinalTemporada, escapeHtml } from "./ui.js";
+import { allStatGames, gameResult } from "./stats.js";
 import { initTheme } from "./theme.js";
 import { initSplash } from "./splash.js";
 import { initRecovery } from "./recovery.js";
 
 const routes = {
+  // Portada estilo lyon.gg (ver js/views/home.js) — la de todos, con o sin
+  // sesión: #/ o cualquier ruta desconocida cae aquí.
+  home: renderHome,
   inicio: renderFeed,
   resumen: renderResumen,
   roster: renderRoster,
@@ -51,6 +56,7 @@ const BOTTOM_TABS = [
 // luego lo de playoffs/stats (consulta más ocasional) y las herramientas
 // extra (Alineación, Playlist) al final.
 const MORE_TABS = [
+  { tab: "home", route: "#/", label: "Inicio", icon: "fa-house" },
   { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
@@ -71,7 +77,7 @@ const MORE_TABS = [
 // copiarlo a mano, para no desincronizarse si cambia esa lista — mismo
 // criterio (buscar "resumen" por tab, no por posición) que ya usa
 // buildBottomTabs() de abajo para insertar Mi Perfil.
-const APPS_GRID = [];
+const APPS_GRID = [{ tab: "home", route: "#/", label: "Inicio", icon: "fa-house" }];
 for (const t of BOTTOM_TABS) {
   APPS_GRID.push(t);
   if (t.tab === "inicio") {
@@ -205,7 +211,7 @@ function currentRoute() {
   if (first === "bateo" || first === "pitcheo" || first === "fildeo") {
     return { tab: "estadisticas", render: (container) => renderEstadisticas(container, first) };
   }
-  const tab = routes[first] ? first : "inicio";
+  const tab = routes[first] ? first : "home";
 
   // El Feed (js/views/feed.js) es exclusivo de cuentas con sesión, a
   // petición expresa. Sin sesión, su link no aparece (ver
@@ -215,7 +221,7 @@ function currentRoute() {
   // por "caimanes:auth-changed" ya muestra el Feed real cuando la sesión
   // resuelve.
   if (tab === "inicio" && !getSession()) {
-    return { tab: "resumen", render: routes.resumen };
+    return { tab: "home", render: routes.home };
   }
 
   return { tab, render: routes[tab] };
@@ -336,6 +342,53 @@ function toggleMoreSheet(forceOpen) {
   const open = forceOpen ?? moreSheet.hidden;
   moreSheet.hidden = !open;
   bottomTabs.querySelector('[data-tab="more"]')?.setAttribute("aria-expanded", String(open));
+  menuToggle?.setAttribute("aria-expanded", String(open));
+  // Sin scroll de la página de atrás mientras el menú (pantalla completa)
+  // está abierto.
+  document.body.classList.toggle("menu-open", open);
+}
+
+// Botón ☰ del header (estilo lyon.gg) — abre el mismo menú de pantalla
+// completa en escritorio y en celular; ya no hay pestañas visibles.
+const menuToggle = document.getElementById("menu-toggle");
+menuToggle?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  toggleMoreSheet();
+});
+
+// ---- Barra "Match Center" (arriba del header, estilo lyon.gg) ----
+// Resultados recientes + el próximo juego corriendo de lado. El contenido
+// va dos veces seguidas para que la animación (CSS) dé la vuelta sin brinco.
+function buildTicker() {
+  const el = document.getElementById("match-ticker");
+  if (!el) return;
+  const RESULT = { W: "Victoria", L: "Derrota", T: "Empate" };
+  const fmt = (d) => new Date(`${d}T00:00:00`).toLocaleDateString("es-MX", { weekday: "short", day: "numeric", month: "short" });
+  const today = new Date().toISOString().slice(0, 10);
+  const next = [...SCHEDULE].filter((g) => g.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0];
+  const recent = allStatGames()
+    .filter((g) => g.date && g.scoreUs != null)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 6);
+  const items = [];
+  if (next) {
+    const time = next.time
+      ? new Date(2000, 0, 1, ...next.time.split(":").map(Number)).toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true })
+      : "";
+    items.push(`<span class="ticker-item ticker-item--next">Próximo: <b>Caimanes vs ${escapeHtml(next.opponent ?? "")}</b> · ${fmt(next.date)}${time ? `, ${time}` : ""}</span>`);
+  }
+  for (const g of recent) {
+    const r = gameResult(g);
+    items.push(
+      `<a class="ticker-item" href="#/juegos/${g.id}"><b>Caimanes <i class="ticker-score ticker-score--${r}">${g.scoreUs}–${g.scoreThem}</i> ${escapeHtml(g.opponent ?? "")}</b> · ${RESULT[r] ?? ""}${g.playoff ? " · Playoffs" : ""}</a>`
+    );
+  }
+  if (!items.length) {
+    el.hidden = true;
+    return;
+  }
+  const run = items.join("");
+  el.innerHTML = `<span class="ticker-label">● Match Center</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
 }
 
 // Ya no hay "afuera" que tocar (es pantalla completa, ver CSS) — esto se
@@ -375,7 +428,7 @@ function render() {
   // grid de "Más"). currentRoute() ya manda al Resumen si se llega por URL
   // directa. La Playlist ya es pública.
   for (const el of [
-    tabs.querySelector('[data-route="inicio"]'),
+    tabs?.querySelector('[data-route="inicio"]'),
     bottomTabs.querySelector('[data-tab="inicio"]'),
     moreSheet.querySelector('[data-tab="inicio"]'),
   ]) {
@@ -387,14 +440,14 @@ function render() {
   // grid de "Más", "Resumen" se muestra siempre.
   const resumenBottom = bottomTabs.querySelector("#bottom-tab-resumen");
   if (resumenBottom) resumenBottom.hidden = !!session;
-  for (const el of [tabs.querySelector('[data-route="resumen"]'), moreSheet.querySelector('[data-tab="resumen"]')]) {
+  for (const el of [tabs?.querySelector('[data-route="resumen"]'), moreSheet.querySelector('[data-tab="resumen"]')]) {
     if (el) el.hidden = false;
   }
 
   const route = currentRoute();
   toggleMoreSheet(false);
 
-  for (const link of tabs.querySelectorAll("a")) {
+  for (const link of tabs?.querySelectorAll("a") ?? []) {
     link.classList.toggle("active", link.dataset.route === route.tab);
   }
 
@@ -419,6 +472,7 @@ function render() {
 }
 
 buildBottomTabs();
+buildTicker();
 initTheme();
 initRecovery();
 mountAuthControl(document.getElementById("auth-slot"));
