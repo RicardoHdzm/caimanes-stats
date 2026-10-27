@@ -6441,8 +6441,14 @@ h2.page-title {
   object-fit: cover;
 }
 
+/* Velo encima del video con el color de fondo DEL TEMA (azul marino en
+   Eclipse, negro en Luna — var(--bg)), semitransparente, y que se funde con
+   el fondo de la página abajo. */
 .home-hero-bg {
-  background:
-    radial-gradient(900px 520px at 50% 30%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.45) 45%, var(--bg) 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 72%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 62%, transparent) 50%,
+    var(--bg) 100%
+  );
 }
