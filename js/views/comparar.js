@@ -9,7 +9,6 @@ import {
   displayPositions,
 } from "../stats.js";
 import { renderAvatar, renderPositionBadges } from "../ui.js";
-import { getSession } from "../auth.js";
 import { getAvatarUrl } from "../db.js";
 
 // dir: 1 = gana el número más alto, -1 = gana el más bajo (ponches, errores,
@@ -193,16 +192,8 @@ export function renderComparar(container, leftId, rightId) {
   h3.textContent = "Comparar jugadores";
   container.appendChild(h3);
 
-  // Solo con cuenta iniciada — a diferencia de RSVP/MVP (públicos para leer,
-  // con cuenta solo para participar), aquí ni el propio comparador se
-  // muestra sin sesión.
-  if (!getSession()) {
-    const p = document.createElement("p");
-    p.className = "subtitle";
-    p.textContent = "Inicia sesión para comparar jugadores.";
-    container.appendChild(p);
-    return;
-  }
+  // Público: cualquiera puede comparar, con o sin sesión (a petición
+  // expresa — antes pedía cuenta).
 
   if (ROSTER.length < 2) {
     const p = document.createElement("p");
