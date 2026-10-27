@@ -5218,3 +5218,178 @@ body.is-row-dragging {
 .flyer-btn[hidden] {
   display: none;
 }
+
+/* ---- Fanzone: generador de wallpaper (ver js/views/fanzone.js) ---- */
+
+.fanzone {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+  gap: 24px;
+  align-items: start;
+}
+
+.fanzone-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fz-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.fz-field select,
+.fz-field input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.fz-row {
+  display: flex;
+  gap: 12px;
+}
+
+.fz-field--grow {
+  flex: 1;
+}
+
+.fz-field--number {
+  width: 110px;
+}
+
+.fz-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.fz-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fz-preset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fz-swatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.fz-preset.active .fz-swatch {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.fz-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.fz-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fz-color input[type="color"] {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+}
+
+.fz-color input[type="color"]:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.fz-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.fanzone-preview {
+  display: flex;
+  justify-content: center;
+}
+
+/* Marco de celular alrededor de la vista previa. */
+.fz-phone {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1170 / 2532;
+  padding: 8px;
+  border-radius: 38px;
+  background: #1a1a1c;
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.6), inset 0 0 0 2px #2c2c30;
+}
+
+.fz-phone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  .fanzone {
+    grid-template-columns: 1fr;
+  }
+
+  .fanzone-preview {
+    order: -1;
+  }
+
+  .fz-phone {
+    max-width: 240px;
+  }
+}

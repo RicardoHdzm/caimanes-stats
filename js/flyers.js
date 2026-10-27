@@ -331,7 +331,7 @@ export async function nextGameFlyer(game, format = "post") {
 
   text(ctx, TEAM_NAME, W / 2, 600, { size: 130, italic: true });
   text(ctx, "VS", W / 2, 684, { size: 60, color: P.accentText });
-  text(ctx, (game.opponent ?? "Rival").toUpperCase(), W / 2, 830, { size: 150, italic: true });
+  text(ctx, (game.opponent ?? "Rival").toUpperCase(), W / 2, 822, { size: 112, italic: true });
 
   roundRect(ctx, 150, 875, W - 300, 180, 28);
   ctx.fillStyle = P.tint(0.06);
@@ -493,6 +493,71 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
   }
 
   drawFooter(ctx, sponsors);
+  return canvas;
+}
+
+// ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
+//
+// Fondo liso, logo arriba, apellido y número grandes en "letra de jersey"
+// (Barlow Condensed estirada a lo ancho). 1170×2532 = proporción de los
+// celulares actuales (19.5:9). `outline` opcional: contorno de las letras.
+const WALL_W = 1170;
+const WALL_H = 2532;
+
+// Texto "de jersey": se estira horizontalmente (`stretch`) y se achica
+// hasta caber en `maxWidth`. Regresa nada; dibuja centrado en cx.
+function jerseyText(ctx, str, cx, baseline, { size, maxWidth, color, outline, stretch = 1.28, outlineWidth }) {
+  let s = size;
+  ctx.font = font(s);
+  while (s > 40 && ctx.measureText(str).width * stretch > maxWidth) {
+    s -= 8;
+    ctx.font = font(s);
+  }
+  ctx.save();
+  ctx.translate(cx, baseline);
+  ctx.scale(stretch, 1);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  if (outline) {
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = outlineWidth ?? Math.max(8, s * 0.06);
+    ctx.strokeText(str, 0, 0);
+  }
+  ctx.fillStyle = color;
+  ctx.fillText(str, 0, 0);
+  ctx.restore();
+}
+
+// `name`: apellido (o lo que se quiera). `number`: texto del número.
+// `bg`/`fg`/`outline`: colores (outline puede ser null).
+export async function wallpaperCanvas({ name, number, bg, fg, outline = null }) {
+  const { logo } = await loadAssets();
+  const canvas = document.createElement("canvas");
+  canvas.width = WALL_W;
+  canvas.height = WALL_H;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, WALL_W, WALL_H);
+
+  if (logo) {
+    const size = 330;
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+    ctx.shadowBlur = 24;
+    ctx.drawImage(logo, (WALL_W - size) / 2, 190, size, size);
+    ctx.restore();
+  }
+
+  const nameText = (name ?? "").trim().toUpperCase();
+  if (nameText) {
+    jerseyText(ctx, nameText, WALL_W / 2, 1060, { size: 300, maxWidth: WALL_W - 170, color: fg, outline });
+  }
+  const numText = String(number ?? "").trim();
+  if (numText) {
+    jerseyText(ctx, numText, WALL_W / 2, 2120, { size: 1100, maxWidth: WALL_W - 170, color: fg, outline, outlineWidth: outline ? 26 : 0 });
+  }
   return canvas;
 }
 

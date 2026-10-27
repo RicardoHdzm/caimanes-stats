@@ -10,6 +10,7 @@ import { renderCalendario } from "./views/calendario.js";
 import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
 import { renderPlaylist } from "./views/playlist.js";
+import { renderFanzone } from "./views/fanzone.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
@@ -32,6 +33,7 @@ const routes = {
   standing: renderStanding,
   alineacion: renderAlineacion,
   playlist: renderPlaylist,
+  fanzone: renderFanzone,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -58,6 +60,7 @@ const MORE_TABS = [
   { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
+  { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
 ];
 
 // Todo lo navegable en celular, para el panel de "Menú" — no es solo las
