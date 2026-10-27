@@ -593,11 +593,11 @@ function crocSkinLayer() {
   return layer;
 }
 
-function drawCrocSkin(ctx) {
+function drawCrocSkin(ctx, alpha = 0.55) {
   ctx.save();
   ctx.imageSmoothingQuality = "high";
   // Más transparente (a petición expresa): la piel se insinúa, no se impone.
-  ctx.globalAlpha = 0.55;
+  ctx.globalAlpha = alpha;
   ctx.drawImage(crocSkinLayer(), 0, 0, WALL_W, WALL_H);
   ctx.globalAlpha = 1;
   // Más oscuro en las orillas, para que la piel no se vea plana.
@@ -633,7 +633,7 @@ function wallText(ctx, str, baseline, { size, maxWidth, color, shadow }) {
 }
 
 // `name`: apellido (o lo que se quiera). `number`: texto del número.
-// `style`: { bg, fg, logo: "white" | "red", shadow } — ver STYLES en
+// `style`: { bg, fg, logo: "white" | "red", shadow, skin } — ver STYLES en
 // js/views/fanzone.js.
 export async function wallpaperCanvas({ name, number, style }) {
   const { logos } = await loadWallpaperAssets();
@@ -644,7 +644,7 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   ctx.fillStyle = style.bg;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
-  drawCrocSkin(ctx);
+  drawCrocSkin(ctx, style.skin ?? 0.55);
 
   const maxWidth = WALL_W * 0.62;
   const nameText = stripAccents(name).trim().toUpperCase();

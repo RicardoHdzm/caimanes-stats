@@ -13,8 +13,10 @@ const STORAGE_KEY = "caimanes-wallpaper";
 // Solo dos estilos (a petición expresa), con el diseño de Ricardo: Clásico
 // (azul marino, letras blancas con sombra) primero y Moderno (negro, rojo).
 const STYLES = [
-  { id: "clasico", label: "Clásico", bg: "#111827", fg: "#ffffff", logo: "white", shadow: true },
-  { id: "moderno", label: "Moderno", bg: "#000000", fg: "#d31245", logo: "red", shadow: false },
+  { id: "clasico", label: "Clásico", bg: "#111827", fg: "#ffffff", logo: "white", shadow: true, skin: 0.55 },
+  // Moderno: negro apenas levantado (#101012) — en negro puro las sombras de
+  // la piel no se ven y las escamas se veían borrosas.
+  { id: "moderno", label: "Moderno", bg: "#101012", fg: "#d31245", logo: "red", shadow: false, skin: 0.8 },
 ];
 
 function loadState() {
