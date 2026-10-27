@@ -9,6 +9,9 @@ import { SCHEDULE } from "./data.js";
 import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 
 export const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
+// Lo que se puede elegir en el selector de posición del orden al bat en
+// lineup/ — todo menos P (el pitcher se elige en la lista de asistentes).
+const EDITABLE_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "JD", "JC"];
 
 export function positionsOf(value) {
   if (!value) return [];
@@ -326,6 +329,7 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
   const orderRows = order.map((row, i) => ({
     slot: i + 1,
     slotDisplay: String(i + 1),
+    playerId: row.playerId,
     name: row.name,
     position: batterLabel.get(row.playerId) ?? "",
     AVG: row.AVG,
@@ -344,6 +348,7 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
     orderRows.push({
       slot: orderRows.length + 1,
       slotDisplay: "P",
+      playerId: assignment.P.playerId,
       name: pitcherStats.name,
       position: "P",
       AVG: pitcherStats.AVG,
@@ -384,7 +389,20 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
       : []),
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
     { key: "name", label: "Jugador", sticky: true },
-    { key: "position", label: "Pos", full: "Posición", render: (v) => renderPositionBadge(v) },
+    {
+      key: "position",
+      label: "Pos",
+      full: "Posición",
+      // En lineup/ (reorder) la posición se puede CAMBIAR desde aquí — ver
+      // el listener de "change" más abajo. El pitcher se queda fijo (se
+      // elige en la lista de asistentes).
+      render: (v, row) =>
+        reorder && v !== "P"
+          ? `<select class="pos-select" data-player="${row.playerId}" aria-label="Posición de ${row.name}">${EDITABLE_POSITIONS.map(
+              (p) => `<option value="${p}"${p === v ? " selected" : ""}>${p}</option>`
+            ).join("")}</select>`
+          : renderPositionBadge(v),
+    },
     { key: "AVG", label: "AVG", full: "Promedio", numeric: true },
     { key: "OBP", label: "OBP", full: "Porcentaje de embasado", numeric: true },
     { key: "SLG", label: "SLG", full: "Porcentaje de slugging", numeric: true },
@@ -409,7 +427,24 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
     });
   }
   drawOrder();
-  if (reorder) enableRowDrag(orderEl, orderRows, drawOrder);
+  if (reorder) {
+    enableRowDrag(orderEl, orderRows, drawOrder);
+    // Cambiar la posición de alguien: si otro ya la tenía, se intercambian
+    // (así nunca quedan dos en la misma). Se repintan la tabla y las
+    // tarjetas de "Posiciones sugeridas"; el flyer lee estas mismas filas.
+    orderEl.addEventListener("change", (e) => {
+      const select = e.target.closest(".pos-select");
+      if (!select) return;
+      const row = orderRows.find((r) => r.playerId === select.dataset.player);
+      if (!row) return;
+      const newPos = select.value;
+      const other = orderRows.find((r) => r !== row && r.position === newPos);
+      if (other) other.position = row.position;
+      row.position = newPos;
+      drawOrder();
+      drawDefense();
+    });
+  }
 
   const defenseHeading = document.createElement("h3");
   defenseHeading.textContent = "Posiciones sugeridas";
@@ -417,19 +452,29 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
 
   const defenseGrid = document.createElement("div");
   defenseGrid.className = "cards grid-3";
-  defenseGrid.innerHTML = DEFENSE_POSITIONS.map((pos) => {
-    const row = assignment[pos];
-    // Sin marca "eres tú" aquí a propósito (a diferencia de Roster/tablas de
-    // stats): estas tarjetas son una PROPUESTA de alineación, no un listado
-    // de jugadores — resaltar la tuya no aporta nada y solo distrae.
-    return `
-      <div class="card">
-        <div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>
-        <span class="card-value" style="font-size: 1.2rem;">${row ? row.name : "Sin jugador"}</span>
-        <span class="card-label">${row ? `OPS ${row.OPS} · ${row.seasonGP} JJ` : "No hay nadie disponible en esta posición"}</span>
-      </div>
-    `;
-  }).join("");
+  // En lineup/ (reorder) las posiciones pueden cambiar a mano desde la
+  // tabla — entonces las tarjetas salen de orderRows (quién trae cada
+  // posición ahora), no de la asignación original.
+  function defenseRowFor(pos) {
+    if (!reorder) return assignment[pos] ? { ...assignment[pos], JJ: assignment[pos].seasonGP } : null;
+    return orderRows.find((r) => r.position === pos) ?? null;
+  }
+  function drawDefense() {
+    defenseGrid.innerHTML = DEFENSE_POSITIONS.map((pos) => {
+      const row = defenseRowFor(pos);
+      // Sin marca "eres tú" aquí a propósito (a diferencia de Roster/tablas de
+      // stats): estas tarjetas son una PROPUESTA de alineación, no un listado
+      // de jugadores — resaltar la tuya no aporta nada y solo distrae.
+      return `
+        <div class="card">
+          <div style="margin-bottom: 6px;">${renderPositionBadge(pos)}</div>
+          <span class="card-value" style="font-size: 1.2rem;">${row ? row.name : "Sin jugador"}</span>
+          <span class="card-label">${row ? `OPS ${row.OPS} · ${row.JJ} JJ` : "No hay nadie disponible en esta posición"}</span>
+        </div>
+      `;
+    }).join("");
+  }
+  drawDefense();
   container.appendChild(defenseGrid);
 
   // Banca: del roster candidato, quien no quedó en el campo ni bateando
@@ -480,8 +525,8 @@ function enableRowDrag(tableContainer, rows, redraw) {
     const from = [...tbody.children].indexOf(tr);
     if (from < 0) return;
     e.preventDefault();
-    handle.setPointerCapture(e.pointerId);
     tr.classList.add("row-dragging");
+    document.body.classList.add("is-row-dragging");
 
     function onMove(ev) {
       const locked = tbody.querySelector(".row-locked");
@@ -494,10 +539,11 @@ function enableRowDrag(tableContainer, rows, redraw) {
     }
 
     function onEnd() {
-      handle.removeEventListener("pointermove", onMove);
-      handle.removeEventListener("pointerup", onEnd);
-      handle.removeEventListener("pointercancel", onEnd);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
       tr.classList.remove("row-dragging");
+      document.body.classList.remove("is-row-dragging");
       const to = [...tbody.children].indexOf(tr);
       if (to !== from && to >= 0) {
         const [moved] = rows.splice(from, 1);
@@ -515,8 +561,11 @@ function enableRowDrag(tableContainer, rows, redraw) {
       redraw();
     }
 
-    handle.addEventListener("pointermove", onMove);
-    handle.addEventListener("pointerup", onEnd);
-    handle.addEventListener("pointercancel", onEnd);
+    // En la VENTANA, no en la agarradera: al reacomodar la fila en el DOM
+    // el navegador suelta el "capture" del mouse y la agarradera deja de
+    // recibir el movimiento (por eso no arrastraba en escritorio).
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onEnd);
+    window.addEventListener("pointercancel", onEnd);
   });
 }
