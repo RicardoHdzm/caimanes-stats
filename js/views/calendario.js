@@ -1,5 +1,5 @@
 import { SCHEDULE } from "../data.js";
-import { seasonStatGames, gameResult } from "../stats.js";
+import { allStatGames, gameResult } from "../stats.js";
 import { heading } from "../ui.js";
 
 const MONTHS = [
@@ -20,11 +20,12 @@ function formatDate(d) {
 }
 
 // Un evento por fecha: juego jugado (con resultado) o juego programado.
-// Incluye los playoffs de la temporada actual (seasonStatGames los marca
-// con `playoff`) — su día lleva borde y trofeo dorados.
+// Incluye TODAS las temporadas (las pasadas también, a petición expresa) y
+// sus playoffs (allStatGames los marca con `playoff`) — el día de un juego
+// de playoffs lleva borde y trofeo dorados.
 function buildEventsByDate() {
   const map = new Map();
-  for (const g of seasonStatGames()) {
+  for (const g of allStatGames()) {
     map.set(g.date, { type: "played", game: g });
   }
   for (const s of SCHEDULE) {
@@ -34,7 +35,7 @@ function buildEventsByDate() {
 }
 
 export function renderCalendario(container) {
-  heading(container, "Calendario de temporada");
+  heading(container, "Calendario");
 
   const events = buildEventsByDate();
   const today = new Date();
