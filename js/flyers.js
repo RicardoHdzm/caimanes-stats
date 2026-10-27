@@ -415,81 +415,48 @@ export async function lineupFlyer(order, game = null, format = "post") {
   return canvas;
 }
 
-// Figuras del juego: los 3 mejores bateadores de ESE juego (hits, carreras,
-// impulsadas y extra-bases pesan) — texto tipo "3-4 · 2 RBI · 1 HR".
-function topPerformers(game, n = 3) {
-  const score = (l) => (l.H ?? 0) * 2 + (l.RBI ?? 0) * 1.5 + (l.R ?? 0) + (l.HR ?? 0) * 3 + (l.HRC ?? 0) * 3 + (l["2B"] ?? 0) + (l["3B"] ?? 0) * 2;
-  return [...(game.batting ?? [])]
-    .filter((l) => (l.H ?? 0) + (l.RBI ?? 0) + (l.R ?? 0) > 0)
-    .sort((a, b) => score(b) - score(a))
-    .slice(0, n)
-    .map((l) => {
-      const bits = [`${l.H ?? 0}-${l.AB ?? 0}`];
-      const hr = (l.HR ?? 0) + (l.HRC ?? 0);
-      if (hr) bits.push(`${hr} HR`);
-      if (l["3B"]) bits.push(`${l["3B"]} 3B`);
-      if (l["2B"]) bits.push(`${l["2B"]} 2B`);
-      if (l.RBI) bits.push(`${l.RBI} RBI`);
-      if (l.R) bits.push(`${l.R} C`);
-      return { name: playerById(l.playerId)?.name ?? l.playerId, line: bits.join(" · ") };
-    });
-}
-
 // `game`: un juego de GAMES/PLAYOFFS. `playoffRound` (opcional): nombre de
 // la ronda si es de playoffs.
 export async function resultFlyer(game, playoffRound = null, format = "post") {
   const { logo, sponsors } = await loadAssets();
   const { canvas, ctx, story } = newFlyer(format);
-  placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 282 });
+  placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 300 });
 
   const us = game.scoreUs;
   const them = game.scoreThem;
+  // VICTORIA / DERROTA en grande y a color (verde / rojo), sin píldora de
+  // fondo — es lo primero que se tiene que leer.
   const result = us > them ? "VICTORIA" : us < them ? "DERROTA" : "EMPATE";
-  const resultBg = us > them ? WIN : us < them ? P.accent : "#5b6470";
-  pill(ctx, result, W / 2, 282, { bg: resultBg, size: 46, height: 74 });
-  if (playoffRound) text(ctx, `PLAYOFFS · ${playoffRound.toUpperCase()}`, W / 2, 402, { size: 36, color: P.light ? "#a87412" : GOLD });
+  const resultColor = us > them ? WIN : us < them ? P.accentText : P.muted;
+  ctx.save();
+  ctx.shadowColor = rgba(us > them ? WIN : P.accent, P.light ? 0.25 : 0.45);
+  ctx.shadowBlur = 40;
+  text(ctx, result, W / 2, 445, { size: 190, italic: true, color: resultColor, maxWidth: W - 140 });
+  ctx.restore();
+  if (playoffRound) text(ctx, `PLAYOFFS · ${playoffRound.toUpperCase()}`, W / 2, 505, { size: 36, color: P.light ? "#a87412" : GOLD });
 
   // Marcador: Caimanes a la izquierda, rival a la derecha.
   const colL = W * 0.27;
   const colR = W * 0.73;
-  text(ctx, TEAM_NAME, colL, 466, { size: 52, maxWidth: 420 });
-  text(ctx, (game.opponent ?? "Rival").toUpperCase(), colR, 466, { size: 52, maxWidth: 420 });
-  text(ctx, String(us), colL, 672, { size: 220, italic: true, color: us >= them ? P.text : P.muted });
-  text(ctx, String(them), colR, 672, { size: 220, italic: true, color: them > us ? P.text : P.muted });
-  text(ctx, "-", W / 2, 632, { size: 130, color: P.accentText });
-  text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 730, { size: 40, color: P.muted, weight: 600 });
+  text(ctx, TEAM_NAME, colL, 585, { size: 50, maxWidth: 420 });
+  text(ctx, (game.opponent ?? "Rival").toUpperCase(), colR, 585, { size: 50, maxWidth: 420 });
+  text(ctx, String(us), colL, 790, { size: 220, italic: true, color: us >= them ? P.text : P.muted });
+  text(ctx, String(them), colR, 790, { size: 220, italic: true, color: them > us ? P.text : P.muted });
+  text(ctx, "-", W / 2, 750, { size: 130, color: P.accentText });
+  text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 855, { size: 40, color: P.muted, weight: 600 });
 
-  let y = 764;
+  // Solo el MVP (a petición expresa, ya sin "figuras del juego").
   if (game.mvp) {
     const mvp = playerById(game.mvp);
     const gold = P.light ? "#a87412" : GOLD;
-    roundRect(ctx, 200, y, W - 400, 88, 44);
+    const y = 905;
+    roundRect(ctx, 170, y, W - 340, 104, 52);
     ctx.fillStyle = rgba(GOLD, P.light ? 0.2 : 0.14);
     ctx.fill();
     ctx.strokeStyle = gold;
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3;
     ctx.stroke();
-    text(ctx, `★ MVP: ${(mvp?.name ?? game.mvp).toUpperCase()}`, W / 2, y + 59, { size: 46, color: gold, maxWidth: W - 460 });
-    y += 120;
-  } else {
-    y += 20;
-  }
-
-  const performers = topPerformers(game);
-  if (performers.length) {
-    text(ctx, "FIGURAS DEL JUEGO", W / 2, y + 10, { size: 34, color: P.accentText });
-    performers.forEach((p, i) => {
-      const ry = y + 60 + i * 56;
-      ctx.textBaseline = "alphabetic";
-      ctx.textAlign = "left";
-      fitFont(ctx, p.name.toUpperCase(), 440, 40);
-      ctx.fillStyle = P.text;
-      ctx.fillText(p.name.toUpperCase(), 170, ry);
-      ctx.textAlign = "right";
-      fitFont(ctx, p.line, 420, 36, { weight: 600 });
-      ctx.fillStyle = P.muted;
-      ctx.fillText(p.line, W - 170, ry);
-    });
+    text(ctx, `★ MVP: ${(mvp?.name ?? game.mvp).toUpperCase()}`, W / 2, y + 70, { size: 56, color: gold, maxWidth: W - 420 });
   }
 
   drawFooter(ctx, sponsors);
