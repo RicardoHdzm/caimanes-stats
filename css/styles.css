@@ -5510,23 +5510,6 @@ body.menu-open {
   object-fit: contain;
 }
 
-.site-brand-name {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.site-brand-name small {
-  font-size: 0.55em;
-  letter-spacing: 0.32em;
-  color: var(--accent-text);
-}
-
 .site-header-actions {
   display: flex;
   align-items: center;
@@ -6367,10 +6350,6 @@ h2.page-title {
     padding-bottom: 200px;
   }
 
-  .site-brand-name {
-    font-size: var(--text-lg);
-  }
-
   .match-ticker {
     gap: 10px;
     padding-left: 10px;
@@ -6378,7 +6357,7 @@ h2.page-title {
 }
 
 /* ---- Escritorio: secciones en fila en el header, sin menú ☰ ----
-   (a petición expresa). Por debajo de 1280px no caben: ahí se esconde la
+   (a petición expresa). Por debajo de 1100px no caben: ahí se esconde la
    fila y vuelve el ☰. */
 .site-header .site-nav {
   position: static;
@@ -6446,13 +6425,13 @@ h2.page-title {
   flex-shrink: 0;
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1100px) {
   .menu-toggle {
     display: none;
   }
 }
 
-@media (max-width: 1279px) {
+@media (max-width: 1099px) {
   .site-header .site-nav,
   .site-header .header-icon,
   .site-header .theme-switch {
