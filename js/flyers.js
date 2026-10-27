@@ -503,71 +503,107 @@ export function stripAccents(str) {
     .normalize("NFC");
 }
 
-// Trama del fondo: piel de caimán — escamas rectangulares redondeadas en
-// hileras escalonadas (como la panza del caimán), más grandes al centro y
-// más chicas hacia las orillas, cada una con un brillo arriba y sombra
-// abajo para que se sienta el relieve. Muy sutil, para no competir con el
-// texto. Aleatorio con semilla fija: el wallpaper sale igual cada vez.
-function drawCrocSkin(ctx) {
+// Trama del fondo: piel de caimán. Escamas orgánicas (celdas de Voronoi
+// sobre una cuadrícula con jitter, un poco más anchas que altas y más
+// grandes al centro que en las orillas), con surco oscuro entre escamas y
+// un relieve suave (más claro arriba de cada una). Se calcula píxel por
+// píxel a media resolución y se escala — es una capa translúcida encima del
+// color de fondo, así que funciona igual en Clásico y Moderno. Semilla
+// fija: sale igual cada vez. Se cachea (es lo más pesado del wallpaper).
+let crocSkinCache = null;
+function crocSkinLayer() {
+  if (crocSkinCache) return crocSkinCache;
+  const SW = Math.round(WALL_W / 2);
+  const SH = Math.round(WALL_H / 2);
   let seed = 20260;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-  // Anchos de columna: grandes al centro, chicos a los lados.
-  const cols = [];
-  for (let x = 0; x < WALL_W + 200; ) {
-    const t = Math.abs(x + 60 - WALL_W / 2) / (WALL_W / 2); // 0 centro, 1 orilla
-    const w = 150 - 60 * Math.min(t, 1);
-    cols.push({ x, w });
-    x += w;
-  }
-
-  ctx.save();
-  let row = 0;
-  for (let y = -40; y < WALL_H + 100; row++) {
-    const rowH = 92 + rand() * 26;
-    const shift = row % 2 ? 0.5 : 0;
-    for (let i = 0; i < cols.length; i++) {
-      const col = cols[i];
-      // Hileras pares centradas en la columna; impares, en la orilla entre
-      // dos columnas (escalonado, como ladrillos).
-      const cx = col.x + (shift ? 0 : col.w / 2) + (rand() - 0.5) * 8;
-      const w = col.w * (0.84 + rand() * 0.08);
-      const h = rowH * (0.8 + rand() * 0.1);
-      const x0 = cx - w / 2;
-      const y0 = y + (rowH - h) / 2 + (rand() - 0.5) * 6;
-      const r = Math.min(w, h) * (0.22 + rand() * 0.12);
-      roundRectPath(ctx, x0, y0, w, h, r);
-      const g = ctx.createLinearGradient(0, y0, 0, y0 + h);
-      g.addColorStop(0, "rgba(255, 255, 255, 0.075)");
-      g.addColorStop(0.45, "rgba(255, 255, 255, 0.025)");
-      g.addColorStop(1, "rgba(0, 0, 0, 0.22)");
-      ctx.fillStyle = g;
-      ctx.fill();
-      ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
-      ctx.lineWidth = 4;
-      ctx.stroke();
+  const CELL_W = 44;
+  const CELL_H = 34;
+  const cols = Math.ceil(SW / CELL_W) + 2;
+  const rows = Math.ceil(SH / CELL_H) + 2;
+  // Un punto por celda (con jitter); filas impares recorridas media celda.
+  const pts = new Float32Array(cols * rows * 2);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const i = (r * cols + c) * 2;
+      pts[i] = (c - 1 + (r % 2 ? 0.5 : 0) + 0.5 + (rand() - 0.5) * 0.55) * CELL_W;
+      pts[i + 1] = (r - 1 + 0.5 + (rand() - 0.5) * 0.5) * CELL_H;
     }
-    y += rowH;
   }
 
+  const layer = document.createElement("canvas");
+  layer.width = SW;
+  layer.height = SH;
+  const lctx = layer.getContext("2d");
+  const img = lctx.createImageData(SW, SH);
+  const data = img.data;
+  const ASPECT = 1.3; // escamas más anchas que altas
+
+  for (let y = 0; y < SH; y++) {
+    const gr = Math.floor(y / CELL_H) + 1;
+    for (let x = 0; x < SW; x++) {
+      // Más grandes al centro: se "comprime" la x hacia las orillas.
+      const t = (x - SW / 2) / (SW / 2);
+      const xs = SW / 2 + (t * Math.abs(t) * 0.18 + t * 0.82) * (SW / 2);
+      const gc = Math.floor(xs / CELL_W) + 1;
+      let d1 = 1e9;
+      let d2 = 1e9;
+      let ny = 0;
+      for (let r = gr - 1; r <= gr + 1; r++) {
+        if (r < 0 || r >= rows) continue;
+        for (let c = gc - 2; c <= gc + 2; c++) {
+          if (c < 0 || c >= cols) continue;
+          const i = (r * cols + c) * 2;
+          const dx = (xs - pts[i]) / ASPECT;
+          const dy = y - pts[i + 1];
+          const d = dx * dx + dy * dy;
+          if (d < d1) {
+            d2 = d1;
+            d1 = d;
+            ny = dy;
+          } else if (d < d2) {
+            d2 = d;
+          }
+        }
+      }
+      const e = Math.sqrt(d2) - Math.sqrt(d1); // distancia al borde de la escama
+      const o = (y * SW + x) * 4;
+      if (e < 1.6) {
+        // Surco entre escamas.
+        data[o + 3] = 120 - e * 40;
+      } else {
+        // Relieve: claro arriba de la escama, oscuro abajo.
+        const dome = Math.min(1, e / 12);
+        const up = ny < 0 ? 1 : 0; // el píxel está debajo del centro → sombra
+        if (up) {
+          data[o] = data[o + 1] = data[o + 2] = 0;
+          data[o + 3] = 18 + (1 - dome) * 30;
+        } else {
+          data[o] = data[o + 1] = data[o + 2] = 255;
+          data[o + 3] = 6 + dome * 12;
+        }
+      }
+    }
+  }
+  lctx.putImageData(img, 0, 0);
+  crocSkinCache = layer;
+  return layer;
+}
+
+function drawCrocSkin(ctx) {
+  ctx.save();
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(crocSkinLayer(), 0, 0, WALL_W, WALL_H);
   // Más oscuro en las orillas, para que la piel no se vea plana.
   const vignette = ctx.createRadialGradient(WALL_W / 2, WALL_H * 0.47, 250, WALL_W / 2, WALL_H * 0.47, WALL_H * 0.75);
   vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-  vignette.addColorStop(1, "rgba(0, 0, 0, 0.5)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.55)");
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
   ctx.restore();
 }
 
-function roundRectPath(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
 
 // Texto centrado que se achica hasta caber en `maxWidth`.
 function wallText(ctx, str, baseline, { size, maxWidth, color, shadow }) {
