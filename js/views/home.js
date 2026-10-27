@@ -65,11 +65,12 @@ function gameStart(g) {
 function countdownText(g) {
   const ms = gameStart(g) - Date.now();
   if (ms <= 0) return "¡Hoy se juega!";
-  const mins = Math.floor(ms / 60000);
-  const d = Math.floor(mins / 1440);
-  const h = Math.floor((mins % 1440) / 60);
-  const m = mins % 60;
-  return `${d ? `${d}d ` : ""}${h}h ${m}m`;
+  const secs = Math.floor(ms / 1000);
+  const d = Math.floor(secs / 86400);
+  const h = Math.floor((secs % 86400) / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${d ? `${d}d ` : ""}${h}h ${m}m ${String(s).padStart(2, "0")}s`;
 }
 
 // La temporada más reciente que tiene juegos capturados (la actual si ya
@@ -79,13 +80,41 @@ function referenceSeason() {
   return withGames.includes(CURRENT_SEASON) ? CURRENT_SEASON : withGames[0] ?? CURRENT_SEASON;
 }
 
+// Los números de la franja suben de 0 a su valor la primera vez que la
+// franja entra en pantalla (~1.4 s, frenando al final). Sin animación si el
+// sistema pide menos movimiento: ahí se quedan con su valor desde el inicio.
+function countUpWhenVisible(section) {
+  if (!section || !("IntersectionObserver" in window)) return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  const nums = [...section.querySelectorAll("[data-count]")];
+  nums.forEach((el) => (el.textContent = "0"));
+  const observer = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    observer.disconnect();
+    const start = performance.now();
+    const DURATION = 1400;
+    function tick(now) {
+      const t = Math.min(1, (now - start) / DURATION);
+      const eased = 1 - Math.pow(1 - t, 3);
+      nums.forEach((el) => (el.textContent = String(Math.round(Number(el.dataset.count) * eased))));
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }, { threshold: 0.4 });
+  observer.observe(section);
+}
+
 export function renderHome(container) {
   const season = TEAM.seasonsTotal;
   const leagueLine = `${TEAM.league} · ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada`;
   const next = nextGame();
   const allGames = allStatGames();
-  const wins = allGames.filter((g) => gameResult(g) === "W").length;
-  const leagues = new Set(SEASONS.map((s) => s.league)).size;
+  // Franja de números: totales de TODOS los juegos capturados (regular +
+  // playoffs, todas las temporadas).
+  const runs = allGames.reduce((sum, g) => sum + (g.scoreUs ?? 0), 0);
+  const teamBatting = battingTotals(allGames);
+  const hits = teamBatting.reduce((sum, r) => sum + (r.H ?? 0), 0);
+  const steals = teamBatting.reduce((sum, r) => sum + (r.SB ?? 0), 0);
 
   const root = document.createElement("div");
   root.className = "home";
@@ -121,10 +150,10 @@ export function renderHome(container) {
     </section>
 
     <section class="home-stats">
-      <div class="home-stat"><b>${season}</b><span>Temporadas del equipo</span></div>
-      <div class="home-stat"><b>${leagues}</b><span>Ligas jugadas</span></div>
-      <div class="home-stat"><b>${wins}</b><span>Victorias registradas</span></div>
-      <div class="home-stat"><b>${ROSTER.length}</b><span>Jugadores en el roster</span></div>
+      <div class="home-stat"><b data-count="${season}">${season}</b><span>Temporadas</span></div>
+      <div class="home-stat"><b data-count="${runs}">${runs}</b><span>Carreras anotadas</span></div>
+      <div class="home-stat"><b data-count="${hits}">${hits}</b><span>Hits</span></div>
+      <div class="home-stat"><b data-count="${steals}">${steals}</b><span>Bases robadas</span></div>
     </section>
 
     <div class="home-marquee" aria-hidden="true">
@@ -280,12 +309,14 @@ export function renderHome(container) {
     root.querySelector("#home-games")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // Cuenta regresiva: se refresca cada 30 s mientras la portada siga abierta.
+  countUpWhenVisible(root.querySelector(".home-stats"));
+
+  // Cuenta regresiva: se refresca cada segundo mientras la portada siga abierta.
   if (next) {
     const el = root.querySelector("#home-countdown");
     const timer = setInterval(() => {
       if (!el.isConnected) return clearInterval(timer);
       el.textContent = countdownText(next);
-    }, 30000);
+    }, 1000);
   }
 }

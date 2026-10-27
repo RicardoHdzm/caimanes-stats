@@ -5888,6 +5888,9 @@ h2.page-title {
   font-weight: 700;
   font-style: italic;
   color: var(--text);
+  /* Dígitos del mismo ancho: los segundos cambian sin que el texto "brinque". */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* Franja de números grandes. */
