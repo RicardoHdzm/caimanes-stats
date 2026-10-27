@@ -93,19 +93,46 @@
   <!-- Estilo lyon.gg (a petición expresa): una barra "Match Center" con los
        resultados recientes y el próximo juego corriendo de lado (la arma
        js/main.js, ver buildTicker), y debajo un header delgado y pegajoso:
-       logo + nombre a la izquierda, cuenta y menú ☰ a la derecha. TODA la
-       navegación vive en el menú (#more-sheet), en escritorio y en celular —
-       ya no hay pestañas visibles. -->
+       logo + nombre a la izquierda y, en escritorio, las secciones en una
+       fila (#tabs — js/main.js marca la activa y oculta las de solo-sesión).
+       En celular/tablet esa fila se esconde y la navegación vive en el menú
+       ☰ de pantalla completa (#more-sheet). -->
   <div class="match-ticker" id="match-ticker" aria-label="Match Center"></div>
   <header class="site-header">
     <a href="#/" class="site-brand" aria-label="Ir al inicio">
       <img src="assets/logos/whitelogo@2x.png" alt="" class="site-brand-logo" />
       <span class="site-brand-name">Caimanes</span>
     </a>
+    <nav class="tabs site-nav" id="tabs" aria-label="Secciones">
+      <a href="#/" data-route="home">Inicio</a>
+      <a href="#/inicio" data-route="inicio">Feed</a>
+      <a href="#" data-route="mi-perfil" id="nav-mi-perfil" hidden>Mi Perfil</a>
+      <a href="#/roster" data-route="roster">Roster</a>
+      <a href="#/resumen" data-route="resumen">Resumen</a>
+      <a href="#/juegos" data-route="juegos">Juegos</a>
+      <a href="#/calendario" data-route="calendario">Calendario</a>
+      <a href="#/standing" data-route="standing">Standing</a>
+      <a href="#/playoffs" data-route="playoffs">Playoffs</a>
+      <a href="#/estadisticas" data-route="estadisticas">Estadísticas</a>
+      <a href="#/temporadas" data-route="temporadas">Temporadas</a>
+      <a href="#/alineacion" data-route="alineacion">Alineación</a>
+      <a href="#/playlist" data-route="playlist">Playlist</a>
+      <a href="#/fanzone" data-route="fanzone">Fanzone</a>
+    </nav>
     <div class="site-header-actions">
       <!-- Vacío a propósito: js/auth.js lo llena (botón de cuenta) y lo deja
            vacío si Supabase no está configurado. -->
       <div id="auth-slot" class="auth-slot"></div>
+      <!-- Solo escritorio (en celular viven en el menú ☰): Instagram y el
+           interruptor de tema eclipse/luna (ver js/theme.js). -->
+      <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" class="header-icon" aria-label="Instagram del equipo">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Luna — clic para cambiar">
+        <span class="theme-switch-thumb"></span>
+        <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
+        <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
+      </button>
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
         <i class="fa-solid fa-bars"></i>
       </button>
