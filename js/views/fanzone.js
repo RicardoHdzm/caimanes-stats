@@ -6,7 +6,7 @@
 // este navegador (localStorage), para no volver a capturarlo.
 import { ROSTER } from "../data.js";
 import { heading, escapeHtml } from "../ui.js";
-import { wallpaperCanvas } from "../flyers.js";
+import { wallpaperCanvas, stripAccents } from "../flyers.js";
 
 const STORAGE_KEY = "caimanes-wallpaper";
 
@@ -48,7 +48,7 @@ export function renderFanzone(container) {
   const saved = loadState() ?? {};
   const state = {
     playerId: saved.playerId ?? "",
-    name: saved.name ?? "CAIMANES",
+    name: stripAccents(saved.name ?? "CAIMANES"),
     number: saved.number ?? "1",
     // Lo guardado de antes (colores sueltos) cae al primer estilo.
     style: STYLES.some((st) => st.id === saved.style) ? saved.style : STYLES[0].id,
@@ -151,10 +151,13 @@ export function renderFanzone(container) {
   playerSel.addEventListener("change", () => {
     const p = ROSTER.find((x) => x.id === playerSel.value);
     if (!p) return update({ playerId: "" });
-    update({ playerId: p.id, name: surnameOf(p).toUpperCase(), number: p.number != null ? String(p.number) : "" });
+    update({ playerId: p.id, name: stripAccents(surnameOf(p)).toUpperCase(), number: p.number != null ? String(p.number) : "" });
   });
   nameIn.addEventListener("input", () => {
-    state.name = nameIn.value.toUpperCase();
+    // Sin acentos, también si se escribe a mano.
+    const clean = stripAccents(nameIn.value).toUpperCase();
+    if (clean !== nameIn.value) nameIn.value = clean;
+    state.name = clean;
     render();
   });
   numberIn.addEventListener("input", () => {

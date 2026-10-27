@@ -465,7 +465,8 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
 
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
-// Diseño de Ricardo: fondo liso, apellido y número centrados en la fuente
+// Diseño de Ricardo: fondo con trama de malla, apellido (sin acentos) y
+// número centrados en la fuente
 // de jersey Legend M54 (assets/fonts/legend-m54.ttf) y, debajo, la cabeza
 // del caimán (assets/logos/, versión blanca o roja según el estilo). El
 // estilo Clásico lleva una sombra suave en las letras; el Moderno, plano.
@@ -491,6 +492,38 @@ function loadWallpaperAssets() {
     return { logos: { white, red } };
   })();
   return wallAssetsPromise;
+}
+
+// Sin acentos (a petición expresa): "HERNÁNDEZ" -> "HERNANDEZ". La Ñ sí
+// se queda (no es acento, es otra letra).
+export function stripAccents(str) {
+  return (str ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u0302\u0304-\u036f]/g, "")
+    .normalize("NFC");
+}
+
+// Trama del fondo: malla de puntitos escalonados, como la tela de una
+// playera — se nota de cerca, de lejos el fondo se sigue viendo liso.
+function drawMesh(ctx) {
+  const step = 16;
+  const dot = 5;
+  ctx.save();
+  ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+  for (let y = 0, row = 0; y < WALL_H; y += step, row++) {
+    for (let x = row % 2 ? step / 2 : 0; x < WALL_W; x += step) {
+      ctx.beginPath();
+      ctx.arc(x, y, dot / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  // Un poco más oscuro en las orillas, para que la trama no se vea plana.
+  const vignette = ctx.createRadialGradient(WALL_W / 2, WALL_H * 0.47, 250, WALL_W / 2, WALL_H * 0.47, WALL_H * 0.75);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.45)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, WALL_W, WALL_H);
+  ctx.restore();
 }
 
 // Texto centrado que se achica hasta caber en `maxWidth`.
@@ -527,9 +560,10 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   ctx.fillStyle = style.bg;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
+  drawMesh(ctx);
 
   const maxWidth = WALL_W * 0.62;
-  const nameText = (name ?? "").trim().toUpperCase();
+  const nameText = stripAccents(name).trim().toUpperCase();
   if (nameText) wallText(ctx, nameText, 1005, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
   const numText = String(number ?? "").trim();
   if (numText) wallText(ctx, numText, 1420, { size: 520, maxWidth, color: style.fg, shadow: style.shadow });
