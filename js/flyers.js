@@ -564,7 +564,7 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   const maxWidth = WALL_W * 0.62;
   const nameText = stripAccents(name).trim().toUpperCase();
-  if (nameText) wallText(ctx, nameText, 1005, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
+  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
   const numText = String(number ?? "").trim();
   if (numText) wallText(ctx, numText, 1420, { size: 520, maxWidth, color: style.fg, shadow: style.shadow });
 
