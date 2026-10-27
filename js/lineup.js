@@ -5,6 +5,8 @@
 import { battingTotals, playerName, allStatGames, currentSeasonGames, gamesPlayedByPlayer } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
+import { SCHEDULE } from "./data.js";
+import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 
 export const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 
@@ -348,6 +350,18 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
       JJ: pitcherStats.seasonGP,
     });
   }
+
+  // Flyer del lineup para redes (ver js/flyers.js) — con el próximo juego
+  // de SCHEDULE, si hay uno, para el "vs Rival · fecha".
+  const nextGame = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+  const shareRow = document.createElement("div");
+  shareRow.className = "share-flyer-row";
+  shareRow.appendChild(
+    shareButton(() =>
+      openFlyer((format) => lineupFlyer(orderRows, nextGame, format), `lineup${nextGame ? `-${nextGame.date}` : ""}`, "Lineup de los Caimanes")
+    )
+  );
+  container.appendChild(shareRow);
 
   const orderColumns = [
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },

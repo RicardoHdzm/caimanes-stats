@@ -4,6 +4,7 @@ import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositi
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
+import { resultFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
@@ -389,6 +390,22 @@ export function renderJuegoDetalle(container, gameId) {
     <div id="mvp-badge-slot"></div>
   `;
   container.appendChild(hero);
+
+  // Flyer del resultado para redes (ver js/flyers.js) — solo con marcador.
+  if (known) {
+    const shareRow = document.createElement("div");
+    shareRow.className = "share-flyer-row share-flyer-row--center";
+    shareRow.appendChild(
+      shareButton(() =>
+        openFlyer(
+          (format) => resultFlyer(game, playoffContext?.round.name ?? null, format),
+          `resultado-${game.date}`,
+          `Caimanes ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
+        )
+      )
+    );
+    hero.appendChild(shareRow);
+  }
 
   // Sin marcador todavía no hay a quién votar — el line-up ni siquiera
   // existe hasta que se captura el juego.
