@@ -1,6 +1,6 @@
 // Portada estilo lyon.gg (a petición expresa): hero a pantalla completa con
 // el logo y el nombre gigante, el próximo juego con cuenta regresiva, una
-// franja de números, cinta en movimiento, historia de juegos (próximos +
+// franja de números, cinta en movimiento, historial de juegos (próximos +
 // últimos 4), la temporada en números y el roster.
 // Todo sale de data.js — no hay nada que mantener aparte.
 import { TEAM, SEASONS, SCHEDULE, ROSTER, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY } from "../data.js";
@@ -165,7 +165,7 @@ export function renderHome(container) {
     </div>
   `;
 
-  // ---- Historia de juegos: los próximos y los últimos 4 finalizados ----
+  // ---- Historial de juegos: los próximos y los últimos 4 finalizados ----
   const games = document.createElement("section");
   games.className = "home-section";
   games.id = "home-games";
@@ -179,7 +179,7 @@ export function renderHome(container) {
           </div>`;
   const upcomingCards = upcoming.map(
     (g) => `
-        <a class="home-match" href="#/calendario">
+        <a class="home-match home-match--next" href="#/calendario">
           <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
           ${matchTeams(g.opponent, `<span class="home-match-vs">vs</span>`)}
           <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${fmtTime(g.time)}` : ""}</span>
@@ -201,7 +201,7 @@ export function renderHome(container) {
   });
   const cards = [...upcomingCards, ...recentCards];
   games.innerHTML = `
-    ${sectionHead("Historia de", "juegos", "JUEGOS")}
+    ${sectionHead("Historial de", "juegos", "JUEGOS", "Próximos juegos y resultados recientes")}
     <div class="home-match-grid">
       ${cards.length ? cards.join("") : `<p class="home-empty">No hay juegos todavía.</p>`}
     </div>

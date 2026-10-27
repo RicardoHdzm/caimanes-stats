@@ -6045,6 +6045,11 @@ h2.page-title {
   transition: border-color 0.15s, transform 0.15s;
 }
 
+/* Los próximos juegos llevan borde rojo para distinguirlos de los ya jugados. */
+.home-match--next {
+  border-color: var(--accent);
+}
+
 .home-match:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
