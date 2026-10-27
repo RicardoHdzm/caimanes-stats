@@ -6430,11 +6430,11 @@ h2.page-title {
 }
 
 .site-header .site-nav a {
-  padding: 8px 7px;
+  padding: 8px 6px;
   border: none;
   border-radius: 8px;
   font-size: var(--text-sm);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .site-header .site-nav a.active {
