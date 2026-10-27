@@ -283,7 +283,10 @@ export function buildLineup(roster, statsById) {
 // deriva de las posiciones registradas en el roster (lo que usa la pestaña
 // Alineación); si se da, cada jugador va a la posición que se le eligió a
 // mano (lo que usa lineup/).
-export function renderLineupResult(container, roster, gamePositionById = null) {
+// `share` (opcional): agrega el botón de flyer para redes. Solo lo usa la
+// herramienta de alineación por juego (lineup/, js/lineup-tool.js) — la
+// sugerencia de la pestaña Alineación no lo lleva, a petición expresa.
+export function renderLineupResult(container, roster, gamePositionById = null, { share = false } = {}) {
   container.innerHTML = "";
 
   if (roster.length === 0) {
@@ -353,15 +356,17 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
 
   // Flyer del lineup para redes (ver js/flyers.js) — con el próximo juego
   // de SCHEDULE, si hay uno, para el "vs Rival · fecha".
-  const nextGame = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
-  const shareRow = document.createElement("div");
-  shareRow.className = "share-flyer-row";
-  shareRow.appendChild(
-    shareButton(() =>
-      openFlyer((format) => lineupFlyer(orderRows, nextGame, format), `lineup${nextGame ? `-${nextGame.date}` : ""}`, "Lineup de Caimanes de Villas")
-    )
-  );
-  container.appendChild(shareRow);
+  if (share) {
+    const nextGame = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+    const shareRow = document.createElement("div");
+    shareRow.className = "share-flyer-row";
+    shareRow.appendChild(
+      shareButton(() =>
+        openFlyer((format) => lineupFlyer(orderRows, nextGame, format), `lineup${nextGame ? `-${nextGame.date}` : ""}`, "Lineup de Caimanes de Villas")
+      )
+    );
+    container.appendChild(shareRow);
+  }
 
   const orderColumns = [
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
