@@ -6,9 +6,8 @@
 // "Descargar". Todo sale de data.js y de assets/ — no hay servidor ni nada
 // externo de por medio.
 //
-// Los colores (fondo, texto, rojo) salen del TEMA ACTIVO (Sol / Eclipse /
-// Luna, ver js/theme.js) — se leen de las variables CSS al momento de
-// dibujar, así que el flyer sale como se ve el sitio en ese momento.
+// Los colores (fondo, texto, rojo) se eligen en la vista previa: Clásico
+// (azul marino) o Moderno (negro) — ver FLYER_COLORS.
 //
 // Las rutas a assets/ se arman con import.meta.url (no relativas a la
 // página) porque esto también lo usa lineup/index.html, que vive en una
@@ -47,21 +46,39 @@ function rgba(hex, alpha) {
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
-function themePalette() {
-  const cs = getComputedStyle(document.documentElement);
-  const v = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
-  const light = document.documentElement.dataset.theme === "light";
+// Colores del flyer: se ELIGEN en la vista previa (Clásico / Moderno, ver
+// openFlyer), ya no dependen del tema activo del sitio (a petición
+// expresa). Mismos valores que los temas Eclipse y Luna de css/styles.css.
+export const FLYER_COLORS = [
+  {
+    id: "clasico",
+    label: "Clásico",
+    bg: "#0a0e18",
+    text: "#f2f3f4",
+    muted: "#a3a5a4",
+    accent: "#bf0f35",
+    accentDark: "#7d0924",
+    accentText: "#e8375c",
+  },
+  {
+    id: "moderno",
+    label: "Moderno",
+    bg: "#0d0d0d",
+    text: "#f2f3f4",
+    muted: "#8d96a0",
+    accent: "#e2202f",
+    accentDark: "#9c1526",
+    accentText: "#ff5a6e",
+  },
+];
+
+function flyerPalette(colorId) {
+  const c = FLYER_COLORS.find((x) => x.id === colorId) ?? FLYER_COLORS[0];
   return {
-    light,
-    bg: v("--bg", "#0d0d0d"),
-    text: v("--text", "#f2f2f2"),
-    muted: v("--muted", "#a3a8b0"),
-    accent: v("--accent", "#e2202f"),
-    accentDark: v("--accent-dark", "#9c1526"),
-    // Rojo para TEXTO sobre el fondo (en claro, el más oscuro — contraste).
-    accentText: v("--accent-text", "#ff5a6e"),
-    // Velo sutil para cajas/rayas: blanco en temas oscuros, negro en claro.
-    tint: (a) => (light ? `rgba(0, 0, 0, ${a * 0.7})` : `rgba(255, 255, 255, ${a})`),
+    ...c,
+    light: false,
+    // Velo sutil para cajas/rayas (blanco: los dos fondos son oscuros).
+    tint: (a) => `rgba(255, 255, 255, ${a})`,
   };
 }
 
@@ -282,8 +299,8 @@ function drawFooter(ctx, sponsors) {
 // Lienzo del formato pedido, con la paleta del tema activo y el fondo ya
 // pintado de orilla a orilla. El logo y el desplazamiento del contenido los
 // pone placeLogo() (en historia el logo va más grande, arriba).
-function newFlyer(format) {
-  P = themePalette();
+function newFlyer(format, color) {
+  P = flyerPalette(color);
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = FORMAT_HEIGHT[format] ?? H;
@@ -309,9 +326,9 @@ function placeLogo(ctx, logo, story, { y, size, contentTop }) {
 // ---- los tres flyers ----
 
 // `game`: una entrada de SCHEDULE ({ date, time, opponent }).
-export async function nextGameFlyer(game, format = "post") {
+export async function nextGameFlyer(game, format = "post", color) {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx, story } = newFlyer(format);
+  const { canvas, ctx, story } = newFlyer(format, color);
   placeLogo(ctx, logo, story, { y: 36, size: 340, contentTop: 398 });
 
   pill(ctx, "PRÓXIMO JUEGO", W / 2, 398, { size: 42 });
@@ -336,9 +353,9 @@ export async function nextGameFlyer(game, format = "post") {
 // `order`: filas del orden al bat ({ name, position, slotDisplay }) — la
 // última puede ser el pitcher (slot "P"). `game` (opcional): próximo juego
 // de SCHEDULE, para el "vs Rival · fecha".
-export async function lineupFlyer(order, game = null, format = "post") {
+export async function lineupFlyer(order, game = null, format = "post", color) {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx, story } = newFlyer(format);
+  const { canvas, ctx, story } = newFlyer(format, color);
   placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 285 });
 
   text(ctx, "LINEUP", W / 2, 360, { size: 110, italic: true });
@@ -405,9 +422,9 @@ export async function lineupFlyer(order, game = null, format = "post") {
 
 // `game`: un juego de GAMES/PLAYOFFS. `playoffRound` (opcional): nombre de
 // la ronda si es de playoffs.
-export async function resultFlyer(game, playoffRound = null, format = "post") {
+export async function resultFlyer(game, playoffRound = null, format = "post", color) {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx, story } = newFlyer(format);
+  const { canvas, ctx, story } = newFlyer(format, color);
   placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 300 });
 
   const us = game.scoreUs;
@@ -708,8 +725,9 @@ function onEsc(e) {
   if (e.key === "Escape") closeModal();
 }
 
-// `make(format)`: función async que regresa el canvas ("post" o "story").
-// `filename`: sin extensión.
+// `make(format, color)`: función async que regresa el canvas — `format`
+// "post" o "story", `color` uno de FLYER_COLORS. `filename`: sin extensión.
+const FLYER_COLOR_KEY = "caimanes-flyer-color";
 export async function openFlyer(make, filename, shareText = "") {
   closeModal();
   modalEl = document.createElement("div");
@@ -717,9 +735,16 @@ export async function openFlyer(make, filename, shareText = "") {
   modalEl.innerHTML = `
     <div class="flyer-sheet" role="dialog" aria-label="Compartir flyer">
       <button type="button" class="flyer-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
-      <div class="flyer-formats">
-        <button type="button" class="flyer-format active" data-format="post"><i class="fa-regular fa-square"></i> Post</button>
-        <button type="button" class="flyer-format" data-format="story"><i class="fa-solid fa-mobile-screen"></i> Historia</button>
+      <div class="flyer-options">
+        <div class="flyer-formats" data-group="format">
+          <button type="button" class="flyer-format active" data-format="post"><i class="fa-regular fa-square"></i> Post</button>
+          <button type="button" class="flyer-format" data-format="story"><i class="fa-solid fa-mobile-screen"></i> Historia</button>
+        </div>
+        <div class="flyer-formats" data-group="color">
+          ${FLYER_COLORS.map(
+            (c) => `<button type="button" class="flyer-format" data-color="${c.id}"><span class="flyer-color-dot" style="background:${c.bg};border-color:${c.accent}"></span> ${c.label}</button>`
+          ).join("")}
+        </div>
       </div>
       <div class="flyer-preview"><span class="spinner" aria-hidden="true"></span></div>
       <div class="flyer-actions" hidden>
@@ -741,6 +766,14 @@ export async function openFlyer(make, filename, shareText = "") {
   const shareBtn = actions.querySelector(".flyer-btn--share");
   let currentFile = null;
   let renderToken = 0;
+  let format = "post";
+  let color = FLYER_COLORS[0].id;
+  try {
+    const saved = localStorage.getItem(FLYER_COLOR_KEY);
+    if (FLYER_COLORS.some((c) => c.id === saved)) color = saved;
+  } catch {
+    // Sin almacenamiento: Clásico.
+  }
 
   // Compartir con la imagen adjunta (menú nativo del celular: WhatsApp,
   // Instagram, Facebook...). Donde no se puede (casi todos los navegadores
@@ -754,14 +787,15 @@ export async function openFlyer(make, filename, shareText = "") {
     }
   });
 
-  async function render(format) {
+  async function render() {
     const token = ++renderToken;
-    for (const btn of sheet.querySelectorAll(".flyer-format")) btn.classList.toggle("active", btn.dataset.format === format);
+    for (const btn of sheet.querySelectorAll("[data-format]")) btn.classList.toggle("active", btn.dataset.format === format);
+    for (const btn of sheet.querySelectorAll("[data-color]")) btn.classList.toggle("active", btn.dataset.color === color);
     preview.style.aspectRatio = format === "story" ? "9 / 16" : "4 / 5";
     preview.innerHTML = '<span class="spinner" aria-hidden="true"></span>';
     actions.hidden = true;
 
-    const canvas = await make(format);
+    const canvas = await make(format, color);
     const blob = await canvasToBlob(canvas);
     if (modalEl !== sheet || token !== renderToken || !blob) return;
     URL.revokeObjectURL(sheet.dataset.url ?? "");
@@ -769,7 +803,7 @@ export async function openFlyer(make, filename, shareText = "") {
     sheet.dataset.url = url;
     preview.innerHTML = `<img src="${url}" alt="Flyer">`;
 
-    const name = `${filename}${format === "story" ? "-historia" : ""}.png`;
+    const name = `${filename}${format === "story" ? "-historia" : ""}-${color}.png`;
     download.href = url;
     download.download = name;
     currentFile = new File([blob], name, { type: "image/png" });
@@ -777,12 +811,22 @@ export async function openFlyer(make, filename, shareText = "") {
     actions.hidden = false;
   }
 
-  sheet.querySelector(".flyer-formats").addEventListener("click", (e) => {
+  sheet.querySelector(".flyer-options").addEventListener("click", (e) => {
     const btn = e.target.closest(".flyer-format");
-    if (btn && !btn.classList.contains("active")) render(btn.dataset.format);
+    if (!btn || btn.classList.contains("active")) return;
+    if (btn.dataset.format) format = btn.dataset.format;
+    if (btn.dataset.color) {
+      color = btn.dataset.color;
+      try {
+        localStorage.setItem(FLYER_COLOR_KEY, color);
+      } catch {
+        // Solo es una comodidad.
+      }
+    }
+    render();
   });
 
-  render("post");
+  render();
 }
 
 // Botón "Compartir" listo para meter en cualquier vista.

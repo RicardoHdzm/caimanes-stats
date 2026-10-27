@@ -398,7 +398,7 @@ export function renderJuegoDetalle(container, gameId) {
     shareRow.appendChild(
       shareButton(() =>
         openFlyer(
-          (format) => resultFlyer(game, playoffContext?.round.name ?? null, format),
+          (format, color) => resultFlyer(game, playoffContext?.round.name ?? null, format, color),
           `resultado-${game.date}`,
           `Caimanes de Villas ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
         )

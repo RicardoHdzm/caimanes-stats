@@ -5350,3 +5350,20 @@ body.is-row-dragging {
     max-width: 240px;
   }
 }
+
+
+/* Vista previa del flyer: dos grupos (Post/Historia y Clásico/Moderno). */
+.flyer-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.flyer-color-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid;
+  border-radius: 50%;
+}
