@@ -5405,7 +5405,9 @@ body.menu-open {
   gap: 16px;
   height: 34px;
   padding: 0 0 0 16px;
-  background: #050505;
+  /* Color de fondo del tema (marino en Eclipse, negro en Luna), apenas más
+     oscuro que el header para que se distingan las dos barras. */
+  background: color-mix(in srgb, var(--bg) 80%, #000);
   border-bottom: 1px solid var(--border);
   font-size: var(--text-xs);
   color: var(--muted);
