@@ -1,6 +1,6 @@
 // Fanzone: cualquier visitante arma un wallpaper para su celular con el
 // logo del equipo, un nombre y un número de jersey (estilo playera), y
-// elige los colores — con presets o a mano. El dibujo vive en
+// elige entre dos estilos de color: Clásico y Moderno. El dibujo vive en
 // wallpaperCanvas() de js/flyers.js; aquí solo el formulario, la vista
 // previa y Descargar/Compartir. Lo último que se eligió se recuerda en
 // este navegador (localStorage), para no volver a capturarlo.
@@ -10,13 +10,11 @@ import { wallpaperCanvas } from "../flyers.js";
 
 const STORAGE_KEY = "caimanes-wallpaper";
 
-const PRESETS = [
-  { id: "caimanes", label: "Caimanes", bg: "#0b0b0c", fg: "#e2202f", outline: "#ffffff" },
-  { id: "plata", label: "Plata", bg: "#000000", fg: "#c4c8cc", outline: null },
-  { id: "rojo", label: "Rojo", bg: "#c8102e", fg: "#ffffff", outline: null },
-  { id: "blanco", label: "Blanco", bg: "#f2f3f5", fg: "#e2202f", outline: "#111111" },
-  { id: "eclipse", label: "Eclipse", bg: "#0a0e18", fg: "#ffffff", outline: "#bf0f35" },
-  { id: "dorado", label: "Dorado", bg: "#0b0b0c", fg: "#f5b942", outline: null },
+// Solo dos estilos (a petición expresa): Clásico (el azul marino de
+// Eclipse) primero y Moderno (el negro con rojo de Caimanes).
+const STYLES = [
+  { id: "clasico", label: "Clásico", bg: "#0a0e18", fg: "#ffffff", outline: "#bf0f35", accent: "#bf0f35" },
+  { id: "moderno", label: "Moderno", bg: "#0b0b0c", fg: "#e2202f", outline: "#ffffff", accent: "#e2202f" },
 ];
 
 function loadState() {
@@ -47,16 +45,15 @@ function surnameOf(player) {
 export function renderFanzone(container) {
   heading(container, "Fanzone");
 
-  const first = PRESETS[0];
+  const saved = loadState() ?? {};
   const state = {
-    playerId: "",
-    name: "CAIMANES",
-    number: "1",
-    bg: first.bg,
-    fg: first.fg,
-    outline: first.outline,
-    ...loadState(),
+    playerId: saved.playerId ?? "",
+    name: saved.name ?? "CAIMANES",
+    number: saved.number ?? "1",
+    // Lo guardado de antes (colores sueltos) cae al primer estilo.
+    style: STYLES.some((st) => st.id === saved.style) ? saved.style : STYLES[0].id,
   };
+  const styleOf = () => STYLES.find((st) => st.id === state.style) ?? STYLES[0];
 
   const wrap = document.createElement("div");
   wrap.className = "fanzone";
@@ -84,24 +81,16 @@ export function renderFanzone(container) {
         </label>
       </div>
 
-      <span class="fz-label">Colores</span>
+      <span class="fz-label">Estilo</span>
       <div class="fz-presets">
-        ${PRESETS.map(
-          (p) => `
-            <button type="button" class="fz-preset" data-preset="${p.id}" title="${p.label}">
-              <span class="fz-swatch" style="background:${p.bg};color:${p.fg};${p.outline ? `-webkit-text-stroke:1px ${p.outline};` : ""}">8</span>
-              <span>${p.label}</span>
+        ${STYLES.map(
+          (st) => `
+            <button type="button" class="fz-preset" data-style="${st.id}" title="${st.label}">
+              <span class="fz-swatch" style="background:${st.bg};color:${st.fg};-webkit-text-stroke:1px ${st.outline};">8</span>
+              <span>${st.label}</span>
             </button>
           `
         ).join("")}
-      </div>
-      <div class="fz-custom">
-        <label class="fz-color"><input id="fz-bg" type="color" /><span>Fondo</span></label>
-        <label class="fz-color"><input id="fz-fg" type="color" /><span>Letras</span></label>
-        <label class="fz-color">
-          <input id="fz-outline" type="color" />
-          <span><input id="fz-outline-on" type="checkbox" /> Contorno</span>
-        </label>
       </div>
 
       <div class="fz-actions">
@@ -119,10 +108,6 @@ export function renderFanzone(container) {
   const playerSel = $("#fz-player");
   const nameIn = $("#fz-name");
   const numberIn = $("#fz-number");
-  const bgIn = $("#fz-bg");
-  const fgIn = $("#fz-fg");
-  const outlineIn = $("#fz-outline");
-  const outlineOn = $("#fz-outline-on");
   const img = $("#fz-img");
   const download = $("#fz-download");
   const shareBtn = $("#fz-share");
@@ -131,15 +116,7 @@ export function renderFanzone(container) {
     playerSel.value = ROSTER.some((p) => p.id === state.playerId) ? state.playerId : "";
     nameIn.value = state.name;
     numberIn.value = state.number;
-    bgIn.value = state.bg;
-    fgIn.value = state.fg;
-    outlineOn.checked = !!state.outline;
-    outlineIn.value = state.outline ?? "#ffffff";
-    outlineIn.disabled = !state.outline;
-    for (const b of wrap.querySelectorAll(".fz-preset")) {
-      const p = PRESETS.find((x) => x.id === b.dataset.preset);
-      b.classList.toggle("active", p.bg === state.bg && p.fg === state.fg && (p.outline ?? null) === (state.outline ?? null));
-    }
+    for (const btn of wrap.querySelectorAll(".fz-preset")) btn.classList.toggle("active", btn.dataset.style === state.style);
   }
 
   let currentFile = null;
@@ -151,7 +128,7 @@ export function renderFanzone(container) {
     timer = setTimeout(async () => {
       const mine = ++token;
       saveState(state);
-      const canvas = await wallpaperCanvas(state);
+      const canvas = await wallpaperCanvas({ name: state.name, number: state.number, style: styleOf() });
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
       if (mine !== token || !blob || !img.isConnected) return;
       if (currentUrl) URL.revokeObjectURL(currentUrl);
@@ -187,14 +164,8 @@ export function renderFanzone(container) {
   });
   wrap.querySelector(".fz-presets").addEventListener("click", (e) => {
     const btn = e.target.closest(".fz-preset");
-    if (!btn) return;
-    const p = PRESETS.find((x) => x.id === btn.dataset.preset);
-    update({ bg: p.bg, fg: p.fg, outline: p.outline });
+    if (btn) update({ style: btn.dataset.style });
   });
-  bgIn.addEventListener("input", () => update({ bg: bgIn.value }));
-  fgIn.addEventListener("input", () => update({ fg: fgIn.value }));
-  outlineIn.addEventListener("input", () => update({ outline: outlineIn.value }));
-  outlineOn.addEventListener("change", () => update({ outline: outlineOn.checked ? outlineIn.value || "#ffffff" : null }));
 
   shareBtn.addEventListener("click", async () => {
     if (!currentFile) return;

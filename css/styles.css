@@ -5320,36 +5320,6 @@ body.is-row-dragging {
   transform: translateY(-2px);
 }
 
-.fz-custom {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.fz-color {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--text);
-}
-
-.fz-color input[type="color"] {
-  width: 40px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: none;
-  cursor: pointer;
-}
-
-.fz-color input[type="color"]:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
 .fz-actions {
   display: flex;
   gap: 10px;

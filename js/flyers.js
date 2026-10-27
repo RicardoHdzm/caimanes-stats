@@ -496,34 +496,104 @@ function jerseyText(ctx, str, cx, baseline, { size, maxWidth, color, outline, st
   ctx.restore();
 }
 
+// Fondo del wallpaper: no plano — color base, brillo del color de acento
+// arriba, rayas diagonales finas, el logo enorme y casi transparente como
+// marca de agua detrás del número, dos franjas verticales tipo jersey a los
+// lados y barras de acento arriba/abajo.
+function drawWallpaperBackground(ctx, logo, { bg, accent }) {
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, WALL_W, WALL_H);
+
+  const glow = ctx.createRadialGradient(WALL_W / 2, 520, 60, WALL_W / 2, 520, 1500);
+  glow.addColorStop(0, rgba(accent, 0.42));
+  glow.addColorStop(0.55, rgba(accent, 0.1));
+  glow.addColorStop(1, rgba(accent, 0));
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, WALL_W, WALL_H);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
+  ctx.lineWidth = 3;
+  for (let x = -WALL_H; x < WALL_W; x += 34) {
+    ctx.beginPath();
+    ctx.moveTo(x, WALL_H);
+    ctx.lineTo(x + WALL_H, 0);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Marca de agua: el logo gigante, apenas visible, detrás del número.
+  if (logo) {
+    const size = 1500;
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.drawImage(logo, (WALL_W - size) / 2, 820, size, size);
+    ctx.restore();
+  }
+
+  // Franjas verticales a los lados (como las de una playera).
+  for (const x of [70, WALL_W - 70 - 26]) {
+    const stripe = ctx.createLinearGradient(0, 0, 0, WALL_H);
+    stripe.addColorStop(0, rgba(accent, 0));
+    stripe.addColorStop(0.3, rgba(accent, 0.75));
+    stripe.addColorStop(0.7, rgba(accent, 0.75));
+    stripe.addColorStop(1, rgba(accent, 0));
+    ctx.fillStyle = stripe;
+    ctx.fillRect(x, 0, 26, WALL_H);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.fillRect(x + 34, WALL_H * 0.3, 5, WALL_H * 0.4);
+  }
+
+  // Oscurece la parte de abajo (ahí van los botones del celular).
+  const fade = ctx.createLinearGradient(0, WALL_H - 700, 0, WALL_H);
+  fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+  fade.addColorStop(1, "rgba(0, 0, 0, 0.55)");
+  ctx.fillStyle = fade;
+  ctx.fillRect(0, WALL_H - 700, WALL_W, 700);
+
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, WALL_W, 12);
+  ctx.fillRect(0, WALL_H - 12, WALL_W, 12);
+}
+
 // `name`: apellido (o lo que se quiera). `number`: texto del número.
-// `bg`/`fg`/`outline`: colores (outline puede ser null).
-export async function wallpaperCanvas({ name, number, bg, fg, outline = null }) {
+// `style`: { bg, fg, outline, accent } — uno de los estilos de Fanzone.
+export async function wallpaperCanvas({ name, number, style }) {
   const { logo } = await loadAssets();
   const canvas = document.createElement("canvas");
   canvas.width = WALL_W;
   canvas.height = WALL_H;
   const ctx = canvas.getContext("2d");
+  const { fg, outline } = style;
 
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, WALL_W, WALL_H);
+  drawWallpaperBackground(ctx, logo, style);
 
   if (logo) {
-    const size = 330;
+    const size = 320;
     ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
-    ctx.shadowBlur = 24;
-    ctx.drawImage(logo, (WALL_W - size) / 2, 190, size, size);
+    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+    ctx.shadowBlur = 30;
+    ctx.drawImage(logo, (WALL_W - size) / 2, 330, size, size);
     ctx.restore();
   }
 
+  // Apellido arriba del número; el número va más al centro de la pantalla
+  // (su centro queda a ~56% del alto, debajo del reloj del celular).
   const nameText = (name ?? "").trim().toUpperCase();
   if (nameText) {
-    jerseyText(ctx, nameText, WALL_W / 2, 1060, { size: 300, maxWidth: WALL_W - 170, color: fg, outline });
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+    ctx.shadowBlur = 24;
+    jerseyText(ctx, nameText, WALL_W / 2, 1010, { size: 280, maxWidth: WALL_W - 260, color: fg, outline });
+    ctx.restore();
   }
   const numText = String(number ?? "").trim();
   if (numText) {
-    jerseyText(ctx, numText, WALL_W / 2, 2120, { size: 1100, maxWidth: WALL_W - 170, color: fg, outline, outlineWidth: outline ? 26 : 0 });
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = 40;
+    jerseyText(ctx, numText, WALL_W / 2, 1790, { size: 1000, maxWidth: WALL_W - 260, color: fg, outline, outlineWidth: outline ? 24 : 0 });
+    ctx.restore();
   }
   return canvas;
 }
