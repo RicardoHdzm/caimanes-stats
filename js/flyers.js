@@ -611,13 +611,39 @@ function drawCrocSkin(ctx, alpha = 0.55) {
 
 
 // Texto centrado que se achica hasta caber en `maxWidth`.
-function wallText(ctx, str, baseline, { size, maxWidth, color, shadow }) {
+//
+// `skin` (0-1, opcional): la misma piel de caimán del fondo, encimada SOLO
+// dentro de las letras (se dibuja el texto en un lienzo aparte, se le pone
+// la piel con "source-atop" y luego se pega con su sombra). `skinScale`
+// achica las escamas — en el apellido, con trazos delgados, escamas del
+// tamaño del fondo se verían como manchas sueltas.
+function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0, skinScale = 1 }) {
+  const layer = document.createElement("canvas");
+  layer.width = WALL_W;
+  layer.height = WALL_H;
+  const lctx = layer.getContext("2d");
   let s = size;
-  ctx.font = `${s}px ${JERSEY_FONT}`;
-  while (s > 40 && ctx.measureText(str).width > maxWidth) {
+  lctx.font = `${s}px ${JERSEY_FONT}`;
+  while (s > 40 && lctx.measureText(str).width > maxWidth) {
     s -= 6;
-    ctx.font = `${s}px ${JERSEY_FONT}`;
+    lctx.font = `${s}px ${JERSEY_FONT}`;
   }
+  lctx.fillStyle = color;
+  lctx.textAlign = "center";
+  lctx.textBaseline = "alphabetic";
+  lctx.fillText(str, WALL_W / 2, baseline);
+
+  if (skin > 0) {
+    lctx.globalCompositeOperation = "source-atop";
+    lctx.globalAlpha = skin;
+    const tile = crocSkinLayer();
+    const tw = WALL_W * skinScale;
+    const th = WALL_H * skinScale;
+    for (let y = 0; y < WALL_H; y += th) {
+      for (let x = 0; x < WALL_W; x += tw) lctx.drawImage(tile, x, y, tw, th);
+    }
+  }
+
   ctx.save();
   if (shadow) {
     ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
@@ -625,15 +651,12 @@ function wallText(ctx, str, baseline, { size, maxWidth, color, shadow }) {
     ctx.shadowOffsetX = 10;
     ctx.shadowOffsetY = 12;
   }
-  ctx.fillStyle = color;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText(str, WALL_W / 2, baseline);
+  ctx.drawImage(layer, 0, 0);
   ctx.restore();
 }
 
 // `name`: apellido (o lo que se quiera). `number`: texto del número.
-// `style`: { bg, fg, logo: "white" | "red", shadow, skin } — ver STYLES en
+// `style`: { bg, fg, logo: "white" | "red", shadow, skin, textSkin } — ver STYLES en
 // js/views/fanzone.js.
 export async function wallpaperCanvas({ name, number, style }) {
   const { logos } = await loadWallpaperAssets();
@@ -648,9 +671,12 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   const maxWidth = WALL_W * 0.62;
   const nameText = stripAccents(name).trim().toUpperCase();
-  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
+  // Piel también dentro de las letras (a petición expresa), más marcada que
+  // en el fondo para que se lea sobre el color sólido.
+  const textSkin = style.textSkin ?? 0.9;
+  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow, skin: textSkin, skinScale: 0.45 });
   const numText = String(number ?? "").trim();
-  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.fg, shadow: style.shadow });
+  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.fg, shadow: style.shadow, skin: textSkin });
 
   const logo = logos[style.logo];
   if (logo) {
