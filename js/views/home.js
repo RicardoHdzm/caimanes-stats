@@ -129,7 +129,7 @@ export function renderHome(container) {
 
     <div class="home-marquee" aria-hidden="true">
       <div class="home-marquee-track">
-        ${Array.from({ length: 8 }, () => `<span>Caimanes de Villas</span><span>#CaimaWin</span><span>Muerde Caiman</span><span>#Caimanation</span>`).join("")}
+        ${Array.from({ length: 8 }, () => `<span>Caimanes de Villas</span><span class="home-marquee-accent">#CaimaWin</span><span>Muerde Caiman</span><span class="home-marquee-accent">#Caimanation</span>`).join("")}
       </div>
     </div>
   `;

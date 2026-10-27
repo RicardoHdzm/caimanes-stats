@@ -5962,6 +5962,11 @@ h2.page-title {
   color: var(--accent);
 }
 
+/* Los hashtags (#CaimaWin, #Caimanation) en rojo Caimanes. */
+.home-marquee-track .home-marquee-accent {
+  color: var(--accent-text);
+}
+
 .home-marquee-ghost {
   color: transparent !important;
   -webkit-text-stroke: 1px var(--muted);
