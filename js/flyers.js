@@ -674,7 +674,7 @@ export async function wallpaperCanvas({ name, number, style }) {
   // Piel también dentro de las letras (a petición expresa), más marcada que
   // en el fondo para que se lea sobre el color sólido.
   const textSkin = style.textSkin ?? 0.9;
-  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow, skin: textSkin, skinScale: 0.45 });
+  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow, skin: textSkin });
   const numText = String(number ?? "").trim();
   if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.fg, shadow: style.shadow, skin: textSkin });
 
