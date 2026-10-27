@@ -265,7 +265,6 @@ export function renderHome(container) {
           ${renderAvatar(p, 72)}
           <span class="home-player-num">#${p.number ?? "-"}</span>
           <span class="home-player-name">${escapeHtml(p.name)}</span>
-          <span class="home-player-pos">${posText ? renderPositionBadges(posText) : ""}</span>
         </a>`;
         })
         .join("")}
