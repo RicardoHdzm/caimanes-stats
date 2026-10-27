@@ -145,7 +145,7 @@ export function renderHome(container) {
 
     <div class="home-marquee" aria-hidden="true">
       <div class="home-marquee-track">
-        ${Array.from({ length: 8 }, () => `<span>Caimanes de Villas</span><span class="home-marquee-ghost">${escapeHtml(TEAM.league)}</span><span>${ordinalTemporada(season)} Temporada</span><span class="home-marquee-ghost">Softbol</span>`).join("")}
+        ${Array.from({ length: 8 }, () => `<span>Caimanes de Villas</span><span class="home-marquee-ghost">#CaimaWin</span><span>Muerde Caiman</span><span class="home-marquee-ghost">#Caimanation</span>`).join("")}
       </div>
     </div>
   `;
