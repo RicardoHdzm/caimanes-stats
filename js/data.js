@@ -128,7 +128,7 @@ export const DUES_PAID = {
     p8: false, // Jorge Zazueta
     p10: true, // Enrique Muñoz
     p11: false, // Luis Lugo Bastidas
-    p12: false, // Luis Fernando Lugo
+    p12: true, // Luis Fernando Lugo
     p13: false, // Luis Pompa
     p14: false, // Ricardo Santoyo
     p15: true, // Ricardo Hernández
