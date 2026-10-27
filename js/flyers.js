@@ -1,17 +1,20 @@
 // Flyers para compartir en redes (próximo juego, lineup, resultado de un
 // juego). Se dibujan en un <canvas> de 1080×1350 ("post", 4:5 de
 // Instagram/Facebook, también se ve bien en WhatsApp) o 1080×1920
-// ("historia", 9:16) y se abren en una
-// ventanita con la vista previa + "Compartir" (menú nativo del celular, con
-// la imagen adjunta) y "Descargar". Todo sale de data.js y de assets/ — no
-// hay servidor ni nada externo de por medio.
+// ("historia", 9:16) y se abren en una ventanita con la vista previa +
+// "Compartir" (menú nativo del celular, con la imagen adjunta) y
+// "Descargar". Todo sale de data.js y de assets/ — no hay servidor ni nada
+// externo de por medio.
+//
+// Los colores (fondo, texto, rojo) salen del TEMA ACTIVO (Sol / Eclipse /
+// Luna, ver js/theme.js) — se leen de las variables CSS al momento de
+// dibujar, así que el flyer sale como se ve el sitio en ese momento.
 //
 // Las rutas a assets/ se arman con import.meta.url (no relativas a la
 // página) porque esto también lo usa lineup/index.html, que vive en una
 // subcarpeta. Las fuentes (Barlow Condensed) ya las declara css/styles.css
 // con @font-face; aquí solo se espera a que carguen antes de dibujar.
 import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS } from "./data.js";
-import { ordinalTemporada } from "./ui.js";
 
 const W = 1080;
 // H = alto del CONTENIDO (el diseño del post). En historia el lienzo mide
@@ -20,11 +23,9 @@ const W = 1080;
 const H = 1350;
 const FORMAT_HEIGHT = { post: 1350, story: 1920 };
 const FONT = '"Barlow Condensed", "Arial Narrow", sans-serif';
-const RED = "#e2202f";
-const RED_DARK = "#9c1526";
 const WIN = "#3fb56f";
 const GOLD = "#f5b942";
-const MUTED = "#a3a8b0";
+const TEAM_NAME = "CAIMANES DE VILLAS";
 
 const POS_COLOR = {
   P: "#4a9eff",
@@ -41,6 +42,41 @@ const POS_COLOR = {
 };
 
 const asset = (path) => new URL(`../${path}`, import.meta.url).href;
+
+// ---- colores del tema activo ----
+
+// Paleta del flyer que se está dibujando (la pone newFlyer()).
+let P = null;
+
+function hexToRgb(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec((hex ?? "").trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function rgba(hex, alpha) {
+  const rgb = hexToRgb(hex) ?? [226, 32, 47];
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+}
+
+function themePalette() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+  const light = document.documentElement.dataset.theme === "light";
+  return {
+    light,
+    bg: v("--bg", "#0d0d0d"),
+    text: v("--text", "#f2f2f2"),
+    muted: v("--muted", "#a3a8b0"),
+    accent: v("--accent", "#e2202f"),
+    accentDark: v("--accent-dark", "#9c1526"),
+    // Rojo para TEXTO sobre el fondo (en claro, el más oscuro — contraste).
+    accentText: v("--accent-text", "#ff5a6e"),
+    // Velo sutil para cajas/rayas: blanco en temas oscuros, negro en claro.
+    tint: (a) => (light ? `rgba(0, 0, 0, ${a * 0.7})` : `rgba(255, 255, 255, ${a})`),
+  };
+}
 
 // ---- carga de recursos ----
 
@@ -63,14 +99,15 @@ function loadAssets() {
       loadImage(asset("assets/logo.png")),
       ...SPONSORS.map((s) => loadImage(asset(s.logo))),
     ]);
-    return { logo, sponsors: sponsors.map(whiteTrimmed).filter(Boolean) };
+    return { logo, sponsors: sponsors.map(sponsorVariants).filter(Boolean) };
   })();
   return assetsPromise;
 }
 
 // Logo de patrocinador (negro sobre transparente, ver SPONSORS en data.js)
-// → recortado a su contenido y pintado en blanco, para el fondo oscuro.
-function whiteTrimmed(img) {
+// → recortado a su contenido, en dos versiones: negro (tema claro) y
+// blanco (temas oscuros).
+function sponsorVariants(img) {
   if (!img?.naturalWidth) return null;
   const w = img.naturalWidth;
   const h = img.naturalHeight;
@@ -97,15 +134,18 @@ function whiteTrimmed(img) {
   } catch {
     // Sin lectura de píxeles: se queda sin recortar.
   }
-  const out = document.createElement("canvas");
-  out.width = box.w;
-  out.height = box.h;
-  const o = out.getContext("2d");
-  o.drawImage(c, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
-  o.globalCompositeOperation = "source-in";
-  o.fillStyle = "#ffffff";
-  o.fillRect(0, 0, box.w, box.h);
-  return out;
+  const make = (color) => {
+    const out = document.createElement("canvas");
+    out.width = box.w;
+    out.height = box.h;
+    const o = out.getContext("2d");
+    o.drawImage(c, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+    o.globalCompositeOperation = "source-in";
+    o.fillStyle = color;
+    o.fillRect(0, 0, box.w, box.h);
+    return out;
+  };
+  return { dark: make("#ffffff"), light: make("#111111"), ratio: box.w / box.h };
 }
 
 // ---- helpers de dibujo ----
@@ -115,17 +155,17 @@ function font(size, { weight = 700, italic = false } = {}) {
 }
 
 // Achica el tamaño hasta que el texto quepa en maxWidth.
-function fitFont(ctx, text, maxWidth, size, opts) {
+function fitFont(ctx, str, maxWidth, size, opts) {
   let s = size;
   ctx.font = font(s, opts);
-  while (s > 20 && ctx.measureText(text).width > maxWidth) {
+  while (s > 20 && ctx.measureText(str).width > maxWidth) {
     s -= 4;
     ctx.font = font(s, opts);
   }
   return s;
 }
 
-function text(ctx, str, x, y, { size, color = "#fff", align = "center", maxWidth = W - 120, ...opts }) {
+function text(ctx, str, x, y, { size, color = P.text, align = "center", maxWidth = W - 120, ...opts }) {
   fitFont(ctx, str, maxWidth, size, opts);
   ctx.fillStyle = color;
   ctx.textAlign = align;
@@ -144,7 +184,7 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 // Píldora de color con texto adentro, centrada en cx.
-function pill(ctx, label, cx, y, { bg = RED, color = "#fff", size = 40, padX = 34, height = 68 } = {}) {
+function pill(ctx, label, cx, y, { bg = P.accent, color = "#fff", size = 40, padX = 34, height = 68 } = {}) {
   ctx.font = font(size);
   const w = ctx.measureText(label).width + padX * 2;
   roundRect(ctx, cx - w / 2, y, w, height, height / 2);
@@ -157,10 +197,8 @@ function pill(ctx, label, cx, y, { bg = RED, color = "#fff", size = 40, padX = 3
   ctx.textBaseline = "alphabetic";
 }
 
-function seasonLine() {
-  const meta = SEASONS[CURRENT_SEASON - 1];
-  const league = meta?.league ?? TEAM.league;
-  return `${league} · ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada`.toUpperCase();
+function leagueLine() {
+  return (SEASONS[CURRENT_SEASON - 1]?.league ?? TEAM.league).toUpperCase();
 }
 
 function formatDate(dateStr) {
@@ -178,20 +216,21 @@ function playerById(id) {
   return PLAYERS.find((p) => p.id === id) ?? null;
 }
 
-// Fondo de marca: negro, brillo rojo arriba, rayas diagonales sutiles y
-// barra roja abajo — mismo lenguaje que el sitio en tema Luna.
+// Fondo de marca con los colores del tema: fondo del tema, brillo rojo
+// arriba, rayas diagonales sutiles y barras rojas arriba/abajo — mismo
+// lenguaje que el sitio. `CH` = alto real del lienzo (post o historia).
 function drawBackground(ctx, CH) {
-  ctx.fillStyle = "#0b0b0c";
+  ctx.fillStyle = P.bg;
   ctx.fillRect(0, 0, W, CH);
 
   const glow = ctx.createRadialGradient(W / 2, 120, 40, W / 2, 120, 900);
-  glow.addColorStop(0, "rgba(226, 32, 47, 0.38)");
-  glow.addColorStop(1, "rgba(226, 32, 47, 0)");
+  glow.addColorStop(0, rgba(P.accent, P.light ? 0.16 : 0.38));
+  glow.addColorStop(1, rgba(P.accent, 0));
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, CH);
 
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
+  ctx.strokeStyle = P.tint(0.035);
   ctx.lineWidth = 2;
   for (let x = -CH; x < W; x += 30) {
     ctx.beginPath();
@@ -201,16 +240,18 @@ function drawBackground(ctx, CH) {
   }
   ctx.restore();
 
-  const fade = ctx.createLinearGradient(0, CH - 420, 0, CH);
-  fade.addColorStop(0, "rgba(0, 0, 0, 0)");
-  fade.addColorStop(1, "rgba(0, 0, 0, 0.75)");
-  ctx.fillStyle = fade;
-  ctx.fillRect(0, CH - 420, W, 420);
+  if (!P.light) {
+    const fade = ctx.createLinearGradient(0, CH - 420, 0, CH);
+    fade.addColorStop(0, "rgba(0, 0, 0, 0)");
+    fade.addColorStop(1, "rgba(0, 0, 0, 0.6)");
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, CH - 420, W, 420);
+  }
 
   const bar = ctx.createLinearGradient(0, 0, W, 0);
-  bar.addColorStop(0, RED_DARK);
-  bar.addColorStop(0.5, RED);
-  bar.addColorStop(1, RED_DARK);
+  bar.addColorStop(0, P.accentDark);
+  bar.addColorStop(0.5, P.accent);
+  bar.addColorStop(1, P.accentDark);
   ctx.fillStyle = bar;
   ctx.fillRect(0, CH - 14, W, 14);
   ctx.fillRect(0, 0, W, 8);
@@ -219,30 +260,29 @@ function drawBackground(ctx, CH) {
 function drawLogo(ctx, logo, cx, y, size) {
   if (!logo) return;
   ctx.save();
-  ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+  ctx.shadowColor = P.light ? "rgba(0, 0, 0, 0.18)" : "rgba(0, 0, 0, 0.55)";
   ctx.shadowBlur = 30;
   ctx.drawImage(logo, cx - size / 2, y, size, size);
   ctx.restore();
 }
 
-// Liga/temporada + tira de patrocinadores, pegados abajo.
+// Liga + tira de patrocinadores, pegados abajo.
 function drawFooter(ctx, sponsors) {
-  text(ctx, seasonLine(), W / 2, H - 200, { size: 34, color: MUTED, weight: 600 });
+  text(ctx, leagueLine(), W / 2, H - 200, { size: 34, color: P.muted, weight: 600 });
   if (sponsors.length === 0) return;
 
   // Mismo criterio que fitSponsorLogo() del pie del sitio: peso visual
   // parejo (alto = base / proporción^0.6) en vez de altura pareja.
   const BASE = 84;
   const GAP = 48;
-  let items = sponsors.map((c) => {
-    const ratio = c.width / c.height;
-    const h = Math.min(BASE / ratio ** 0.6, BASE);
-    return { c, w: h * ratio, h };
+  let items = sponsors.map((s) => {
+    const h = Math.min(BASE / s.ratio ** 0.6, BASE);
+    return { c: P.light ? s.light : s.dark, w: h * s.ratio, h };
   });
-  const total = items.reduce((s, i) => s + i.w, 0) + GAP * (items.length - 1);
+  const total = items.reduce((sum, i) => sum + i.w, 0) + GAP * (items.length - 1);
   const scale = Math.min(1, (W - 140) / total);
   items = items.map((i) => ({ ...i, w: i.w * scale, h: i.h * scale }));
-  let x = (W - (total * scale)) / 2;
+  let x = (W - total * scale) / 2;
   const midY = H - 105;
   ctx.globalAlpha = 0.85;
   for (const i of items) {
@@ -252,10 +292,11 @@ function drawFooter(ctx, sponsors) {
   ctx.globalAlpha = 1;
 }
 
-// Lienzo del formato pedido, con el fondo ya pintado de orilla a orilla y
-// el contexto desplazado para que el contenido (diseñado a 1350 de alto)
-// quede centrado.
+// Lienzo del formato pedido, con la paleta del tema activo, el fondo ya
+// pintado de orilla a orilla y el contexto desplazado para que el contenido
+// (diseñado a 1350 de alto) quede centrado.
 function newFlyer(format) {
+  P = themePalette();
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = FORMAT_HEIGHT[format] ?? H;
@@ -271,42 +312,42 @@ function newFlyer(format) {
 export async function nextGameFlyer(game, format = "post") {
   const { logo, sponsors } = await loadAssets();
   const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 60, 250);
+  drawLogo(ctx, logo, W / 2, 36, 340);
 
-  pill(ctx, "PRÓXIMO JUEGO", W / 2, 345, { size: 42 });
+  pill(ctx, "PRÓXIMO JUEGO", W / 2, 398, { size: 42 });
 
-  text(ctx, "CAIMANES", W / 2, 560, { size: 160, italic: true });
-  text(ctx, "VS", W / 2, 650, { size: 64, color: RED });
-  text(ctx, (game.opponent ?? "Rival").toUpperCase(), W / 2, 800, { size: 160, italic: true });
+  text(ctx, TEAM_NAME, W / 2, 600, { size: 130, italic: true });
+  text(ctx, "VS", W / 2, 684, { size: 60, color: P.accentText });
+  text(ctx, (game.opponent ?? "Rival").toUpperCase(), W / 2, 830, { size: 150, italic: true });
 
-  roundRect(ctx, 150, 860, W - 300, 190, 28);
-  ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+  roundRect(ctx, 150, 875, W - 300, 180, 28);
+  ctx.fillStyle = P.tint(0.06);
   ctx.fill();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+  ctx.strokeStyle = P.tint(0.12);
   ctx.lineWidth = 2;
   ctx.stroke();
-  text(ctx, formatDate(game.date), W / 2, 940, { size: 60, maxWidth: W - 360 });
-  if (game.time) text(ctx, formatTime(game.time), W / 2, 1020, { size: 72, color: RED, italic: true });
+  text(ctx, formatDate(game.date), W / 2, 950, { size: 58, maxWidth: W - 360 });
+  if (game.time) text(ctx, formatTime(game.time), W / 2, 1028, { size: 70, color: P.accentText, italic: true });
 
   drawFooter(ctx, sponsors);
   return canvas;
 }
 
-// `order`: filas del orden al bat ({ name, position }) — la última puede
-// ser el pitcher (slot "P"). `game` (opcional): próximo juego de SCHEDULE,
-// para el "vs Rival · fecha".
+// `order`: filas del orden al bat ({ name, position, slotDisplay }) — la
+// última puede ser el pitcher (slot "P"). `game` (opcional): próximo juego
+// de SCHEDULE, para el "vs Rival · fecha".
 export async function lineupFlyer(order, game = null, format = "post") {
   const { logo, sponsors } = await loadAssets();
   const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 40, 170);
+  drawLogo(ctx, logo, W / 2, 24, 240);
 
-  text(ctx, "LINEUP", W / 2, 320, { size: 120, italic: true });
+  text(ctx, "LINEUP", W / 2, 360, { size: 110, italic: true });
   if (game) {
     const sub = `VS ${(game.opponent ?? "").toUpperCase()} · ${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`;
-    text(ctx, sub, W / 2, 375, { size: 38, color: RED, weight: 600 });
+    text(ctx, sub, W / 2, 412, { size: 38, color: P.accentText, weight: 600 });
   }
 
-  const top = 415;
+  const top = 445;
   const bottom = H - 265;
   const rowH = Math.min(66, (bottom - top) / Math.max(order.length, 1));
   const left = 150;
@@ -316,16 +357,16 @@ export async function lineupFlyer(order, game = null, format = "post") {
     const mid = y + rowH / 2;
     if (i % 2 === 0) {
       roundRect(ctx, left - 30, y + 3, right - left + 60, rowH - 6, 14);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.045)";
+      ctx.fillStyle = P.tint(0.05);
       ctx.fill();
     }
     // Turno (o "P" para el pitcher que no batea).
     const slot = row.slotDisplay ?? String(i + 1);
     ctx.beginPath();
     ctx.arc(left + 22, mid, 24, 0, Math.PI * 2);
-    ctx.fillStyle = slot === "P" ? "rgba(255, 255, 255, 0.12)" : RED;
+    ctx.fillStyle = slot === "P" ? P.tint(0.14) : P.accent;
     ctx.fill();
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = slot === "P" ? P.text : "#fff";
     ctx.font = font(30);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -334,17 +375,17 @@ export async function lineupFlyer(order, game = null, format = "post") {
     // Nombre.
     ctx.textAlign = "left";
     fitFont(ctx, row.name.toUpperCase(), right - left - 200, 42);
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = P.text;
     ctx.fillText(row.name.toUpperCase(), left + 72, mid + 2);
 
     // Posición (badge con su color, igual que en el sitio).
     const pos = row.position ?? "";
     if (pos) {
-      const color = POS_COLOR[pos] ?? MUTED;
+      const color = POS_COLOR[pos] ?? P.muted;
       const bw = 86;
       const bh = 44;
       roundRect(ctx, right - bw, mid - bh / 2, bw, bh, 10);
-      ctx.fillStyle = `${color}26`;
+      ctx.fillStyle = rgba(color, 0.15);
       ctx.fill();
       ctx.strokeStyle = color;
       ctx.lineWidth = 2.5;
@@ -386,53 +427,54 @@ function topPerformers(game, n = 3) {
 export async function resultFlyer(game, playoffRound = null, format = "post") {
   const { logo, sponsors } = await loadAssets();
   const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 40, 160);
+  drawLogo(ctx, logo, W / 2, 24, 240);
 
   const us = game.scoreUs;
   const them = game.scoreThem;
   const result = us > them ? "VICTORIA" : us < them ? "DERROTA" : "EMPATE";
-  const resultBg = us > them ? WIN : us < them ? RED : "#5b6470";
-  pill(ctx, result, W / 2, 222, { bg: resultBg, size: 46, height: 74 });
-  if (playoffRound) text(ctx, `PLAYOFFS · ${playoffRound.toUpperCase()}`, W / 2, 348, { size: 36, color: GOLD });
+  const resultBg = us > them ? WIN : us < them ? P.accent : "#5b6470";
+  pill(ctx, result, W / 2, 282, { bg: resultBg, size: 46, height: 74 });
+  if (playoffRound) text(ctx, `PLAYOFFS · ${playoffRound.toUpperCase()}`, W / 2, 402, { size: 36, color: P.light ? "#a87412" : GOLD });
 
   // Marcador: Caimanes a la izquierda, rival a la derecha.
   const colL = W * 0.27;
   const colR = W * 0.73;
-  text(ctx, "CAIMANES", colL, 425, { size: 52, maxWidth: 400 });
-  text(ctx, (game.opponent ?? "Rival").toUpperCase(), colR, 425, { size: 52, maxWidth: 400 });
-  text(ctx, String(us), colL, 640, { size: 240, italic: true, color: us >= them ? "#fff" : "#d6d8dc" });
-  text(ctx, String(them), colR, 640, { size: 240, italic: true, color: them > us ? "#fff" : "#8e939b" });
-  text(ctx, "-", W / 2, 600, { size: 140, color: RED });
-  text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 705, { size: 40, color: MUTED, weight: 600 });
+  text(ctx, TEAM_NAME, colL, 466, { size: 52, maxWidth: 420 });
+  text(ctx, (game.opponent ?? "Rival").toUpperCase(), colR, 466, { size: 52, maxWidth: 420 });
+  text(ctx, String(us), colL, 672, { size: 220, italic: true, color: us >= them ? P.text : P.muted });
+  text(ctx, String(them), colR, 672, { size: 220, italic: true, color: them > us ? P.text : P.muted });
+  text(ctx, "-", W / 2, 632, { size: 130, color: P.accentText });
+  text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 730, { size: 40, color: P.muted, weight: 600 });
 
-  let y = 745;
+  let y = 764;
   if (game.mvp) {
     const mvp = playerById(game.mvp);
-    roundRect(ctx, 200, y, W - 400, 90, 45);
-    ctx.fillStyle = "rgba(245, 185, 66, 0.14)";
+    const gold = P.light ? "#a87412" : GOLD;
+    roundRect(ctx, 200, y, W - 400, 88, 44);
+    ctx.fillStyle = rgba(GOLD, P.light ? 0.2 : 0.14);
     ctx.fill();
-    ctx.strokeStyle = GOLD;
+    ctx.strokeStyle = gold;
     ctx.lineWidth = 2.5;
     ctx.stroke();
-    text(ctx, `★ MVP: ${(mvp?.name ?? game.mvp).toUpperCase()}`, W / 2, y + 60, { size: 46, color: GOLD, maxWidth: W - 460 });
-    y += 125;
+    text(ctx, `★ MVP: ${(mvp?.name ?? game.mvp).toUpperCase()}`, W / 2, y + 59, { size: 46, color: gold, maxWidth: W - 460 });
+    y += 120;
   } else {
     y += 20;
   }
 
   const performers = topPerformers(game);
   if (performers.length) {
-    text(ctx, "FIGURAS DEL JUEGO", W / 2, y + 10, { size: 34, color: RED });
+    text(ctx, "FIGURAS DEL JUEGO", W / 2, y + 10, { size: 34, color: P.accentText });
     performers.forEach((p, i) => {
-      const ry = y + 62 + i * 58;
+      const ry = y + 60 + i * 56;
       ctx.textBaseline = "alphabetic";
       ctx.textAlign = "left";
       fitFont(ctx, p.name.toUpperCase(), 440, 40);
-      ctx.fillStyle = "#fff";
+      ctx.fillStyle = P.text;
       ctx.fillText(p.name.toUpperCase(), 170, ry);
       ctx.textAlign = "right";
       fitFont(ctx, p.line, 420, 36, { weight: 600 });
-      ctx.fillStyle = MUTED;
+      ctx.fillStyle = P.muted;
       ctx.fillText(p.line, W - 170, ry);
     });
   }
