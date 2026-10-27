@@ -5089,7 +5089,7 @@ a.comment-author-name:hover {
   justify-content: center;
   width: 100%;
   aspect-ratio: 4 / 5;
-  max-height: calc(100vh - 170px);
+  max-height: calc(100vh - 230px);
 }
 
 .flyer-preview img {
@@ -5126,6 +5126,36 @@ a.comment-author-name:hover {
 
 .flyer-btn--share {
   border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Selector Post / Historia de la vista previa del flyer. */
+.flyer-formats {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-alt);
+}
+
+.flyer-format {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flyer-format.active {
   background: var(--accent);
   color: #fff;
 }
