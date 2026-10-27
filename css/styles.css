@@ -6277,19 +6277,41 @@ h2.page-title {
   gap: 14px;
 }
 
+/* Tarjeta: foto a la izquierda, nombre y número a un lado. */
 .home-player {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 18px 10px;
+  gap: 16px;
+  padding: 16px 18px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
   color: var(--text);
-  text-align: center;
   text-decoration: none;
   transition: border-color 0.15s, transform 0.15s;
+}
+
+.home-player > :first-child {
+  flex-shrink: 0;
+}
+
+.home-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* En celular no caben 3 tarjetas horizontales: una por fila. */
+@media (max-width: 640px) {
+  .home-roster {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .home-player {
+    padding: 12px 14px;
+  }
 }
 
 .home-player:hover {
@@ -6299,13 +6321,13 @@ h2.page-title {
 
 .home-player-num {
   font-family: var(--font-display);
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
   color: var(--accent-text);
 }
 
 .home-player-name {
   font-weight: 700;
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
 }
 
 /* Historia. */

@@ -292,8 +292,10 @@ export function renderHome(container) {
           return `
         <a class="home-player" href="#/jugador/${p.id}">
           ${renderAvatar(p, 72)}
-          <span class="home-player-num">#${p.number ?? "-"}</span>
-          <span class="home-player-name">${escapeHtml(p.name)}</span>
+          <span class="home-player-info">
+            <span class="home-player-name">${escapeHtml(p.name)}</span>
+            <span class="home-player-num">#${p.number ?? "-"}</span>
+          </span>
         </a>`;
         })
         .join("")}
