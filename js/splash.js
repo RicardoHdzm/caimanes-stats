@@ -1,3 +1,7 @@
+// OJO: ya no hay #splash-gate en index.html (se quitó la pantalla de
+// "Entrar", a petición expresa) — initSplash() arranca la app de inmediato.
+// Todo lo de abajo queda para cuando se quiera volver a tener login.
+//
 // Pantalla de bienvenida (#splash-gate en index.html) — video de fondo,
 // logo grande y dos botones: "Soy jugador" abre el login AQUÍ MISMO (ya no
 // hay una página #/login aparte — ver showLogin() abajo); "Soy invitado"
