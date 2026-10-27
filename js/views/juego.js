@@ -400,7 +400,7 @@ export function renderJuegoDetalle(container, gameId) {
         openFlyer(
           (format) => resultFlyer(game, playoffContext?.round.name ?? null, format),
           `resultado-${game.date}`,
-          `Caimanes ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
+          `Caimanes de Villas ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
         )
       )
     );

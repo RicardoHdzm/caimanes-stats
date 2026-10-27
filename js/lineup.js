@@ -358,7 +358,7 @@ export function renderLineupResult(container, roster, gamePositionById = null) {
   shareRow.className = "share-flyer-row";
   shareRow.appendChild(
     shareButton(() =>
-      openFlyer((format) => lineupFlyer(orderRows, nextGame, format), `lineup${nextGame ? `-${nextGame.date}` : ""}`, "Lineup de los Caimanes")
+      openFlyer((format) => lineupFlyer(orderRows, nextGame, format), `lineup${nextGame ? `-${nextGame.date}` : ""}`, "Lineup de Caimanes de Villas")
     )
   );
   container.appendChild(shareRow);

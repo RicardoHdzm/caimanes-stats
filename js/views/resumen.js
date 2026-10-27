@@ -259,7 +259,7 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
     );
     // Flyer para redes (ver js/flyers.js).
     next.querySelector(".leader-hero-body").appendChild(
-      shareButton(() => openFlyer((format) => nextGameFlyer(g, format), `proximo-juego-${g.date}`, `Próximo juego: Caimanes vs ${g.opponent}`))
+      shareButton(() => openFlyer((format) => nextGameFlyer(g, format), `proximo-juego-${g.date}`, `Próximo juego: Caimanes de Villas vs ${g.opponent}`))
     );
     bottomRow.appendChild(next);
     wireRsvp(next, g.id);
