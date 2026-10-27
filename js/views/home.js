@@ -14,9 +14,9 @@ import {
   gameMvp,
   playoffSeasonStatus,
   playerName,
-  displayPositions,
 } from "../stats.js";
-import { escapeHtml, renderAvatar, renderPositionBadges, ordinalTemporada } from "../ui.js";
+import { escapeHtml, renderAvatar, ordinalTemporada } from "../ui.js";
+import { suggestedStarters } from "../lineup.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 
@@ -251,15 +251,15 @@ export function renderHome(container) {
   }
 
   // ---- Roster ----
+  // Solo los 9 titulares de "Posiciones sugeridas" (pestaña Alineación, sin
+  // JD ni JC), en orden P, C, 1B…; el resto vive en "Ver roster completo".
   const roster = document.createElement("section");
   roster.className = "home-section";
   roster.innerHTML = `
     ${sectionHead("Nuestro", "roster", "ROSTER", `${ordinalTemporada(season)} Temporada · ${ROSTER.length} jugadores`)}
     <div class="home-roster">
-      ${[...ROSTER]
-        .sort((a, b) => (a.number ?? 999) - (b.number ?? 999))
+      ${suggestedStarters()
         .map((p) => {
-          const posText = displayPositions(p.id, p.position);
           return `
         <a class="home-player" href="#/jugador/${p.id}">
           ${renderAvatar(p, 72)}

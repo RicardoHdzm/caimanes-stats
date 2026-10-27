@@ -2,10 +2,11 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, playerName, allStatGames, currentSeasonGames, gamesPlayedByPlayer } from "./stats.js";
+import { battingTotals, playerName, allStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
-import { SCHEDULE } from "./data.js";
+import { SCHEDULE, ROSTER } from "./data.js";
+import { cachedPositionOverrides } from "./db.js";
 import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 
 export const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
@@ -277,6 +278,48 @@ export function buildLineup(roster, statsById) {
   return buildLineupFromAssignment(roster, statsById, assignDefense(roster, statsById));
 }
 
+// Stats de bateo de carrera (todas las temporadas) + juegos jugados de ESTA
+// temporada — solo temporada REGULAR, sin playoffs (a petición expresa) —
+// para el criterio de "regular" (ver byRegularThenOps): la mitad o más de
+// los juegos de temporada regular jugados hasta hoy (5 de 10 ya cuenta).
+function lineupStatsById(roster) {
+  const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
+  const seasonGames = currentSeasonGames();
+  const seasonPlayed = gamesPlayedByPlayer(seasonGames);
+  return new Map(
+    roster.map((p) => {
+      const seasonGP = seasonPlayed.get(p.id) ?? 0;
+      const base = careerById.get(p.id) ?? emptyStats(p.id);
+      return [p.id, { ...base, seasonGP, regular: seasonGP >= seasonGames.length / 2 }];
+    })
+  );
+}
+
+// El roster completo como lo usa la pestaña Alineación. Posiciones
+// personalizadas (ver "Editar mis posiciones" en el perfil): ya vienen del
+// cache precargado (preloadOverrides en js/db.js), se leen SÍNCRONO; sin
+// precarga/señal el Map viene vacío y se usa la de data.js.
+//
+// `position` = las MÁS JUGADAS (ver displayPositions en js/stats.js), a
+// petición expresa; la registrada queda en `registeredPosition` como
+// último recurso del motor (ver assignDefense arriba).
+export function alineacionRoster() {
+  const overrides = cachedPositionOverrides();
+  return ROSTER.map((p) => {
+    const registered = overrides.get(p.id) ?? p.position ?? "";
+    return { ...p, registeredPosition: registered, position: displayPositions(p.id, registered) };
+  });
+}
+
+// Los 9 titulares de "Posiciones sugeridas" de la pestaña Alineación (sin
+// JD ni JC), en orden P, C, 1B… — los usa el roster de la portada. Mismo
+// cálculo que la pestaña: `roster` ya trae las posiciones más jugadas.
+export function suggestedStarters(roster = alineacionRoster()) {
+  const assignment = assignDefense(roster, lineupStatsById(roster));
+  const byId = new Map(roster.map((p) => [p.id, p]));
+  return DEFENSE_POSITIONS.map((pos) => assignment[pos] && byId.get(assignment[pos].playerId)).filter(Boolean);
+}
+
 // Pinta las dos secciones (orden al bat + posiciones sugeridas) dentro de
 // `container` a partir de un roster candidato. `container` se limpia
 // primero — se puede volver a llamar para regenerar con otro roster.
@@ -302,21 +345,7 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
     return;
   }
 
-  // Stats de bateo de carrera (todas las temporadas) + juegos jugados de
-  // ESTA temporada — solo temporada REGULAR, sin playoffs (a petición
-  // expresa) — para el criterio de "regular" (ver byRegularThenOps): la
-  // mitad o más de los juegos de temporada regular jugados hasta hoy (5 de
-  // 10 ya cuenta).
-  const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
-  const seasonGames = currentSeasonGames();
-  const seasonPlayed = gamesPlayedByPlayer(seasonGames);
-  const statsById = new Map(
-    roster.map((p) => {
-      const seasonGP = seasonPlayed.get(p.id) ?? 0;
-      const base = careerById.get(p.id) ?? emptyStats(p.id);
-      return [p.id, { ...base, seasonGP, regular: seasonGP >= seasonGames.length / 2 }];
-    })
-  );
+  const statsById = lineupStatsById(roster);
   const assignment = gamePositionById
     ? assignDefenseByChoice(roster, gamePositionById, statsById)
     : assignDefense(roster, statsById);
