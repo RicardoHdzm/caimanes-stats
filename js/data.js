@@ -126,7 +126,7 @@ export const DUES_PAID = {
     p6: true, // Edwyn Pompa
     p7: false, // Francois Cardenas
     p8: false, // Jorge Zazueta
-    p10: false, // Enrique Muñoz
+    p10: true, // Enrique Muñoz
     p11: false, // Luis Lugo Bastidas
     p12: false, // Luis Fernando Lugo
     p13: false, // Luis Pompa
