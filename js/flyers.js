@@ -447,7 +447,7 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
   text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 855, { size: 40, color: P.muted, weight: 600 });
 
   // Solo el MVP (a petición expresa, ya sin "figuras del juego").
-  const mvpId = gameMvp(game); // derrota = sin MVP
+  const mvpId = gameMvp(game); // derrota = sin MVP (ver gameMvp en js/stats.js)
   if (mvpId) {
     const mvp = playerById(mvpId);
     const gold = P.light ? "#a87412" : GOLD;
