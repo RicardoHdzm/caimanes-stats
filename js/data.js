@@ -131,7 +131,7 @@ export const DUES_PAID = {
     p12: false, // Luis Fernando Lugo
     p13: false, // Luis Pompa
     p14: false, // Ricardo Santoyo
-    p15: false, // Ricardo Hernández
+    p15: true, // Ricardo Hernández
     p16: false, // Ruben Perez
     p18: false, // Javier Urquiza
     p21: false, // Alberto Solis
