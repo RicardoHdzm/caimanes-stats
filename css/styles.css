@@ -6022,15 +6022,6 @@ h2.page-title {
   font-size: var(--text-sm);
 }
 
-.home-mini-title {
-  margin: 34px 0 14px;
-  font-family: var(--font-display);
-  font-size: var(--text-md);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 .home-empty {
   color: var(--muted);
 }
@@ -6060,6 +6051,10 @@ h2.page-title {
 }
 
 .home-match-league {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -6125,62 +6120,16 @@ h2.page-title {
   color: var(--accent-text);
 }
 
-/* Resultados recientes: fila deslizable. */
-.home-results {
-  display: flex;
-  gap: 12px;
-  padding-bottom: 14px;
-  overflow-x: auto;
-}
-
-/* Barra de desplazamiento gruesa y redondeada, en rojo Caimanes sobre un
-   riel oscuro. Chrome/Safari/Edge usan los ::-webkit-scrollbar; Firefox no
-   los entiende y se queda con scrollbar-color (más delgada, mismo color). */
-.home-results::-webkit-scrollbar {
-  height: 12px;
-}
-
-.home-results::-webkit-scrollbar-track {
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--text) 6%, transparent);
-}
-
-.home-results::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: var(--accent);
-}
-
-.home-results::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--accent) 82%, #fff);
-}
-
-@supports not selector(::-webkit-scrollbar) {
-  .home-results {
-    scrollbar-color: var(--accent) color-mix(in srgb, var(--text) 6%, transparent);
-  }
-}
-
-.home-result {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--muted);
-  font-size: var(--text-xs);
-  text-decoration: none;
-}
-
-.home-result b {
+.home-match-score {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
-  color: var(--text);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.home-result-badge {
+/* Etiqueta Victoria/Derrota de los juegos ya jugados. */
+.home-match-badge {
   padding: 3px 9px;
   border-radius: var(--radius-pill);
   font-weight: 800;
@@ -6190,11 +6139,11 @@ h2.page-title {
   background: var(--surface-alt);
 }
 
-.home-result-badge--W {
+.home-match-badge--W {
   background: color-mix(in srgb, var(--win) 75%, #000);
 }
 
-.home-result-badge--L {
+.home-match-badge--L {
   background: color-mix(in srgb, var(--accent) 85%, #000);
 }
 

@@ -1,7 +1,7 @@
 // Portada estilo lyon.gg (a petición expresa): hero a pantalla completa con
 // el logo y el nombre gigante, el próximo juego con cuenta regresiva, una
-// franja de números, cinta en movimiento, próximos juegos + resultados
-// recientes, la temporada en números, el roster y la historia del equipo.
+// franja de números, cinta en movimiento, historia de juegos (próximos +
+// últimos 4), la temporada en números y el roster.
 // Todo sale de data.js — no hay nada que mantener aparte.
 import { TEAM, SEASONS, SCHEDULE, ROSTER, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY } from "../data.js";
 import {
@@ -165,54 +165,46 @@ export function renderHome(container) {
     </div>
   `;
 
-  // ---- Próximos juegos + resultados recientes ----
+  // ---- Historia de juegos: los próximos y los últimos 4 finalizados ----
   const games = document.createElement("section");
   games.className = "home-section";
   games.id = "home-games";
   const upcoming = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date));
-  const recent = [...allGames].filter((g) => g.date && g.scoreUs != null).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
-  games.innerHTML = `
-    ${sectionHead("Próximos", "juegos", "JUEGOS", "El calendario del equipo — fecha, hora y rival.")}
-    <div class="home-match-grid">
-      ${
-        upcoming.length
-          ? upcoming
-              .map(
-                (g) => `
-        <a class="home-match" href="#/calendario">
-          <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
+  const recent = [...allGames].filter((g) => g.date && g.scoreUs != null).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
+  const matchTeams = (opponent, middle) => `
           <div class="home-match-teams">
             <span class="home-match-team"><img src="assets/logo.png" alt="" /> Caimanes</span>
-            <span class="home-match-vs">vs</span>
-            <span class="home-match-team home-match-team--rival"><i class="home-match-rival-badge">${escapeHtml(rivalInitials(g.opponent))}</i>${escapeHtml(g.opponent ?? "Rival")}</span>
-          </div>
+            ${middle}
+            <span class="home-match-team home-match-team--rival"><i class="home-match-rival-badge">${escapeHtml(rivalInitials(opponent))}</i>${escapeHtml(opponent ?? "Rival")}</span>
+          </div>`;
+  const upcomingCards = upcoming.map(
+    (g) => `
+        <a class="home-match" href="#/calendario">
+          <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
+          ${matchTeams(g.opponent, `<span class="home-match-vs">vs</span>`)}
           <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${fmtTime(g.time)}` : ""}</span>
           <span class="home-match-cta">Ver calendario ▸</span>
         </a>`
-              )
-              .join("")
-          : `<p class="home-empty">No hay juegos programados por ahora.</p>`
-      }
+  );
+  const recentCards = recent.map((g) => {
+    const r = gameResult(g);
+    return `
+        <a class="home-match" href="#/juegos/${g.id}">
+          <span class="home-match-league">
+            ${escapeHtml(TEAM.league)}${g.playoff ? " · Playoffs" : ""}
+            <span class="home-match-badge home-match-badge--${r}">${RESULT_LABEL[r] ?? "—"}</span>
+          </span>
+          ${matchTeams(g.opponent, `<span class="home-match-score">${g.scoreUs}–${g.scoreThem}</span>`)}
+          <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}</span>
+          <span class="home-match-cta">Ver juego ▸</span>
+        </a>`;
+  });
+  const cards = [...upcomingCards, ...recentCards];
+  games.innerHTML = `
+    ${sectionHead("Historia de", "juegos", "JUEGOS")}
+    <div class="home-match-grid">
+      ${cards.length ? cards.join("") : `<p class="home-empty">No hay juegos todavía.</p>`}
     </div>
-    ${
-      recent.length
-        ? `
-      <h3 class="home-mini-title">Resultados recientes</h3>
-      <div class="home-results">
-        ${recent
-          .map((g) => {
-            const r = gameResult(g);
-            return `
-          <a class="home-result" href="#/juegos/${g.id}">
-            <span class="home-result-badge home-result-badge--${r}">${RESULT_LABEL[r] ?? "—"}</span>
-            <b>${g.scoreUs}–${g.scoreThem}</b>
-            <span>vs ${escapeHtml(g.opponent ?? "")}${g.playoff ? " · Playoffs" : ""} · ${escapeHtml(fmtDate(g.date))}</span>
-          </a>`;
-          })
-          .join("")}
-      </div>`
-        : ""
-    }
   `;
   root.appendChild(games);
 
