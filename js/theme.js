@@ -1,4 +1,4 @@
-// Tres temas: Sol (claro, [data-theme="light"]), Eclipse (navy clásico,
+// Temas: Eclipse (navy clásico,
 // [data-theme="eclipse"]) y Luna (oscuro, el de siempre — default, sin
 // atributo). El botón vive en index.html (junto al ícono de Instagram) —
 // admin.html y lineup/index.html no lo tienen, pero si el tema guardado es
@@ -19,7 +19,11 @@
 // círculo deslizante (no hay espacio para ese widget dentro de un tile
 // cuadrado). Ambos controles, si están presentes, avanzan el mismo ciclo.
 const STORAGE_KEY = "caimanes-theme";
-const THEMES = ["light", "eclipse", "dark"];
+// "light" (Sol) quitado por ahora, a petición expresa — sus colores siguen
+// en css/styles.css ([data-theme="light"]); para regresarlo, vuelve a
+// ponerlo al principio de THEMES, en el script inline de cada .html y su
+// ícono en #theme-toggle de index.html. Quien lo tenía guardado cae a Luna.
+const THEMES = ["eclipse", "dark"];
 const THEME_LABEL = { light: "Sol", eclipse: "Eclipse", dark: "Luna" };
 const THEME_ICON = { light: "fa-sun", eclipse: "fa-circle-half-stroke", dark: "fa-moon" };
 

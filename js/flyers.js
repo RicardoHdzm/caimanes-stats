@@ -28,20 +28,6 @@ const WIN = "#3fb56f";
 const GOLD = "#f5b942";
 const TEAM_NAME = "CAIMANES DE VILLAS";
 
-const POS_COLOR = {
-  P: "#4a9eff",
-  C: "#a855f7",
-  "1B": "#e2c93f",
-  "2B": "#e2c93f",
-  "3B": "#e2c93f",
-  SS: "#e2c93f",
-  LF: "#3fb56f",
-  CF: "#3fb56f",
-  RF: "#3fb56f",
-  JD: "#ff8c33",
-  JC: "#ff6fb5",
-};
-
 const asset = (path) => new URL(`../${path}`, import.meta.url).href;
 
 // ---- colores del tema activo ----
@@ -392,14 +378,15 @@ export async function lineupFlyer(order, game = null, format = "post") {
     ctx.fillStyle = P.text;
     ctx.fillText(row.name.toUpperCase(), left + 72, mid + 2);
 
-    // Posición (badge con su color, igual que en el sitio).
+    // Posición: badge en blanco (color del texto del tema) para todas, a
+    // petición expresa — ya no con el color de cada posición del sitio.
     const pos = row.position ?? "";
     if (pos) {
-      const color = POS_COLOR[pos] ?? P.muted;
+      const color = P.text;
       const bw = 86;
       const bh = 44;
       roundRect(ctx, right - bw, mid - bh / 2, bw, bh, 10);
-      ctx.fillStyle = rgba(color, 0.15);
+      ctx.fillStyle = P.tint(0.1);
       ctx.fill();
       ctx.strokeStyle = color;
       ctx.lineWidth = 2.5;

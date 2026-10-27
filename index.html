@@ -8,7 +8,7 @@
   <script>
     try {
       var theme = localStorage.getItem("caimanes-theme");
-      if (theme === "light" || theme === "eclipse") {
+      if (theme === "eclipse") {
         document.documentElement.dataset.theme = theme;
       }
     } catch (e) {}
@@ -108,7 +108,6 @@
          js/theme.js). -->
     <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Luna — clic para cambiar">
       <span class="theme-switch-thumb"></span>
-      <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
       <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
       <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
     </button>
