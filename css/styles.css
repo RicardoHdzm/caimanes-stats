@@ -5500,9 +5500,11 @@ body.menu-open {
   text-decoration: none;
 }
 
+/* Cabeza del caimán en blanco (assets/logos/whitelogo@2x.png, más ancha
+   que alta): se fija el alto y el ancho sale solo. */
 .site-brand-logo {
-  width: 44px;
-  height: 44px;
+  width: auto;
+  height: 34px;
   object-fit: contain;
 }
 
