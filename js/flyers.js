@@ -573,15 +573,17 @@ function crocSkinLayer() {
         // Surco entre escamas.
         data[o + 3] = 120 - e * 40;
       } else {
-        // Relieve: claro arriba de la escama, oscuro abajo.
+        // Relieve redondeado, con la luz desde arriba: gradual de claro
+        // (parte de arriba de la escama, ny < 0) a oscuro (parte de abajo),
+        // y más oscuro cerca del surco.
         const dome = Math.min(1, e / 12);
-        const up = ny < 0 ? 1 : 0; // el píxel está debajo del centro → sombra
-        if (up) {
-          data[o] = data[o + 1] = data[o + 2] = 0;
-          data[o + 3] = 18 + (1 - dome) * 30;
-        } else {
+        const shade = Math.max(-1, Math.min(1, -ny / (CELL_H * 0.55)));
+        if (shade > 0) {
           data[o] = data[o + 1] = data[o + 2] = 255;
-          data[o + 3] = 6 + dome * 12;
+          data[o + 3] = shade * dome * 20;
+        } else {
+          data[o] = data[o + 1] = data[o + 2] = 0;
+          data[o + 3] = -shade * 34 + (1 - dome) * 22;
         }
       }
     }
@@ -594,7 +596,10 @@ function crocSkinLayer() {
 function drawCrocSkin(ctx) {
   ctx.save();
   ctx.imageSmoothingQuality = "high";
+  // Más transparente (a petición expresa): la piel se insinúa, no se impone.
+  ctx.globalAlpha = 0.55;
   ctx.drawImage(crocSkinLayer(), 0, 0, WALL_W, WALL_H);
+  ctx.globalAlpha = 1;
   // Más oscuro en las orillas, para que la piel no se vea plana.
   const vignette = ctx.createRadialGradient(WALL_W / 2, WALL_H * 0.47, 250, WALL_W / 2, WALL_H * 0.47, WALL_H * 0.75);
   vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
