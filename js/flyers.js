@@ -500,14 +500,14 @@ function jerseyText(ctx, str, cx, baseline, { size, maxWidth, color, outline, st
 // arriba, rayas diagonales finas, el logo enorme y casi transparente como
 // marca de agua detrás del número, dos franjas verticales tipo jersey a los
 // lados y barras de acento arriba/abajo.
-function drawWallpaperBackground(ctx, logo, { bg, accent }) {
+function drawWallpaperBackground(ctx, logo, { bg, accent, glow: glowColor = accent }) {
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
 
   const glow = ctx.createRadialGradient(WALL_W / 2, 520, 60, WALL_W / 2, 520, 1500);
-  glow.addColorStop(0, rgba(accent, 0.42));
-  glow.addColorStop(0.55, rgba(accent, 0.1));
-  glow.addColorStop(1, rgba(accent, 0));
+  glow.addColorStop(0, rgba(glowColor, 0.42));
+  glow.addColorStop(0.55, rgba(glowColor, 0.1));
+  glow.addColorStop(1, rgba(glowColor, 0));
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
 

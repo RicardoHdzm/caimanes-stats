@@ -13,8 +13,8 @@ const STORAGE_KEY = "caimanes-wallpaper";
 // Solo dos estilos (a petición expresa): Clásico (el azul marino de
 // Eclipse) primero y Moderno (el negro con rojo de Caimanes).
 const STYLES = [
-  { id: "clasico", label: "Clásico", bg: "#0a0e18", fg: "#ffffff", outline: "#bf0f35", accent: "#bf0f35" },
-  { id: "moderno", label: "Moderno", bg: "#0b0b0c", fg: "#e2202f", outline: "#ffffff", accent: "#e2202f" },
+  { id: "clasico", label: "Clásico", bg: "#0a0e18", fg: "#ffffff", outline: "#bf0f35", accent: "#bf0f35", glow: "#3b5bb5" },
+  { id: "moderno", label: "Moderno", bg: "#0b0b0c", fg: "#e2202f", outline: "#ffffff", accent: "#e2202f", glow: "#e2202f" },
 ];
 
 function loadState() {
