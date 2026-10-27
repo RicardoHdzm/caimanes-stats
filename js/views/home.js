@@ -122,9 +122,11 @@ export function renderHome(container) {
   // ---- Hero ----
   root.innerHTML = `
     <section class="home-hero">
-      <!-- Fondo: el video de la bienvenida (sin sonido, en loop), con un velo
-           oscuro encima (.home-hero-bg) para que se lea el texto. -->
-      <video class="home-hero-video" src="assets/video.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
+      <!-- Fondo: assets/hero.mp4 = copia ligera de assets/video.mp4 (720p,
+           sin audio, ~1.5 MB en vez de 34 MB — con el velo encima no se nota
+           la diferencia). El poster es su primer cuadro: se ve al instante
+           mientras carga el video. Velo del color del tema: .home-hero-bg. -->
+      <video class="home-hero-video" src="assets/hero.mp4" poster="assets/hero-poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="home-hero-bg" aria-hidden="true"></div>
       <div class="home-hero-content">
         <img src="assets/logo.png" alt="" class="home-hero-logo" />
