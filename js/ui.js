@@ -199,19 +199,60 @@ export function ordinalTemporada(n) {
   return `${n}${ORDINAL_SUFFIXES[n] ?? "va"}`;
 }
 
-// Avatar de un jugador: foto si `player.photo` está definido, si no un
-// círculo con sus iniciales. `size` en px (default 40).
-export function renderAvatar(player, size = 40) {
-  const style = `width:${size}px;height:${size}px;font-size:${size * 0.4}px;`;
-  if (player.photo) {
-    return `<img class="avatar" src="${player.photo}" alt="${player.name}" style="${style}">`;
-  }
-  const initials = (player.name ?? "")
+// Fotos de perfil: un archivo por jugador en assets/players/, con el ID del
+// jugador como nombre — assets/players/p12.jpg (o .png). No hay que tocar
+// data.js: si el archivo existe se usa, si no salen las iniciales. Se
+// intenta .jpg, luego .png, y si ninguno existe se cambia por el círculo de
+// iniciales (ver avatarFallback abajo). `player.photo` en data.js, si
+// está, sigue teniendo prioridad. La ruta se arma desde este archivo (no
+// desde la página) para que funcione igual en lineup/, que vive en una
+// subcarpeta.
+const PLAYER_PHOTO_EXTS = ["jpg", "png"];
+function playerPhotoUrl(playerId, ext) {
+  return new URL(`../assets/players/${playerId}.${ext}`, import.meta.url).href;
+}
+
+// Se llama desde el onerror del <img>: prueba la siguiente extensión y, si
+// ya no hay, pone las iniciales en su lugar.
+if (typeof window !== "undefined") {
+  window.__avatarFallback = (img) => {
+    const next = Number(img.dataset.ext ?? 0) + 1;
+    if (next < PLAYER_PHOTO_EXTS.length && img.dataset.player) {
+      img.dataset.ext = String(next);
+      img.src = playerPhotoUrl(img.dataset.player, PLAYER_PHOTO_EXTS[next]);
+      return;
+    }
+    img.onerror = null;
+    const span = document.createElement("span");
+    span.className = "avatar avatar-initials";
+    span.style.cssText = img.style.cssText;
+    span.textContent = img.dataset.initials ?? "";
+    img.replaceWith(span);
+  };
+}
+
+function initialsOf(player) {
+  return (player.name ?? "")
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
+}
+
+// Avatar de un jugador: su foto (player.photo, o la de assets/players/) y,
+// si no hay, un círculo con sus iniciales. `size` en px (default 40).
+export function renderAvatar(player, size = 40) {
+  const style = `width:${size}px;height:${size}px;font-size:${size * 0.4}px;`;
+  const initials = initialsOf(player);
+  const alt = escapeHtml(player.name ?? "");
+  if (player.photo) {
+    return `<img class="avatar" src="${player.photo}" alt="${alt}" style="${style}" data-initials="${initials}" onerror="window.__avatarFallback(this)">`;
+  }
+  const id = player.id ?? player.playerId;
+  if (id) {
+    return `<img class="avatar" src="${playerPhotoUrl(id, PLAYER_PHOTO_EXTS[0])}" alt="${alt}" style="${style}" data-player="${id}" data-ext="0" data-initials="${initials}" onerror="window.__avatarFallback(this)">`;
+  }
   return `<span class="avatar avatar-initials" style="${style}">${initials}</span>`;
 }
 
