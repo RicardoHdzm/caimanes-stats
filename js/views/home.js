@@ -256,7 +256,7 @@ export function renderHome(container) {
   const roster = document.createElement("section");
   roster.className = "home-section";
   roster.innerHTML = `
-    ${sectionHead("Nuestro", "roster", "ROSTER", `${ordinalTemporada(season)} Temporada · ${ROSTER.length} jugadores`)}
+    ${sectionHead("Somos", "Caimanes", "ROSTER", `${ordinalTemporada(season)} Temporada · ${ROSTER.length} jugadores`)}
     <div class="home-roster">
       ${suggestedStarters()
         .map((p) => {
