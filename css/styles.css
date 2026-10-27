@@ -6447,8 +6447,8 @@ h2.page-title {
 .home-hero-bg {
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--bg) 72%, transparent) 0%,
-    color-mix(in srgb, var(--bg) 62%, transparent) 50%,
+    color-mix(in srgb, var(--bg) 86%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 50%,
     var(--bg) 100%
   );
 }
