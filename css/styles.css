@@ -6067,6 +6067,16 @@ h2.page-title {
   color: var(--muted);
 }
 
+/* Temporada y número de juego, justo debajo de la liga. */
+.home-match-tag {
+  margin-top: -8px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
 .home-match-teams {
   display: grid;
   grid-template-columns: 1fr auto 1fr;

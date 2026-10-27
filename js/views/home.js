@@ -32,6 +32,20 @@ function fmtTime(timeStr) {
 
 // Título de sección: "PRÓXIMOS **JUEGOS** ///" con una palabra gigante y
 // tenue detrás (como "ARENA" / "ADN" en lyon.gg).
+// "8va Temporada · Juego 9" — número de juego dentro de su temporada (por
+// fecha). Los de playoffs se cuentan dentro de su serie, con el nombre de la
+// ronda: "8va Temporada · Cuartos de Final · Juego 2".
+function gameTag(g) {
+  const season = `${ordinalTemporada(g.season)} Temporada`;
+  if (g.playoff) {
+    const round = PLAYOFFS.find((e) => e.season === g.season)?.rounds.find((r) => r.games?.some((x) => x.id === g.id));
+    const n = round ? round.games.findIndex((x) => x.id === g.id) + 1 : 0;
+    return [season, round?.name ?? "Playoffs", n ? `Juego ${n}` : ""].filter(Boolean).join(" · ");
+  }
+  const n = GAMES.filter((x) => x.season === g.season).sort((a, b) => a.date.localeCompare(b.date)).findIndex((x) => x.id === g.id) + 1;
+  return n ? `${season} · Juego ${n}` : season;
+}
+
 function sectionHead(first, accent, bgWord, sub = "") {
   return `
     <div class="home-section-head">
@@ -177,10 +191,14 @@ export function renderHome(container) {
             ${middle}
             <span class="home-match-team home-match-team--rival"><i class="home-match-rival-badge">${escapeHtml(rivalInitials(opponent))}</i>${escapeHtml(opponent ?? "Rival")}</span>
           </div>`;
+  // Los programados son de la temporada actual y siguen la numeración de los
+  // juegos de temporada regular que ya se capturaron en GAMES.
+  const playedThisSeason = GAMES.filter((g) => g.season === CURRENT_SEASON).length;
   const upcomingCards = upcoming.map(
-    (g) => `
+    (g, i) => `
         <a class="home-match home-match--next" href="#/calendario">
           <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
+          <span class="home-match-tag">${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${playedThisSeason + i + 1}</span>
           ${matchTeams(g.opponent, `<span class="home-match-vs">vs</span>`)}
           <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${fmtTime(g.time)}` : ""}</span>
           <span class="home-match-cta">Ver calendario ▸</span>
@@ -191,9 +209,10 @@ export function renderHome(container) {
     return `
         <a class="home-match" href="#/juegos/${g.id}">
           <span class="home-match-league">
-            ${escapeHtml(TEAM.league)}${g.playoff ? " · Playoffs" : ""}
+            ${escapeHtml(TEAM.league)}
             <span class="home-match-badge home-match-badge--${r}">${RESULT_LABEL[r] ?? "—"}</span>
           </span>
+          <span class="home-match-tag">${escapeHtml(gameTag(g))}</span>
           ${matchTeams(g.opponent, `<span class="home-match-score">${g.scoreUs}–${g.scoreThem}</span>`)}
           <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}</span>
           <span class="home-match-cta">Ver juego ▸</span>
