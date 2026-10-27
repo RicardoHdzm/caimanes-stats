@@ -617,6 +617,22 @@ function drawCrocSkin(ctx, alpha = 0.55) {
 // la piel con "source-atop" y luego se pega con su sombra). `skinScale`
 // achica las escamas — en el apellido, con trazos delgados, escamas del
 // tamaño del fondo se verían como manchas sueltas.
+// Encima la piel de caimán SOLO sobre lo que ya está dibujado en `lctx`
+// (letras, logo) — "source-atop" respeta la transparencia de lo de abajo.
+function applySkin(lctx, alpha, scale = 1) {
+  if (!(alpha > 0)) return;
+  lctx.save();
+  lctx.globalCompositeOperation = "source-atop";
+  lctx.globalAlpha = alpha;
+  const tile = crocSkinLayer();
+  const tw = WALL_W * scale;
+  const th = WALL_H * scale;
+  for (let y = 0; y < WALL_H; y += th) {
+    for (let x = 0; x < WALL_W; x += tw) lctx.drawImage(tile, x, y, tw, th);
+  }
+  lctx.restore();
+}
+
 function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0, skinScale = 1 }) {
   const layer = document.createElement("canvas");
   layer.width = WALL_W;
@@ -633,16 +649,7 @@ function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0,
   lctx.textBaseline = "alphabetic";
   lctx.fillText(str, WALL_W / 2, baseline);
 
-  if (skin > 0) {
-    lctx.globalCompositeOperation = "source-atop";
-    lctx.globalAlpha = skin;
-    const tile = crocSkinLayer();
-    const tw = WALL_W * skinScale;
-    const th = WALL_H * skinScale;
-    for (let y = 0; y < WALL_H; y += th) {
-      for (let x = 0; x < WALL_W; x += tw) lctx.drawImage(tile, x, y, tw, th);
-    }
-  }
+  applySkin(lctx, skin, skinScale);
 
   ctx.save();
   if (shadow) {
@@ -680,9 +687,16 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   const logo = logos[style.logo];
   if (logo) {
+    // El logo también con la piel (a petición expresa), igual que las letras.
     const w = 190;
     const h = (w * logo.naturalHeight) / logo.naturalWidth;
-    ctx.drawImage(logo, (WALL_W - w) / 2, 1565, w, h);
+    const layer = document.createElement("canvas");
+    layer.width = WALL_W;
+    layer.height = WALL_H;
+    const lctx = layer.getContext("2d");
+    lctx.drawImage(logo, (WALL_W - w) / 2, 1565, w, h);
+    applySkin(lctx, textSkin);
+    ctx.drawImage(layer, 0, 0);
   }
   return canvas;
 }
