@@ -42,6 +42,15 @@ function sectionHead(first, accent, bgWord, sub = "") {
   `;
 }
 
+// "Rockin Roll" -> "RR", "Blockreto" -> "BL": el "logo" del rival (no
+// tenemos los escudos de los demás equipos).
+function rivalInitials(name) {
+  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
 function nextGame() {
   const today = new Date().toISOString().slice(0, 10);
   return [...SCHEDULE].filter((g) => g.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] ?? SCHEDULE[0] ?? null;
@@ -157,7 +166,7 @@ export function renderHome(container) {
           <div class="home-match-teams">
             <span class="home-match-team"><img src="assets/logo.png" alt="" /> Caimanes</span>
             <span class="home-match-vs">vs</span>
-            <span class="home-match-team home-match-team--rival">${escapeHtml(g.opponent ?? "Rival")}</span>
+            <span class="home-match-team home-match-team--rival"><i class="home-match-rival-badge">${escapeHtml(rivalInitials(g.opponent))}</i>${escapeHtml(g.opponent ?? "Rival")}</span>
           </div>
           <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${fmtTime(g.time)}` : ""}</span>
           <span class="home-match-cta">Ver calendario ▸</span>
@@ -203,7 +212,7 @@ export function renderHome(container) {
     if (po?.rounds.length) {
       const st = playoffSeasonStatus(po);
       const lastRound = st.rounds[st.rounds.length - 1]?.round?.name ?? "";
-      poText = st.status === "campeones" ? "¡Campeones!" : st.status === "eliminados" ? `Playoffs · ${lastRound}` : `Playoffs en curso · ${lastRound}`;
+      poText = st.status === "campeones" ? "¡Campeones!" : st.status === "eliminados" ? `Playoffs · eliminados en ${lastRound}` : `Playoffs en curso · ${lastRound}`;
     }
     const played = gamesPlayedByPlayer(statGames);
     const top = battingTotals(statGames)

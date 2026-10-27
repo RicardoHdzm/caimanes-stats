@@ -6074,8 +6074,8 @@ h2.page-title {
   object-fit: contain;
 }
 
-.home-match-team--rival::before {
-  content: "VS";
+.home-match-rival-badge {
+  font-style: normal;
   display: flex;
   align-items: center;
   justify-content: center;
