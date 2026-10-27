@@ -465,7 +465,7 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
 
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
-// Diseño de Ricardo: fondo con trama de malla, apellido (sin acentos) y
+// Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y
 // número centrados en la fuente
 // de jersey Legend M54 (assets/fonts/legend-m54.ttf) y, debajo, la cabeza
 // del caimán (assets/logos/, versión blanca o roja según el estilo). El
@@ -503,27 +503,70 @@ export function stripAccents(str) {
     .normalize("NFC");
 }
 
-// Trama del fondo: malla de puntitos escalonados, como la tela de una
-// playera — se nota de cerca, de lejos el fondo se sigue viendo liso.
-function drawMesh(ctx) {
-  const step = 16;
-  const dot = 5;
-  ctx.save();
-  ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
-  for (let y = 0, row = 0; y < WALL_H; y += step, row++) {
-    for (let x = row % 2 ? step / 2 : 0; x < WALL_W; x += step) {
-      ctx.beginPath();
-      ctx.arc(x, y, dot / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+// Trama del fondo: piel de caimán — escamas rectangulares redondeadas en
+// hileras escalonadas (como la panza del caimán), más grandes al centro y
+// más chicas hacia las orillas, cada una con un brillo arriba y sombra
+// abajo para que se sienta el relieve. Muy sutil, para no competir con el
+// texto. Aleatorio con semilla fija: el wallpaper sale igual cada vez.
+function drawCrocSkin(ctx) {
+  let seed = 20260;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // Anchos de columna: grandes al centro, chicos a los lados.
+  const cols = [];
+  for (let x = 0; x < WALL_W + 200; ) {
+    const t = Math.abs(x + 60 - WALL_W / 2) / (WALL_W / 2); // 0 centro, 1 orilla
+    const w = 150 - 60 * Math.min(t, 1);
+    cols.push({ x, w });
+    x += w;
   }
-  // Un poco más oscuro en las orillas, para que la trama no se vea plana.
+
+  ctx.save();
+  let row = 0;
+  for (let y = -40; y < WALL_H + 100; row++) {
+    const rowH = 92 + rand() * 26;
+    const shift = row % 2 ? 0.5 : 0;
+    for (let i = 0; i < cols.length; i++) {
+      const col = cols[i];
+      // Hileras pares centradas en la columna; impares, en la orilla entre
+      // dos columnas (escalonado, como ladrillos).
+      const cx = col.x + (shift ? 0 : col.w / 2) + (rand() - 0.5) * 8;
+      const w = col.w * (0.84 + rand() * 0.08);
+      const h = rowH * (0.8 + rand() * 0.1);
+      const x0 = cx - w / 2;
+      const y0 = y + (rowH - h) / 2 + (rand() - 0.5) * 6;
+      const r = Math.min(w, h) * (0.22 + rand() * 0.12);
+      roundRectPath(ctx, x0, y0, w, h, r);
+      const g = ctx.createLinearGradient(0, y0, 0, y0 + h);
+      g.addColorStop(0, "rgba(255, 255, 255, 0.075)");
+      g.addColorStop(0.45, "rgba(255, 255, 255, 0.025)");
+      g.addColorStop(1, "rgba(0, 0, 0, 0.22)");
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+    y += rowH;
+  }
+
+  // Más oscuro en las orillas, para que la piel no se vea plana.
   const vignette = ctx.createRadialGradient(WALL_W / 2, WALL_H * 0.47, 250, WALL_W / 2, WALL_H * 0.47, WALL_H * 0.75);
   vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-  vignette.addColorStop(1, "rgba(0, 0, 0, 0.45)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.5)");
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
   ctx.restore();
+}
+
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
 }
 
 // Texto centrado que se achica hasta caber en `maxWidth`.
@@ -560,19 +603,19 @@ export async function wallpaperCanvas({ name, number, style }) {
 
   ctx.fillStyle = style.bg;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
-  drawMesh(ctx);
+  drawCrocSkin(ctx);
 
   const maxWidth = WALL_W * 0.62;
   const nameText = stripAccents(name).trim().toUpperCase();
   if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
   const numText = String(number ?? "").trim();
-  if (numText) wallText(ctx, numText, 1420, { size: 520, maxWidth, color: style.fg, shadow: style.shadow });
+  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.fg, shadow: style.shadow });
 
   const logo = logos[style.logo];
   if (logo) {
     const w = 190;
     const h = (w * logo.naturalHeight) / logo.naturalWidth;
-    ctx.drawImage(logo, (WALL_W - w) / 2, 1495, w, h);
+    ctx.drawImage(logo, (WALL_W - w) / 2, 1565, w, h);
   }
   return canvas;
 }
