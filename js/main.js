@@ -56,7 +56,6 @@ const BOTTOM_TABS = [
 // luego lo de playoffs/stats (consulta más ocasional) y las herramientas
 // extra (Alineación, Playlist) al final.
 const MORE_TABS = [
-  { tab: "home", route: "#/", label: "Inicio", icon: "fa-house" },
   { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
