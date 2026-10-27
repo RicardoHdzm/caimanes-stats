@@ -10,11 +10,11 @@ import { wallpaperCanvas } from "../flyers.js";
 
 const STORAGE_KEY = "caimanes-wallpaper";
 
-// Solo dos estilos (a petición expresa): Clásico (el azul marino de
-// Eclipse) primero y Moderno (el negro con rojo de Caimanes).
+// Solo dos estilos (a petición expresa), con el diseño de Ricardo: Clásico
+// (azul marino, letras blancas con sombra) primero y Moderno (negro, rojo).
 const STYLES = [
-  { id: "clasico", label: "Clásico", bg: "#0a0e18", fg: "#ffffff", outline: "#bf0f35", accent: "#bf0f35", glow: "#3b5bb5" },
-  { id: "moderno", label: "Moderno", bg: "#0b0b0c", fg: "#e2202f", outline: "#ffffff", accent: "#e2202f", glow: "#e2202f" },
+  { id: "clasico", label: "Clásico", bg: "#111827", fg: "#ffffff", logo: "white", shadow: true },
+  { id: "moderno", label: "Moderno", bg: "#000000", fg: "#d31245", logo: "red", shadow: false },
 ];
 
 function loadState() {
@@ -86,7 +86,7 @@ export function renderFanzone(container) {
         ${STYLES.map(
           (st) => `
             <button type="button" class="fz-preset" data-style="${st.id}" title="${st.label}">
-              <span class="fz-swatch" style="background:${st.bg};color:${st.fg};-webkit-text-stroke:1px ${st.outline};">8</span>
+              <span class="fz-swatch" style="background:${st.bg};color:${st.fg};">8</span>
               <span>${st.label}</span>
             </button>
           `

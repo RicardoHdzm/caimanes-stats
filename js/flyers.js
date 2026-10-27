@@ -465,135 +465,80 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
 
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
-// Fondo liso, logo arriba, apellido y número grandes en "letra de jersey"
-// (Barlow Condensed estirada a lo ancho). 1170×2532 = proporción de los
-// celulares actuales (19.5:9). `outline` opcional: contorno de las letras.
+// Diseño de Ricardo: fondo liso, apellido y número centrados en la fuente
+// de jersey Legend M54 (assets/fonts/legend-m54.ttf) y, debajo, la cabeza
+// del caimán (assets/logos/, versión blanca o roja según el estilo). El
+// estilo Clásico lleva una sombra suave en las letras; el Moderno, plano.
+// 1170×2532 = proporción de los celulares actuales (19.5:9).
 const WALL_W = 1170;
 const WALL_H = 2532;
+const JERSEY_FONT = '"Legend M54", "Barlow Condensed", "Arial Narrow", sans-serif';
 
-// Texto "de jersey": se estira horizontalmente (`stretch`) y se achica
-// hasta caber en `maxWidth`. Regresa nada; dibuja centrado en cx.
-function jerseyText(ctx, str, cx, baseline, { size, maxWidth, color, outline, stretch = 1.28, outlineWidth }) {
-  let s = size;
-  ctx.font = font(s);
-  while (s > 40 && ctx.measureText(str).width * stretch > maxWidth) {
-    s -= 8;
-    ctx.font = font(s);
-  }
-  ctx.save();
-  ctx.translate(cx, baseline);
-  ctx.scale(stretch, 1);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
-  if (outline) {
-    ctx.lineJoin = "round";
-    ctx.strokeStyle = outline;
-    ctx.lineWidth = outlineWidth ?? Math.max(8, s * 0.06);
-    ctx.strokeText(str, 0, 0);
-  }
-  ctx.fillStyle = color;
-  ctx.fillText(str, 0, 0);
-  ctx.restore();
+let wallAssetsPromise = null;
+function loadWallpaperAssets() {
+  wallAssetsPromise ??= (async () => {
+    try {
+      const face = new FontFace("Legend M54", `url("${asset("assets/fonts/legend-m54.ttf")}")`);
+      await face.load();
+      document.fonts.add(face);
+    } catch {
+      // Sin la fuente se dibuja con Barlow Condensed (respaldo de JERSEY_FONT).
+    }
+    const [white, red] = await Promise.all([
+      loadImage(asset("assets/logos/whitelogo@2x.png")),
+      loadImage(asset("assets/logos/redlogo@2x.png")),
+    ]);
+    return { logos: { white, red } };
+  })();
+  return wallAssetsPromise;
 }
 
-// Fondo del wallpaper: no plano — color base, brillo del color de acento
-// arriba, rayas diagonales finas, el logo enorme y casi transparente como
-// marca de agua detrás del número, dos franjas verticales tipo jersey a los
-// lados y barras de acento arriba/abajo.
-function drawWallpaperBackground(ctx, logo, { bg, accent, glow: glowColor = accent }) {
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, WALL_W, WALL_H);
-
-  const glow = ctx.createRadialGradient(WALL_W / 2, 520, 60, WALL_W / 2, 520, 1500);
-  glow.addColorStop(0, rgba(glowColor, 0.42));
-  glow.addColorStop(0.55, rgba(glowColor, 0.1));
-  glow.addColorStop(1, rgba(glowColor, 0));
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, WALL_W, WALL_H);
-
+// Texto centrado que se achica hasta caber en `maxWidth`.
+function wallText(ctx, str, baseline, { size, maxWidth, color, shadow }) {
+  let s = size;
+  ctx.font = `${s}px ${JERSEY_FONT}`;
+  while (s > 40 && ctx.measureText(str).width > maxWidth) {
+    s -= 6;
+    ctx.font = `${s}px ${JERSEY_FONT}`;
+  }
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
-  ctx.lineWidth = 3;
-  for (let x = -WALL_H; x < WALL_W; x += 34) {
-    ctx.beginPath();
-    ctx.moveTo(x, WALL_H);
-    ctx.lineTo(x + WALL_H, 0);
-    ctx.stroke();
+  if (shadow) {
+    ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetX = 10;
+    ctx.shadowOffsetY = 12;
   }
+  ctx.fillStyle = color;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(str, WALL_W / 2, baseline);
   ctx.restore();
-
-  // Marca de agua: el logo gigante, apenas visible, detrás del número.
-  if (logo) {
-    const size = 1500;
-    ctx.save();
-    ctx.globalAlpha = 0.06;
-    ctx.drawImage(logo, (WALL_W - size) / 2, 820, size, size);
-    ctx.restore();
-  }
-
-  // Franjas verticales a los lados (como las de una playera).
-  for (const x of [70, WALL_W - 70 - 26]) {
-    const stripe = ctx.createLinearGradient(0, 0, 0, WALL_H);
-    stripe.addColorStop(0, rgba(accent, 0));
-    stripe.addColorStop(0.3, rgba(accent, 0.75));
-    stripe.addColorStop(0.7, rgba(accent, 0.75));
-    stripe.addColorStop(1, rgba(accent, 0));
-    ctx.fillStyle = stripe;
-    ctx.fillRect(x, 0, 26, WALL_H);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.fillRect(x + 34, WALL_H * 0.3, 5, WALL_H * 0.4);
-  }
-
-  // Oscurece la parte de abajo (ahí van los botones del celular).
-  const fade = ctx.createLinearGradient(0, WALL_H - 700, 0, WALL_H);
-  fade.addColorStop(0, "rgba(0, 0, 0, 0)");
-  fade.addColorStop(1, "rgba(0, 0, 0, 0.55)");
-  ctx.fillStyle = fade;
-  ctx.fillRect(0, WALL_H - 700, WALL_W, 700);
-
-  ctx.fillStyle = accent;
-  ctx.fillRect(0, 0, WALL_W, 12);
-  ctx.fillRect(0, WALL_H - 12, WALL_W, 12);
 }
 
 // `name`: apellido (o lo que se quiera). `number`: texto del número.
-// `style`: { bg, fg, outline, accent } — uno de los estilos de Fanzone.
+// `style`: { bg, fg, logo: "white" | "red", shadow } — ver STYLES en
+// js/views/fanzone.js.
 export async function wallpaperCanvas({ name, number, style }) {
-  const { logo } = await loadAssets();
+  const { logos } = await loadWallpaperAssets();
   const canvas = document.createElement("canvas");
   canvas.width = WALL_W;
   canvas.height = WALL_H;
   const ctx = canvas.getContext("2d");
-  const { fg, outline } = style;
 
-  drawWallpaperBackground(ctx, logo, style);
+  ctx.fillStyle = style.bg;
+  ctx.fillRect(0, 0, WALL_W, WALL_H);
 
-  if (logo) {
-    const size = 320;
-    ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
-    ctx.shadowBlur = 30;
-    ctx.drawImage(logo, (WALL_W - size) / 2, 330, size, size);
-    ctx.restore();
-  }
-
-  // Apellido arriba del número; el número va más al centro de la pantalla
-  // (su centro queda a ~56% del alto, debajo del reloj del celular).
+  const maxWidth = WALL_W * 0.62;
   const nameText = (name ?? "").trim().toUpperCase();
-  if (nameText) {
-    ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
-    ctx.shadowBlur = 24;
-    jerseyText(ctx, nameText, WALL_W / 2, 1010, { size: 280, maxWidth: WALL_W - 260, color: fg, outline });
-    ctx.restore();
-  }
+  if (nameText) wallText(ctx, nameText, 1005, { size: 165, maxWidth, color: style.fg, shadow: style.shadow });
   const numText = String(number ?? "").trim();
-  if (numText) {
-    ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-    ctx.shadowBlur = 40;
-    jerseyText(ctx, numText, WALL_W / 2, 1790, { size: 1000, maxWidth: WALL_W - 260, color: fg, outline, outlineWidth: outline ? 24 : 0 });
-    ctx.restore();
+  if (numText) wallText(ctx, numText, 1420, { size: 520, maxWidth, color: style.fg, shadow: style.shadow });
+
+  const logo = logos[style.logo];
+  if (logo) {
+    const w = 190;
+    const h = (w * logo.naturalHeight) / logo.naturalWidth;
+    ctx.drawImage(logo, (WALL_W - w) / 2, 1495, w, h);
   }
   return canvas;
 }
