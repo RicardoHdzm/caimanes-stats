@@ -18,8 +18,8 @@ import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS } from "./data.js";
 
 const W = 1080;
 // H = alto del CONTENIDO (el diseño del post). En historia el lienzo mide
-// 1920 y ese mismo contenido va centrado — los ~285 px que sobran arriba y
-// abajo quedan de fondo, justo donde Instagram/WhatsApp ponen sus botones.
+// 1920: el logo crece y va arriba, y el resto del contenido se recorre
+// debajo (ver placeLogo).
 const H = 1350;
 const FORMAT_HEIGHT = { post: 1350, story: 1920 };
 const FONT = '"Barlow Condensed", "Arial Narrow", sans-serif';
@@ -292,9 +292,9 @@ function drawFooter(ctx, sponsors) {
   ctx.globalAlpha = 1;
 }
 
-// Lienzo del formato pedido, con la paleta del tema activo, el fondo ya
-// pintado de orilla a orilla y el contexto desplazado para que el contenido
-// (diseñado a 1350 de alto) quede centrado.
+// Lienzo del formato pedido, con la paleta del tema activo y el fondo ya
+// pintado de orilla a orilla. El logo y el desplazamiento del contenido los
+// pone placeLogo() (en historia el logo va más grande, arriba).
 function newFlyer(format) {
   P = themePalette();
   const canvas = document.createElement("canvas");
@@ -302,8 +302,21 @@ function newFlyer(format) {
   canvas.height = FORMAT_HEIGHT[format] ?? H;
   const ctx = canvas.getContext("2d");
   drawBackground(ctx, canvas.height);
-  ctx.translate(0, (canvas.height - H) / 2);
-  return { canvas, ctx };
+  return { canvas, ctx, story: format === "story" };
+}
+
+// En post: el logo va donde dice el diseño (`y`, `size`). En historia
+// (1920 de alto) sobra espacio: el logo sale MUCHO más grande en la parte
+// de arriba y el resto del contenido (que en el diseño empieza en
+// `contentTop`) se recorre para quedar justo debajo.
+const STORY_LOGO = { y: 140, size: 470, gap: 30 };
+function placeLogo(ctx, logo, story, { y, size, contentTop }) {
+  if (!story) {
+    drawLogo(ctx, logo, W / 2, y, size);
+    return;
+  }
+  drawLogo(ctx, logo, W / 2, STORY_LOGO.y, STORY_LOGO.size);
+  ctx.translate(0, STORY_LOGO.y + STORY_LOGO.size + STORY_LOGO.gap - contentTop);
 }
 
 // ---- los tres flyers ----
@@ -311,8 +324,8 @@ function newFlyer(format) {
 // `game`: una entrada de SCHEDULE ({ date, time, opponent }).
 export async function nextGameFlyer(game, format = "post") {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 36, 340);
+  const { canvas, ctx, story } = newFlyer(format);
+  placeLogo(ctx, logo, story, { y: 36, size: 340, contentTop: 398 });
 
   pill(ctx, "PRÓXIMO JUEGO", W / 2, 398, { size: 42 });
 
@@ -338,8 +351,8 @@ export async function nextGameFlyer(game, format = "post") {
 // de SCHEDULE, para el "vs Rival · fecha".
 export async function lineupFlyer(order, game = null, format = "post") {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 24, 240);
+  const { canvas, ctx, story } = newFlyer(format);
+  placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 285 });
 
   text(ctx, "LINEUP", W / 2, 360, { size: 110, italic: true });
   if (game) {
@@ -426,8 +439,8 @@ function topPerformers(game, n = 3) {
 // la ronda si es de playoffs.
 export async function resultFlyer(game, playoffRound = null, format = "post") {
   const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx } = newFlyer(format);
-  drawLogo(ctx, logo, W / 2, 24, 240);
+  const { canvas, ctx, story } = newFlyer(format);
+  placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 282 });
 
   const us = game.scoreUs;
   const them = game.scoreThem;

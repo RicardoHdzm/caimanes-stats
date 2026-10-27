@@ -283,10 +283,12 @@ export function buildLineup(roster, statsById) {
 // deriva de las posiciones registradas en el roster (lo que usa la pestaña
 // Alineación); si se da, cada jugador va a la posición que se le eligió a
 // mano (lo que usa lineup/).
-// `share` (opcional): agrega el botón de flyer para redes. Solo lo usa la
-// herramienta de alineación por juego (lineup/, js/lineup-tool.js) — la
-// sugerencia de la pestaña Alineación no lo lleva, a petición expresa.
-export function renderLineupResult(container, roster, gamePositionById = null, { share = false } = {}) {
+// `share` (opcional): agrega el botón de flyer para redes. `reorder`
+// (opcional): el orden al bat se puede reacomodar ARRASTRANDO las filas
+// (de la agarradera ⠿). Los dos solo los usa la herramienta de alineación
+// por juego (lineup/, js/lineup-tool.js) — la sugerencia de la pestaña
+// Alineación no los lleva, a petición expresa.
+export function renderLineupResult(container, roster, gamePositionById = null, { share = false, reorder = false } = {}) {
   container.innerHTML = "";
 
   if (roster.length === 0) {
@@ -369,6 +371,17 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
   }
 
   const orderColumns = [
+    ...(reorder
+      ? [
+          {
+            key: "drag",
+            label: "",
+            sticky: true,
+            render: (_v, row) =>
+              row.slotDisplay === "P" ? "" : '<span class="drag-handle" title="Arrastra para cambiar el orden"><i class="fa-solid fa-grip-vertical"></i></span>',
+          },
+        ]
+      : []),
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
     { key: "name", label: "Jugador", sticky: true },
     { key: "position", label: "Pos", full: "Posición", render: (v) => renderPositionBadge(v) },
@@ -383,13 +396,20 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
 
   const orderEl = document.createElement("div");
   container.appendChild(orderEl);
-  renderSortableTable(orderEl, {
-    columns: orderColumns,
-    rows: orderRows,
-    defaultSort: "slot",
-    defaultDir: 1,
-    rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
-  });
+  function drawOrder() {
+    renderSortableTable(orderEl, {
+      columns: orderColumns,
+      rows: orderRows,
+      defaultSort: "slot",
+      defaultDir: 1,
+      // Con arrastre, los encabezados no reordenan (si no, ordenar por OPS
+      // "deshace" lo que se acomodó a mano).
+      sortable: !reorder,
+      rowClass: (row) => (row.slotDisplay === "P" ? "row-locked" : row.playerId === getCurrentPlayerId() ? "row-you" : ""),
+    });
+  }
+  drawOrder();
+  if (reorder) enableRowDrag(orderEl, orderRows, drawOrder);
 
   const defenseHeading = document.createElement("h3");
   defenseHeading.textContent = "Posiciones sugeridas";
@@ -442,4 +462,61 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
       .join("");
     container.appendChild(benchGrid);
   }
+}
+
+// Arrastrar para reacomodar el orden al bat (solo lineup/, ver `reorder` en
+// renderLineupResult). Con pointer events — funciona igual con mouse y con
+// el dedo (el drag & drop nativo de HTML no sirve en celular). La fila del
+// pitcher ("P", no batea) se queda fija al final. `rows` es el MISMO
+// arreglo que lee el flyer de compartir: se reacomoda en su lugar y se
+// renumeran los turnos, así el flyer sale con el orden nuevo.
+function enableRowDrag(tableContainer, rows, redraw) {
+  tableContainer.addEventListener("pointerdown", (e) => {
+    const handle = e.target.closest(".drag-handle");
+    if (!handle) return;
+    const tr = handle.closest("tr");
+    const tbody = tr?.parentElement;
+    if (!tbody) return;
+    const from = [...tbody.children].indexOf(tr);
+    if (from < 0) return;
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    tr.classList.add("row-dragging");
+
+    function onMove(ev) {
+      const locked = tbody.querySelector(".row-locked");
+      const others = [...tbody.children].filter((r) => r !== tr && r !== locked);
+      const before = others.find((r) => {
+        const box = r.getBoundingClientRect();
+        return ev.clientY < box.top + box.height / 2;
+      });
+      tbody.insertBefore(tr, before ?? locked ?? null);
+    }
+
+    function onEnd() {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onEnd);
+      handle.removeEventListener("pointercancel", onEnd);
+      tr.classList.remove("row-dragging");
+      const to = [...tbody.children].indexOf(tr);
+      if (to !== from && to >= 0) {
+        const [moved] = rows.splice(from, 1);
+        rows.splice(to, 0, moved);
+        let n = 0;
+        for (const r of rows) {
+          if (r.slotDisplay === "P") continue;
+          n += 1;
+          r.slot = n;
+          r.slotDisplay = String(n);
+        }
+        const pitcher = rows.find((r) => r.slotDisplay === "P");
+        if (pitcher) pitcher.slot = n + 1;
+      }
+      redraw();
+    }
+
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onEnd);
+    handle.addEventListener("pointercancel", onEnd);
+  });
 }

@@ -145,6 +145,6 @@ document.getElementById("generate-btn").addEventListener("click", () => {
   const attendees = attending.map((e) => e.player);
   const gamePositionById = new Map(attending.map((e) => [e.player.id, e.select.value || null]));
 
-  renderLineupResult(resultEl, attendees, gamePositionById, { share: true });
+  renderLineupResult(resultEl, attendees, gamePositionById, { share: true, reorder: true });
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
 });

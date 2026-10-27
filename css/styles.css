@@ -5159,3 +5159,33 @@ a.comment-author-name:hover {
   background: var(--accent);
   color: #fff;
 }
+
+/* Arrastrar para reacomodar el orden al bat en lineup/ (ver enableRowDrag
+   en js/lineup.js). touch-action: none — sin esto, en celular el dedo
+   desplaza la página en vez de arrastrar la fila. */
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.drag-handle:hover {
+  background: var(--surface-alt);
+  color: var(--accent-text);
+}
+
+.stats-table tr.row-dragging td {
+  background: var(--accent-glow);
+}
+
+.stats-table tr.row-dragging .drag-handle {
+  cursor: grabbing;
+  color: var(--accent-text);
+}
