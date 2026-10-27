@@ -79,22 +79,6 @@ function referenceSeason() {
   return withGames.includes(CURRENT_SEASON) ? CURRENT_SEASON : withGames[0] ?? CURRENT_SEASON;
 }
 
-function leaguesHistory() {
-  // Temporadas consecutivas en la misma liga → un tramo de la historia.
-  const spans = [];
-  SEASONS.forEach((s, i) => {
-    const n = i + 1;
-    const last = spans[spans.length - 1];
-    if (last && last.league === s.league) {
-      last.to = n;
-      last.yearTo = s.year;
-    } else {
-      spans.push({ league: s.league, from: n, to: n, yearFrom: s.year, yearTo: s.year });
-    }
-  });
-  return spans;
-}
-
 export function renderHome(container) {
   const season = TEAM.seasonsTotal;
   const leagueLine = `${TEAM.league} · ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada`;
@@ -289,28 +273,6 @@ export function renderHome(container) {
     <a class="home-btn home-btn--ghost home-center" href="#/roster">Ver roster completo →</a>
   `;
   root.appendChild(roster);
-
-  // ---- Historia ----
-  const spans = leaguesHistory();
-  const history = document.createElement("section");
-  history.className = "home-section";
-  history.innerHTML = `
-    ${sectionHead("Somos", "Caimanes", "LIGAS", `Desde ${SEASONS[0]?.year ?? ""} en el diamante: ${season} temporadas en ${leagues} ligas.`)}
-    <ol class="home-timeline">
-      ${spans
-        .map(
-          (s) => `
-        <li>
-          <span class="home-timeline-year">${s.yearFrom}${s.yearTo !== s.yearFrom ? `–${s.yearTo}` : ""}</span>
-          <b>${escapeHtml(s.league)}</b>
-          <span>${s.from === s.to ? `${ordinalTemporada(s.from)} Temporada` : `${ordinalTemporada(s.from)} a ${ordinalTemporada(s.to)} Temporada`}</span>
-        </li>`
-        )
-        .join("")}
-    </ol>
-    <a class="home-btn home-btn--ghost home-center" href="#/temporadas">Ver todas las temporadas →</a>
-  `;
-  root.appendChild(history);
 
   container.appendChild(root);
 
