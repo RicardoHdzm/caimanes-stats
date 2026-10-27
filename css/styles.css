@@ -5925,6 +5925,12 @@ h2.page-title {
   color: var(--accent-text);
 }
 
+/* El "+" va por CSS y no en el texto: el conteo animado reescribe el
+   textContent del número en cada cuadro y se lo comería. */
+.home-stat b[data-plus]::before {
+  content: "+";
+}
+
 .home-stat span {
   font-size: var(--text-xs);
   font-weight: 700;

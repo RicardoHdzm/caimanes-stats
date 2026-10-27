@@ -153,9 +153,9 @@ export function renderHome(container) {
 
     <section class="home-stats">
       <div class="home-stat"><b data-count="${season}">${season}</b><span>Temporadas</span></div>
-      <div class="home-stat"><b data-count="${runs}">${runs}</b><span>Carreras anotadas</span></div>
-      <div class="home-stat"><b data-count="${hits}">${hits}</b><span>Hits</span></div>
-      <div class="home-stat"><b data-count="${steals}">${steals}</b><span>Bases robadas</span></div>
+      <div class="home-stat"><b data-count="${runs}" data-plus>${runs}</b><span>Carreras anotadas</span></div>
+      <div class="home-stat"><b data-count="${hits}" data-plus>${hits}</b><span>Hits</span></div>
+      <div class="home-stat"><b data-count="${steals}" data-plus>${steals}</b><span>Bases robadas</span></div>
     </section>
 
     <div class="home-marquee" aria-hidden="true">
