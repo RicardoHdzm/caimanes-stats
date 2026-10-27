@@ -6264,7 +6264,8 @@ h2.page-title {
 /* Roster. */
 .home-roster {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  /* 3 columnas fijas: los 9 titulares quedan en 3 filas de 3. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
