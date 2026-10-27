@@ -368,7 +368,7 @@ function buildTicker() {
   const recent = allStatGames()
     .filter((g) => g.date && g.scoreUs != null)
     .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 6);
+    .slice(0, 4);
   const items = [];
   if (next) {
     const time = next.time
@@ -386,7 +386,10 @@ function buildTicker() {
     el.hidden = true;
     return;
   }
-  const run = items.join("");
+  // Con solo 5 avisos una vuelta no llena una pantalla ancha: se repite la
+  // lista 2 veces por mitad (la animación recorre -50%, ver CSS) para que
+  // nunca se vea un hueco antes de que la cinta vuelva a empezar.
+  const run = items.join("").repeat(2);
   el.innerHTML = `<span class="ticker-label">● Match Center</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
 }
 

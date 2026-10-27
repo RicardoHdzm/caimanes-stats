@@ -5435,7 +5435,7 @@ body.menu-open {
   display: flex;
   gap: 34px;
   width: max-content;
-  animation: ticker-run 45s linear infinite;
+  animation: ticker-run 65s linear infinite;
 }
 
 .match-ticker:hover .ticker-track {
