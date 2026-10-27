@@ -6113,9 +6113,35 @@ h2.page-title {
 .home-results {
   display: flex;
   gap: 12px;
-  padding-bottom: 8px;
+  padding-bottom: 14px;
   overflow-x: auto;
-  scrollbar-width: thin;
+}
+
+/* Barra de desplazamiento gruesa y redondeada, en rojo Caimanes sobre un
+   riel oscuro. Chrome/Safari/Edge usan los ::-webkit-scrollbar; Firefox no
+   los entiende y se queda con scrollbar-color (más delgada, mismo color). */
+.home-results::-webkit-scrollbar {
+  height: 12px;
+}
+
+.home-results::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.home-results::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.home-results::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 82%, #fff);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .home-results {
+    scrollbar-color: var(--accent) color-mix(in srgb, var(--text) 6%, transparent);
+  }
 }
 
 .home-result {

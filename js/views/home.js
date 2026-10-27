@@ -157,7 +157,7 @@ export function renderHome(container) {
   const upcoming = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date));
   const recent = [...allGames].filter((g) => g.date && g.scoreUs != null).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
   games.innerHTML = `
-    ${sectionHead("Próximos", "juegos", "DIAMANTE", "El calendario del equipo — fecha, hora y rival.")}
+    ${sectionHead("Próximos", "juegos", "CALENDARIO", "El calendario del equipo — fecha, hora y rival.")}
     <div class="home-match-grid">
       ${
         upcoming.length
@@ -295,7 +295,7 @@ export function renderHome(container) {
   const history = document.createElement("section");
   history.className = "home-section";
   history.innerHTML = `
-    ${sectionHead("Somos", "Caimanes", "ADN", `Desde ${SEASONS[0]?.year ?? ""} en el diamante: ${season} temporadas en ${leagues} ligas.`)}
+    ${sectionHead("Somos", "Caimanes", "TEMPORADA", `Desde ${SEASONS[0]?.year ?? ""} en el diamante: ${season} temporadas en ${leagues} ligas.`)}
     <ol class="home-timeline">
       ${spans
         .map(
