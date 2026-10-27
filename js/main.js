@@ -390,7 +390,7 @@ function buildTicker() {
   // lista 2 veces por mitad (la animación recorre -50%, ver CSS) para que
   // nunca se vea un hueco antes de que la cinta vuelva a empezar.
   const run = items.join("").repeat(2);
-  el.innerHTML = `<span class="ticker-label">● Match Center</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
+  el.innerHTML = `<span class="ticker-label">● Juegos</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
 }
 
 // Ya no hay "afuera" que tocar (es pantalla completa, ver CSS) — esto se
