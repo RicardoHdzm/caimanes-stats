@@ -937,6 +937,7 @@ export const SCHEDULE = [
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
    // { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
   // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
+  { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" },
 ];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se

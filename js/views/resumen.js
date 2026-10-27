@@ -16,6 +16,7 @@ import {
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
+import { SUPABASE_CONFIGURED } from "../supabase-config.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -152,6 +153,12 @@ export function wireRsvp(cardEl, gameId) {
   const actionsEl = cardEl.querySelector(".rsvp-actions");
 
   function renderActions(myStatus) {
+    // Sin Supabase (pausado, ver SUPABASE_PAUSED) no hay cuentas: ni
+    // botones ni el aviso de "Inicia sesión", que no se podría cumplir.
+    if (!SUPABASE_CONFIGURED) {
+      actionsEl.innerHTML = "";
+      return;
+    }
     if (!getCurrentPlayerId()) {
       actionsEl.innerHTML = `<p class="auth-hint">Inicia sesión para confirmar tu asistencia.</p>`;
       return;
