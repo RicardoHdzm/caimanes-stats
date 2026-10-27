@@ -8,6 +8,7 @@ import {
   gamesPlayedByPlayer,
   playerName,
   rankAmong,
+  gameMvp,
 } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, ordinalTemporada, escapeHtml } from "../ui.js";
 import { renderPlayoffEntry } from "./playoffs.js";
@@ -48,7 +49,7 @@ function sectionHeading(container, icon, text) {
 // GAMES en js/data.js) — la lista juego por juego. Sin ningún MVP
 // capturado no se pinta nada.
 function renderMvpSummary(container, statGames) {
-  const withMvp = statGames.filter((g) => g.mvp).sort((a, b) => a.date.localeCompare(b.date));
+  const withMvp = statGames.filter((g) => gameMvp(g)).sort((a, b) => a.date.localeCompare(b.date));
   if (withMvp.length === 0) return;
 
   sectionHeading(container, "fa-star", "MVPs de la temporada");
@@ -65,7 +66,7 @@ function renderMvpSummary(container, statGames) {
       },
       { key: "name", label: "MVP" },
     ],
-    rows: withMvp.map((g) => ({ id: g.id, date: g.date, opponent: g.opponent, playoff: !!g.playoff, name: playerName(g.mvp) })),
+    rows: withMvp.map((g) => ({ id: g.id, date: g.date, opponent: g.opponent, playoff: !!g.playoff, name: playerName(gameMvp(g)) })),
     defaultSort: "date",
     defaultDir: 1,
     onRowClick: (row) => {
@@ -83,7 +84,10 @@ function renderTopFive(container, statGames) {
   const played = gamesPlayedByPlayer(statGames);
   const minGames = statGames.length / 2;
   const mvpCounts = new Map();
-  for (const g of statGames) if (g.mvp) mvpCounts.set(g.mvp, (mvpCounts.get(g.mvp) ?? 0) + 1);
+  for (const g of statGames) {
+    const id = gameMvp(g);
+    if (id) mvpCounts.set(id, (mvpCounts.get(id) ?? 0) + 1);
+  }
   const top = battingTotals(statGames)
     .filter((r) => (played.get(r.playerId) ?? 0) >= minGames && r.AB > 0)
     // Empate de OPS: gana quien tiene más turnos al bat (un 1.000 en 19 AB
@@ -127,7 +131,10 @@ function renderTopFive(container, statGames) {
 // porque en el perfil sale de forma asíncrona.
 function renderSeasonMedals(container, statGames) {
   const mvpCounts = new Map();
-  for (const g of statGames) if (g.mvp) mvpCounts.set(g.mvp, (mvpCounts.get(g.mvp) ?? 0) + 1);
+  for (const g of statGames) {
+    const id = gameMvp(g);
+    if (id) mvpCounts.set(id, (mvpCounts.get(id) ?? 0) + 1);
+  }
   const mvpList = [...mvpCounts.entries()].map(([playerId, mvpTotal]) => ({ playerId, mvpTotal }));
   const PODIUM = { 1: "gold", 2: "silver", 3: "bronze" };
 

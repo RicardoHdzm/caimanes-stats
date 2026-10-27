@@ -307,6 +307,20 @@ export function rankAmong(list, playerId, key, dir = "desc") {
   return { place, of: list.length };
 }
 
+// MVP de un juego: el oficial de data.js (`mvp`) — pero un juego PERDIDO
+// no tiene MVP (a petición expresa): ni se muestra ni cuenta para "MVP x
+// N", Starboy o los MVPs de la temporada. El dato se queda en data.js tal
+// cual; solo no se usa. null si no hay.
+export function gameMvp(g) {
+  if (!g?.mvp || gameResult(g) === "L") return null;
+  return g.mvp;
+}
+
+// Un juego perdido no lleva sección de MVP (ni votación).
+export function gameHasMvp(g) {
+  return gameResult(g) !== "L";
+}
+
 export function gameResult(g) {
   if (g.scoreUs != null && g.scoreThem != null) {
     if (g.scoreUs > g.scoreThem) return "W";

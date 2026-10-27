@@ -15,6 +15,7 @@
 // subcarpeta. Las fuentes (Barlow Condensed) ya las declara css/styles.css
 // con @font-face; aquí solo se espera a que carguen antes de dibujar.
 import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS } from "./data.js";
+import { gameMvp } from "./stats.js";
 
 const W = 1080;
 // H = alto del CONTENIDO (el diseño del post). En historia el lienzo mide
@@ -446,8 +447,9 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
   text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 855, { size: 40, color: P.muted, weight: 600 });
 
   // Solo el MVP (a petición expresa, ya sin "figuras del juego").
-  if (game.mvp) {
-    const mvp = playerById(game.mvp);
+  const mvpId = gameMvp(game); // derrota = sin MVP
+  if (mvpId) {
+    const mvp = playerById(mvpId);
     const gold = P.light ? "#a87412" : GOLD;
     const y = 905;
     roundRect(ctx, 170, y, W - 340, 104, 52);
@@ -456,7 +458,7 @@ export async function resultFlyer(game, playoffRound = null, format = "post") {
     ctx.strokeStyle = gold;
     ctx.lineWidth = 3;
     ctx.stroke();
-    text(ctx, `★ MVP: ${(mvp?.name ?? game.mvp).toUpperCase()}`, W / 2, y + 70, { size: 56, color: gold, maxWidth: W - 420 });
+    text(ctx, `★ MVP: ${(mvp?.name ?? mvpId).toUpperCase()}`, W / 2, y + 70, { size: 56, color: gold, maxWidth: W - 420 });
   }
 
   drawFooter(ctx, sponsors);

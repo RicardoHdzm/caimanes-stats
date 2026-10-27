@@ -1,5 +1,5 @@
 import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
-import { playerName, gameResult, playoffStatus } from "../stats.js";
+import { playerName, gameResult, playoffStatus, gameMvp, gameHasMvp } from "../stats.js";
 import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
@@ -165,7 +165,7 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
   // MVP OFICIAL capturado en data.js (campo `mvp` del juego): manda sobre
   // el voto y cierra la votación de este juego aunque sea el más reciente
   // (así también se ve con Supabase pausado).
-  const officialMvp = game.mvp ?? null;
+  const officialMvp = gameMvp(game);
   if (officialMvp) isLatest = false;
 
   // Sección visible para TODOS, abierta o cerrada (a petición expresa) —
@@ -415,7 +415,8 @@ export function renderJuegoDetalle(container, gameId) {
       ...(game.pitching ?? []).map((l) => l.playerId),
       ...(game.fielding ?? []).map((l) => l.playerId),
     ]);
-    renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"), isLatestGame(game));
+    // Juego perdido: sin MVP (a petición expresa) — ni sección ni votación.
+    if (gameHasMvp(game)) renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"), isLatestGame(game));
   }
 
   const lineupHeading = document.createElement("h3");

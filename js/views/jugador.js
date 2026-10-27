@@ -11,6 +11,7 @@ import {
   hitStreaks,
   attendanceStreaks,
   displayPositions,
+  gameHasMvp,
 } from "../stats.js";
 import {
   heading,
@@ -270,6 +271,8 @@ export function mvpCountsFromVotes(perGameVotes, games = GAMES) {
     // MVP OFICIAL de data.js (campo `mvp`): manda sobre el voto, y cuenta
     // aunque sea el juego más reciente — mismo criterio que renderMvpVote
     // en js/views/juego.js. Así se ve también con Supabase pausado.
+    // Juego perdido: no hay MVP, ni oficial ni votado (a petición expresa).
+    if (game && !gameHasMvp(game)) return;
     if (game?.mvp) {
       counts.set(game.mvp, (counts.get(game.mvp) ?? 0) + 1);
       return;

@@ -30,6 +30,7 @@ import {
   cachedProfiles,
 } from "../db.js";
 import { heading, escapeHtml, renderAvatar } from "../ui.js";
+import { gameResult } from "../stats.js";
 import { reactionBarHtml, wireReactionBar } from "./reactions.js";
 
 const MAX_ITEMS = 30;
@@ -101,6 +102,8 @@ async function recentMvp() {
     .slice(1)[0];
   if (!closed) return null;
   // MVP oficial de data.js (campo `mvp`) manda sobre el voto.
+  // Juego perdido: sin MVP (a petición expresa).
+  if (gameResult(closed) === "L") return null;
   if (closed.mvp) {
     const official = playerById(closed.mvp);
     return official ? { game: closed, player: official } : null;
