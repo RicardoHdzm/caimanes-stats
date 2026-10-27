@@ -334,9 +334,16 @@ export function renderGlossary(container, columns) {
   container.appendChild(p);
 }
 
+// Título de página estilo lyon.gg: "RESUMEN DE **TEMPORADA** ///" — la
+// última palabra en rojo y tres diagonales de remate. Con una sola palabra
+// va completa en blanco. La palabra en rojo es solo presentación: el texto
+// del título sigue siendo el mismo (lectores de pantalla, etc.).
 export function heading(container, text, subtitle) {
   const h2 = document.createElement("h2");
-  h2.textContent = text;
+  h2.className = "page-title";
+  const words = String(text).trim().split(/\s+/);
+  const last = words.length > 1 ? words.pop() : null;
+  h2.innerHTML = `${escapeHtml(words.join(" "))}${last ? ` <span class="page-title-accent">${escapeHtml(last)}</span>` : ""} <i class="page-title-slashes" aria-hidden="true">///</i>`;
   container.appendChild(h2);
   if (subtitle) {
     const p = document.createElement("p");
