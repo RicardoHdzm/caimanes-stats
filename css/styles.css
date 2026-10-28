@@ -5037,6 +5037,29 @@ a.comment-author-name:hover {
   color: #fff;
 }
 
+/* Botón redondo de "compartir este juego" al final de cada fila de las
+   tablas juego por juego del perfil (ver wireGameShare en js/views/jugador.js). */
+.game-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.game-share-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
 .leader-hero-body .share-flyer-btn {
   margin-top: 10px;
 }

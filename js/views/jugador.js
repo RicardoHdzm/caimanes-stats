@@ -1,4 +1,4 @@
-import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS } from "../data.js";
+import { TEAM, PLAYERS, GAMES, SCHEDULE, SEASONS, INJURED, MANAGERS, CURRENT_SEASON } from "../data.js";
 import {
   currentSeasonGames,
   seasonStatGames,
@@ -43,6 +43,7 @@ import {
 } from "../db.js";
 import { DEFENSE_POSITIONS } from "../lineup.js";
 import { renderLockedComparison } from "./comparar.js";
+import { openFlyer, shareButton, playerStatsFlyer, playerGameFlyer } from "../flyers.js";
 import { wireRsvp } from "./resumen.js";
 import { mvpCandidateIds, isLatestGame } from "./juego.js";
 
@@ -1589,6 +1590,69 @@ export function renderJugadorDetalle(container, playerId) {
     container.appendChild(cards);
   }
 
+  // Compartir las stats de la temporada como imagen (ver playerStatsFlyer
+  // en js/flyers.js) — mismas cifras que las tarjetas de arriba.
+  const firstName = player.name.split(" ")[0];
+  if (battingSeason || pitchingSeason || fieldingSeason) {
+    const gamesPlayed = games.filter((g) =>
+      [g.batting, g.pitching, g.fielding].some((lines) => lines?.some((l) => l.playerId === player.id))
+    ).length;
+    const shareRow = document.createElement("div");
+    shareRow.className = "share-flyer-row share-flyer-row--center";
+    shareRow.appendChild(
+      shareButton(
+        () =>
+          openFlyer(
+            (format, color) =>
+              playerStatsFlyer(
+                {
+                  player,
+                  seasonLabel: `${ordinalTemporada(CURRENT_SEASON)} Temporada`,
+                  gamesPlayed,
+                  batting: battingSeason,
+                  pitching: pitchingSeason,
+                  fielding: fieldingSeason,
+                },
+                format,
+                color
+              ),
+            `stats-${player.id}-temporada-${CURRENT_SEASON}`,
+            `Stats de ${player.name} — Caimanes de Villas`
+          ),
+        "Compartir estadísticas"
+      )
+    );
+    container.appendChild(shareRow);
+  }
+
+  // Compartir la línea de UN juego: botón al final de cada fila de "Bateo
+  // por juego" (o de "Pitcheo por juego" si no bateó nunca). El clic se
+  // atrapa en fase de captura para que no lo tome la fila (que abre el juego).
+  const shareGameColumn = {
+    key: "share",
+    label: "",
+    render: (_, row) =>
+      `<button type="button" class="game-share-btn" data-share-game="${row.gameId}" aria-label="Compartir este juego"><i class="fa-solid fa-share-nodes"></i></button>`,
+  };
+  function wireGameShare(tableEl) {
+    tableEl.addEventListener(
+      "click",
+      (e) => {
+        const btn = e.target.closest("[data-share-game]");
+        if (!btn) return;
+        e.stopPropagation();
+        const game = games.find((g) => g.id === btn.dataset.shareGame);
+        if (!game) return;
+        openFlyer(
+          (format, color) => playerGameFlyer(player, game, format, color),
+          `stats-${player.id}-${game.date}`,
+          `${firstName} vs ${game.opponent} — Caimanes de Villas`
+        );
+      },
+      true
+    );
+  }
+
   const gamesSorted = [...games].sort((a, b) => a.date.localeCompare(b.date));
 
   // Columna "Rival" de las tablas juego por juego: los juegos de playoffs
@@ -1709,8 +1773,9 @@ export function renderJugadorDetalle(container, playerId) {
 
     const el = document.createElement("div");
     container.appendChild(el);
+    wireGameShare(el);
     renderSortableTable(el, {
-      columns: battingColumns,
+      columns: [...battingColumns, shareGameColumn],
       rows: battingRows,
       defaultSort: "date",
       defaultDir: 1,
@@ -1794,8 +1859,11 @@ export function renderJugadorDetalle(container, playerId) {
 
     const el = document.createElement("div");
     container.appendChild(el);
+    // El botón de compartir el juego va en Bateo; aquí solo si nunca bateó.
+    const sharesHere = battingRows.length === 0;
+    if (sharesHere) wireGameShare(el);
     renderSortableTable(el, {
-      columns: pitchingColumns,
+      columns: sharesHere ? [...pitchingColumns, shareGameColumn] : pitchingColumns,
       rows: pitchingRows,
       defaultSort: "date",
       defaultDir: 1,

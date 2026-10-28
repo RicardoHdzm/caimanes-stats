@@ -1,5 +1,5 @@
 // Flyers para compartir en redes (próximo juego, lineup, resultado de un
-// juego). Se dibujan en un <canvas> de 1080×1350 ("post", 4:5 de
+// juego, y las stats de un jugador: de la temporada o de un juego). Se dibujan en un <canvas> de 1080×1350 ("post", 4:5 de
 // Instagram/Facebook, también se ve bien en WhatsApp) o 1080×1920
 // ("historia", 9:16) y se abren en una ventanita con la vista previa +
 // "Compartir" (menú nativo del celular, con la imagen adjunta) y
@@ -13,8 +13,8 @@
 // página) porque esto también lo usa lineup/index.html, que vive en una
 // subcarpeta. Las fuentes (Barlow Condensed) ya las declara css/styles.css
 // con @font-face; aquí solo se espera a que carguen antes de dibujar.
-import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS } from "./data.js";
-import { gameMvp } from "./stats.js";
+import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS, PLAYOFFS } from "./data.js";
+import { gameMvp, battingTotals, pitchingTotals, fieldingTotals } from "./stats.js";
 
 const W = 1080;
 // H = alto del CONTENIDO (el diseño del post). En historia el lienzo mide
@@ -464,6 +464,182 @@ export async function resultFlyer(game, playoffRound = null, format = "post", co
     ctx.stroke();
     text(ctx, `★ MVP: ${(mvp?.name ?? mvpId).toUpperCase()}`, W / 2, y + 70, { size: 56, color: gold, maxWidth: W - 420 });
   }
+
+  drawFooter(ctx, sponsors);
+  return canvas;
+}
+
+// ---- Stats de un jugador (perfil, ver js/views/jugador.js) ----
+//
+// Mismo esqueleto en los dos: logo chico, número y nombre, una píldora
+// (temporada o resultado del juego), una línea de contexto y hasta dos
+// bloques de "fichas" (valor grande + etiqueta) — bateo arriba y pitcheo o
+// fildeo abajo.
+
+const TILE_TOP = 610;
+const TILE_H = 118;
+const TILE_GAP = 22;
+
+function playerHeader(ctx, logo, story, player) {
+  placeLogo(ctx, logo, story, { y: 24, size: 180, contentTop: 230 });
+  // El 0 en data.js es "todavía sin número", no se pinta.
+  if (player.number) text(ctx, `#${player.number}`, W / 2, 262, { size: 54, color: P.accentText, italic: true });
+  text(ctx, (player.name ?? "").toUpperCase(), W / 2, 360, { size: 104, italic: true, maxWidth: W - 160 });
+}
+
+// `tiles`: [{ value, label }]. Hasta 4 por fila. Regresa dónde terminó.
+function statTiles(ctx, label, tiles, top) {
+  const left = 90;
+  const width = W - left * 2;
+  const cols = Math.min(4, tiles.length);
+  const tw = (width - TILE_GAP * (cols - 1)) / cols;
+  text(ctx, label, left, top - 18, { size: 34, color: P.accentText, align: "left" });
+  tiles.forEach((t, i) => {
+    const x = left + (i % cols) * (tw + TILE_GAP);
+    const y = top + Math.floor(i / cols) * (TILE_H + TILE_GAP);
+    roundRect(ctx, x, y, tw, TILE_H, 22);
+    ctx.fillStyle = P.tint(0.06);
+    ctx.fill();
+    ctx.strokeStyle = P.tint(0.12);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    text(ctx, String(t.value), x + tw / 2, y + 72, { size: 70, italic: true, maxWidth: tw - 24 });
+    text(ctx, t.label, x + tw / 2, y + TILE_H - 16, { size: 26, color: P.muted, weight: 600, maxWidth: tw - 20 });
+  });
+  const rows = Math.ceil(tiles.length / cols);
+  return top + rows * (TILE_H + TILE_GAP) - TILE_GAP;
+}
+
+// Hasta dos bloques, uno debajo del otro.
+function statSections(ctx, sections) {
+  let top = TILE_TOP;
+  for (const s of sections.slice(0, 2)) {
+    top = statTiles(ctx, s.label, s.tiles, top) + 80;
+  }
+}
+
+const DECISION_LABEL = { W: "VICTORIA", L: "DERROTA", SV: "SALVAMENTO" };
+
+// `stats`: { player, seasonLabel ("9na Temporada"), gamesPlayed, batting,
+// pitching, fielding } — las filas de battingTotals/pitchingTotals/
+// fieldingTotals (js/stats.js) del jugador, o null si no tiene.
+export async function playerStatsFlyer(stats, format = "post", color) {
+  const { logo, sponsors } = await loadAssets();
+  const { canvas, ctx, story } = newFlyer(format, color);
+  const { player, batting, pitching, fielding } = stats;
+  playerHeader(ctx, logo, story, player);
+
+  pill(ctx, `ESTADÍSTICAS · ${stats.seasonLabel.toUpperCase()}`, W / 2, 396, { size: 40 });
+  const g = stats.gamesPlayed;
+  text(ctx, `${g} ${g === 1 ? "JUEGO" : "JUEGOS"}`, W / 2, 530, { size: 38, color: P.muted, weight: 600 });
+
+  const sections = [];
+  if (batting) {
+    sections.push({
+      label: "BATEO",
+      tiles: [
+        { value: batting.AVG, label: "AVG" },
+        { value: batting.OPS, label: "OPS" },
+        { value: batting.H, label: "HITS" },
+        { value: batting.HR, label: "HR" },
+        { value: batting.RBI, label: "IMPULSADAS" },
+        { value: batting.R, label: "CARRERAS" },
+        { value: batting.BB, label: "BASES X BOLA" },
+        { value: batting.SB, label: "ROBADAS" },
+      ],
+    });
+  }
+  if (pitching) {
+    sections.push({
+      label: "PITCHEO",
+      tiles: [
+        { value: pitching.IP, label: "ENTRADAS" },
+        { value: pitching.SO, label: "PONCHES" },
+        { value: `${pitching.W}-${pitching.L}`, label: "RÉCORD" },
+        { value: pitching.WHIP, label: "WHIP" },
+      ],
+    });
+  }
+  if (fielding) {
+    sections.push({
+      label: "FILDEO",
+      tiles: [
+        { value: fielding.FPCT, label: "FPCT" },
+        { value: fielding.PO, label: "OUTS (PO)" },
+        { value: fielding.A, label: "ASISTENCIAS" },
+        { value: fielding.E, label: "ERRORES" },
+      ],
+    });
+  }
+  statSections(ctx, sections);
+
+  drawFooter(ctx, sponsors);
+  return canvas;
+}
+
+// `game`: un juego de GAMES o de PLAYOFFS (con `playoff`), `player`: el
+// jugador. Su línea sale de los mismos totales de js/stats.js aplicados a
+// ese único juego (así dos salidas del mismo pitcher se suman bien).
+export async function playerGameFlyer(player, game, format = "post", color) {
+  const { logo, sponsors } = await loadAssets();
+  const { canvas, ctx, story } = newFlyer(format, color);
+  playerHeader(ctx, logo, story, player);
+
+  const us = game.scoreUs;
+  const them = game.scoreThem;
+  const result = us > them ? "VICTORIA" : us < them ? "DERROTA" : "EMPATE";
+  const bg = us > them ? WIN : us < them ? P.accent : P.tint(0.14);
+  pill(ctx, `${result} ${us}-${them} VS ${(game.opponent ?? "Rival").toUpperCase()}`, W / 2, 396, { size: 40, bg });
+
+  const round = game.playoff
+    ? PLAYOFFS.find((e) => e.season === game.season)?.rounds.find((r) => r.games?.some((g) => g.id === game.id))
+    : null;
+  const context = [formatDate(game.date), round ? `PLAYOFFS · ${round.name.toUpperCase()}` : ""].filter(Boolean).join(" · ");
+  text(ctx, context, W / 2, 530, { size: 36, color: P.muted, weight: 600 });
+
+  const batting = battingTotals([game]).find((r) => r.playerId === player.id);
+  const pitching = pitchingTotals([game]).find((r) => r.playerId === player.id && r.outs + r.H + r.R + r.BB + r.SO > 0);
+  const fielding = fieldingTotals([game]).find((r) => r.playerId === player.id);
+  const sections = [];
+  if (batting) {
+    sections.push({
+      label: "BATEO",
+      tiles: [
+        { value: `${batting.H}-${batting.AB}`, label: "H-AB" },
+        { value: batting["2B"], label: "DOBLES" },
+        { value: batting["3B"], label: "TRIPLES" },
+        { value: batting.HR, label: "HR" },
+        { value: batting.RBI, label: "IMPULSADAS" },
+        { value: batting.R, label: "CARRERAS" },
+        { value: batting.BB, label: "BASES X BOLA" },
+        { value: batting.SB, label: "ROBADAS" },
+      ],
+    });
+  }
+  if (pitching) {
+    const lines = (game.pitching ?? []).filter((l) => l.playerId === player.id);
+    const decision = lines.map((l) => DECISION_LABEL[l.decision]).find(Boolean);
+    sections.push({
+      label: `PITCHEO${decision ? ` · ${decision}` : ""}`,
+      tiles: [
+        { value: pitching.IP, label: "ENTRADAS" },
+        { value: pitching.H, label: "HITS" },
+        { value: pitching.R, label: "CARRERAS" },
+        { value: pitching.SO, label: "PONCHES" },
+      ],
+    });
+  }
+  if (fielding) {
+    sections.push({
+      label: "FILDEO",
+      tiles: [
+        { value: fielding.PO, label: "OUTS (PO)" },
+        { value: fielding.A, label: "ASISTENCIAS" },
+        { value: fielding.E, label: "ERRORES" },
+      ],
+    });
+  }
+  statSections(ctx, sections);
 
   drawFooter(ctx, sponsors);
   return canvas;
