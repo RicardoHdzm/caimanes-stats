@@ -21,7 +21,8 @@ function playButtonHtml(walkup, cls) {
 }
 
 // Tarjeta: foto, jugador, canción, artista y el botón de play — de QUIÉN es
-// cada canción (la tabla de arriba es la playlist en sí, sin esa parte).
+// cada canción, con foto (la tabla de arriba también dice de quién es, pero
+// en una columna de texto).
 function playlistCard(player, walkup) {
   const artist = walkup.artist ? `<p class="playlist-card-artist">${escapeHtml(walkup.artist)}</p>` : "";
   return `
@@ -55,6 +56,11 @@ const TRACK_COLUMNS = [
   { key: "track", label: "#", numeric: true },
   { key: "title", label: "Canción" },
   { key: "artist", label: "Artista" },
+  {
+    key: "player",
+    label: "Jugador",
+    render: (_, row) => `<a href="#/jugador/${row.playerId}" class="playlist-track-player">${escapeHtml(row.player)}</a>`,
+  },
   { key: "play", label: "", render: (_, row) => playButtonHtml(row.walkup, "playlist-track-play") },
 ];
 
@@ -92,7 +98,7 @@ export function renderPlaylist(container) {
     // lista, no un dato guardado en ningún lado.
     renderSortableTable(tableEl, {
       columns: TRACK_COLUMNS,
-      rows: rows.map((r, i) => ({ track: i + 1, title: r.walkup.title, artist: r.walkup.artist ?? "", walkup: r.walkup })),
+      rows: rows.map((r, i) => ({ track: i + 1, title: r.walkup.title, artist: r.walkup.artist ?? "", player: r.player.name, playerId: r.player.id, walkup: r.walkup })),
       sortable: false,
       defaultSort: "track",
       defaultDir: 1,
