@@ -54,13 +54,13 @@ async function hydrateAvatars(root) {
 
 const TRACK_COLUMNS = [
   { key: "track", label: "#", numeric: true },
-  { key: "title", label: "Canción" },
-  { key: "artist", label: "Artista" },
   {
     key: "player",
     label: "Jugador",
     render: (_, row) => `<a href="#/jugador/${row.playerId}" class="playlist-track-player">${escapeHtml(row.player)}</a>`,
   },
+  { key: "title", label: "Canción" },
+  { key: "artist", label: "Artista" },
   { key: "play", label: "", render: (_, row) => playButtonHtml(row.walkup, "playlist-track-play") },
 ];
 
