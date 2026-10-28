@@ -488,15 +488,17 @@ function playerHeader(ctx, logo, story, player) {
   text(ctx, (player.name ?? "").toUpperCase(), W / 2, 360, { size: 104, italic: true, maxWidth: W - 160 });
 }
 
-// `tiles`: [{ value, label }]. Hasta 4 por fila. Regresa dónde terminó.
-function statTiles(ctx, label, tiles, top) {
+// `tiles`: [{ value, label }]. `cols` por fila (4 por default); si la última
+// fila queda incompleta, se centra. Regresa dónde terminó.
+function statTiles(ctx, label, tiles, top, cols = Math.min(4, tiles.length)) {
   const left = 90;
   const width = W - left * 2;
-  const cols = Math.min(4, tiles.length);
   const tw = (width - TILE_GAP * (cols - 1)) / cols;
+  const lastRowStart = Math.floor((tiles.length - 1) / cols) * cols;
+  const lastRowShift = ((cols - (tiles.length - lastRowStart)) * (tw + TILE_GAP)) / 2;
   text(ctx, label, left, top - 18, { size: 34, color: P.accentText, align: "left" });
   tiles.forEach((t, i) => {
-    const x = left + (i % cols) * (tw + TILE_GAP);
+    const x = left + (i % cols) * (tw + TILE_GAP) + (i >= lastRowStart ? lastRowShift : 0);
     const y = top + Math.floor(i / cols) * (TILE_H + TILE_GAP);
     roundRect(ctx, x, y, tw, TILE_H, 22);
     ctx.fillStyle = P.tint(0.06);
@@ -515,7 +517,7 @@ function statTiles(ctx, label, tiles, top) {
 function statSections(ctx, sections) {
   let top = TILE_TOP;
   for (const s of sections.slice(0, 2)) {
-    top = statTiles(ctx, s.label, s.tiles, top) + 80;
+    top = statTiles(ctx, s.label, s.tiles, top, s.cols) + 80;
   }
 }
 
@@ -605,7 +607,11 @@ export async function playerGameFlyer(player, game, format = "post", color) {
   if (batting) {
     sections.push({
       label: "BATEO",
+      // 9 fichas: de 5 en 5 para que quepan en dos filas (con pitcheo abajo
+      // no hay espacio para una tercera).
+      cols: 5,
       tiles: [
+        { value: batting.AVG, label: "AVG" },
         { value: `${batting.H}-${batting.AB}`, label: "H-AB" },
         { value: batting["2B"], label: "DOBLES" },
         { value: batting["3B"], label: "TRIPLES" },
