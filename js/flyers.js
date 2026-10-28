@@ -474,7 +474,8 @@ export async function resultFlyer(game, playoffRound = null, format = "post", co
 // Mismo esqueleto en los dos: logo chico, número y nombre, una píldora
 // (temporada o resultado del juego), una línea de contexto y hasta dos
 // bloques de "fichas" (valor grande + etiqueta) — bateo arriba y pitcheo o
-// fildeo abajo.
+// fildeo abajo. Los errores NO se muestran (a petición expresa): en Fildeo
+// solo van FPCT, outs y asistencias.
 
 const TILE_TOP = 610;
 const TILE_H = 118;
@@ -567,7 +568,6 @@ export async function playerStatsFlyer(stats, format = "post", color) {
         { value: fielding.FPCT, label: "FPCT" },
         { value: fielding.PO, label: "OUTS (PO)" },
         { value: fielding.A, label: "ASISTENCIAS" },
-        { value: fielding.E, label: "ERRORES" },
       ],
     });
   }
@@ -635,7 +635,6 @@ export async function playerGameFlyer(player, game, format = "post", color) {
       tiles: [
         { value: fielding.PO, label: "OUTS (PO)" },
         { value: fielding.A, label: "ASISTENCIAS" },
-        { value: fielding.E, label: "ERRORES" },
       ],
     });
   }
