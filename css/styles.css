@@ -5585,6 +5585,17 @@ body.menu-open {
   cursor: pointer;
 }
 
+/* Título de cada grupo del menú (Temporada, Equipo, Números, Fans, Más). */
+.more-sheet .more-sheet-group {
+  margin: 26px 0 2px;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
 .more-sheet .more-sheet-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -6365,25 +6376,103 @@ h2.page-title {
   display: flex;
   flex: 1;
   justify-content: center;
-  gap: 2px;
+  gap: 6px;
   min-width: 0;
   padding: 0;
   border: none;
   background: none;
-  overflow-x: auto;
-  scrollbar-width: none;
+  /* visible (no auto): los desplegables de .nav-group salen por debajo
+     del header y con overflow se recortarían. */
+  overflow: visible;
 }
 
 .site-header .site-nav::-webkit-scrollbar {
   display: none;
 }
 
-.site-header .site-nav a {
-  padding: 8px 6px;
+.site-header .site-nav a,
+.nav-group-btn {
+  padding: 8px 12px;
   border: none;
   border-radius: 8px;
   font-size: var(--text-sm);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Grupos desplegables (Temporada, Equipo, Números, Fans) ---- */
+.nav-group {
+  position: relative;
+}
+
+.nav-group-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.nav-group-btn i {
+  font-size: 0.7em;
+  transition: transform 0.2s;
+}
+
+.nav-group:hover .nav-group-btn,
+.nav-group.open .nav-group-btn {
+  color: var(--text);
+  background: var(--surface);
+}
+
+.nav-group.active .nav-group-btn {
+  color: var(--accent-text);
+}
+
+.nav-group:hover .nav-group-btn i,
+.nav-group.open .nav-group-btn i {
+  transform: rotate(180deg);
+}
+
+/* El padding-top hace de "puente" invisible entre el botón y la lista,
+   para que el :hover no se pierda al bajar el mouse. */
+.nav-group-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 40;
+  display: none;
+  min-width: 190px;
+  padding-top: 8px;
+  transform: translateX(-50%);
+}
+
+.nav-group:hover .nav-group-menu,
+.nav-group.open .nav-group-menu,
+.nav-group:focus-within .nav-group-menu {
+  display: block;
+}
+
+.nav-group-menu::before {
+  content: "";
+  position: absolute;
+  inset: 8px 0 0;
+  z-index: -1;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+.site-header .site-nav .nav-group-menu a {
+  display: block;
+  margin: 4px;
+  padding: 10px 14px;
 }
 
 .site-header .site-nav a.active {

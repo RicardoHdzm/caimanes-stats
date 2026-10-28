@@ -51,11 +51,8 @@ const BOTTOM_TABS = [
   { tab: "roster", route: "#/roster", label: "Roster", icon: "fa-users" },
 ];
 
-// Mismo orden que la nav de escritorio (ver <nav class="tabs"> en
-// index.html), agrupado por tema: temporada (Calendario, Juegos, Standing,
-// Playoffs), equipo (Roster — vive en BOTTOM_TABS, APPS_GRID lo mete tras
-// Playoffs — y Alineación), números (Resumen, Estadísticas, Temporadas) y
-// fans (Playlist, Fanzone).
+// Todo lo que no está en la barra de abajo. El orden y el agrupado del menú
+// los decide NAV_GROUPS, más abajo.
 const MORE_TABS = [
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
   { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
@@ -69,26 +66,29 @@ const MORE_TABS = [
   { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
 ];
 
-// Todo lo navegable en celular, para el panel de "Menú" — no es solo las
-// rutas que no caben en la barra de abajo: es una pantalla completa tipo
-// "apps del celular" con TODO, incluidas Resumen/Mi Perfil/Roster (que ya
-// están abajo, pero repetidas aquí no estorban y así "Menú" es de verdad
-// un mapa completo del sitio). Se arma recorriendo BOTTOM_TABS en vez de
-// copiarlo a mano, para no desincronizarse si cambia esa lista — mismo
-// criterio (buscar "resumen" por tab, no por posición) que ya usa
-// buildBottomTabs() de abajo para insertar Mi Perfil.
-const APPS_GRID = [{ tab: "home", route: "#/", label: "Inicio", icon: "fa-house" }];
-const rosterTab = BOTTOM_TABS.find((t) => t.tab === "roster");
-for (const t of BOTTOM_TABS) {
-  if (t === rosterTab) continue; // va con el grupo "equipo", tras Playoffs
-  APPS_GRID.push(t);
-  if (t.tab === "inicio") {
-    APPS_GRID.push({ tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" });
-  }
-}
-for (const t of MORE_TABS) {
-  APPS_GRID.push(t);
-  if (t.tab === "playoffs" && rosterTab) APPS_GRID.push(rosterTab);
+// El menú ☰ (pantalla completa) es el mapa completo del sitio: arriba
+// Inicio/Feed/Mi Perfil sueltos y abajo las secciones agrupadas por tema,
+// los mismos grupos que los desplegables de la nav de escritorio (ver
+// .nav-group en index.html), a petición expresa.
+const ALL_TABS = new Map([...BOTTOM_TABS, ...MORE_TABS].map((t) => [t.tab, t]));
+const APPS_TOP = [
+  { tab: "home", route: "#/", label: "Inicio", icon: "fa-house" },
+  ALL_TABS.get("inicio"),
+  { tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" },
+];
+const NAV_GROUPS = [
+  { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
+  { label: "Equipo", tabs: ["roster", "alineacion"] },
+  { label: "Números", tabs: ["resumen", "estadisticas", "temporadas"] },
+  { label: "Fans", tabs: ["playlist", "fanzone"] },
+].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
+
+function appTile(t) {
+  return `
+        <a href="${t.route}" data-tab="${t.tab}"${t.tab === "mi-perfil" ? ' id="more-tile-mi-perfil" hidden' : ""}>
+          <span class="more-app-icon"><i class="fa-solid ${t.icon}"></i></span>
+          <span>${t.label}</span>
+        </a>`;
 }
 
 const app = document.getElementById("app");
@@ -283,7 +283,7 @@ function buildBottomTabs() {
   });
   bottomTabs.appendChild(moreBtn);
 
-  // Pantalla completa tipo "apps del celular" (ver APPS_GRID arriba) — con
+  // Pantalla completa tipo "apps del celular" (ver NAV_GROUPS arriba) — con
   // encabezado y botón de cerrar porque, a diferencia del panelito chico de
   // antes, ya no queda nada de la página debajo para tocar "afuera" y
   // cerrarlo así.
@@ -294,15 +294,16 @@ function buildBottomTabs() {
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
+    <div class="more-sheet-grid">${APPS_TOP.map(appTile).join("")}
+    </div>
+    ${NAV_GROUPS.map(
+      (g) => `
+    <h4 class="more-sheet-group">${g.label}</h4>
+    <div class="more-sheet-grid">${g.tabs.map(appTile).join("")}
+    </div>`
+    ).join("")}
+    <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
-      ${APPS_GRID.map(
-        (t) => `
-        <a href="${t.route}" data-tab="${t.tab}"${t.tab === "mi-perfil" ? ' id="more-tile-mi-perfil" hidden' : ""}>
-          <span class="more-app-icon"><i class="fa-solid ${t.icon}"></i></span>
-          <span>${t.label}</span>
-        </a>
-      `
-      ).join("")}
       <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" id="more-tile-instagram" aria-label="Instagram del equipo">
         <span class="more-app-icon"><i class="fa-brands fa-instagram"></i></span>
         <span>Instagram</span>
@@ -361,6 +362,33 @@ menuToggle?.addEventListener("click", (e) => {
   toggleMoreSheet();
 });
 
+// ---- Desplegables de la nav de escritorio ----
+// Con mouse se abren solos al pasar encima (CSS :hover); el clic en el
+// botón es para pantallas táctiles y teclado. Clic afuera o Esc cierran.
+function setNavGroupOpen(group, open) {
+  group.classList.toggle("open", open);
+  group.querySelector(".nav-group-btn")?.setAttribute("aria-expanded", String(open));
+}
+for (const group of tabs?.querySelectorAll(".nav-group") ?? []) {
+  group.querySelector(".nav-group-btn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = !group.classList.contains("open");
+    for (const other of tabs.querySelectorAll(".nav-group")) setNavGroupOpen(other, false);
+    setNavGroupOpen(group, open);
+  });
+  // Al quitar el mouse se cierra también la que se abrió con clic, para
+  // que no quede colgada.
+  group.addEventListener("mouseleave", () => setNavGroupOpen(group, false));
+}
+document.addEventListener("click", () => {
+  for (const group of tabs?.querySelectorAll(".nav-group.open") ?? []) setNavGroupOpen(group, false);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  for (const group of tabs?.querySelectorAll(".nav-group") ?? []) setNavGroupOpen(group, false);
+  if (tabs?.contains(document.activeElement)) document.activeElement.blur();
+});
+
 // ---- Barra "Match Center" (arriba del header, estilo lyon.gg) ----
 // Resultados recientes + el próximo juego corriendo de lado. El contenido
 // va dos veces seguidas para que la animación (CSS) dé la vuelta sin brinco.
@@ -411,7 +439,7 @@ const MORE_TAB_IDS = new Set(MORE_TABS.map((t) => t.tab));
 function render() {
   const myId = getCurrentPlayerId();
   // Los 3 lugares donde puede aparecer "Mi Perfil" (nav de escritorio,
-  // barra de abajo, y ahora también el grid de "Más" — ver APPS_GRID
+  // barra de abajo, y ahora también el grid de "Más" — ver APPS_TOP
   // arriba): mismo trato para los tres, oculto sin sesión.
   for (const el of [miPerfilLink, bottomTabs.querySelector('[data-tab="mi-perfil"]'), moreSheet.querySelector('[data-tab="mi-perfil"]')]) {
     if (!el) continue;
@@ -458,6 +486,14 @@ function render() {
   for (const link of tabs?.querySelectorAll("a") ?? []) {
     link.classList.toggle("active", link.dataset.route === route.tab);
   }
+  // El grupo de la sección abierta también se marca, y los desplegables se
+  // cierran (y sueltan el foco, que si no los deja abiertos por
+  // :focus-within) al navegar.
+  for (const group of tabs?.querySelectorAll(".nav-group") ?? []) {
+    group.classList.toggle("active", !!group.querySelector("a.active"));
+    setNavGroupOpen(group, false);
+  }
+  if (tabs?.contains(document.activeElement)) document.activeElement.blur();
 
   // "resumen" está en MORE_TABS (cuenta para "Menú") PERO también tiene su
   // propia pestaña en la barra cuando no hay sesión (ver buildBottomTabs) —

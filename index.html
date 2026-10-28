@@ -93,20 +93,41 @@
       <a href="#/" data-route="home">Inicio</a>
       <a href="#/inicio" data-route="inicio">Feed</a>
       <a href="#" data-route="mi-perfil" id="nav-mi-perfil" hidden>Mi Perfil</a>
-      <!-- Agrupadas por tema, de lo más consultado a lo menos: temporada
-           (calendario, juegos, standing, playoffs), equipo (roster,
-           alineación), números (resumen, estadísticas, temporadas) y fans. -->
-      <a href="#/calendario" data-route="calendario">Calendario</a>
-      <a href="#/juegos" data-route="juegos">Juegos</a>
-      <a href="#/standing" data-route="standing">Standing</a>
-      <a href="#/playoffs" data-route="playoffs">Playoffs</a>
-      <a href="#/roster" data-route="roster">Roster</a>
-      <a href="#/alineacion" data-route="alineacion">Alineación</a>
-      <a href="#/resumen" data-route="resumen">Resumen</a>
-      <a href="#/estadisticas" data-route="estadisticas">Estadísticas</a>
-      <a href="#/temporadas" data-route="temporadas">Temporadas</a>
-      <a href="#/playlist" data-route="playlist">Playlist</a>
-      <a href="#/fanzone" data-route="fanzone">Fanzone</a>
+      <!-- Agrupadas por tema en menús desplegables (a petición expresa):
+           cada grupo abre su lista al pasar el mouse o al darle clic. El
+           menú ☰ del celular usa los mismos grupos (NAV_GROUPS en
+           js/main.js) — si se mueve una sección aquí, moverla allá también. -->
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false">Temporada <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+        <div class="nav-group-menu">
+          <a href="#/calendario" data-route="calendario">Calendario</a>
+          <a href="#/juegos" data-route="juegos">Juegos</a>
+          <a href="#/standing" data-route="standing">Standing</a>
+          <a href="#/playoffs" data-route="playoffs">Playoffs</a>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false">Equipo <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+        <div class="nav-group-menu">
+          <a href="#/roster" data-route="roster">Roster</a>
+          <a href="#/alineacion" data-route="alineacion">Alineación</a>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false">Números <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+        <div class="nav-group-menu">
+          <a href="#/resumen" data-route="resumen">Resumen</a>
+          <a href="#/estadisticas" data-route="estadisticas">Estadísticas</a>
+          <a href="#/temporadas" data-route="temporadas">Temporadas</a>
+        </div>
+      </div>
+      <div class="nav-group">
+        <button type="button" class="nav-group-btn" aria-expanded="false">Fans <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>
+        <div class="nav-group-menu">
+          <a href="#/playlist" data-route="playlist">Playlist</a>
+          <a href="#/fanzone" data-route="fanzone">Fanzone</a>
+        </div>
+      </div>
     </nav>
     <div class="site-header-actions">
       <!-- Vacío a propósito: js/auth.js lo llena (botón de cuenta) y lo deja
