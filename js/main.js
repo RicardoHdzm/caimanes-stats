@@ -52,18 +52,19 @@ const BOTTOM_TABS = [
 ];
 
 // Mismo orden que la nav de escritorio (ver <nav class="tabs"> en
-// index.html): lo del día a día primero (Juegos, Calendario, Standing),
-// luego lo de playoffs/stats (consulta más ocasional) y las herramientas
-// extra (Alineación, Playlist) al final.
+// index.html), agrupado por tema: temporada (Calendario, Juegos, Standing,
+// Playoffs), equipo (Roster — vive en BOTTOM_TABS, APPS_GRID lo mete tras
+// Playoffs — y Alineación), números (Resumen, Estadísticas, Temporadas) y
+// fans (Playlist, Fanzone).
 const MORE_TABS = [
-  { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
-  { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "calendario", route: "#/calendario", label: "Calendario", icon: "fa-calendar-day" },
+  { tab: "juegos", route: "#/juegos", label: "Juegos", icon: "fa-flag-checkered" },
   { tab: "standing", route: "#/standing", label: "Standing", icon: "fa-ranking-star" },
   { tab: "playoffs", route: "#/playoffs", label: "Playoffs", icon: "fa-trophy" },
+  { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
+  { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "estadisticas", route: "#/estadisticas", label: "Estadísticas", icon: "fa-chart-simple" },
   { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
-  { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
   { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
 ];
@@ -77,13 +78,18 @@ const MORE_TABS = [
 // criterio (buscar "resumen" por tab, no por posición) que ya usa
 // buildBottomTabs() de abajo para insertar Mi Perfil.
 const APPS_GRID = [{ tab: "home", route: "#/", label: "Inicio", icon: "fa-house" }];
+const rosterTab = BOTTOM_TABS.find((t) => t.tab === "roster");
 for (const t of BOTTOM_TABS) {
+  if (t === rosterTab) continue; // va con el grupo "equipo", tras Playoffs
   APPS_GRID.push(t);
   if (t.tab === "inicio") {
     APPS_GRID.push({ tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" });
   }
 }
-APPS_GRID.push(...MORE_TABS);
+for (const t of MORE_TABS) {
+  APPS_GRID.push(t);
+  if (t.tab === "playoffs" && rosterTab) APPS_GRID.push(rosterTab);
+}
 
 const app = document.getElementById("app");
 const tabs = document.getElementById("tabs");
