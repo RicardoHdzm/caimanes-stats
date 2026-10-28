@@ -3016,6 +3016,17 @@ main h3::before {
 /* Botón de play dentro de la tabla de arriba (la playlist en sí) — mismo
    look que .playlist-card-play de las tarjetas de abajo, pero más chico
    para caber cómodo en una celda de tabla. */
+/* Nombre del jugador en la tabla de la playlist: link a su perfil. */
+.playlist-track-player {
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.playlist-track-player:hover {
+  color: var(--accent-text);
+}
+
 .playlist-track-play {
   font-size: 1.3rem;
   color: var(--accent-text);
