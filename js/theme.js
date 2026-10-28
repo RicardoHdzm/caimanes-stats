@@ -1,6 +1,7 @@
-// Temas: Eclipse (navy clásico,
-// [data-theme="eclipse"]) y Luna (oscuro, el de siempre — default, sin
-// atributo). El botón vive en index.html (junto al ícono de Instagram) —
+// Temas: Eclipse (azul marino, [data-theme="eclipse"]) — el DEFAULT, a
+// petición expresa — y Luna (negro, sin atributo), que solo se usa si alguien
+// la eligió y quedó guardada en localStorage. Íconos: rayo (Eclipse) y fuego
+// (Luna). El botón vive en index.html (junto al ícono de Instagram) —
 // admin.html y lineup/index.html no lo tienen, pero si el tema guardado es
 // otro que Luna lo respetan igual (cada uno trae su propio script inline en
 // <head> que lo aplica antes de que cargue el CSS, para no parpadear con el
@@ -22,10 +23,10 @@ const STORAGE_KEY = "caimanes-theme";
 // "light" (Sol) quitado por ahora, a petición expresa — sus colores siguen
 // en css/styles.css ([data-theme="light"]); para regresarlo, vuelve a
 // ponerlo al principio de THEMES, en el script inline de cada .html y su
-// ícono en #theme-toggle de index.html. Quien lo tenía guardado cae a Luna.
+// ícono en #theme-toggle de index.html. Quien lo tenía guardado cae a Eclipse.
 const THEMES = ["eclipse", "dark"];
 const THEME_LABEL = { light: "Sol", eclipse: "Eclipse", dark: "Luna" };
-const THEME_ICON = { light: "fa-sun", eclipse: "fa-circle-half-stroke", dark: "fa-moon" };
+const THEME_ICON = { light: "fa-sun", eclipse: "fa-bolt", dark: "fa-fire" };
 
 function currentTheme() {
   const attr = document.documentElement.dataset.theme;

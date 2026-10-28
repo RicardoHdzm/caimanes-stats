@@ -309,7 +309,7 @@ function buildBottomTabs() {
         <span>Instagram</span>
       </a>
       <button type="button" id="more-tile-theme">
-        <span class="more-app-icon"><i class="fa-solid fa-moon" id="more-tile-theme-icon"></i></span>
+        <span class="more-app-icon"><i class="fa-solid fa-bolt" id="more-tile-theme-icon"></i></span>
         <span>Tema</span>
       </button>
       <a href="admin.html" id="more-tile-admin" hidden>

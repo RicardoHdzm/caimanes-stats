@@ -6,12 +6,12 @@
        la página no "parpadee" oscuro-y-luego-claro en cada carga. El resto
        de la lógica (botón, guardar el cambio) vive en js/theme.js. -->
   <script>
+    // Eclipse (azul) es el default; Luna (negro) solo si se eligió y guardó.
+    var theme = "eclipse";
     try {
-      var theme = localStorage.getItem("caimanes-theme");
-      if (theme === "eclipse") {
-        document.documentElement.dataset.theme = theme;
-      }
+      if (localStorage.getItem("caimanes-theme") === "dark") theme = "dark";
     } catch (e) {}
+    if (theme === "eclipse") document.documentElement.dataset.theme = theme;
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
@@ -23,16 +23,16 @@
   <!-- Preview al compartir el link (WhatsApp, Facebook, X). La imagen y la URL
        tienen que ser absolutas: los scrapers no resuelven rutas relativas. -->
   <meta name="description" content="Estadísticas de los Caimanes de Villas: roster, bateo, pitcheo, fildeo, calendario y resultados de la temporada." />
-  <meta name="theme-color" content="#0b0d10" />
-  <link rel="canonical" href="https://ricardohdzm.github.io/caimanes-stats/" />
+  <meta name="theme-color" content="#0a0e18" />
+  <link rel="canonical" href="https://caimanes.team/" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Caimanes de Villas" />
   <meta property="og:locale" content="es_MX" />
   <meta property="og:title" content="Caimanes de Villas — Stats" />
   <meta property="og:description" content="Estadísticas de los Caimanes de Villas: roster, bateo, pitcheo, fildeo, calendario y resultados de la temporada." />
-  <meta property="og:url" content="https://ricardohdzm.github.io/caimanes-stats/" />
-  <meta property="og:image" content="https://ricardohdzm.github.io/caimanes-stats/assets/thumbnail.png" />
+  <meta property="og:url" content="https://caimanes.team/" />
+  <meta property="og:image" content="https://caimanes.team/assets/thumbnail.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Logo de los Caimanes de Villas" />
@@ -40,7 +40,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Caimanes de Villas — Stats" />
   <meta name="twitter:description" content="Estadísticas de los Caimanes de Villas: roster, bateo, pitcheo, fildeo, calendario y resultados de la temporada." />
-  <meta name="twitter:image" content="https://ricardohdzm.github.io/caimanes-stats/assets/thumbnail.png" />
+  <meta name="twitter:image" content="https://caimanes.team/assets/thumbnail.png" />
 
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link rel="manifest" href="manifest.webmanifest" />
@@ -138,10 +138,10 @@
       <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" class="header-icon" aria-label="Instagram del equipo">
         <i class="fa-brands fa-instagram"></i>
       </a>
-      <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Luna — clic para cambiar">
+      <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
         <span class="theme-switch-thumb"></span>
-        <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
-        <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
+        <i class="fa-solid fa-bolt theme-switch-icon theme-switch-icon--eclipse"></i>
+        <i class="fa-solid fa-fire theme-switch-icon theme-switch-icon--moon"></i>
       </button>
       <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
         <i class="fa-solid fa-bars"></i>
