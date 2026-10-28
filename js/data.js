@@ -772,6 +772,63 @@ export const GAMES = [
     substitutions: [
     ],
   },
+  {
+    id: "g13",
+    season: 9,
+    date: "2026-10-27",
+    time: "19:00",
+    opponent: "Blockreto",
+    weCloseBatting: true,
+    scoreUs: 20,
+    scoreThem: 22,
+    batting: [
+      { playerId: "p10", order: 1, position: "LF", AB: 5, H: 2, "2B": 1, "3B": 1, HR: 0, HRC: 0, RBI: 0, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p5", order: 2, position: "2B", AB: 3, H: 2, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p1", order: 3, position: "SS", AB: 5, H: 5, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 5, BB: 0, SO: 0, SB: 3 },
+      { playerId: "p12", order: 4, position: "1B", AB: 5, H: 4, "2B": 3, "3B": 0, HR: 1, HRC: 0, RBI: 8, R: 4, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p26", order: 5, position: "CF", AB: 5, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 3, R: 2, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p15", order: 6, position: "3B", AB: 4, H: 3, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 1, SO: 0, SB: 3 },
+      { playerId: "p7", order: 7, position: "JD", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p4", order: 8, position: "RF", AB: 4, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p24", order: 9, position: "C", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p21", order: 10, position: "JC", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p3", order: 2, position: "2B", AB: 2, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 0 },
+    ],
+    pitching: [
+      { playerId: "p16", IP: 4, H: 12, R: 4, ER: 0, BB: 0, SO: 2, HR: 0, decision: "" },
+      { playerId: "p14", IP: 2.1, H: 13, R: 12, ER: 0, BB: 3, SO: 0, HR: 0, decision: "L" },
+      { playerId: "p16", IP: 0.2, H: 3, R: 6, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+    ],
+    fielding: [
+      { playerId: "p16", PO: 0, A: 0, E: 0 },
+      { playerId: "p24", PO: 0, A: 0, E: 1 },
+      { playerId: "p12", PO: 3, A: 0, E: 0 },
+      { playerId: "p5", PO: 3, A: 0, E: 1 },
+      { playerId: "p15", PO: 1, A: 0, E: 1 },
+      { playerId: "p1", PO: 3, A: 5, E: 4 },
+      { playerId: "p10", PO: 2, A: 1, E: 2 },
+      { playerId: "p26", PO: 3, A: 0, E: 0 },
+      { playerId: "p4", PO: 0, A: 0, E: 0 },
+      { playerId: "p3", PO: 2, A: 0, E: 0 },
+      { playerId: "p7", PO: 2, A: 0, E: 0 },
+    ],
+    outs: [
+      { playerId: "p10", GO: 2, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p5", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p1", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p12", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p26", GO: 2, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p15", GO: 0, FO: 0, LO: 1, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p7", GO: 0, FO: 1, LO: 1, BO: 0, RO: 0, SAC: 1 },
+      { playerId: "p4", GO: 2, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p24", GO: 2, FO: 0, LO: 0, BO: 1, RO: 0, SAC: 0 },
+      { playerId: "p21", GO: 2, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p3", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+    ],
+    substitutions: [
+      { inning: 0, type: "bateo", playerOut: "p5", playerIn: "p3", position: "2B" },
+    ],
+  },
 ];
 
 // Juegos de PLAYOFFS — solo temporadas que llegaron a esta fase tienen
@@ -937,7 +994,7 @@ export const SCHEDULE = [
    // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
    // { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
   // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
-  { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" },
+  // { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" }, // ya se jugó: es g13 en GAMES
 ];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
