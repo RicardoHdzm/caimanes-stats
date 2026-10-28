@@ -828,6 +828,7 @@ export const GAMES = [
     substitutions: [
       { inning: 0, type: "bateo", playerOut: "p5", playerIn: "p3", position: "2B" },
     ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1361225502573347",
   },
 ];
 
