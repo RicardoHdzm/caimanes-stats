@@ -146,7 +146,7 @@ export const DUES_PAID = {
 // Ids de jugadores que se lesionaron durante la temporada — a mano, no hay
 // ningún dato de lesiones en GAMES de donde sacarlo solo. Alimenta la
 // medalla "Fragile" (ver js/views/jugador.js).
-export const INJURED = ["p1", "p2"];
+export const INJURED = ["p2"];
 
 // Ids de jugadores que administran el equipo (cuenta de coach en Supabase,
 // ver COACH_EMAIL en js/auth.js) — a mano, igual que INJURED de arriba.
