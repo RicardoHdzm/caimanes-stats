@@ -5585,7 +5585,7 @@ body.menu-open {
   cursor: pointer;
 }
 
-/* Título de cada grupo del menú (Temporada, Equipo, Números, Fans, Más). */
+/* Título de cada grupo del menú (Temporada, Equipo, Números, Multimedia, Más). */
 .more-sheet .more-sheet-group {
   margin: 26px 0 2px;
   font-family: var(--font-display);
@@ -6399,7 +6399,7 @@ h2.page-title {
   letter-spacing: 0.06em;
 }
 
-/* ---- Grupos desplegables (Temporada, Equipo, Números, Fans) ---- */
+/* ---- Grupos desplegables (Temporada, Equipo, Números, Multimedia) ---- */
 .nav-group {
   position: relative;
 }

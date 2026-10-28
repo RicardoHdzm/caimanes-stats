@@ -80,7 +80,7 @@ const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
   { label: "Números", tabs: ["resumen", "estadisticas", "temporadas"] },
-  { label: "Fans", tabs: ["playlist", "fanzone"] },
+  { label: "Multimedia", tabs: ["playlist", "fanzone"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 
 function appTile(t) {
