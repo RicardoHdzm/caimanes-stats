@@ -17,8 +17,7 @@ const POSITION_GROUPS = [
   { id: "C", label: "Catcher", codes: ["C"] },
   { id: "IF", label: "Infield", codes: ["1B", "2B", "3B", "SS"] },
   { id: "OF", label: "Outfield", codes: ["LF", "CF", "RF"] },
-  { id: "JD", label: "JD", codes: ["JD"] },
-  { id: "JC", label: "JC", codes: ["JC"] },
+  { id: "BAT", label: "Bateadores", codes: ["JD", "JC"] },
 ];
 
 function playerPositions(player) {
