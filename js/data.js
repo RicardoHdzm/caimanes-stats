@@ -317,7 +317,7 @@ export const GAMES = [
       { playerId: "p16", IP: 2, H: 10, R: 7, ER: 0, BB: 1, SO: 0, HR: 1, decision: "" },
     ],
     fielding: [
-      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p6", PO: 1, A: 0, E: 0 },
       { playerId: "p4", PO: 1, A: 0, E: 1 },
       { playerId: "p1", PO: 2, A: 0, E: 0 },
       { playerId: "p19", PO: 0, A: 1, E: 0 },
@@ -368,7 +368,7 @@ export const GAMES = [
       { playerId: "p14", IP: 3, H: 10, R: 7, ER: 0, BB: 0, SO: 2, HR: 1, decision: "W" },
     ],
     fielding: [
-      { playerId: "p6", PO: 1, A: 0, E: 2 },
+      { playerId: "p6", PO: 4, A: 0, E: 2 },
       { playerId: "p12", PO: 4, A: 0, E: 1 },
       { playerId: "p5", PO: 1, A: 0, E: 2 },
       { playerId: "p18", PO: 0, A: 0, E: 1 },
@@ -416,7 +416,7 @@ export const GAMES = [
     ],
     fielding: [
       { playerId: "p14", PO: 0, A: 0, E: 0 },
-      { playerId: "p6", PO: 1, A: 0, E: 0 },
+      { playerId: "p6", PO: 5, A: 0, E: 0 },
       { playerId: "p12", PO: 4, A: 0, E: 0 },
       { playerId: "p9", PO: 1, A: 0, E: 2 },
       { playerId: "p19", PO: 1, A: 4, E: 2 },
@@ -512,7 +512,7 @@ export const GAMES = [
     ],
     fielding: [
       { playerId: "p16", PO: 2, A: 0, E: 0 },
-      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p6", PO: 2, A: 0, E: 0 },
       { playerId: "p12", PO: 5, A: 0, E: 1 },
       { playerId: "p8", PO: 1, A: 0, E: 0 },
       { playerId: "p15", PO: 0, A: 1, E: 1 },
@@ -571,7 +571,7 @@ export const GAMES = [
     ],
     fielding: [
       { playerId: "p14", PO: 0, A: 0, E: 0 },
-      { playerId: "p6", PO: 1, A: 0, E: 0 },
+      { playerId: "p6", PO: 3, A: 0, E: 0 },
       { playerId: "p12", PO: 5, A: 1, E: 0 },
       { playerId: "p3", PO: 0, A: 0, E: 1 },
       { playerId: "p15", PO: 2, A: 3, E: 2 },
@@ -910,7 +910,7 @@ export const PLAYOFFS = [
             ],
             fielding: [
               { playerId: "p16", PO: 0, A: 1, E: 0 },
-              { playerId: "p6", PO: 1, A: 0, E: 0 },
+              { playerId: "p6", PO: 2, A: 0, E: 0 },
               { playerId: "p12", PO: 2, A: 0, E: 1 },
               { playerId: "p3", PO: 1, A: 3, E: 2 },
               { playerId: "p15", PO: 1, A: 0, E: 3 },
