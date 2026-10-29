@@ -46,9 +46,9 @@ function statLine(row) {
   if (!s) return "";
   const items = (pairs) => pairs.map(([value, label]) => `<span><b>${value}</b> ${label}</span>`).join("");
   if (row.pitcherOnly) {
-    return s.pitchOuts > 0 ? items([[s.WHIP.toFixed(2), "WHIP"], [s.pitchIP, "IP"], [s.pitchSO, "K"]]) : "Sin entradas esta temporada";
+    return s.pitchOuts > 0 ? items([[s.WHIP.toFixed(2), "WHIP"], [s.pitchIP, "IP"], [s.pitchSO, "K"]]) : `<span class="lineup-stat-empty">Sin entradas esta temporada</span>`;
   }
-  if (!s.AB && !s.BB) return "Sin turnos esta temporada";
+  if (!s.AB && !s.BB) return `<span class="lineup-stat-empty">Sin turnos esta temporada</span>`;
   return items([[s.AVG, "AVG"], [s.OPS, "OPS"], [s.HR + (s.HRC ?? 0), "HR"], [s.RBI, "RBI"]]);
 }
 
@@ -109,13 +109,16 @@ export function renderAlineacion(container, compareLeft, compareRight) {
     const benchEl = document.createElement("div");
     benchEl.className = "lineup-bench";
     benchEl.innerHTML = bench
-      .map(
-        (p) => `
+      .map(({ player: p, stats }) => {
+        // Quien nunca ha bateado pero sí lanzado, con sus stats de pitcheo.
+        const pitcherOnly = !!stats && !stats.AB && !stats.BB && stats.pitchOuts > 0;
+        return `
         <a href="#/jugador/${p.id}" class="lineup-bench-player">
           ${renderAvatar(p, 56)}
-          <span>${escapeHtml(shortName(p.name))}</span>
-        </a>`
-      )
+          <span class="lineup-bench-name">${escapeHtml(shortName(p.name))}${p.number ? ` <small>#${p.number}</small>` : ""}</span>
+          <span class="lineup-bench-stats">${statLine({ stats, pitcherOnly })}</span>
+        </a>`;
+      })
       .join("");
     container.appendChild(benchEl);
   }

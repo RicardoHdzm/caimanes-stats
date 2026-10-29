@@ -387,7 +387,7 @@ export function publicLineup(roster = alineacionRoster()) {
     lineupOrder.push({ player: defense.P, label: "P", pitcherOnly: true, stats: statsById.get(defense.P.id) });
   }
   const used = new Set(lineupOrder.map((r) => r.player.id));
-  const bench = roster.filter((p) => !used.has(p.id));
+  const bench = roster.filter((p) => !used.has(p.id)).map((p) => ({ player: p, stats: statsById.get(p.id) }));
   return { defense, order: lineupOrder, bench };
 }
 
