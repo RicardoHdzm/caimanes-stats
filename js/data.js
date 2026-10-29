@@ -74,7 +74,7 @@ export const PLAYERS = [
   { id: "p7", number: 55, name: "Francois Cardenas", position: "RF/CF/2B", walkup: { title: "Taste", artist: "Sabrina Carpenter" }, seasons: [6, 7, 8, 9] },
   { id: "p8", number: 66, name: "Jorge Zazueta", position: "C/3B/1B", walkup: { title: "Steal My Girl", artist: "One Direction" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
   { id: "p9", number: 17, name: "Carlos Sepulveda", position: "2B/RF/C", walkup: { title: "...Ready For It?", artist: "Taylor Swift" }, seasons: [7, 8] },
-  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "What Makes You Beautiful", artist: "One Direction" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
+  { id: "p10", number: 4, name: "Enrique Muñoz", position: "LF/CF/3B", walkup: { title: "Off the Wall", artist: "Michael Jackson", url: "https://open.spotify.com/intl-es/track/3zYpRGnnoegSpt3SguSo3W?si=9a3e37cd4c474aaa" }, seasons: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
   { id: "p11", number: 28, name: "Luis Lugo Bastidas", position: "RF/CF/2B", walkup: { title: "bad idea right?", artist: "Olivia Rodrigo" }, seasons: [7, 8, 9] },
   { id: "p12", number: 16, name: "Luis Fernando Lugo", position: "1B/2B/3B", walkup: { title: "Blank Space", artist: "Taylor Swift" }, seasons: [3, 4, 5, 6, 7, 8, 9] },
   { id: "p13", number: 29, name: "Luis Pompa", position: "RF/2B/C", walkup: { title: "Bad Blood", artist: "Taylor Swift" }, seasons: [2, 3, 4, 5, 6, 7, 8, 9] },
@@ -123,11 +123,11 @@ export const DUES_PAID = {
     p3: false, // Omar Ramirez
     p4: false, // Carlos Borboa
     p5: false, // Christopher Felix
-    p6: true, // Edwyn Pompa
+    p6: false, // Edwyn Pompa
     p7: false, // Francois Cardenas
     p8: false, // Jorge Zazueta
     p10: true, // Enrique Muñoz
-    p11: false, // Luis Lugo Bastidas
+    p11: true, // Luis Lugo Bastidas
     p12: true, // Luis Fernando Lugo
     p13: false, // Luis Pompa
     p14: false, // Ricardo Santoyo
