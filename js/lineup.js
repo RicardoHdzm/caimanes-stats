@@ -2,7 +2,7 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, pitchingTotals, playerName, seasonStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
+import { battingTotals, pitchingTotals, fieldingTotals, playerName, seasonStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
 import { SCHEDULE, ROSTER, CURRENT_SEASON } from "./data.js";
@@ -313,6 +313,10 @@ function lineupStatsById(roster) {
   const statGames = lineupStatsGames();
   const seasonStatsById = new Map(battingTotals(statGames).map((r) => [r.playerId, r]));
   const pitchingById = new Map(pitchingTotals(statGames).map((r) => [r.playerId, r]));
+  // El fildeo solo se MUESTRA (tarjetas de Alineación): el motor no lo usa
+  // para elegir posiciones — sin posición por línea y con tan pocos juegos,
+  // el FPCT no alcanza para comparar a dos jugadores.
+  const fieldingById = new Map(fieldingTotals(statGames).map((r) => [r.playerId, r]));
   const seasonGames = currentSeasonGames();
   const seasonPlayed = gamesPlayedByPlayer(seasonGames);
   return new Map(
@@ -320,6 +324,7 @@ function lineupStatsById(roster) {
       const seasonGP = seasonPlayed.get(p.id) ?? 0;
       const base = seasonStatsById.get(p.id) ?? emptyStats(p.id);
       const pitching = pitchingById.get(p.id);
+      const fielding = fieldingById.get(p.id);
       return [
         p.id,
         {
@@ -330,6 +335,8 @@ function lineupStatsById(roster) {
           pitchIP: pitching?.IP ?? "0.0",
           pitchSO: pitching?.SO ?? 0,
           WHIP: Number(pitching?.WHIP ?? 0),
+          // null = sin oportunidades de fildeo (ni PO, ni A, ni E).
+          FPCT: fielding && fielding.PO + fielding.A + fielding.E > 0 ? fielding.FPCT : null,
         },
       ];
     })

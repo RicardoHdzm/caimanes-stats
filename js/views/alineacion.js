@@ -40,11 +40,15 @@ function statLine(row) {
   const s = row.stats;
   if (!s) return "";
   const items = (pairs) => pairs.map(([value, label]) => `<span><b>${value}</b> ${label}</span>`).join("");
+  // FPCT al final, solo si tuvo oportunidades de fildeo.
+  const fielding = s.FPCT != null ? [[s.FPCT, "FPCT"]] : [];
   if (row.pitcherOnly) {
-    return s.pitchOuts > 0 ? items([[s.WHIP.toFixed(2), "WHIP"], [s.pitchIP, "IP"], [s.pitchSO, "K"]]) : `<span class="lineup-stat-empty">Sin entradas esta temporada</span>`;
+    return s.pitchOuts > 0
+      ? items([[s.WHIP.toFixed(2), "WHIP"], [s.pitchIP, "IP"], [s.pitchSO, "K"], ...fielding])
+      : `<span class="lineup-stat-empty">Sin entradas esta temporada</span>`;
   }
   if (!s.AB && !s.BB) return `<span class="lineup-stat-empty">Sin turnos esta temporada</span>`;
-  return items([[s.AVG, "AVG"], [s.OPS, "OPS"], [s.HR + (s.HRC ?? 0), "HR"], [s.RBI, "RBI"]]);
+  return items([[s.AVG, "AVG"], [s.OPS, "OPS"], [s.HR + (s.HRC ?? 0), "HR"], [s.RBI, "RBI"], ...fielding]);
 }
 
 function fieldPlayer(pos, player) {
