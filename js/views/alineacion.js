@@ -99,7 +99,7 @@ export function renderAlineacion(container, compareLeft, compareRight) {
 
   if (bench.length) {
     const benchHeading = document.createElement("h3");
-    benchHeading.textContent = "Banca";
+    benchHeading.textContent = "Reservas";
     container.appendChild(benchHeading);
     // Mismas tarjetas que el orden al bat, sin el turno.
     const benchEl = document.createElement("ul");
