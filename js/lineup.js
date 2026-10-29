@@ -2,7 +2,7 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, playerName, seasonStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
+import { battingTotals, pitchingTotals, playerName, seasonStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
 import { SCHEDULE, ROSTER, CURRENT_SEASON } from "./data.js";
@@ -20,7 +20,7 @@ export function positionsOf(value) {
 }
 
 function emptyStats(playerId) {
-  return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0, seasonGP: 0, regular: false };
+  return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0, seasonGP: 0, regular: false, pitchOuts: 0, WHIP: 0 };
 }
 
 // Criterio principal de TODA elección del motor (quién se queda con una
@@ -33,6 +33,21 @@ function byRegularThenOps(a, b) {
   if (a.regular !== b.regular) return a.regular ? -1 : 1;
   return Number(b.OPS) - Number(a.OPS);
 }
+
+// Para la posición de PITCHER el bateo no dice nada (a petición expresa): ahí
+// se decide por el pitcheo de la temporada — regulares primero, luego quien
+// sí ha lanzado, luego menor WHIP y, a igual WHIP, más entradas (outs).
+function byRegularThenPitching(a, b) {
+  if (a.regular !== b.regular) return a.regular ? -1 : 1;
+  const aPitched = a.pitchOuts > 0;
+  const bPitched = b.pitchOuts > 0;
+  if (aPitched !== bPitched) return aPitched ? -1 : 1;
+  if (aPitched && a.WHIP !== b.WHIP) return a.WHIP - b.WHIP;
+  if (a.pitchOuts !== b.pitchOuts) return b.pitchOuts - a.pitchOuts;
+  return Number(b.OPS) - Number(a.OPS);
+}
+
+const rankFor = (pos) => (pos === "P" ? byRegularThenPitching : byRegularThenOps);
 
 // La primera posición listada en el roster (ej. "SS" en "SS/LF/CF") es la
 // posición principal del jugador.
@@ -72,7 +87,7 @@ export function assignDefense(roster, statsById) {
       const candidates = pool
         .filter((p) => primaryPosition(p) === pos && !used.has(p.id))
         .map(statsFor)
-        .sort(byRegularThenOps);
+        .sort(rankFor(pos));
       if (candidates.length > 0) {
         assignment[pos] = candidates[0];
         used.add(candidates[0].playerId);
@@ -87,7 +102,7 @@ export function assignDefense(roster, statsById) {
         const candidates = pool
           .filter((p) => positionsOf(p.position).includes(pos) && !used.has(p.id))
           .map(statsFor)
-          .sort(byRegularThenOps);
+          .sort(rankFor(pos));
         if (bestCandidates === null || candidates.length < bestCandidates.length) {
           bestPos = pos;
           bestCandidates = candidates;
@@ -113,7 +128,7 @@ export function assignDefense(roster, statsById) {
     const candidates = roster
       .filter((p) => positionsOf(p.registeredPosition).includes(pos) && !used.has(p.id))
       .map(statsFor)
-      .sort(byRegularThenOps);
+      .sort(rankFor(pos));
     if (candidates[0]) {
       assignment[pos] = candidates[0];
       used.add(candidates[0].playerId);
@@ -148,7 +163,7 @@ export function assignDefenseByChoice(roster, gamePositionById, statsById) {
     const candidates = roster
       .filter((p) => gamePositionById.get(p.id) === pos && !used.has(p.id))
       .map(statsFor)
-      .sort(byRegularThenOps);
+      .sort(rankFor(pos));
     if (candidates.length > 0) {
       assignment[pos] = candidates[0];
       used.add(candidates[0].playerId);
@@ -295,14 +310,26 @@ function lineupStatsGames() {
 }
 
 function lineupStatsById(roster) {
-  const seasonStatsById = new Map(battingTotals(lineupStatsGames()).map((r) => [r.playerId, r]));
+  const statGames = lineupStatsGames();
+  const seasonStatsById = new Map(battingTotals(statGames).map((r) => [r.playerId, r]));
+  const pitchingById = new Map(pitchingTotals(statGames).map((r) => [r.playerId, r]));
   const seasonGames = currentSeasonGames();
   const seasonPlayed = gamesPlayedByPlayer(seasonGames);
   return new Map(
     roster.map((p) => {
       const seasonGP = seasonPlayed.get(p.id) ?? 0;
       const base = seasonStatsById.get(p.id) ?? emptyStats(p.id);
-      return [p.id, { ...base, seasonGP, regular: seasonGP >= seasonGames.length / 2 }];
+      const pitching = pitchingById.get(p.id);
+      return [
+        p.id,
+        {
+          ...base,
+          seasonGP,
+          regular: seasonGP >= seasonGames.length / 2,
+          pitchOuts: pitching?.outs ?? 0,
+          WHIP: Number(pitching?.WHIP ?? 0),
+        },
+      ];
     })
   );
 }
