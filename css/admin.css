@@ -578,3 +578,51 @@
   opacity: 0.4;
   cursor: default;
 }
+
+/* Selector de jugador con búsqueda (ver "Selector de jugador" en js/admin.js). */
+.rows-table input.player-search {
+  min-width: 170px;
+  text-align: left;
+}
+
+.player-picker-list {
+  position: fixed;
+  z-index: 100;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  font-size: 0.85rem;
+}
+
+.player-picker-list li {
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: var(--text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.player-picker-list li.not-roster {
+  color: var(--muted);
+}
+
+.player-picker-list li.active,
+.player-picker-list li[data-id]:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.player-picker-list li.empty {
+  color: var(--muted);
+  cursor: default;
+}
+
+.copy-batting-btn {
+  margin-left: 6px;
+}

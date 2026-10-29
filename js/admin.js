@@ -86,12 +86,151 @@ const SUBSTITUTION_FIELDS = [
   { key: "position", label: "Pos", full: "Solo si es cambio de campo", type: "select", options: POSITION_OPTIONS },
 ];
 
-function playerOptionsHtml() {
-  return (
-    `<option value="">—</option>` +
-    PLAYERS.map((p) => `<option value="${p.id}">#${p.number ?? "-"} ${p.name}</option>`).join("")
-  );
+// ---- Selector de jugador con búsqueda ----
+//
+// En vez de un <select> con los 26 nombres (lento de recorrer en cada fila),
+// cada celda de jugador es un campo de texto: se escribe parte del nombre o
+// el número y aparece la lista filtrada (sin importar acentos ni
+// mayúsculas: "munoz" encuentra a Muñoz). Flechas para moverse, Enter o Tab
+// para elegir (Enter además salta a la siguiente casilla de la fila), Esc
+// para cerrar. El id elegido vive en un <input type="hidden" data-key>, así
+// que getRows/addRow siguen leyendo/escribiendo `.value` como antes.
+//
+// La lista es UNA sola, pegada al <body> con position: fixed — dentro de la
+// tabla (que tiene scroll horizontal) quedaría recortada.
+const normalizeText = (s) => (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const playerLabel = (p) => `#${p.number ?? "-"} ${p.name}`;
+// Los del roster de la temporada actual primero; los demás después.
+const PICKER_PLAYERS = [...PLAYERS].sort(
+  (a, b) => Number(!!b.seasons?.includes(CURRENT_SEASON)) - Number(!!a.seasons?.includes(CURRENT_SEASON))
+);
+const PICKER_MAX = 8;
+
+function playerCellHtml(key) {
+  return `<input type="hidden" data-key="${key}"><input type="text" class="player-search" placeholder="Escribe un nombre…" autocomplete="off" spellcheck="false">`;
 }
+
+function matchingPlayers(query) {
+  const tokens = normalizeText(query).replace(/#/g, "").split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return PICKER_PLAYERS;
+  return PICKER_PLAYERS.filter((p) => {
+    const hay = normalizeText(`${p.number ?? ""} ${p.name}`);
+    return tokens.every((t) => hay.split(/\s+/).some((word) => word.startsWith(t)));
+  });
+}
+
+const pickerList = document.createElement("ul");
+pickerList.className = "player-picker-list";
+pickerList.hidden = true;
+document.body.appendChild(pickerList);
+let pickerInput = null;
+let pickerMatches = [];
+let pickerIndex = 0;
+
+function hiddenFor(input) {
+  return input.previousElementSibling;
+}
+
+function renderPicker() {
+  pickerList.innerHTML = pickerMatches.length
+    ? pickerMatches
+        .slice(0, PICKER_MAX)
+        .map(
+          (p, i) =>
+            `<li data-id="${p.id}" class="${i === pickerIndex ? "active" : ""}${p.seasons?.includes(CURRENT_SEASON) ? "" : " not-roster"}">${playerLabel(p)}</li>`
+        )
+        .join("")
+    : `<li class="empty">Nadie con ese nombre</li>`;
+  const r = pickerInput.getBoundingClientRect();
+  pickerList.style.left = `${r.left}px`;
+  pickerList.style.top = `${r.bottom + 2}px`;
+  pickerList.style.minWidth = `${r.width}px`;
+  pickerList.hidden = false;
+}
+
+function openPicker(input) {
+  pickerInput = input;
+  pickerMatches = matchingPlayers(input.value === playerLabelById(hiddenFor(input).value) ? "" : input.value);
+  pickerIndex = 0;
+  renderPicker();
+}
+
+function closePicker() {
+  pickerList.hidden = true;
+  pickerInput = null;
+}
+
+function playerLabelById(id) {
+  const p = PLAYERS.find((x) => x.id === id);
+  return p ? playerLabel(p) : "";
+}
+
+function choosePlayer(input, player) {
+  hiddenFor(input).value = player?.id ?? "";
+  input.value = player ? playerLabel(player) : "";
+  closePicker();
+}
+
+// Si se sale del campo sin elegir: se queda con el único que coincide, o se
+// limpia (para que nunca quede texto que no corresponde a nadie).
+function settlePicker(input) {
+  const hidden = hiddenFor(input);
+  if (input.value.trim() === "") return choosePlayer(input, null);
+  if (input.value === playerLabelById(hidden.value)) return;
+  const matches = matchingPlayers(input.value);
+  choosePlayer(input, matches.length === 1 ? matches[0] : null);
+}
+
+document.addEventListener("focusin", (e) => {
+  if (e.target.matches?.(".player-search")) {
+    e.target.select();
+    openPicker(e.target);
+  }
+});
+document.addEventListener("input", (e) => {
+  if (!e.target.matches?.(".player-search")) return;
+  hiddenFor(e.target).value = "";
+  openPicker(e.target);
+});
+document.addEventListener("focusout", (e) => {
+  if (e.target.matches?.(".player-search")) {
+    settlePicker(e.target);
+    closePicker();
+  }
+});
+document.addEventListener("keydown", (e) => {
+  const input = e.target;
+  if (!input.matches?.(".player-search") || pickerList.hidden) return;
+  const visible = Math.min(pickerMatches.length, PICKER_MAX);
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    if (!visible) return;
+    pickerIndex = (pickerIndex + (e.key === "ArrowDown" ? 1 : -1) + visible) % visible;
+    renderPicker();
+  } else if (e.key === "Enter" || e.key === "Tab") {
+    // Sin haber escrito nada nuevo (campo vacío o con el jugador ya elegido),
+    // Tab solo avanza y Enter no cambia la elección.
+    const untouched = input.value.trim() === "" || input.value === playerLabelById(hiddenFor(input).value);
+    const player = untouched ? PLAYERS.find((p) => p.id === hiddenFor(input).value) : pickerMatches[pickerIndex];
+    if (!player || (e.key === "Tab" && untouched)) return;
+    choosePlayer(input, player);
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // Salta a la siguiente casilla de la misma fila.
+      const cells = [...input.closest("tr").querySelectorAll("input:not([type=hidden]), select")];
+      cells[cells.indexOf(input) + 1]?.focus();
+    }
+  } else if (e.key === "Escape") {
+    closePicker();
+  }
+});
+// mousedown (no click): si no, el campo pierde el foco antes y la lista se cierra.
+pickerList.addEventListener("mousedown", (e) => {
+  e.preventDefault();
+  const li = e.target.closest("li[data-id]");
+  if (li && pickerInput) choosePlayer(pickerInput, PLAYERS.find((p) => p.id === li.dataset.id));
+});
+window.addEventListener("scroll", () => pickerInput && renderPicker(), true);
 
 function createRowsEditor(container, fields) {
   const wrap = document.createElement("div");
@@ -112,7 +251,7 @@ function createRowsEditor(container, fields) {
       fields
         .map((f) => {
           if (f.type === "player") {
-            return `<td><select data-key="${f.key}">${playerOptionsHtml()}</select></td>`;
+            return `<td>${playerCellHtml(f.key)}</td>`;
           }
           if (f.type === "select") {
             const opts = f.options.map((o) => `<option value="${o}">${o || "—"}</option>`).join("");
@@ -126,7 +265,24 @@ function createRowsEditor(container, fields) {
     tbody.appendChild(tr);
     for (const f of fields) {
       if (values[f.key] === undefined) continue;
-      tr.querySelector(`[data-key="${f.key}"]`).value = values[f.key];
+      const el = tr.querySelector(`[data-key="${f.key}"]`);
+      el.value = values[f.key];
+      if (f.type === "player") el.nextElementSibling.value = playerLabelById(values[f.key]);
+    }
+    return tr;
+  }
+
+  // Ids de jugador ya capturados en esta tabla (primera columna de jugador).
+  function playerIds() {
+    const key = fields.find((f) => f.type === "player").key;
+    return [...tbody.querySelectorAll(`[data-key="${key}"]`)].map((el) => el.value).filter(Boolean);
+  }
+
+  // Quita las filas que no tienen ningún jugador elegido.
+  function removeEmptyRows() {
+    for (const row of [...tbody.querySelectorAll("tr")]) {
+      const hasPlayer = fields.some((f) => f.type === "player" && row.querySelector(`[data-key="${f.key}"]`).value);
+      if (!hasPlayer) row.remove();
     }
   }
 
@@ -147,7 +303,7 @@ function createRowsEditor(container, fields) {
     tbody.innerHTML = "";
   }
 
-  return { addRow, getRows, clearRows };
+  return { addRow, getRows, clearRows, playerIds, removeEmptyRows };
 }
 
 function lineToCode(fields, values) {
@@ -277,7 +433,33 @@ for (const btn of document.querySelectorAll(".add-row-btn")) {
     outs: outsEditor,
     substitutions: substitutionsEditor,
   }[section];
-  btn.addEventListener("click", () => editor.addRow());
+  btn.addEventListener("click", () => {
+    const tr = editor.addRow();
+    tr.querySelector(".player-search, input, select")?.focus();
+  });
+}
+
+// "Copiar jugadores del bateo": llena Fildeo/Outs con los mismos jugadores
+// del line-up (en su orden) para no elegirlos otra vez uno por uno. Solo
+// agrega a quien falte, y quita antes las filas vacías. En Fildeo no entra
+// el JC (solo batea) y sí entran los pitchers de la tabla de Pitcheo.
+for (const btn of document.querySelectorAll(".copy-batting-btn")) {
+  btn.addEventListener("click", () => {
+    const target = { fielding: fieldingEditor, outs: outsEditor }[btn.dataset.section];
+    const batting = battingEditor.getRows();
+    let ids = batting
+      .filter((r) => btn.dataset.section !== "fielding" || r.position !== "JC")
+      .map((r) => r.playerId);
+    if (btn.dataset.section === "fielding") ids = [...ids, ...pitchingEditor.getRows().map((r) => r.playerId)];
+    target.removeEmptyRows();
+    const already = new Set(target.playerIds());
+    for (const id of ids) {
+      if (already.has(id)) continue;
+      already.add(id);
+      target.addRow({ playerId: id });
+    }
+    if (already.size === 0) target.addRow();
+  });
 }
 
 const gameForm = document.getElementById("game-form");
