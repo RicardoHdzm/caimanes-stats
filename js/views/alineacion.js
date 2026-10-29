@@ -53,7 +53,7 @@ function fieldPlayer(pos, player) {
 }
 
 export function renderAlineacion(container, compareLeft, compareRight) {
-  heading(container, "Alineación sugerida");
+  heading(container, "Alineación ideal");
 
   const { defense, order, bench } = publicLineup();
 
