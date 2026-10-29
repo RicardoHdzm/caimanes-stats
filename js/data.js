@@ -88,9 +88,9 @@ export const PLAYERS = [
   { id: "p21", number: 0, name: "Alberto Solis", position: "RF", walkup: { title: "vampire", artist: "Olivia Rodrigo" }, seasons: [7, 9] },
   { id: "p22", number: 0, name: "Octavio Rodriguez", position: "CF", walkup: { title: "Cruel Summer", artist: "Taylor Swift" }, seasons: [9] },
   { id: "p23", number: 0, name: "Emanuel Ramos", position: "RF", walkup: { title: "Nonsense", artist: "Sabrina Carpenter" }, seasons: [9] },
-  { id: "p24", number: 0, name: "Alex Escalante", position: "RF", walkup: { title: "Espresso", artist: "Sabrina Carpenter" }, seasons: [9] },
+  { id: "p24", number: 3, name: "Alex Escalante", position: "RF", walkup: { title: "Espresso", artist: "Sabrina Carpenter" }, seasons: [9] },
   { id: "p25", number: 0, name: "Fernando Olivas", position: "RF", walkup: { title: "Please Please Please", artist: "Sabrina Carpenter" }, seasons: [1, 2 , 3, 4 ,5 ,6, 9] },
-  { id: "p26", number: 0, name: "Marco Olivas", position: "CF", walkup: { title: "get him back!", artist: "Olivia Rodrigo" }, seasons: [1, 2, 9] },
+  { id: "p26", number: 14, name: "Marco Olivas", position: "CF", walkup: { title: "get him back!", artist: "Olivia Rodrigo" }, seasons: [1, 2, 9] },
 ];
 
 // Roster de la temporada ACTUAL: los de PLAYERS que traen CURRENT_SEASON en
