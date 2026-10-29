@@ -59,7 +59,7 @@ export function renderRoster(container) {
   const positionOverrides = cachedPositionOverrides();
   const rows = ROSTER.map((p) => ({
     ...p,
-    position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position),
+    position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position, { withDH: true }),
     gamesPlayed: played.get(p.id) ?? 0,
   }));
 

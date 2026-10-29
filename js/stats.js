@@ -41,21 +41,25 @@ export function seasonStatGames(season = CURRENT_SEASON) {
 // A petición expresa, las posiciones que salen en Roster/perfil/Comparar
 // ya no son fijas: se actualizan solas con las que MÁS ha jugado cada quien
 // en la temporada actual (regular + playoffs), máximo 3. Cada juego cuenta
-// una vez por posición, sumando: su `position` en `batting` (solo las 9 de
-// campo — JD/JC no), "P" si aparece en `pitching`, y la posición de una
-// sustitución "campo" en la que entró. Empates: primero las del orden
+// una vez por posición, sumando: su `position` en `batting`, "P" si aparece
+// en `pitching`, y la posición de una sustitución en la que entró. JD y JC
+// cuentan SOLO para lo que se muestra (Roster, perfil, Comparar — a petición
+// expresa, si los ha jugado); el motor de alineación (js/lineup.js) los
+// ignora porque ahí solo importan las 9 de campo. Empates: primero las del orden
 // registrado (data.js / perfil), luego el orden de campo. Sin juegos esta
 // temporada (arranque de temporada) se usan los de la temporada anterior
 // en la que jugó (ver displayPositions).
 const FIELD_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
+const SHOWN_POSITIONS = [...FIELD_POSITIONS, "JD", "JC"];
 const MAX_SHOWN_POSITIONS = 3;
 
-export function playedPositionCounts(games) {
+export function playedPositionCounts(games, { withDH = false } = {}) {
+  const allowed = withDH ? SHOWN_POSITIONS : FIELD_POSITIONS;
   const counts = new Map(); // playerId -> Map(posición -> juegos)
   for (const game of games) {
     const seen = new Set();
     const add = (playerId, pos) => {
-      if (!playerId || !FIELD_POSITIONS.includes(pos)) return;
+      if (!playerId || !allowed.includes(pos)) return;
       const key = `${playerId}|${pos}`;
       if (seen.has(key)) return;
       seen.add(key);
@@ -65,7 +69,10 @@ export function playedPositionCounts(games) {
     };
     for (const line of game.batting ?? []) add(line.playerId, line.position);
     for (const line of game.pitching ?? []) add(line.playerId, "P");
-    for (const sub of game.substitutions ?? []) if (sub.type === "campo") add(sub.playerIn, sub.position);
+    for (const sub of game.substitutions ?? []) {
+      // Un cambio de bateo solo cuenta si entró como JD/JC (los de campo, siempre).
+      if (sub.type === "campo" || (withDH && (sub.position === "JD" || sub.position === "JC"))) add(sub.playerIn, sub.position);
+    }
   }
   return counts;
 }
@@ -73,9 +80,10 @@ export function playedPositionCounts(games) {
 // Conteos por temporada, de la actual hacia atrás — se calculan una sola vez
 // por carga de página (GAMES no cambia en vivo).
 const positionCountsBySeason = new Map();
-function positionCountsOf(season) {
-  if (!positionCountsBySeason.has(season)) positionCountsBySeason.set(season, playedPositionCounts(seasonStatGames(season)));
-  return positionCountsBySeason.get(season);
+function positionCountsOf(season, withDH) {
+  const key = `${season}|${withDH}`;
+  if (!positionCountsBySeason.has(key)) positionCountsBySeason.set(key, playedPositionCounts(seasonStatGames(season), { withDH }));
+  return positionCountsBySeason.get(key);
 }
 
 // "2B/CF/SS" para mostrar — `registered` es la cadena registrada (override
@@ -83,17 +91,17 @@ function positionCountsOf(season) {
 // respaldo. Si el jugador todavía no juega esta temporada (arranque de
 // temporada), se toman las más jugadas de la temporada MÁS RECIENTE en la
 // que sí jugó; solo si nunca ha jugado un juego capturado se muestra la
-// registrada.
-export function displayPositions(playerId, registered = "") {
+// registrada. `withDH`: incluir JD/JC (Roster, perfil, Comparar).
+export function displayPositions(playerId, registered = "", { withDH = false } = {}) {
   let counts = null;
   for (let season = CURRENT_SEASON; season >= 1 && !counts?.size; season--) {
-    counts = positionCountsOf(season).get(playerId) ?? null;
+    counts = positionCountsOf(season, withDH).get(playerId) ?? null;
   }
   if (!counts || counts.size === 0) return registered ?? "";
   const regOrder = (registered ?? "").split("/").map((v) => v.trim());
   const tieRank = (pos) => {
     const i = regOrder.indexOf(pos);
-    return i >= 0 ? i : 100 + FIELD_POSITIONS.indexOf(pos);
+    return i >= 0 ? i : 100 + SHOWN_POSITIONS.indexOf(pos);
   };
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1] || tieRank(a[0]) - tieRank(b[0]))

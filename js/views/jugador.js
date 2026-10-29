@@ -796,7 +796,7 @@ export function renderJugadorDetalle(container, playerId) {
   // displayPositions en js/stats.js); currentPosition (la registrada) se
   // sigue usando para el editor de posiciones y como respaldo.
   const shownPositions = (registered) => {
-    const shown = displayPositions(player.id, registered);
+    const shown = displayPositions(player.id, registered, { withDH: true });
     return shown ? renderPositionBadges(shown) : "";
   };
   // Bio + cumpleaños del perfil social (player_profiles), ya precargados

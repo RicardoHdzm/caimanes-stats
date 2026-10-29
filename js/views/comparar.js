@@ -113,7 +113,7 @@ function comparisonBlock(title, rows, leftStats, rightStats) {
 
 function playerHeader(player, played) {
   // Las más jugadas esta temporada (ver displayPositions en js/stats.js).
-  const positions = displayPositions(player.id, player.position);
+  const positions = displayPositions(player.id, player.position, { withDH: true });
   return `
     <div class="compare-player">
       <span data-avatar="${player.id}">${renderAvatar(player, 72)}</span>
