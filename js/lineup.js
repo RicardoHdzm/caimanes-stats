@@ -320,6 +320,26 @@ export function suggestedStarters(roster = alineacionRoster()) {
   return DEFENSE_POSITIONS.map((pos) => assignment[pos] && byId.get(assignment[pos].playerId)).filter(Boolean);
 }
 
+// La alineación sugerida ya "en limpio" para la pestaña pública Alineación
+// (js/views/alineacion.js): quién va en cada posición, el orden al bat y la
+// banca, todo como jugadores de `roster` — sin las stats con que se calculó
+// (esas se quedan en el Generador de alineación, lineup/).
+// `order`: [{ player, label }] — label = posición con la que batea (o JD/JC);
+// si el pitcher no batea va al final con label "P" y `pitcherOnly: true`.
+export function publicLineup(roster = alineacionRoster()) {
+  const statsById = lineupStatsById(roster);
+  const { assignment, order, batterLabel, pitcherBats } = buildLineup(roster, statsById);
+  const byId = new Map(roster.map((p) => [p.id, p]));
+  const defense = Object.fromEntries(
+    DEFENSE_POSITIONS.map((pos) => [pos, assignment[pos] ? byId.get(assignment[pos].playerId) : null])
+  );
+  const lineupOrder = order.map((row) => ({ player: byId.get(row.playerId), label: batterLabel.get(row.playerId) ?? "" }));
+  if (!pitcherBats && defense.P) lineupOrder.push({ player: defense.P, label: "P", pitcherOnly: true });
+  const used = new Set(lineupOrder.map((r) => r.player.id));
+  const bench = roster.filter((p) => !used.has(p.id));
+  return { defense, order: lineupOrder, bench };
+}
+
 // Pinta las dos secciones (orden al bat + posiciones sugeridas) dentro de
 // `container` a partir de un roster candidato. `container` se limpia
 // primero — se puede volver a llamar para regenerar con otro roster.
