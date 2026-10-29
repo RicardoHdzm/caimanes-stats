@@ -651,6 +651,95 @@ export async function playerGameFlyer(player, game, format = "post", color) {
   return canvas;
 }
 
+// ---- Líderes de la temporada (Resumen, ver js/views/resumen.js) ----
+
+// Foto del jugador (assets/players/, .jpg o .png) — null si no tiene.
+async function loadPlayerPhoto(playerId) {
+  for (const ext of ["jpg", "png"]) {
+    const img = await loadImage(asset(`assets/players/${playerId}.${ext}`));
+    if (img) return img;
+  }
+  return null;
+}
+
+// Foto redonda recortada al centro, con aro rojo; sin foto, sus iniciales.
+function drawPhotoCircle(ctx, img, name, cx, cy, r) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.clip();
+  if (img) {
+    const side = Math.min(img.naturalWidth, img.naturalHeight);
+    const sx = (img.naturalWidth - side) / 2;
+    // Un poco hacia arriba: en las fotos la cara casi nunca está al centro.
+    const sy = Math.max(0, (img.naturalHeight - side) / 2 - side * 0.08);
+    ctx.drawImage(img, sx, sy, side, side, cx - r, cy - r, r * 2, r * 2);
+  } else {
+    ctx.fillStyle = P.tint(0.12);
+    ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+    const initials = (name ?? "")
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join("");
+    ctx.fillStyle = P.text;
+    ctx.font = font(r * 0.8);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, cx, cy + 2);
+    ctx.textBaseline = "alphabetic";
+  }
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = P.accent;
+  ctx.lineWidth = 5;
+  ctx.stroke();
+}
+
+// `data`: { seasonLabel ("9na Temporada"), leaders: [{ label, value,
+// playerId, name }] } — el #1 de cada categoría, máximo 6 (dos columnas de
+// tres).
+export async function leadersFlyer(data, format = "post", color) {
+  const { logo, sponsors } = await loadAssets();
+  const leaders = data.leaders.slice(0, 6);
+  const photos = await Promise.all(leaders.map((l) => loadPlayerPhoto(l.playerId)));
+  const { canvas, ctx, story } = newFlyer(format, color);
+  placeLogo(ctx, logo, story, { y: 24, size: 200, contentTop: 245 });
+
+  text(ctx, "LÍDERES", W / 2, 340, { size: 118, italic: true });
+  pill(ctx, data.seasonLabel.toUpperCase(), W / 2, 366, { size: 38, height: 62 });
+
+  const left = 90;
+  const gap = 22;
+  const cols = 2;
+  const tw = (W - left * 2 - gap) / cols;
+  const th = 196;
+  const top = 466;
+  leaders.forEach((l, i) => {
+    const x = left + (i % cols) * (tw + gap);
+    const y = top + Math.floor(i / cols) * (th + gap);
+    roundRect(ctx, x, y, tw, th, 26);
+    ctx.fillStyle = P.tint(0.06);
+    ctx.fill();
+    ctx.strokeStyle = P.tint(0.12);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const r = 64;
+    drawPhotoCircle(ctx, photos[i], l.name, x + 26 + r, y + th / 2, r);
+    const tx = x + 26 + r * 2 + 24;
+    const maxW = x + tw - 20 - tx;
+    text(ctx, l.label, tx, y + 52, { size: 30, color: P.accentText, align: "left", maxWidth: maxW });
+    text(ctx, String(l.value), tx, y + 128, { size: 76, italic: true, align: "left", maxWidth: maxW });
+    text(ctx, (l.name ?? "").toUpperCase(), tx, y + 170, { size: 32, weight: 600, color: P.muted, align: "left", maxWidth: maxW });
+  });
+
+  drawFooter(ctx, sponsors);
+  return canvas;
+}
+
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
 // Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y

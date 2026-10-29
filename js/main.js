@@ -7,6 +7,7 @@ import { renderEstadisticas } from "./views/estadisticas.js";
 import { renderJuegos } from "./views/juegos.js";
 import { renderPlayoffs } from "./views/playoffs.js";
 import { renderTemporadas } from "./views/temporadas.js";
+import { renderRecords } from "./views/records.js";
 import { renderCalendario } from "./views/calendario.js";
 import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
@@ -37,6 +38,7 @@ const routes = {
   calendario: renderCalendario,
   standing: renderStanding,
   alineacion: renderAlineacion,
+  records: renderRecords,
   playlist: renderPlaylist,
   fanzone: renderFanzone,
 };
@@ -62,6 +64,7 @@ const MORE_TABS = [
   { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "estadisticas", route: "#/estadisticas", label: "Estadísticas", icon: "fa-chart-simple" },
   { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
+  { tab: "records", route: "#/records", label: "Récords", icon: "fa-crown" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
   { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
 ];
@@ -79,7 +82,7 @@ const APPS_TOP = [
 const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
-  { label: "Números", tabs: ["resumen", "estadisticas", "temporadas"] },
+  { label: "Números", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
   { label: "Multimedia", tabs: ["playlist", "fanzone"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 

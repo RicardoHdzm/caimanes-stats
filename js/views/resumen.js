@@ -1,4 +1,4 @@
-import { SCHEDULE, TEAM, PLAYERS } from "../data.js";
+import { SCHEDULE, TEAM, PLAYERS, CURRENT_SEASON } from "../data.js";
 import {
   currentSeasonGames,
   seasonStatGames,
@@ -13,11 +13,11 @@ import {
   minPlateAppearances,
   seasonRecords,
 } from "../stats.js";
-import { heading, escapeHtml, renderAvatar } from "../ui.js";
+import { heading, escapeHtml, renderAvatar, ordinalTemporada } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
 import { SUPABASE_CONFIGURED } from "../supabase-config.js";
-import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
+import { nextGameFlyer, leadersFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -361,6 +361,37 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
   leadersHeading.textContent = "Líderes de la temporada";
   container.appendChild(leadersHeading);
 
+  // Imagen "Líderes" para redes (ver leadersFlyer en js/flyers.js): el #1
+  // de cada categoría, con su foto.
+  const season = statGames[0]?.season ?? CURRENT_SEASON;
+  const hitsSorted = [...battingList].sort((a, b) => b.H - a.H || Number(b.AVG) - Number(a.AVG));
+  const flyerLeaders = [
+    { label: "PROMEDIO", list: batSorted, value: (p) => p.AVG, ok: (p) => p.H > 0 },
+    { label: "HITS", list: hitsSorted, value: (p) => p.H, ok: (p) => p.H > 0 },
+    { label: "JONRONES", list: hrSorted, value: (p) => p.HR + p.HRC, ok: (p) => p.HR + p.HRC > 0 },
+    { label: "IMPULSADAS", list: rbiSorted, value: (p) => p.RBI, ok: (p) => p.RBI > 0 },
+    { label: "ROBADAS", list: sbSorted, value: (p) => p.SB, ok: (p) => p.SB > 0 },
+    { label: "WHIP", list: pitSorted, value: (p) => p.WHIP, ok: () => true },
+  ]
+    .map((c) => ({ ...c, first: c.list[0] }))
+    .filter((c) => c.first && c.ok(c.first))
+    .map((c) => ({ label: c.label, value: c.value(c.first), playerId: c.first.playerId, name: c.first.name }));
+  if (flyerLeaders.length > 0) {
+    const shareRow = document.createElement("div");
+    shareRow.className = "share-flyer-row";
+    const seasonText = `${ordinalTemporada(season)} Temporada`;
+    shareRow.appendChild(
+      shareButton(() =>
+        openFlyer(
+          (format, color) => leadersFlyer({ seasonLabel: seasonText, leaders: flyerLeaders }, format, color),
+          `lideres-temporada-${season}`,
+          `Líderes de la ${seasonText} — Caimanes de Villas`
+        )
+      )
+    );
+    container.appendChild(shareRow);
+  }
+
   const leadersRow = document.createElement("div");
   leadersRow.className = "leaders grid-2 tab-carousel";
   leadersRow.innerHTML =
@@ -415,88 +446,94 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
     const recordsHeading = document.createElement("h3");
     recordsHeading.textContent = "Récords de la temporada";
     container.appendChild(recordsHeading);
-
-    // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
-    // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
-    // empate o récord de equipo no hay a quién retratar, y como el icono ya
-    // sale en el título no hace falta repetirlo en una insignia — el texto
-    // ocupa todo el ancho. El 2do/3er lugar (r.runnersUp) va abajo, igual
-    // que en Líderes de la temporada.
-    const recordsRow = document.createElement("div");
-    recordsRow.className = "records-grid tab-carousel";
-    recordsRow.innerHTML = records
-      .map((r) => {
-        // Con un solo dueño, su foto grande; empatados entre jugadores, la
-        // foto de cada uno (chica, en fila) — solo un récord de equipo se
-        // queda sin nada, porque ahí de verdad no hay jugador que mostrar.
-        let visualHtml = "";
-        if (r.playerId) {
-          visualHtml = `<div class="record-hero-avatar">${avatarSlot(playerFor(r), 72)}</div>`;
-        } else if (r.playerIds?.length > 1) {
-          const MAX_SHOWN = 4;
-          const shown = r.playerIds.slice(0, MAX_SHOWN);
-          const extra = r.playerIds.length - shown.length;
-          visualHtml = `
-            <div class="record-hero-avatar-group">
-              ${shown.map((id) => avatarSlot(playerFor({ id }), 40)).join("")}
-              ${extra > 0 ? `<span class="avatar-more">+${extra}</span>` : ""}
-            </div>
-          `;
-        }
-        const runnersHtml = r.runnersUp?.length
-          ? `
-            <div class="leader-runners">
-              ${r.runnersUp
-                .map(
-                  (ru) => `
-                    <div class="leader-runner-row">
-                      ${
-                        ru.playerId
-                          ? avatarSlot(playerFor(ru), 26)
-                          : `<span class="record-runner-icon"><i class="fa-solid ${r.icon}"></i></span>`
-                      }
-                      <span class="leader-runner-name">${escapeHtml(ru.name)}</span>
-                      <span class="leader-runner-value">${ru.value}</span>
-                    </div>
-                  `
-                )
-                .join("")}
-            </div>
-          `
-          : "";
-        return `
-        <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
-          <div class="record-hero">
-            <div class="record-hero-main">
-              <span class="record-label"><i class="fa-solid ${r.icon}"></i>${r.label}</span>
-              <span class="record-value">${r.value}</span>
-              <span class="record-detail">${r.detail}</span>
-              <span class="record-note">${r.note}</span>
-            </div>
-            ${visualHtml}
-          </div>
-          ${runnersHtml}
-        </div>
-      `;
-      })
-      .join("");
-
-    // Cada récord lleva al jugador (o al juego) que lo tiene.
-    for (const card of recordsRow.querySelectorAll(".record-card")) {
-      const { player, game } = card.dataset;
-      if (!player && !game) continue;
-      card.classList.add("record-clickable");
-      card.addEventListener("click", (e) => {
-        // Un avatar de 2do/3er lugar (u otro jugador empatado) es su propio
-        // link a SU perfil — sin esto, este listener lo pisaría y siempre
-        // mandaría al dueño principal del récord, sin importar en qué
-        // avatar se haya hecho clic.
-        if (e.target.closest("a")) return;
-        location.hash = player ? `#/jugador/${player}` : `#/juegos/${game}`;
-      });
-    }
-
-    container.appendChild(recordsRow);
-    hydrateAvatars(recordsRow);
+    renderRecordCards(container, records);
   }
+}
+
+// Tarjetas de récords (las de seasonRecords en js/stats.js) — las usan
+// "Récords de la temporada" aquí y la pestaña Récords (js/views/records.js)
+// con los de todas las temporadas.
+export function renderRecordCards(container, records) {
+  // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
+  // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
+  // empate o récord de equipo no hay a quién retratar, y como el icono ya
+  // sale en el título no hace falta repetirlo en una insignia — el texto
+  // ocupa todo el ancho. El 2do/3er lugar (r.runnersUp) va abajo, igual
+  // que en Líderes de la temporada.
+  const recordsRow = document.createElement("div");
+  recordsRow.className = "records-grid tab-carousel";
+  recordsRow.innerHTML = records
+    .map((r) => {
+      // Con un solo dueño, su foto grande; empatados entre jugadores, la
+      // foto de cada uno (chica, en fila) — solo un récord de equipo se
+      // queda sin nada, porque ahí de verdad no hay jugador que mostrar.
+      let visualHtml = "";
+      if (r.playerId) {
+        visualHtml = `<div class="record-hero-avatar">${avatarSlot(playerFor(r), 72)}</div>`;
+      } else if (r.playerIds?.length > 1) {
+        const MAX_SHOWN = 4;
+        const shown = r.playerIds.slice(0, MAX_SHOWN);
+        const extra = r.playerIds.length - shown.length;
+        visualHtml = `
+          <div class="record-hero-avatar-group">
+            ${shown.map((id) => avatarSlot(playerFor({ id }), 40)).join("")}
+            ${extra > 0 ? `<span class="avatar-more">+${extra}</span>` : ""}
+          </div>
+        `;
+      }
+      const runnersHtml = r.runnersUp?.length
+        ? `
+          <div class="leader-runners">
+            ${r.runnersUp
+              .map(
+                (ru) => `
+                  <div class="leader-runner-row">
+                    ${
+                      ru.playerId
+                        ? avatarSlot(playerFor(ru), 26)
+                        : `<span class="record-runner-icon"><i class="fa-solid ${r.icon}"></i></span>`
+                    }
+                    <span class="leader-runner-name">${escapeHtml(ru.name)}</span>
+                    <span class="leader-runner-value">${ru.value}</span>
+                  </div>
+                `
+              )
+              .join("")}
+          </div>
+        `
+        : "";
+      return `
+      <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
+        <div class="record-hero">
+          <div class="record-hero-main">
+            <span class="record-label"><i class="fa-solid ${r.icon}"></i>${r.label}</span>
+            <span class="record-value">${r.value}</span>
+            <span class="record-detail">${r.detail}</span>
+            <span class="record-note">${r.note}</span>
+          </div>
+          ${visualHtml}
+        </div>
+        ${runnersHtml}
+      </div>
+    `;
+    })
+    .join("");
+
+  // Cada récord lleva al jugador (o al juego) que lo tiene.
+  for (const card of recordsRow.querySelectorAll(".record-card")) {
+    const { player, game } = card.dataset;
+    if (!player && !game) continue;
+    card.classList.add("record-clickable");
+    card.addEventListener("click", (e) => {
+      // Un avatar de 2do/3er lugar (u otro jugador empatado) es su propio
+      // link a SU perfil — sin esto, este listener lo pisaría y siempre
+      // mandaría al dueño principal del récord, sin importar en qué
+      // avatar se haya hecho clic.
+      if (e.target.closest("a")) return;
+      location.hash = player ? `#/jugador/${player}` : `#/juegos/${game}`;
+    });
+  }
+
+  container.appendChild(recordsRow);
+  hydrateAvatars(recordsRow);
 }
