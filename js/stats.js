@@ -92,12 +92,15 @@ function positionCountsOf(season, withDH) {
 // temporada), se toman las más jugadas de la temporada MÁS RECIENTE en la
 // que sí jugó; solo si nunca ha jugado un juego capturado se muestra la
 // registrada. `withDH`: incluir JD/JC (Roster, perfil, Comparar).
-export function displayPositions(playerId, registered = "", { withDH = false } = {}) {
+// `fallback: false`: sin juegos en el campo regresa "" en vez de la
+// registrada — el motor de alineación lo usa para que alguien que nunca ha
+// jugado una posición no se quede con ella solo por tenerla registrada.
+export function displayPositions(playerId, registered = "", { withDH = false, fallback = true } = {}) {
   let counts = null;
   for (let season = CURRENT_SEASON; season >= 1 && !counts?.size; season--) {
     counts = positionCountsOf(season, withDH).get(playerId) ?? null;
   }
-  if (!counts || counts.size === 0) return registered ?? "";
+  if (!counts || counts.size === 0) return fallback ? registered ?? "" : "";
   const regOrder = (registered ?? "").split("/").map((v) => v.trim());
   const tieRank = (pos) => {
     const i = regOrder.indexOf(pos);

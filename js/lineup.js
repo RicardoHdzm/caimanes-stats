@@ -301,13 +301,15 @@ function lineupStatsById(roster) {
 // precarga/señal el Map viene vacío y se usa la de data.js.
 //
 // `position` = las MÁS JUGADAS (ver displayPositions en js/stats.js), a
-// petición expresa; la registrada queda en `registeredPosition` como
-// último recurso del motor (ver assignDefense arriba).
+// petición expresa — vacía si nunca ha jugado en el campo (solo JD/JC o sin
+// juegos capturados): así no le gana una posición a quien sí la ha jugado.
+// La registrada queda en `registeredPosition` como último recurso del
+// motor (ver assignDefense arriba).
 export function alineacionRoster() {
   const overrides = cachedPositionOverrides();
   return ROSTER.map((p) => {
     const registered = overrides.get(p.id) ?? p.position ?? "";
-    return { ...p, registeredPosition: registered, position: displayPositions(p.id, registered) };
+    return { ...p, registeredPosition: registered, position: displayPositions(p.id, registered, { fallback: false }) };
   });
 }
 

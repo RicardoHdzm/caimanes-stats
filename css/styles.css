@@ -6600,20 +6600,23 @@ h2.page-title {
   height: 100%;
 }
 
+/* Colores del sitio (no verde pasto): jardín en el tono de las tarjetas,
+   cuadro con un velo rojo y líneas en rojo Caimanes — cambian solos con el
+   tema (Eclipse azul / Luna negro). */
 .field-grass {
-  fill: color-mix(in srgb, var(--win) 10%, transparent);
-  stroke: color-mix(in srgb, var(--text) 18%, transparent);
-  stroke-width: 0.4;
+  fill: var(--surface);
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 0.5;
 }
 
 .field-infield {
-  fill: color-mix(in srgb, var(--accent) 9%, transparent);
-  stroke: color-mix(in srgb, var(--text) 30%, transparent);
-  stroke-width: 0.4;
+  fill: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  stroke: var(--accent);
+  stroke-width: 0.6;
 }
 
 .field-mound {
-  fill: color-mix(in srgb, var(--text) 14%, transparent);
+  fill: color-mix(in srgb, var(--accent) 45%, var(--surface));
 }
 
 .field-plate {
