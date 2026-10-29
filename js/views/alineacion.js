@@ -1,4 +1,4 @@
-import { heading, renderAvatar, escapeHtml } from "../ui.js";
+import { heading, renderAvatar, escapeHtml, renderGlossary } from "../ui.js";
 import { publicLineup } from "../lineup.js";
 import { renderComparar } from "./comparar.js";
 
@@ -33,6 +33,32 @@ const FIELD_SVG = `
     <path class="field-plate" d="M48.4 91 h3.2 v1.4 l-1.6 1.4 l-1.6 -1.4 z" />
   </svg>
 `;
+
+// Glosario al final de Reservas: las siglas de las tarjetas (mismas
+// definiciones que las tablas de Estadísticas) y las de las posiciones.
+const STAT_GLOSSARY = [
+  { label: "AVG", full: "Promedio de bateo" },
+  { label: "OPS", full: "Embasado + slugging (OBP + SLG)" },
+  { label: "HR", full: "Home runs" },
+  { label: "RBI", full: "Carreras impulsadas" },
+  { label: "FPCT", full: "Porcentaje de fildeo" },
+  { label: "WHIP", full: "Bases por bola + hits permitidos por entrada" },
+  { label: "IP", full: "Entradas lanzadas" },
+  { label: "K", full: "Ponches" },
+];
+const POSITION_GLOSSARY = [
+  { label: "P", full: "Pitcher" },
+  { label: "C", full: "Catcher" },
+  { label: "1B", full: "Primera base" },
+  { label: "2B", full: "Segunda base" },
+  { label: "3B", full: "Tercera base" },
+  { label: "SS", full: "Shortstop" },
+  { label: "LF", full: "Jardín izquierdo" },
+  { label: "CF", full: "Jardín central" },
+  { label: "RF", full: "Jardín derecho" },
+  { label: "JD", full: "Jugador designado" },
+  { label: "JC", full: "Jugador de cortesía" },
+];
 
 // Línea de stats de la temporada bajo el nombre: de bateo, o de pitcheo
 // para el pitcher que no batea.
@@ -126,6 +152,12 @@ export function renderAlineacion(container, compareLeft, compareRight) {
       .join("");
     container.appendChild(benchEl);
   }
+
+  const glossaryHeading = document.createElement("h3");
+  glossaryHeading.textContent = "Glosario";
+  container.appendChild(glossaryHeading);
+  renderGlossary(container, STAT_GLOSSARY);
+  renderGlossary(container, POSITION_GLOSSARY);
 
   renderComparar(container, compareLeft, compareRight);
 }

@@ -801,7 +801,7 @@ export const GAMES = [
     ],
     fielding: [
       { playerId: "p16", PO: 0, A: 0, E: 0 },
-      { playerId: "p24", PO: 0, A: 0, E: 1 },
+      { playerId: "p24", PO: 2, A: 0, E: 1 },
       { playerId: "p12", PO: 3, A: 0, E: 1 },
       { playerId: "p5", PO: 3, A: 0, E: 2 },
       { playerId: "p15", PO: 1, A: 0, E: 1 },
