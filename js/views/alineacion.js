@@ -34,11 +34,6 @@ const FIELD_SVG = `
   </svg>
 `;
 
-function shortName(name) {
-  const parts = (name ?? "").trim().split(/\s+/);
-  return parts.length > 1 ? `${parts[0]} ${parts[1]}` : parts[0] ?? "";
-}
-
 // Línea de stats de la temporada bajo el nombre: de bateo, o de pitcheo
 // para el pitcher que no batea.
 function statLine(row) {
@@ -106,18 +101,23 @@ export function renderAlineacion(container, compareLeft, compareRight) {
     const benchHeading = document.createElement("h3");
     benchHeading.textContent = "Banca";
     container.appendChild(benchHeading);
-    const benchEl = document.createElement("div");
-    benchEl.className = "lineup-bench";
+    // Mismas tarjetas que el orden al bat, sin el turno.
+    const benchEl = document.createElement("ul");
+    benchEl.className = "lineup-order";
     benchEl.innerHTML = bench
       .map(({ player: p, stats }) => {
         // Quien nunca ha bateado pero sí lanzado, con sus stats de pitcheo.
         const pitcherOnly = !!stats && !stats.AB && !stats.BB && stats.pitchOuts > 0;
         return `
-        <a href="#/jugador/${p.id}" class="lineup-bench-player">
-          ${renderAvatar(p, 56)}
-          <span class="lineup-bench-name">${escapeHtml(shortName(p.name))}${p.number ? ` <small>#${p.number}</small>` : ""}</span>
-          <span class="lineup-bench-stats">${statLine({ stats, pitcherOnly })}</span>
-        </a>`;
+        <li>
+          <a href="#/jugador/${p.id}" class="lineup-order-row">
+            ${renderAvatar(p, 42)}
+            <span class="lineup-order-info">
+              <span class="lineup-order-name">${escapeHtml(p.name)}${p.number ? ` <small>#${p.number}</small>` : ""}</span>
+              <span class="lineup-order-stats">${statLine({ stats, pitcherOnly })}</span>
+            </span>
+          </a>
+        </li>`;
       })
       .join("");
     container.appendChild(benchEl);
