@@ -2,10 +2,10 @@
 // partir de un roster candidato. Es el mismo cálculo que usa la pestaña
 // "Alineación" (con todo el equipo) y la herramienta lineup/ (con solo
 // los jugadores que asisten a un juego) — viven aquí para no duplicarlo.
-import { battingTotals, playerName, allStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
+import { battingTotals, playerName, seasonStatGames, currentSeasonGames, gamesPlayedByPlayer, displayPositions } from "./stats.js";
 import { renderSortableTable, renderPositionBadge } from "./ui.js";
 import { getCurrentPlayerId } from "./auth.js";
-import { SCHEDULE, ROSTER } from "./data.js";
+import { SCHEDULE, ROSTER, CURRENT_SEASON } from "./data.js";
 import { cachedPositionOverrides } from "./db.js";
 import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 
@@ -278,18 +278,30 @@ export function buildLineup(roster, statsById) {
   return buildLineupFromAssignment(roster, statsById, assignDefense(roster, statsById));
 }
 
-// Stats de bateo de carrera (todas las temporadas) + juegos jugados de ESTA
-// temporada — solo temporada REGULAR, sin playoffs (a petición expresa) —
-// para el criterio de "regular" (ver byRegularThenOps): la mitad o más de
-// los juegos de temporada regular jugados hasta hoy (5 de 10 ya cuenta).
+// Stats de bateo de la temporada ACTUAL (regular + playoffs) — a petición
+// expresa, ya no las de toda la carrera: la alineación tiene que reflejar
+// cómo viene cada quien en esta temporada. Mientras la temporada no tenga
+// ningún juego capturado (arranque), se usa la más reciente que sí tenga.
+// Más los juegos jugados de ESTA temporada — solo temporada REGULAR, sin
+// playoffs (a petición expresa) — para el criterio de "regular" (ver
+// byRegularThenOps): la mitad o más de los juegos de temporada regular
+// jugados hasta hoy (5 de 10 ya cuenta).
+function lineupStatsGames() {
+  for (let season = CURRENT_SEASON; season >= 1; season--) {
+    const games = seasonStatGames(season);
+    if (games.length) return games;
+  }
+  return [];
+}
+
 function lineupStatsById(roster) {
-  const careerById = new Map(battingTotals(allStatGames()).map((r) => [r.playerId, r]));
+  const seasonStatsById = new Map(battingTotals(lineupStatsGames()).map((r) => [r.playerId, r]));
   const seasonGames = currentSeasonGames();
   const seasonPlayed = gamesPlayedByPlayer(seasonGames);
   return new Map(
     roster.map((p) => {
       const seasonGP = seasonPlayed.get(p.id) ?? 0;
-      const base = careerById.get(p.id) ?? emptyStats(p.id);
+      const base = seasonStatsById.get(p.id) ?? emptyStats(p.id);
       return [p.id, { ...base, seasonGP, regular: seasonGP >= seasonGames.length / 2 }];
     })
   );
