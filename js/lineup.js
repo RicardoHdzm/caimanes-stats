@@ -327,6 +327,8 @@ function lineupStatsById(roster) {
           seasonGP,
           regular: seasonGP >= seasonGames.length / 2,
           pitchOuts: pitching?.outs ?? 0,
+          pitchIP: pitching?.IP ?? "0.0",
+          pitchSO: pitching?.SO ?? 0,
           WHIP: Number(pitching?.WHIP ?? 0),
         },
       ];
@@ -374,8 +376,16 @@ export function publicLineup(roster = alineacionRoster()) {
   const defense = Object.fromEntries(
     DEFENSE_POSITIONS.map((pos) => [pos, assignment[pos] ? byId.get(assignment[pos].playerId) : null])
   );
-  const lineupOrder = order.map((row) => ({ player: byId.get(row.playerId), label: batterLabel.get(row.playerId) ?? "" }));
-  if (!pitcherBats && defense.P) lineupOrder.push({ player: defense.P, label: "P", pitcherOnly: true });
+  // `stats`: los mismos números con los que se armó (lineupStatsById), para
+  // la línea de stats de cada tarjeta del orden al bat.
+  const lineupOrder = order.map((row) => ({
+    player: byId.get(row.playerId),
+    label: batterLabel.get(row.playerId) ?? "",
+    stats: statsById.get(row.playerId),
+  }));
+  if (!pitcherBats && defense.P) {
+    lineupOrder.push({ player: defense.P, label: "P", pitcherOnly: true, stats: statsById.get(defense.P.id) });
+  }
   const used = new Set(lineupOrder.map((r) => r.player.id));
   const bench = roster.filter((p) => !used.has(p.id));
   return { defense, order: lineupOrder, bench };

@@ -39,6 +39,19 @@ function shortName(name) {
   return parts.length > 1 ? `${parts[0]} ${parts[1]}` : parts[0] ?? "";
 }
 
+// Línea de stats de la temporada bajo el nombre: de bateo, o de pitcheo
+// para el pitcher que no batea.
+function statLine(row) {
+  const s = row.stats;
+  if (!s) return "";
+  const items = (pairs) => pairs.map(([value, label]) => `<span><b>${value}</b> ${label}</span>`).join("");
+  if (row.pitcherOnly) {
+    return s.pitchOuts > 0 ? items([[s.WHIP.toFixed(2), "WHIP"], [s.pitchIP, "IP"], [s.pitchSO, "K"]]) : "Sin entradas esta temporada";
+  }
+  if (!s.AB && !s.BB) return "Sin turnos esta temporada";
+  return items([[s.AVG, "AVG"], [s.OPS, "OPS"], [s.HR + (s.HRC ?? 0), "HR"], [s.RBI, "RBI"]]);
+}
+
 function fieldPlayer(pos, player) {
   const [x, y] = FIELD_SPOTS[pos];
   if (!player) {
@@ -78,7 +91,10 @@ export function renderAlineacion(container, compareLeft, compareRight) {
         <a href="#/jugador/${row.player.id}" class="lineup-order-row">
           <span class="lineup-order-slot${row.pitcherOnly ? " lineup-order-slot--p" : ""}">${row.pitcherOnly ? "P" : ++turn}</span>
           ${renderAvatar(row.player, 42)}
-          <span class="lineup-order-name">${escapeHtml(row.player.name)}${row.player.number ? ` <small>#${row.player.number}</small>` : ""}</span>
+          <span class="lineup-order-info">
+            <span class="lineup-order-name">${escapeHtml(row.player.name)}${row.player.number ? ` <small>#${row.player.number}</small>` : ""}</span>
+            <span class="lineup-order-stats">${statLine(row)}</span>
+          </span>
           <span class="lineup-order-pos">${escapeHtml(row.label)}</span>
         </a>
       </li>`

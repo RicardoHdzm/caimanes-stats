@@ -6719,8 +6719,33 @@ h2.page-title {
   color: var(--text);
 }
 
-.lineup-order-name {
+.lineup-order-info {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lineup-order-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.lineup-order-stats span {
+  white-space: nowrap;
+}
+
+.lineup-order-stats b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.lineup-order-name {
   min-width: 0;
   font-family: var(--font-display);
   font-size: var(--text-lg);
