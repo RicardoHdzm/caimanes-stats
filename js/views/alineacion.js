@@ -34,7 +34,7 @@ const FIELD_SVG = `
   </svg>
 `;
 
-// Glosario al final de Reservas: las siglas de las tarjetas (mismas
+// Glosario al final de la página: las siglas de las tarjetas (mismas
 // definiciones que las tablas de Estadísticas).
 const STAT_GLOSSARY = [
   { label: "AVG", full: "Promedio de bateo" },
@@ -140,10 +140,10 @@ export function renderAlineacion(container, compareLeft, compareRight) {
     container.appendChild(benchEl);
   }
 
+  renderComparar(container, compareLeft, compareRight);
+
   const glossaryHeading = document.createElement("h3");
   glossaryHeading.textContent = "Glosario";
   container.appendChild(glossaryHeading);
   renderGlossary(container, STAT_GLOSSARY);
-
-  renderComparar(container, compareLeft, compareRight);
 }
