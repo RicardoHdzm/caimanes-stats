@@ -3019,34 +3019,41 @@ main h3::before {
 
 /* ---- playlist del equipo (js/views/playlist.js) ---- */
 
-/* Botón de play dentro de la tabla de arriba (la playlist en sí) — mismo
-   look que .playlist-card-play de las tarjetas de abajo, pero más chico
-   para caber cómodo en una celda de tabla. */
-/* Nombre del jugador en la tabla de la playlist: link a su perfil. */
-.playlist-track-player {
-  color: var(--text);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.playlist-track-player:hover {
-  color: var(--accent-text);
-}
-
-.playlist-track-play {
-  font-size: 1.3rem;
-  color: var(--accent-text);
-  line-height: 1;
-}
-
-.playlist-track-play--disabled {
+.playlist-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 420px;
+  margin-bottom: 18px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
   color: var(--muted);
-  opacity: 0.4;
+  transition: border-color 0.15s;
 }
 
-/* Tarjetas (foto, jugador, canción, artista, botón de play) — de quién es
-   cada canción, debajo de la tabla. 3 columnas fijas en escritorio (a
-   petición expresa); en celular, una sola (ver el @media más abajo). */
+.playlist-search:focus-within {
+  border-color: var(--accent);
+}
+
+.playlist-search input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  /* 16px: con menos, iOS hace zoom a la página al enfocar el campo. */
+  font-size: 16px;
+}
+
+/* Tarjetas (foto, jugador, canción, artista, botón de play). 3 columnas fijas
+   en escritorio (a petición expresa); en celular, una sola (ver el @media más
+   abajo). */
 .playlist-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

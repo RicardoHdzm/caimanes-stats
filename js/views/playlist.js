@@ -6,23 +6,29 @@
 // de Supabase (getAllWalkupOverrides) se repinta con esas. Solo salen las
 // canciones reales (ver hasRealWalkup en js/ui.js).
 import { ROSTER } from "../data.js";
-import { heading, renderAvatar, renderSortableTable, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
+import { heading, renderAvatar, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
 
 // El link real de Spotify/YouTube/etc. si hay uno válido; sin link, el
-// botón se ve pero no hace nada (no hay a dónde mandarlo). Compartido entre
-// la tabla de arriba y las tarjetas de abajo, `cls` es la clase base de
-// cada una (mismo look, tamaño distinto por CSS).
-function playButtonHtml(walkup, cls) {
+// botón se ve pero no hace nada (no hay a dónde mandarlo).
+function playButtonHtml(walkup) {
   const parsed = safeWalkupUrl(walkup.url);
   return parsed
-    ? `<a class="${cls}" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer" aria-label="Reproducir"><i class="fa-solid fa-circle-play"></i></a>`
-    : `<span class="${cls} ${cls}--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
+    ? `<a class="playlist-card-play" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer" aria-label="Reproducir"><i class="fa-solid fa-circle-play"></i></a>`
+    : `<span class="playlist-card-play playlist-card-play--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
 }
 
-// Tarjeta: foto, jugador, canción, artista y el botón de play — de QUIÉN es
-// cada canción, con foto (la tabla de arriba también dice de quién es, pero
-// en una columna de texto).
+// Buscador: cada palabra escrita debe ser el inicio de una palabra del nombre
+// o del número, sin importar acentos ni mayúsculas ("munoz", "lu fe", "21").
+const normalizeText = (s) => (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+function matchesPlayer(player, query) {
+  const tokens = normalizeText(query).replace(/#/g, "").split(/s+/).filter(Boolean);
+  const words = normalizeText(`${player.number ?? ""} ${player.name}`).split(/s+/);
+  return tokens.every((t) => words.some((w) => w.startsWith(t)));
+}
+
+// Tarjeta: foto, jugador, canción, artista y el botón de play.
 function playlistCard(player, walkup) {
   const artist = walkup.artist ? `<p class="playlist-card-artist">${escapeHtml(walkup.artist)}</p>` : "";
   return `
@@ -33,7 +39,7 @@ function playlistCard(player, walkup) {
         <p class="playlist-card-title">${escapeHtml(walkup.title)}</p>
         ${artist}
       </div>
-      ${playButtonHtml(walkup, "playlist-card-play")}
+      ${playButtonHtml(walkup)}
     </div>
   `;
 }
@@ -52,27 +58,17 @@ async function hydrateAvatars(root) {
   );
 }
 
-const TRACK_COLUMNS = [
-  { key: "track", label: "#", numeric: true },
-  {
-    key: "player",
-    label: "Jugador",
-    render: (_, row) => `<a href="#/jugador/${row.playerId}" class="playlist-track-player">${escapeHtml(row.player)}</a>`,
-  },
-  { key: "title", label: "Canción" },
-  { key: "artist", label: "Artista" },
-  { key: "play", label: "", render: (_, row) => playButtonHtml(row.walkup, "playlist-track-play") },
-];
-
 export function renderPlaylist(container) {
   heading(container, "Playlist del equipo");
 
-  const tableEl = document.createElement("div");
-  container.appendChild(tableEl);
-
-  const listHeading = document.createElement("h3");
-  listHeading.textContent = "Canción de cada quien";
-  container.appendChild(listHeading);
+  const search = document.createElement("label");
+  search.className = "playlist-search";
+  search.innerHTML = `
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input type="search" placeholder="Buscar jugador" aria-label="Buscar jugador" autocomplete="off" enterkeyhint="go" />
+  `;
+  container.appendChild(search);
+  const input = search.querySelector("input");
 
   const listEl = document.createElement("div");
   listEl.className = "playlist-grid";
@@ -81,32 +77,35 @@ export function renderPlaylist(container) {
   // Solo se listan quienes de verdad tienen canción — un roster completo
   // con la mitad diciendo "sin canción todavía" sería puro ruido en una
   // playlist.
-  function draw(walkupMap) {
-    const rows = ROSTER.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
-      hasRealWalkup(r.walkup)
-    );
+  let rows = [];
 
+  function drawCards() {
     if (rows.length === 0) {
-      tableEl.innerHTML = "";
       listEl.innerHTML = '<p class="subtitle">Nadie ha registrado su canción de entrada todavía.</p>';
       return;
     }
-
-    // La tabla de arriba (la playlist en sí, numerada) — orden fijo: el
-    // mismo en el que aparecen en el roster, no se reordena solo (no es
-    // sortable, ver renderSortableTable). Track number = su lugar en esta
-    // lista, no un dato guardado en ningún lado.
-    renderSortableTable(tableEl, {
-      columns: TRACK_COLUMNS,
-      rows: rows.map((r, i) => ({ track: i + 1, title: r.walkup.title, artist: r.walkup.artist ?? "", player: r.player.name, playerId: r.player.id, walkup: r.walkup })),
-      sortable: false,
-      defaultSort: "track",
-      defaultDir: 1,
-    });
-
-    listEl.innerHTML = rows.map((r) => playlistCard(r.player, r.walkup)).join("");
+    const shown = rows.filter((r) => matchesPlayer(r.player, input.value));
+    listEl.innerHTML = shown.length
+      ? shown.map((r) => playlistCard(r.player, r.walkup)).join("")
+      : '<p class="subtitle">Ningún jugador coincide con la búsqueda.</p>';
     hydrateAvatars(listEl);
   }
+
+  function draw(walkupMap) {
+    rows = ROSTER.map((p) => ({ player: p, walkup: walkupMap.get(p.id) ?? p.walkup })).filter((r) =>
+      hasRealWalkup(r.walkup)
+    );
+    drawCards();
+  }
+
+  input.addEventListener("input", drawCards);
+  // Enter pone la canción del primer resultado, para no tener que ir por el
+  // botón en pleno juego.
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    listEl.querySelector("a.playlist-card-play")?.click();
+  });
 
   draw(new Map());
 
@@ -114,4 +113,8 @@ export function renderPlaylist(container) {
     if (overrides.size === 0) return;
     draw(overrides);
   });
+
+  // Listo para escribir en computadora; en celular no, para que no salte el
+  // teclado apenas se abre la página.
+  if (matchMedia("(hover: hover)").matches) input.focus();
 }
