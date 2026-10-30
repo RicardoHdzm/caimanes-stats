@@ -35,7 +35,7 @@ const FIELD_SVG = `
 `;
 
 // Glosario al final de Reservas: las siglas de las tarjetas (mismas
-// definiciones que las tablas de Estadísticas) y las de las posiciones.
+// definiciones que las tablas de Estadísticas).
 const STAT_GLOSSARY = [
   { label: "AVG", full: "Promedio de bateo" },
   { label: "OPS", full: "Embasado + slugging (OBP + SLG)" },
@@ -45,19 +45,6 @@ const STAT_GLOSSARY = [
   { label: "WHIP", full: "Bases por bola + hits permitidos por entrada" },
   { label: "IP", full: "Entradas lanzadas" },
   { label: "K", full: "Ponches" },
-];
-const POSITION_GLOSSARY = [
-  { label: "P", full: "Pitcher" },
-  { label: "C", full: "Catcher" },
-  { label: "1B", full: "Primera base" },
-  { label: "2B", full: "Segunda base" },
-  { label: "3B", full: "Tercera base" },
-  { label: "SS", full: "Shortstop" },
-  { label: "LF", full: "Jardín izquierdo" },
-  { label: "CF", full: "Jardín central" },
-  { label: "RF", full: "Jardín derecho" },
-  { label: "JD", full: "Jugador designado" },
-  { label: "JC", full: "Jugador de cortesía" },
 ];
 
 // Línea de stats de la temporada bajo el nombre: de bateo, o de pitcheo
@@ -157,7 +144,6 @@ export function renderAlineacion(container, compareLeft, compareRight) {
   glossaryHeading.textContent = "Glosario";
   container.appendChild(glossaryHeading);
   renderGlossary(container, STAT_GLOSSARY);
-  renderGlossary(container, POSITION_GLOSSARY);
 
   renderComparar(container, compareLeft, compareRight);
 }
