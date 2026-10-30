@@ -4077,45 +4077,6 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   color: var(--text);
 }
 
-/* Logos de patrocinadores (ver SPONSORS en js/data.js) — PNGs transparentes
-   con el logo en negro. En tema claro se ven tal cual; en Eclipse y Luna
-   (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
-   necesidad de guardar una segunda versión de cada logo. */
-.footer-sponsors-title {
-  display: block;
-  margin-bottom: 22px;
-  color: var(--muted);
-  font-size: var(--text-2xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.footer-sponsors {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 28px;
-  margin-bottom: 18px;
-}
-
-/* Tamaño de arranque nomás — al cargar, fitSponsorLogo() en js/main.js le
-   recorta el margen transparente y le pone alto/ancho de área pareja.
-   max-width + object-fit por si eso no corre (logo muy horizontal). */
-.footer-sponsor-logo {
-  height: 46px;
-  width: auto;
-  max-width: 150px;
-  object-fit: contain;
-  opacity: 0.85;
-  filter: invert(1);
-}
-
-:root[data-theme="light"] .footer-sponsor-logo {
-  filter: none;
-}
-
 /* ---- Comentarios (juego + alineación) ---- */
 
 .comments-list {
@@ -5849,6 +5810,35 @@ h2.page-title {
 .home-btn--ghost:hover {
   border-color: var(--accent);
   color: var(--accent-text);
+}
+
+/* Logos de patrocinadores (ver SPONSORS en js/data.js) — PNGs transparentes
+   con el logo en negro. En tema claro se ven tal cual; en Eclipse y Luna
+   (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
+   necesidad de guardar una segunda versión de cada logo. */
+.home-sponsors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 32px 48px;
+  padding: 8px 0;
+}
+
+/* Tamaño de arranque nomás — al cargar, fitSponsorLogo() en js/views/home.js
+   le recorta el margen transparente y le pone alto/ancho de área pareja.
+   max-width + object-fit por si eso no corre (logo muy horizontal). */
+.home-sponsor-logo {
+  height: 64px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  opacity: 0.9;
+  filter: invert(1);
+}
+
+:root[data-theme="light"] .home-sponsor-logo {
+  filter: none;
 }
 
 .home-center {

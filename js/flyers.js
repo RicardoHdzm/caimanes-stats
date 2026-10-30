@@ -275,7 +275,7 @@ function drawFooter(ctx, sponsors) {
   text(ctx, leagueLine(), W / 2, H - 200, { size: 34, color: P.muted, weight: 600 });
   if (sponsors.length === 0) return;
 
-  // Mismo criterio que fitSponsorLogo() del pie del sitio: peso visual
+  // Mismo criterio que fitSponsorLogo() de la portada: peso visual
   // parejo (alto = base / proporción^0.6) en vez de altura pareja.
   const BASE = 84;
   const GAP = 48;

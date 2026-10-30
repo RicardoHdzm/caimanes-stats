@@ -1050,13 +1050,11 @@ export const STANDINGS_HISTORY = {
   },
 };
 
-// Patrocinadores — se ven como una tira de logos al final de cada página
-// (ver #footer-sponsors en index.html, pintada por js/main.js). Cada
-// archivo debe ser un PNG transparente con el logo en NEGRO — en tema claro
-// se usa tal cual, y en Eclipse/Luna (los dos oscuros) se invierte a blanco
-// solo, sin necesidad de guardar dos versiones (ver .footer-sponsor-logo en
-// css/styles.css). `url` es opcional: sin él, el logo se ve pero no es
-// clicable.
+// Patrocinadores — se ven en su propia sección al final de la portada (ver
+// js/views/home.js) y en los flyers (js/flyers.js). Cada archivo debe ser un
+// PNG transparente con el logo en NEGRO — en tema claro se usa tal cual, y
+// en Eclipse/Luna (los dos oscuros) se invierte a blanco solo, sin necesidad
+// de guardar dos versiones (ver .home-sponsor-logo en css/styles.css).
 export const SPONSORS = [
   { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png" },
   { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
