@@ -6036,8 +6036,13 @@ h2.page-title {
   padding: 70px 0 10px;
 }
 
+/* min-height: que lo que sigue arranque debajo de la palabra de fondo, aunque
+   el encabezado sea de una sola línea (sale 34px arriba y le quedan 26px de
+   margin-bottom; los 12px de más son el aire entre la palabra y el contenido). */
 .home-section-head {
+  --home-bg-word-size: clamp(4rem, 12vw, 8.5rem);
   position: relative;
+  min-height: calc(var(--home-bg-word-size) - 34px - 26px + 12px);
   margin-bottom: 26px;
 }
 
@@ -6046,7 +6051,7 @@ h2.page-title {
   top: -34px;
   right: 0;
   font-family: var(--font-display);
-  font-size: clamp(4rem, 12vw, 8.5rem);
+  font-size: var(--home-bg-word-size);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.04em;
