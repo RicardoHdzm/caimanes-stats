@@ -1,5 +1,5 @@
 import { ROSTER, TEAM } from "../data.js";
-import { gamesPlayedByPlayer, currentSeasonGames, seasonStatGames, battingTotals, displayPositions } from "../stats.js";
+import { gamesPlayedByPlayer, currentSeasonGames, displayPositions } from "../stats.js";
 import { heading, renderAvatar, renderGlossary, escapeHtml, ordinalTemporada } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
@@ -41,8 +41,7 @@ function playerPositions(player) {
 // las posiciones, el número y el nombre van encima de la foto.
 function rosterCard(player, duesMap) {
   const paid = duesMap.get(player.id) ?? false;
-  const stat = (value, label, extra = "") =>
-    `<span class="roster-card-stat${extra}"><b>${value}</b><span>${label}</span></span>`;
+  const stat = (value, label) => `<span class="roster-card-stat"><b>${value}</b><span>${label}</span></span>`;
   const games = `<i class="${player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : ""}">${player.gamesPlayed}</i>/${TEAM.gamesInSeason}`;
   return `
     <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
@@ -56,9 +55,8 @@ function rosterCard(player, duesMap) {
         </span>
       </span>
       <span class="roster-card-stats">
-        ${stat(player.batting?.AVG ?? "—", "AVG")}
         ${stat(paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
-        ${stat(games, "Apariciones", " roster-card-stat--games")}
+        ${stat(games, "Apariciones")}
       </span>
     </a>`;
 }
@@ -67,7 +65,6 @@ export function renderRoster(container) {
   heading(container, "Roster");
 
   const played = gamesPlayedByPlayer(currentSeasonGames());
-  const battingById = new Map(battingTotals(seasonStatGames()).map((r) => [r.playerId, r]));
   // Posiciones personalizadas ya precargadas (durante la pantalla de
   // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que las
   // tarjetas salgan con las del perfil desde el primer render, sin swap. Sin
@@ -81,7 +78,6 @@ export function renderRoster(container) {
     ...p,
     position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position, { withDH: true }),
     gamesPlayed: played.get(p.id) ?? 0,
-    batting: battingById.get(p.id),
   })).sort((a, b) => (a.number || Infinity) - (b.number || Infinity));
 
   const filterRow = document.createElement("div");
@@ -132,6 +128,4 @@ export function renderRoster(container) {
   });
 
   renderGlossary(container, [{ label: "Apariciones", full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs` }]);
-  // En celular la tarjeta no lleva Apariciones: la nota no tendría a qué referirse.
-  container.lastElementChild.classList.add("roster-glossary");
 }

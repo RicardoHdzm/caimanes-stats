@@ -6945,8 +6945,7 @@ a.home-sponsor-card:hover {
 /* ---- Roster en tarjetas (js/views/roster.js) ----
    La foto es la protagonista y se funde con la tarjeta hacia abajo; encima,
    posiciones, número y nombre. Debajo, una sola fila de stats. En celular van
-   2 columnas y solo lo esencial: con una por fila, los 21 jugadores daban
-   demasiado scroll. */
+   2 tarjetas por fila: con una, los 21 jugadores daban demasiado scroll. */
 
 .roster-grid {
   display: grid;
@@ -7072,7 +7071,7 @@ a.home-sponsor-card:hover {
 
 .roster-card-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   border-top: 1px solid var(--border);
 }
 
@@ -7143,15 +7142,6 @@ a.home-sponsor-card:hover {
   .roster-card-seasons {
     font-size: 0.58rem;
     letter-spacing: 0.03em;
-  }
-
-  .roster-card-stat--games,
-  .roster-glossary {
-    display: none;
-  }
-
-  .roster-card-stats {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .roster-card-stat {
