@@ -71,7 +71,7 @@ function fieldPlayer(pos, player) {
   }
   return `
     <a class="field-spot" href="#/jugador/${player.id}" style="left:${x}%;top:${y}%">
-      ${renderAvatar(player, 58)}
+      ${renderAvatar(player, 92)}
       <span class="field-pos">${pos}</span>
       <span class="field-name">${escapeHtml(player.name)}</span>
     </a>`;

@@ -6908,9 +6908,15 @@ a.home-sponsor-card:hover {
 }
 
 @media (max-width: 640px) {
+  /* Más alto que en escritorio: a lo ancho no caben las fotos sin encimarse. */
+  .lineup-field {
+    aspect-ratio: 1 / 1.52;
+  }
+
   .field-spot .avatar {
-    width: 42px !important;
-    height: 42px !important;
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 22px !important;
     border-width: 2px;
   }
 
@@ -6920,7 +6926,7 @@ a.home-sponsor-card:hover {
   }
 
   .field-name {
-    max-width: 84px;
+    max-width: 76px;
     font-size: var(--text-2xs);
   }
 }
