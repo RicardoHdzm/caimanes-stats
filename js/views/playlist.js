@@ -23,8 +23,8 @@ function playButtonHtml(walkup) {
 const normalizeText = (s) => (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 function matchesPlayer(player, query) {
-  const tokens = normalizeText(query).replace(/#/g, "").split(/s+/).filter(Boolean);
-  const words = normalizeText(`${player.number ?? ""} ${player.name}`).split(/s+/);
+  const tokens = normalizeText(query).replace(/#/g, "").split(/\s+/).filter(Boolean);
+  const words = normalizeText(`${player.number ?? ""} ${player.name}`).split(/\s+/);
   return tokens.every((t) => words.some((w) => w.startsWith(t)));
 }
 
