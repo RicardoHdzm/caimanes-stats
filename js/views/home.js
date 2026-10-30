@@ -143,7 +143,7 @@ export function renderHome(container) {
       <video class="home-hero-video" src="assets/hero.mp4" poster="assets/hero-poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="home-hero-bg" aria-hidden="true"></div>
       <div class="home-hero-content">
-        <img src="assets/logo.png" alt="" class="home-hero-logo" />
+        <img src="assets/logos/caimanes-hero.png" alt="" class="home-hero-logo" />
         <h1 class="home-hero-name">Caimanes</h1>
         <p class="home-hero-tag">De Villas</p>
         <p class="home-hero-league">${escapeHtml(leagueLine)}</p>
