@@ -7062,7 +7062,7 @@ a.home-sponsor-card:hover {
   text-transform: uppercase;
 }
 
-.roster-card-dues {
+.roster-card-seasons {
   color: var(--muted);
   font-size: 0.66rem;
   font-weight: 700;
@@ -7140,7 +7140,7 @@ a.home-sponsor-card:hover {
     font-size: 1.1rem;
   }
 
-  .roster-card-dues {
+  .roster-card-seasons {
     font-size: 0.58rem;
     letter-spacing: 0.03em;
   }

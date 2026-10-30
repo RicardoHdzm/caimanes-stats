@@ -42,12 +42,12 @@ function rosterCard(player, duesMap) {
         ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
         <span class="roster-card-who">
           <span class="roster-card-name">${escapeHtml(player.name)}</span>
-          <span class="roster-card-dues">Inscripción: ${paid ? '<span class="stat-green">Pagada</span>' : "Pendiente"}</span>
+          <span class="roster-card-seasons">Temporadas: ${player.seasons?.length ?? 0}</span>
         </span>
       </span>
       <span class="roster-card-stats">
         ${stat(player.batting?.AVG ?? "—", "AVG")}
-        ${stat(player.seasons?.length ?? 0, "Temporadas")}
+        ${stat(paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
         ${stat(games, "Apariciones", " roster-card-stat--games")}
       </span>
     </a>`;
