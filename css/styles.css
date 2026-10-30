@@ -2297,8 +2297,12 @@ main h3::before {
 }
 
 .leader-hero-avatar .avatar {
-  border: 3px solid var(--surface);
+  border: 3px solid var(--accent);
   box-shadow: var(--shadow-card);
+}
+
+.leader-runner-row .avatar {
+  border: 2px solid var(--accent);
 }
 
 /* Contenido extra debajo del encabezado a color que NO es una lista de
@@ -3798,7 +3802,7 @@ button.mvp-vote-card:active {
 }
 
 .record-hero-avatar .avatar {
-  border: 3px solid var(--surface);
+  border: 3px solid var(--accent);
   box-shadow: var(--shadow-card);
 }
 
@@ -3829,19 +3833,21 @@ button.mvp-vote-card:active {
   box-shadow: var(--shadow-card);
 }
 
+.record-hero-avatar-group .avatar {
+  border-color: var(--accent);
+}
+
 /* ---- Look "red social" con sesión iniciada ----
    html[data-session] lo pone js/auth.js (notifyChange()) en cada cambio de
    sesión — mismo truco que ya usa el tema (document.documentElement.
    dataset.theme, ver js/theme.js). Con sesión, estos avatares PÚBLICOS
-   (Líderes/Récords de Resumen, y el chip del header — ver .leader-hero-
-   avatar, .record-hero-avatar(-group) y .auth-btn-avatar arriba/abajo)
-   cambian su anillo neutro de siempre por uno del acento del sitio, mismo
-   truco de borde+box-shadow que ya usaban — no se inventa nada nuevo. Sin
-   sesión (invitado) no cambia nada. */
+   (Líderes/Récords de Resumen — ver .leader-hero-avatar y
+   .record-hero-avatar(-group) arriba) suman un anillo del color de la
+   tarjeta por fuera de su borde rojo, mismo truco de box-shadow que ya
+   usaban. Sin sesión (invitado) no cambia nada. */
 html[data-session="in"] .leader-hero-avatar .avatar,
 html[data-session="in"] .record-hero-avatar .avatar,
 html[data-session="in"] .record-hero-avatar-group .avatar {
-  border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--surface), var(--shadow-card);
 }
 
