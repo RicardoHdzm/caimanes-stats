@@ -378,7 +378,7 @@ export function renderHome(container) {
     const sponsors = document.createElement("section");
     sponsors.className = "home-section";
     sponsors.innerHTML = `
-      ${sectionHead("Nuestros", "patrocinadores", "APOYO")}
+      ${sectionHead("Nuestros", "patrocinadores", "SPONSORS")}
       <div class="home-sponsors">
         ${SPONSORS.map((s) => {
           const logo = `<img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy">`;
