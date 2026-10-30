@@ -452,8 +452,8 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
 
 // Tarjetas de récords (las de seasonRecords en js/stats.js) — las usan
 // "Récords de la temporada" aquí y la pestaña Récords (js/views/records.js)
-// con los de todas las temporadas.
-export function renderRecordCards(container, records) {
+// con los de todas las temporadas. `className`: clases extra para la fila.
+export function renderRecordCards(container, records, className = "") {
   // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
   // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
   // empate o récord de equipo no hay a quién retratar, y como el icono ya
@@ -461,7 +461,7 @@ export function renderRecordCards(container, records) {
   // ocupa todo el ancho. El 2do/3er lugar (r.runnersUp) va abajo, igual
   // que en Líderes de la temporada.
   const recordsRow = document.createElement("div");
-  recordsRow.className = "records-grid tab-carousel";
+  recordsRow.className = `records-grid tab-carousel ${className}`.trim();
   recordsRow.innerHTML = records
     .map((r) => {
       // Con un solo dueño, su foto grande; empatados entre jugadores, la

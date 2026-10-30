@@ -3661,6 +3661,14 @@ button.mvp-vote-card:active {
   gap: 14px;
 }
 
+/* Pestaña Récords (js/views/records.js): 3 columnas donde caben; abajo de
+   eso siguen las 2 de siempre, y en celular el carrusel. */
+@media (min-width: 900px) {
+  .records-3col {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* Cantidad variable de jugadores en banca (0 a N), a diferencia de las 9
    posiciones fijas de .grid-3 — necesita columnas que se ajusten solas. */
 .bench-grid {
