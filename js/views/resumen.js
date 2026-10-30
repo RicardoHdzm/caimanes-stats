@@ -324,7 +324,7 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
   container.appendChild(teamHeading);
 
   const teamRow = document.createElement("div");
-  teamRow.className = "leaders grid-2 team-stats-row tab-carousel";
+  teamRow.className = "leaders grid-2 team-stats-row tab-carousel wide-4col";
   teamRow.innerHTML =
     heroCardShell(
       "fa-baseball-bat-ball",
@@ -393,7 +393,7 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
   }
 
   const leadersRow = document.createElement("div");
-  leadersRow.className = "leaders grid-2 tab-carousel";
+  leadersRow.className = "leaders grid-2 tab-carousel wide-3col";
   leadersRow.innerHTML =
     teamLeaderCardHtml({
       icon: "fa-baseball-bat-ball",
@@ -452,8 +452,8 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
 
 // Tarjetas de récords (las de seasonRecords en js/stats.js) — las usan
 // "Récords de la temporada" aquí y la pestaña Récords (js/views/records.js)
-// con los de todas las temporadas. `className`: clases extra para la fila.
-export function renderRecordCards(container, records, className = "") {
+// con los de todas las temporadas.
+export function renderRecordCards(container, records) {
   // Mismo estilo "hero" que las tarjetas de líderes: la foto real del
   // dueño del récord a la derecha cuando hay uno solo (r.playerId); con
   // empate o récord de equipo no hay a quién retratar, y como el icono ya
@@ -461,7 +461,7 @@ export function renderRecordCards(container, records, className = "") {
   // ocupa todo el ancho. El 2do/3er lugar (r.runnersUp) va abajo, igual
   // que en Líderes de la temporada.
   const recordsRow = document.createElement("div");
-  recordsRow.className = `records-grid tab-carousel ${className}`.trim();
+  recordsRow.className = "records-grid tab-carousel wide-3col";
   recordsRow.innerHTML = records
     .map((r) => {
       // Con un solo dueño, su foto grande; empatados entre jugadores, la

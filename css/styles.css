@@ -3661,11 +3661,16 @@ button.mvp-vote-card:active {
   gap: 14px;
 }
 
-/* Pestaña Récords (js/views/records.js): 3 columnas donde caben; abajo de
-   eso siguen las 2 de siempre, y en celular el carrusel. */
+/* Resumen y Récords: más columnas donde caben; abajo de eso siguen las 2 de
+   siempre, y en celular el carrusel. 4 para Stats de equipo, que son 4
+   tarjetas: en 3 columnas una quedaría sola en su fila. */
 @media (min-width: 900px) {
-  .records-3col {
+  .wide-3col {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .wide-4col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

@@ -30,7 +30,7 @@ function leaderRow(container, cards) {
     .filter((c) => c.list.length > 0);
   if (shown.length === 0) return;
   const row = document.createElement("div");
-  row.className = "leaders grid-2 tab-carousel records-3col";
+  row.className = "leaders grid-2 tab-carousel wide-3col";
   row.innerHTML = shown.map(teamLeaderCardHtml).join("");
   container.appendChild(row);
   hydrateAvatars(row);
@@ -50,7 +50,7 @@ export function renderRecords(container) {
 
   // ---- En un juego ----
   sectionHeading(container, "fa-bolt", "En un juego");
-  renderRecordCards(container, seasonRecords(games), "records-3col");
+  renderRecordCards(container, seasonRecords(games));
 
   // ---- En una temporada ----
   // Una fila por jugador y temporada; el mismo jugador puede salir dos
