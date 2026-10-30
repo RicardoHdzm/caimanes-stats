@@ -1,8 +1,9 @@
 import { ROSTER, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames, displayPositions } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, renderPositionBadges } from "../ui.js";
+import { heading, renderAvatar, renderGlossary, renderPositionBadges, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
+import { hydrateAvatars } from "./resumen.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
 const PLAYOFF_MIN_GAMES = 5;
@@ -24,7 +25,7 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Celda de "Inscripción": un ícono, verde si ya pagó y rojo si no. El
+// Icono de "Inscripción": verde si ya pagó y rojo si no. El
 // estado sale de DUES_PAID en js/data.js (ver getDuesMap en js/db.js) — ya
 // no de Supabase, así que para cambiarlo hay que editar ese archivo, no
 // esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
@@ -46,23 +47,42 @@ function renderDuesCell(playerId, duesMap) {
     : `<span class="dues-icon dues-icon-unpaid" title="Pendiente">${DUES_SVG.x}</span>`;
 }
 
+// Tarjeta de un jugador; toda la tarjeta lleva a su perfil. El 0 en data.js
+// es "todavía sin número", no se pinta.
+function rosterCard(player, duesMap) {
+  const cls = player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : "stat-red";
+  return `
+    <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
+      <span class="roster-card-photo" data-avatar="${player.id}" data-size="72">${renderAvatar(player, 72)}</span>
+      <span class="roster-card-body">
+        <span class="roster-card-name">${player.number ? `<small>#${player.number}</small> ` : ""}${escapeHtml(player.name)}</span>
+        <span class="roster-card-positions">${renderPositionBadges(player.position)}</span>
+        <span class="roster-card-meta">
+          <span>Apariciones <span><b class="${cls}">${player.gamesPlayed}</b>/${TEAM.gamesInSeason}</span></span>
+          <span>Inscripción ${renderDuesCell(player.id, duesMap)}</span>
+        </span>
+      </span>
+    </a>`;
+}
+
 export function renderRoster(container) {
   heading(container, "Roster");
 
   const played = gamesPlayedByPlayer(currentSeasonGames());
   // Posiciones personalizadas ya precargadas (durante la pantalla de
-  // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que la
-  // tabla salga con las del perfil desde el primer render, sin swap. Sin
+  // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que las
+  // tarjetas salgan con las del perfil desde el primer render, sin swap. Sin
   // precarga (o sin señal), el Map viene vacío y se usa la de data.js.
   // Lo que se MUESTRA (y filtra) son las más jugadas esta temporada (ver
   // displayPositions en js/stats.js); la registrada solo desempata y sirve
   // de respaldo mientras no haya juegos.
   const positionOverrides = cachedPositionOverrides();
+  // Por número; los que todavía no tienen van al final.
   const rows = ROSTER.map((p) => ({
     ...p,
     position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position, { withDH: true }),
     gamesPlayed: played.get(p.id) ?? 0,
-  }));
+  })).sort((a, b) => (a.number || Infinity) - (b.number || Infinity));
 
   const filterRow = document.createElement("div");
   filterRow.className = "pos-filter-row";
@@ -76,40 +96,13 @@ export function renderRoster(container) {
   filterRow.appendChild(countEl);
   container.appendChild(filterRow);
 
-  const columns = [
-    { key: "number", label: "#", full: "Número", numeric: true },
-    { key: "name", label: "Nombre" },
-    {
-      key: "position",
-      label: "Pos",
-      full: "Posición",
-      render: renderPositionBadges,
-    },
-    {
-      key: "gamesPlayed",
-      label: "Apariciones",
-      full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs`,
-      numeric: true,
-      render: (value) => {
-        const cls = value >= PLAYOFF_MIN_GAMES ? "stat-green" : "stat-red";
-        return `<span class="${cls}">${value}</span>/${TEAM.gamesInSeason}</span>`;
-      },
-    },
-  ];
+  const gridEl = document.createElement("div");
+  gridEl.className = "roster-grid";
+  container.appendChild(gridEl);
 
-  // Columna de inscripción — visible para TODOS (con o sin sesión), a
-  // petición expresa. Sale de DUES_PAID en js/data.js (ver getDuesMap).
+  // La inscripción se ve para TODOS (con o sin sesión), a petición expresa.
+  // Sale de DUES_PAID en js/data.js (ver getDuesMap).
   let duesMap = null;
-  columns.push({
-    key: "paid",
-    label: "Inscripción",
-    full: "Inscripción de temporada pagada",
-    render: (_value, row) => renderDuesCell(row.id, duesMap),
-  });
-
-  const tableEl = document.createElement("div");
-  container.appendChild(tableEl);
-
   let activeGroup = "ALL";
 
   function draw() {
@@ -121,16 +114,8 @@ export function renderRoster(container) {
         ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}`
         : `${filtered.length} de ${rows.length} jugadores`;
 
-    renderSortableTable(tableEl, {
-      columns,
-      rows: filtered,
-      defaultSort: "number",
-      defaultDir: 1,
-      onRowClick: (row) => {
-        location.hash = `#/jugador/${row.id}`;
-      },
-      rowClass: (row) => (row.id === getCurrentPlayerId() ? "row-you" : ""),
-    });
+    gridEl.innerHTML = filtered.map((row) => rosterCard(row, duesMap)).join("");
+    hydrateAvatars(gridEl);
   }
 
   filterRow.addEventListener("click", (e) => {
@@ -150,5 +135,5 @@ export function renderRoster(container) {
     draw();
   });
 
-  renderGlossary(container, columns);
+  renderGlossary(container, [{ label: "Apariciones", full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs` }]);
 }
