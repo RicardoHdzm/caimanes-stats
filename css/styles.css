@@ -6677,26 +6677,6 @@ a.home-sponsor-card:hover {
   background: var(--surface);
 }
 
-.header-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--muted);
-  font-size: var(--text-lg);
-  text-decoration: none;
-  transition: color 0.15s, border-color 0.15s;
-}
-
-.header-icon:hover {
-  color: var(--accent-text);
-  border-color: var(--accent);
-}
-
 /* El interruptor de tema venía posicionado en la esquina del header viejo. */
 .site-header .theme-switch {
   position: relative;
@@ -6713,7 +6693,6 @@ a.home-sponsor-card:hover {
 
 @media (max-width: 1099px) {
   .site-header .site-nav,
-  .site-header .header-icon,
   .site-header .theme-switch {
     display: none;
   }
