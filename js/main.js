@@ -105,6 +105,14 @@ document.getElementById("season-label").textContent =
 
 document.getElementById("footer-year").textContent = new Date().getFullYear();
 
+document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
+  (g) => `
+    <div class="footer-col">
+      <h3 class="footer-col-title">${g.label}</h3>
+      ${g.tabs.map((t) => `<a href="${t.route}">${t.label}</a>`).join("")}
+    </div>`
+).join("");
+
 function currentRoute() {
   const hash = location.hash.replace(/^#\//, "");
   const [first, second, third] = hash.split("/");

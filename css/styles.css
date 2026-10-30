@@ -4065,12 +4065,134 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
 /* Fondo opaco propio: sin esto la trama diagonal del body se vería a través
    del footer, y la idea es que quede solo en el cuerpo. */
 .footer {
-  text-align: center;
   color: var(--muted);
-  font-size: var(--text-xs);
-  padding: 28px 24px;
+  font-size: var(--text-sm);
+  padding: 44px 24px 28px;
   border-top: 1px solid var(--border);
   background: var(--bg);
+}
+
+.footer-inner {
+  max-width: 1150px;
+  margin-inline: auto;
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.3fr) 3fr;
+  gap: 40px 56px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.footer-logo img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.footer-wordmark {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.footer-wordmark span {
+  color: var(--accent-text);
+}
+
+.footer-about {
+  max-width: 320px;
+  margin: 14px 0 16px;
+  line-height: 1.5;
+}
+
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px 24px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* El ::before y el margen de "main h3" no aplican: esto vive fuera de main. */
+.footer-col-title {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.footer-col a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-col a:hover {
+  color: var(--accent-text);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.footer-social {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.footer-social:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.footer-legal {
+  margin: 0;
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 860px) {
+  .footer-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .footer code {

@@ -152,12 +152,28 @@
 
   <main id="app"></main>
 
+  <!-- Las columnas de links (#footer-nav) las arma js/main.js desde
+       NAV_GROUPS, los mismos grupos de la nav y del menú ☰. -->
   <footer class="footer">
-    <div class="season-row">
-      <span class="season" id="season-label"></span>
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a href="#/" class="footer-logo" aria-label="Caimanes de Villas — ir al inicio">
+            <img src="assets/logo.png" alt="" />
+            <span class="footer-wordmark">Caimanes <span>de Villas</span></span>
+          </a>
+          <p class="footer-about">Equipo de softbol. Roster, estadísticas y resultados de cada temporada.</p>
+          <span class="season" id="season-label"></span>
+        </div>
+        <nav class="footer-nav" id="footer-nav" aria-label="Secciones del sitio"></nav>
+      </div>
+      <div class="footer-bottom">
+        <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Instagram del equipo">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <p class="footer-legal">Caimanes de Villas © <span id="footer-year"></span> · Diseñado por JRHM.STUDIO</p>
+      </div>
     </div>
-
-    Caimanes de Villas © - <span id="footer-year"></span> - Diseñado por JRHM.STUDIO
   </footer>
 
   <!-- Solo se ven en celular (ver @media en styles.css); la nav de arriba
