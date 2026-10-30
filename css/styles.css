@@ -4195,7 +4195,13 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   }
 
   .footer-logo {
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-logo img {
+    width: 84px;
+    height: 84px;
   }
 
   .footer-about {
