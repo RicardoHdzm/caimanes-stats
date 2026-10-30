@@ -6926,14 +6926,15 @@ a.home-sponsor-card:hover {
 }
 
 /* ---- Roster en tarjetas (js/views/roster.js) ----
-   Arriba quién es (foto, número, nombre, posiciones); abajo, en una franja
-   aparte, su situación en la temporada. La franja se pega al fondo para que
-   quede alineada entre tarjetas aunque un nombre ocupe dos líneas. */
+   La foto es la protagonista y se funde con la tarjeta hacia abajo; encima,
+   posiciones, número y nombre. Debajo, una sola fila de stats. En celular van
+   2 columnas y solo lo esencial: con una por fila, los 21 jugadores daban
+   demasiado scroll. */
 
 .roster-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
   margin-bottom: 18px;
 }
 
@@ -6942,7 +6943,7 @@ a.home-sponsor-card:hover {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--surface);
   color: var(--text);
   text-decoration: none;
@@ -6951,94 +6952,192 @@ a.home-sponsor-card:hover {
 
 .roster-card:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .roster-card--you {
   border-color: var(--accent);
-  background: var(--row-you-solid);
 }
 
-.roster-card-main {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 18px 14px;
+.roster-card-photo {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1.05;
+  overflow: hidden;
+  background: var(--surface-alt);
 }
 
-.roster-card-who {
+.roster-card-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--surface) 2%,
+    color-mix(in srgb, var(--surface) 70%, transparent) 26%,
+    transparent 55%
+  );
+}
+
+.roster-card-img {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* !important: renderAvatar() le pone tamaño en línea, y aquí llena la tarjeta. */
+.roster-card-img .avatar {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+  object-position: center 20%;
+}
+
+.roster-card-positions {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: 12px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
+  gap: 4px;
+}
+
+.roster-card-positions span {
+  padding: 3px 10px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .roster-card-number {
-  color: var(--accent-text);
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 14px;
+  color: #fff;
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: 1.7rem;
   font-weight: 700;
-  line-height: 1.1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.roster-card-who {
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+  bottom: 12px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .roster-card-name {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: 1.55rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.02;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.roster-card-positions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 7px;
+.roster-card-league {
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-.roster-card-positions .pos-badge {
-  margin: 0;
-}
-
-.roster-card-foot {
+.roster-card-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 0 18px 16px;
+  grid-template-columns: 1fr 1fr 1fr 1.5fr;
+  border-top: 1px solid var(--border);
 }
 
 .roster-card-stat {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2px;
+  padding: 10px 2px;
+  text-align: center;
 }
 
-.roster-card-stat-label {
+.roster-card-stat b {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.roster-card-stat i {
+  font-style: normal;
+}
+
+.roster-card-stat > span {
   color: var(--muted);
-  font-size: var(--text-2xs);
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.roster-card-stat-value {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
+@media (max-width: 640px) {
+  .roster-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
 
-.roster-card-stat-value svg {
-  width: 11px;
-  height: 11px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  .roster-card {
+    border-radius: 12px;
+  }
+
+  .roster-card-positions {
+    top: 8px;
+    left: 8px;
+  }
+
+  .roster-card-positions span {
+    padding: 2px 7px;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+  }
+
+  .roster-card-number {
+    top: 5px;
+    right: 9px;
+    font-size: 1.2rem;
+  }
+
+  .roster-card-who {
+    right: 10px;
+    bottom: 8px;
+    left: 10px;
+  }
+
+  .roster-card-name {
+    font-size: 1.1rem;
+  }
+
+  .roster-card-league,
+  .roster-card-stat--games,
+  .roster-glossary {
+    display: none;
+  }
+
+  .roster-card-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .roster-card-stat {
+    padding: 7px 2px;
+  }
+
+  .roster-card-stat b {
+    font-size: 0.95rem;
+  }
 }

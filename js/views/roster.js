@@ -1,8 +1,8 @@
 import { ROSTER, TEAM } from "../data.js";
-import { gamesPlayedByPlayer, currentSeasonGames, displayPositions } from "../stats.js";
-import { heading, renderAvatar, renderGlossary, renderPositionBadges, escapeHtml } from "../ui.js";
+import { gamesPlayedByPlayer, currentSeasonGames, seasonStatGames, battingTotals, displayPositions } from "../stats.js";
+import { heading, renderAvatar, renderGlossary, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { getDuesMap, cachedPositionOverrides } from "../db.js";
+import { cachedPositionOverrides } from "../db.js";
 import { hydrateAvatars } from "./resumen.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
@@ -25,43 +25,31 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// "Inscripción": en verde si ya pagó; si no, texto normal (la mayoría está
-// pendiente, y en rojo la página entera se veía como una alerta). El
-// estado sale de DUES_PAID en js/data.js (ver getDuesMap en js/db.js) — ya
-// no de Supabase, así que para cambiarlo hay que editar ese archivo, no
-// esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
-// a haber una fuente que pueda fallar; hoy nunca pasa.
-const DUES_CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3 5 8.7 9.5 3.6"/></svg>';
-
-function renderDuesStatus(playerId, duesMap) {
-  if (!duesMap) return "Sin dato";
-  const paid = duesMap.get(playerId) ?? false;
-  return paid ? `<span class="stat-green">${DUES_CHECK} Pagada</span>` : "Pendiente";
-}
-
-// Tarjeta de un jugador; toda la tarjeta lleva a su perfil. El 0 en data.js
-// es "todavía sin número", no se pinta.
-function rosterCard(player, duesMap) {
-  const cls = player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : "";
+// Tarjeta de un jugador con su foto de protagonista; toda la tarjeta lleva a
+// su perfil. El 0 en data.js es "todavía sin número", no se pinta. `data-avatar`
+// va en su propio elemento porque hydrateAvatars() reemplaza su contenido, y
+// las posiciones, el número y el nombre van encima de la foto.
+function rosterCard(player) {
+  const b = player.batting;
+  const stat = (value, label, extra = "") =>
+    `<span class="roster-card-stat${extra}"><b>${value}</b><span>${label}</span></span>`;
+  const games = `<i class="${player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : ""}">${player.gamesPlayed}</i>/${TEAM.gamesInSeason}`;
   return `
     <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
-      <span class="roster-card-main">
-        <span class="roster-card-photo" data-avatar="${player.id}" data-size="72">${renderAvatar(player, 72)}</span>
+      <span class="roster-card-photo">
+        <span class="roster-card-img" data-avatar="${player.id}" data-size="280">${renderAvatar(player, 280)}</span>
+        <span class="roster-card-positions">${playerPositions(player).map((pos) => `<span>${pos}</span>`).join("")}</span>
+        ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
         <span class="roster-card-who">
-          ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
           <span class="roster-card-name">${escapeHtml(player.name)}</span>
-          <span class="roster-card-positions">${renderPositionBadges(player.position)}</span>
+          <span class="roster-card-league">${escapeHtml(TEAM.league)} · Caimanes</span>
         </span>
       </span>
-      <span class="roster-card-foot">
-        <span class="roster-card-stat">
-          <span class="roster-card-stat-label">Apariciones</span>
-          <span class="roster-card-stat-value"><span><span class="${cls}">${player.gamesPlayed}</span>/${TEAM.gamesInSeason}</span></span>
-        </span>
-        <span class="roster-card-stat">
-          <span class="roster-card-stat-label">Inscripción</span>
-          <span class="roster-card-stat-value">${renderDuesStatus(player.id, duesMap)}</span>
-        </span>
+      <span class="roster-card-stats">
+        ${stat(b?.AVG ?? "—", "AVG")}
+        ${stat(b ? b.HR + b.HRC : "—", "HR")}
+        ${stat(b?.RBI ?? "—", "RBI")}
+        ${stat(games, "Apariciones", " roster-card-stat--games")}
       </span>
     </a>`;
 }
@@ -70,6 +58,7 @@ export function renderRoster(container) {
   heading(container, "Roster");
 
   const played = gamesPlayedByPlayer(currentSeasonGames());
+  const battingById = new Map(battingTotals(seasonStatGames()).map((r) => [r.playerId, r]));
   // Posiciones personalizadas ya precargadas (durante la pantalla de
   // bienvenida, ver preloadOverrides): se leen SÍNCRONO aquí para que las
   // tarjetas salgan con las del perfil desde el primer render, sin swap. Sin
@@ -83,6 +72,7 @@ export function renderRoster(container) {
     ...p,
     position: displayPositions(p.id, positionOverrides.get(p.id) ?? p.position, { withDH: true }),
     gamesPlayed: played.get(p.id) ?? 0,
+    batting: battingById.get(p.id),
   })).sort((a, b) => (a.number || Infinity) - (b.number || Infinity));
 
   const filterRow = document.createElement("div");
@@ -101,9 +91,6 @@ export function renderRoster(container) {
   gridEl.className = "roster-grid";
   container.appendChild(gridEl);
 
-  // La inscripción se ve para TODOS (con o sin sesión), a petición expresa.
-  // Sale de DUES_PAID en js/data.js (ver getDuesMap).
-  let duesMap = null;
   let activeGroup = "ALL";
 
   function draw() {
@@ -115,7 +102,7 @@ export function renderRoster(container) {
         ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}`
         : `${filtered.length} de ${rows.length} jugadores`;
 
-    gridEl.innerHTML = filtered.map((row) => rosterCard(row, duesMap)).join("");
+    gridEl.innerHTML = filtered.map(rosterCard).join("");
     hydrateAvatars(gridEl);
   }
 
@@ -127,14 +114,9 @@ export function renderRoster(container) {
     draw();
   });
 
-  // Las posiciones ya vienen del cache precargado (ver rows arriba), así que
-  // se dibuja de una. La inscripción (getDuesMap) sale de DUES_PAID en
-  // data.js — resuelve en el mismo tick, imperceptible.
   draw();
-  getDuesMap().then((map) => {
-    duesMap = map;
-    draw();
-  });
 
   renderGlossary(container, [{ label: "Apariciones", full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs` }]);
+  // En celular la tarjeta no lleva Apariciones: la nota no tendría a qué referirse.
+  container.lastElementChild.classList.add("roster-glossary");
 }
