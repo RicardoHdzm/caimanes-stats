@@ -6727,7 +6727,8 @@ a.home-sponsor-card:hover {
   width: 100%;
   max-width: 760px;
   aspect-ratio: 1 / 0.86;
-  margin: 8px auto 12px;
+  /* Abajo sobra espacio: el nombre del catcher sale del cuadro (ver .field-spot--home). */
+  margin: 8px auto 44px;
 }
 
 .field-lines {
@@ -6769,6 +6770,12 @@ a.home-sponsor-card:hover {
   transform: translate(-50%, -50%);
   color: var(--text);
   text-decoration: none;
+}
+
+/* El catcher se ancla por el centro de la foto, no de todo el bloque, para que
+   la foto quede justo sobre la esquina de home del diamante. */
+.field-spot--home {
+  transform: translate(-50%, -46px);
 }
 
 .field-spot .avatar {
@@ -6911,6 +6918,10 @@ a.home-sponsor-card:hover {
   /* Más alto que en escritorio: a lo ancho no caben las fotos sin encimarse. */
   .lineup-field {
     aspect-ratio: 1 / 1.52;
+  }
+
+  .field-spot--home {
+    transform: translate(-50%, -28px);
   }
 
   .field-spot .avatar {

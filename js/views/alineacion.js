@@ -21,7 +21,7 @@ const FIELD_SPOTS = {
   "3B": [17, 64],
   "1B": [83, 64],
   P: [50, 62],
-  C: [50, 89],
+  C: [50, 92],
 };
 
 // Campo visto desde atrás de home: jardín (abanico), diamante y home.
@@ -70,7 +70,7 @@ function fieldPlayer(pos, player) {
     return `<div class="field-spot field-spot--empty" style="left:${x}%;top:${y}%"><span class="field-pos">${pos}</span></div>`;
   }
   return `
-    <a class="field-spot" href="#/jugador/${player.id}" style="left:${x}%;top:${y}%">
+    <a class="field-spot${pos === "C" ? " field-spot--home" : ""}" href="#/jugador/${player.id}" style="left:${x}%;top:${y}%">
       ${renderAvatar(player, 92)}
       <span class="field-pos">${pos}</span>
       <span class="field-name">${escapeHtml(player.name)}</span>
