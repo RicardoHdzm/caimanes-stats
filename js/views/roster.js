@@ -2,7 +2,7 @@ import { ROSTER, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames, seasonStatGames, battingTotals, displayPositions } from "../stats.js";
 import { heading, renderAvatar, renderGlossary, escapeHtml } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
-import { cachedPositionOverrides } from "../db.js";
+import { getDuesMap, cachedPositionOverrides } from "../db.js";
 import { hydrateAvatars } from "./resumen.js";
 
 // Apariciones mínimas para tener derecho a jugar playoffs en esta liga.
@@ -29,8 +29,8 @@ function playerPositions(player) {
 // su perfil. El 0 en data.js es "todavía sin número", no se pinta. `data-avatar`
 // va en su propio elemento porque hydrateAvatars() reemplaza su contenido, y
 // las posiciones, el número y el nombre van encima de la foto.
-function rosterCard(player) {
-  const b = player.batting;
+function rosterCard(player, duesMap) {
+  const paid = duesMap.get(player.id) ?? false;
   const stat = (value, label, extra = "") =>
     `<span class="roster-card-stat${extra}"><b>${value}</b><span>${label}</span></span>`;
   const games = `<i class="${player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : ""}">${player.gamesPlayed}</i>/${TEAM.gamesInSeason}`;
@@ -42,13 +42,12 @@ function rosterCard(player) {
         ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
         <span class="roster-card-who">
           <span class="roster-card-name">${escapeHtml(player.name)}</span>
-          <span class="roster-card-league">${escapeHtml(TEAM.league)} · Caimanes</span>
+          <span class="roster-card-dues">Inscripción: ${paid ? '<span class="stat-green">Pagada</span>' : "Pendiente"}</span>
         </span>
       </span>
       <span class="roster-card-stats">
-        ${stat(b?.AVG ?? "—", "AVG")}
-        ${stat(b ? b.HR + b.HRC : "—", "HR")}
-        ${stat(b?.RBI ?? "—", "RBI")}
+        ${stat(player.batting?.AVG ?? "—", "AVG")}
+        ${stat(player.seasons?.length ?? 0, "Temporadas")}
         ${stat(games, "Apariciones", " roster-card-stat--games")}
       </span>
     </a>`;
@@ -92,6 +91,9 @@ export function renderRoster(container) {
   container.appendChild(gridEl);
 
   let activeGroup = "ALL";
+  // La inscripción se ve para TODOS (con o sin sesión). Sale de DUES_PAID en
+  // js/data.js (ver getDuesMap) y resuelve en el mismo tick, imperceptible.
+  let duesMap = new Map();
 
   function draw() {
     const group = POSITION_GROUPS.find((g) => g.id === activeGroup) ?? POSITION_GROUPS[0];
@@ -102,7 +104,7 @@ export function renderRoster(container) {
         ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}`
         : `${filtered.length} de ${rows.length} jugadores`;
 
-    gridEl.innerHTML = filtered.map(rosterCard).join("");
+    gridEl.innerHTML = filtered.map((row) => rosterCard(row, duesMap)).join("");
     hydrateAvatars(gridEl);
   }
 
@@ -114,7 +116,10 @@ export function renderRoster(container) {
     draw();
   });
 
-  draw();
+  getDuesMap().then((map) => {
+    duesMap = map;
+    draw();
+  });
 
   renderGlossary(container, [{ label: "Apariciones", full: `Se necesitan ${PLAYOFF_MIN_GAMES} para tener derecho a playoffs` }]);
   // En celular la tarjeta no lleva Apariciones: la nota no tendría a qué referirse.
