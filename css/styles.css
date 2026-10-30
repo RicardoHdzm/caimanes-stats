@@ -5772,7 +5772,7 @@ h2.page-title {
 }
 
 .home-hero-logo {
-  width: clamp(150px, 22vw, 230px);
+  width: clamp(190px, 28vw, 290px);
   filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
 }
 
