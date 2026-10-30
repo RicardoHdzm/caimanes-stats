@@ -39,12 +39,12 @@ const DUES_SVG = {
   x: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.2 3.2 8.8 8.8M8.8 3.2 3.2 8.8"/></svg>',
 };
 
-function renderDuesCell(playerId, duesMap) {
-  if (!duesMap) return '<span class="dues-icon dues-icon-unknown" title="Sin dato">?</span>';
+function renderDuesStatus(playerId, duesMap) {
+  if (!duesMap) return '<span class="dues-icon dues-icon-unknown">?</span> Sin dato';
   const paid = duesMap.get(playerId) ?? false;
   return paid
-    ? `<span class="dues-icon dues-icon-paid" title="Pagada">${DUES_SVG.check}</span>`
-    : `<span class="dues-icon dues-icon-unpaid" title="Pendiente">${DUES_SVG.x}</span>`;
+    ? `<span class="dues-icon dues-icon-paid">${DUES_SVG.check}</span> <span class="stat-green">Pagada</span>`
+    : `<span class="dues-icon dues-icon-unpaid">${DUES_SVG.x}</span> <span class="stat-red">Pendiente</span>`;
 }
 
 // Tarjeta de un jugador; toda la tarjeta lleva a su perfil. El 0 en data.js
@@ -53,13 +53,22 @@ function rosterCard(player, duesMap) {
   const cls = player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : "stat-red";
   return `
     <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
-      <span class="roster-card-photo" data-avatar="${player.id}" data-size="72">${renderAvatar(player, 72)}</span>
-      <span class="roster-card-body">
-        <span class="roster-card-name">${player.number ? `<small>#${player.number}</small> ` : ""}${escapeHtml(player.name)}</span>
-        <span class="roster-card-positions">${renderPositionBadges(player.position)}</span>
-        <span class="roster-card-meta">
-          <span>Apariciones <span><b class="${cls}">${player.gamesPlayed}</b>/${TEAM.gamesInSeason}</span></span>
-          <span>Inscripción ${renderDuesCell(player.id, duesMap)}</span>
+      <span class="roster-card-main">
+        <span class="roster-card-photo" data-avatar="${player.id}" data-size="72">${renderAvatar(player, 72)}</span>
+        <span class="roster-card-who">
+          ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
+          <span class="roster-card-name">${escapeHtml(player.name)}</span>
+          <span class="roster-card-positions">${renderPositionBadges(player.position)}</span>
+        </span>
+      </span>
+      <span class="roster-card-foot">
+        <span class="roster-card-stat">
+          <span class="roster-card-stat-label">Apariciones</span>
+          <span class="roster-card-stat-value"><span><span class="${cls}">${player.gamesPlayed}</span>/${TEAM.gamesInSeason}</span></span>
+        </span>
+        <span class="roster-card-stat">
+          <span class="roster-card-stat-label">Inscripción</span>
+          <span class="roster-card-stat-value">${renderDuesStatus(player.id, duesMap)}</span>
         </span>
       </span>
     </a>`;

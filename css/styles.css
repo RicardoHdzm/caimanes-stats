@@ -6975,7 +6975,10 @@ a.home-sponsor-card:hover {
   }
 }
 
-/* ---- Roster en tarjetas (js/views/roster.js) ---- */
+/* ---- Roster en tarjetas (js/views/roster.js) ----
+   Arriba quién es (foto, número, nombre, posiciones); abajo, en una franja
+   aparte, su situación en la temporada. La franja se pega al fondo para que
+   quede alineada entre tarjetas aunque un nombre ocupe dos líneas. */
 
 .roster-grid {
   display: grid;
@@ -6986,9 +6989,8 @@ a.home-sponsor-card:hover {
 
 .roster-card {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
+  flex-direction: column;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
@@ -7007,52 +7009,94 @@ a.home-sponsor-card:hover {
   background: var(--row-you-solid);
 }
 
+.roster-card-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
 .roster-card-photo .avatar {
   border: 3px solid var(--accent);
 }
 
-.roster-card-body {
+.roster-card-who {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
   min-width: 0;
+}
+
+.roster-card-number {
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .roster-card-name {
   font-family: var(--font-display);
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
-.roster-card-name small {
-  color: var(--accent-text);
-  font-size: 0.85em;
+.roster-card-positions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
 }
 
 .roster-card-positions .pos-badge {
   margin: 0;
 }
 
-.roster-card-meta {
+.roster-card-foot {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+}
+
+.roster-card-stat {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 14px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 16px;
+}
+
+.roster-card-stat + .roster-card-stat {
+  border-left: 1px solid var(--border);
+}
+
+.roster-card-stat-label {
   color: var(--muted);
-  font-size: var(--text-xs);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.roster-card-stat-value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-.roster-card-meta > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+.roster-card-stat-value .dues-icon {
+  width: 18px;
+  height: 18px;
 }
 
-.roster-card-meta b {
-  font-weight: 700;
+.roster-card-stat-value .dues-icon svg {
+  width: 9px;
+  height: 9px;
 }
