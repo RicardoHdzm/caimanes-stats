@@ -1055,10 +1055,11 @@ export const STANDINGS_HISTORY = {
 // PNG transparente con el logo en NEGRO — en tema claro se usa tal cual, y
 // en Eclipse/Luna (los dos oscuros) se invierte a blanco solo, sin necesidad
 // de guardar dos versiones (ver .home-sponsor-logo en css/styles.css).
+// `url` es opcional: sin él, la tarjeta se ve pero no es clicable.
 export const SPONSORS = [
-  { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png" },
-  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png" },
+  { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png", url: "https://www.instagram.com/jerseyhub.cln/" },
+  { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png", url: "https://www.instagram.com/asesorejml/" },
   { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
-  { name: "Valpro", logo: "assets/sponsors/sponsor004.png" },
-  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png" },
+  { name: "Valpro", logo: "assets/sponsors/sponsor004.png", url: "https://www.instagram.com/valpro.automotriz/" },
+  { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png", url: "https://www.instagram.com/jorgezazueta.fit/" },
 ];

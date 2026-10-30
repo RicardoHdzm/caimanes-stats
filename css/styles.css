@@ -5838,6 +5838,15 @@ h2.page-title {
   background: var(--surface);
 }
 
+a.home-sponsor-card {
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+a.home-sponsor-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
 @media (max-width: 900px) {
   .home-sponsors {
     --sponsor-cols: 3;

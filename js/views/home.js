@@ -380,7 +380,12 @@ export function renderHome(container) {
     sponsors.innerHTML = `
       ${sectionHead("Nuestros", "patrocinadores", "APOYO")}
       <div class="home-sponsors">
-        ${SPONSORS.map((s) => `<div class="home-sponsor-card"><img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy"></div>`).join("")}
+        ${SPONSORS.map((s) => {
+          const logo = `<img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy">`;
+          return s.url
+            ? `<a class="home-sponsor-card" href="${s.url}" target="_blank" rel="noopener noreferrer">${logo}</a>`
+            : `<div class="home-sponsor-card">${logo}</div>`;
+        }).join("")}
       </div>
     `;
     root.appendChild(sponsors);
