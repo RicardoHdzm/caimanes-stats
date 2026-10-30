@@ -25,32 +25,24 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Icono de "Inscripción": verde si ya pagó y rojo si no. El
+// "Inscripción": en verde si ya pagó; si no, texto normal (la mayoría está
+// pendiente, y en rojo la página entera se veía como una alerta). El
 // estado sale de DUES_PAID en js/data.js (ver getDuesMap en js/db.js) — ya
 // no de Supabase, así que para cambiarlo hay que editar ese archivo, no
 // esta pantalla. `duesMap` null se deja contemplado por si algún día vuelve
 // a haber una fuente que pueda fallar; hoy nunca pasa.
-//
-// La ✓ / ✕ van en SVG (no ícono de Font Awesome): el glifo de la fuente
-// trae sus propias métricas y quedaba un pelo descentrado dentro del
-// círculo; dibujado en un viewBox de 12×12 queda exacto.
-const DUES_SVG = {
-  check: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3 5 8.7 9.5 3.6"/></svg>',
-  x: '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.2 3.2 8.8 8.8M8.8 3.2 3.2 8.8"/></svg>',
-};
+const DUES_CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3 5 8.7 9.5 3.6"/></svg>';
 
 function renderDuesStatus(playerId, duesMap) {
-  if (!duesMap) return '<span class="dues-icon dues-icon-unknown">?</span> Sin dato';
+  if (!duesMap) return "Sin dato";
   const paid = duesMap.get(playerId) ?? false;
-  return paid
-    ? `<span class="dues-icon dues-icon-paid">${DUES_SVG.check}</span> <span class="stat-green">Pagada</span>`
-    : `<span class="dues-icon dues-icon-unpaid">${DUES_SVG.x}</span> <span class="stat-red">Pendiente</span>`;
+  return paid ? `<span class="stat-green">${DUES_CHECK} Pagada</span>` : "Pendiente";
 }
 
 // Tarjeta de un jugador; toda la tarjeta lleva a su perfil. El 0 en data.js
 // es "todavía sin número", no se pinta.
 function rosterCard(player, duesMap) {
-  const cls = player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : "stat-red";
+  const cls = player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : "";
   return `
     <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
       <span class="roster-card-main">
