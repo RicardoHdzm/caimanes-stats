@@ -1,6 +1,6 @@
 import { ROSTER, TEAM } from "../data.js";
 import { gamesPlayedByPlayer, currentSeasonGames, seasonStatGames, battingTotals, displayPositions } from "../stats.js";
-import { heading, renderAvatar, renderGlossary, escapeHtml } from "../ui.js";
+import { heading, renderAvatar, renderGlossary, escapeHtml, ordinalTemporada } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
 import { hydrateAvatars } from "./resumen.js";
@@ -20,6 +20,16 @@ const POSITION_GROUPS = [
   { id: "OF", label: "Outfield", codes: ["LF", "CF", "RF"] },
   { id: "BAT", label: "Bateadores", codes: ["JD", "JC"] },
 ];
+
+// Qué temporada lleva el jugador en el equipo, en palabras. El roster solo
+// trae a quien juega la actual, así que siempre es al menos la primera. De la
+// décima en adelante, abreviado ("11va").
+const SEASON_ORDINALS = ["Primera", "Segunda", "Tercera", "Cuarta", "Quinta", "Sexta", "Séptima", "Octava", "Novena", "Décima"];
+
+function playerSeasonLabel(player) {
+  const count = player.seasons.length;
+  return `${SEASON_ORDINALS[count - 1] ?? ordinalTemporada(count)} Temporada`;
+}
 
 function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
@@ -42,7 +52,7 @@ function rosterCard(player, duesMap) {
         ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
         <span class="roster-card-who">
           <span class="roster-card-name">${escapeHtml(player.name)}</span>
-          <span class="roster-card-seasons">Temporadas: ${player.seasons?.length ?? 0}</span>
+          <span class="roster-card-seasons">${playerSeasonLabel(player)}</span>
         </span>
       </span>
       <span class="roster-card-stats">
