@@ -170,7 +170,6 @@ function fitSponsorLogo(img) {
   }
   const ratio = box.w / box.h;
   const height = Math.min(SPONSOR_LOGO_BASE_H / ratio ** SPONSOR_LOGO_EXPONENT, SPONSOR_LOGO_BASE_H);
-  img.style.maxWidth = "none";
   img.style.height = `${height.toFixed(1)}px`;
   img.style.width = `${(height * ratio).toFixed(1)}px`;
 }
@@ -381,7 +380,7 @@ export function renderHome(container) {
     sponsors.innerHTML = `
       ${sectionHead("Nuestros", "patrocinadores", "APOYO")}
       <div class="home-sponsors">
-        ${SPONSORS.map((s) => `<img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy">`).join("")}
+        ${SPONSORS.map((s) => `<div class="home-sponsor-card"><img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy"></div>`).join("")}
       </div>
     `;
     root.appendChild(sponsors);

@@ -5817,21 +5817,52 @@ h2.page-title {
    (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
    necesidad de guardar una segunda versión de cada logo. */
 .home-sponsors {
+  --sponsor-cols: 5;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Sin stretch en la última fila: si queda incompleta, se centra. */
+.home-sponsor-card {
+  display: flex;
+  flex: 0 1 calc((100% - (var(--sponsor-cols) - 1) * 14px) / var(--sponsor-cols));
   align-items: center;
   justify-content: center;
-  gap: 32px 48px;
-  padding: 8px 0;
+  min-width: 0;
+  min-height: 130px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+@media (max-width: 900px) {
+  .home-sponsors {
+    --sponsor-cols: 3;
+  }
+}
+
+@media (max-width: 560px) {
+  .home-sponsors {
+    --sponsor-cols: 2;
+  }
+
+  .home-sponsor-card {
+    min-height: 110px;
+    padding: 16px;
+  }
 }
 
 /* Tamaño de arranque nomás — al cargar, fitSponsorLogo() en js/views/home.js
    le recorta el margen transparente y le pone alto/ancho de área pareja.
-   max-width + object-fit por si eso no corre (logo muy horizontal). */
+   max-width + object-fit para que un logo muy horizontal no se salga de su
+   tarjeta. */
 .home-sponsor-logo {
   height: 64px;
   width: auto;
-  max-width: 200px;
+  max-width: 100%;
   object-fit: contain;
   opacity: 0.9;
   filter: invert(1);
