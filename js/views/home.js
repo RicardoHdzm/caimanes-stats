@@ -211,9 +211,7 @@ export function renderHome(container) {
           <span class="home-next-label">Próximo juego</span>
           <span class="home-next-match">Caimanes <em>vs</em> ${escapeHtml(next.opponent ?? "Rival")}</span>
           <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
-          <div class="home-next-side">
-            <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
-          </div>
+          <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
         </div>`
           : ""
       }
@@ -235,14 +233,13 @@ export function renderHome(container) {
 
   // Flyer para redes (ver js/flyers.js).
   if (next) {
-    const shareBtn = shareButton(
-      () => openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`),
-      ""
+    const shareBtn = shareButton(() =>
+      openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`)
     );
+    // Solo la palabra, sin el ícono del botón normal.
+    shareBtn.textContent = "Compartir";
     shareBtn.classList.add("home-next-share");
-    shareBtn.setAttribute("aria-label", "Compartir próximo juego");
-    shareBtn.title = "Compartir";
-    root.querySelector(".home-next-side").appendChild(shareBtn);
+    root.querySelector(".home-next").appendChild(shareBtn);
   }
 
   // ---- Historial de juegos: los próximos y los últimos 4 finalizados ----

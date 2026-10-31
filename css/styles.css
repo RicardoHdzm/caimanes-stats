@@ -6014,7 +6014,7 @@ a.home-sponsor-card:hover {
   transform: translateX(-50%);
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-areas: "label count" "match count" "when count";
+  grid-template-areas: "label count" "match count" "when count" "share count";
   column-gap: 28px;
   width: min(760px, calc(100% - 40px));
   padding: 16px 22px;
@@ -6035,27 +6035,23 @@ a.home-sponsor-card:hover {
   border-radius: inherit;
 }
 
-.home-next-side {
-  grid-area: count;
-  align-self: center;
-  display: flex;
-  align-items: center;
-  gap: 14px;
+/* Solo texto, sin forma de botón: el contador es lo importante. */
+.home-next-share {
+  grid-area: share;
+  position: relative;
+  justify-self: start;
+  padding: 4px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-text);
+  font-size: var(--text-xs);
 }
 
-/* Solo el ícono y sin color hasta pasarle el cursor: el contador es lo importante. */
-.home-next-share {
-  position: relative;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  gap: 0;
-  border-color: var(--border);
-  border-radius: 50%;
+.home-next-share:hover {
   background: transparent;
-  color: var(--muted);
+  color: var(--text);
+  text-decoration: underline;
 }
 
 .home-next-label {
@@ -6088,6 +6084,8 @@ a.home-sponsor-card:hover {
 }
 
 .home-next-countdown {
+  grid-area: count;
+  align-self: center;
   font-family: var(--font-display);
   font-size: var(--text-3xl);
   font-weight: 700;
@@ -6565,20 +6563,16 @@ a.home-sponsor-card:hover {
 
   .home-next {
     grid-template-columns: 1fr;
-    grid-template-areas: "label" "match" "when" "count";
-  }
-
-  .home-next-side {
-    justify-content: space-between;
-    margin-top: 6px;
+    grid-template-areas: "label" "match" "when" "share" "count";
   }
 
   .home-next-countdown {
+    margin-top: 6px;
     font-size: var(--text-2xl);
   }
 
   .home-hero {
-    padding-bottom: 200px;
+    padding-bottom: 220px;
   }
 
   .match-ticker {
