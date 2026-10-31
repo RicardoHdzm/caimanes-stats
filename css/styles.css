@@ -5144,10 +5144,6 @@ a.comment-author-name:hover {
   color: #fff;
 }
 
-.leader-hero-body .share-flyer-btn {
-  margin-top: 10px;
-}
-
 .flyer-modal {
   position: fixed;
   inset: 0;
@@ -6029,7 +6025,27 @@ a.home-sponsor-card:hover {
   backdrop-filter: blur(8px);
   color: var(--text);
   text-align: left;
-  text-decoration: none;
+}
+
+/* Toda la tarjeta lleva al calendario sin meter el botón de compartir dentro
+   de un enlace: el enlace cubre la tarjeta y el botón va por encima. */
+.home-next-link {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.home-next-side {
+  grid-area: count;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.home-next-side .share-flyer-btn {
+  position: relative;
 }
 
 .home-next-label {
@@ -6062,8 +6078,6 @@ a.home-sponsor-card:hover {
 }
 
 .home-next-countdown {
-  grid-area: count;
-  align-self: center;
   font-family: var(--font-display);
   font-size: var(--text-3xl);
   font-weight: 700;
@@ -6544,13 +6558,21 @@ a.home-sponsor-card:hover {
     grid-template-areas: "label" "match" "when" "count";
   }
 
-  .home-next-countdown {
+  .home-next-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 10px;
     margin-top: 6px;
+  }
+
+  .home-next-countdown {
     font-size: var(--text-2xl);
   }
 
   .home-hero {
-    padding-bottom: 200px;
+    padding-bottom: 216px;
   }
 
   .match-ticker {

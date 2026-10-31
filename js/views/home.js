@@ -17,6 +17,7 @@ import {
 } from "../stats.js";
 import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime } from "../ui.js";
 import { suggestedStarters } from "../lineup.js";
+import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 
@@ -205,12 +206,15 @@ export function renderHome(container) {
       ${
         next
           ? `
-        <a class="home-next" href="#/calendario">
+        <div class="home-next">
+          <a class="home-next-link" href="#/calendario" aria-label="Ver calendario"></a>
           <span class="home-next-label">Próximo juego</span>
           <span class="home-next-match">Caimanes <em>vs</em> ${escapeHtml(next.opponent ?? "Rival")}</span>
           <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
-          <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
-        </a>`
+          <div class="home-next-side">
+            <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
+          </div>
+        </div>`
           : ""
       }
     </section>
@@ -228,6 +232,13 @@ export function renderHome(container) {
       </div>
     </div>
   `;
+
+  // Flyer para redes (ver js/flyers.js).
+  if (next) {
+    root.querySelector(".home-next-side").appendChild(
+      shareButton(() => openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`))
+    );
+  }
 
   // ---- Historial de juegos: los próximos y los últimos 4 finalizados ----
   const games = document.createElement("section");

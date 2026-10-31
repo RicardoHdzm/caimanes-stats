@@ -17,7 +17,7 @@ import { heading, escapeHtml, renderAvatar, ordinalTemporada, formatGameTime } f
 import { getCurrentPlayerId } from "../auth.js";
 import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
 import { SUPABASE_CONFIGURED } from "../supabase-config.js";
-import { nextGameFlyer, leadersFlyer, openFlyer, shareButton } from "../flyers.js";
+import { leadersFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
@@ -256,10 +256,6 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
       "Próximo juego",
       `<p><span class="leader-hero-value">vs</span> ${g.opponent}</p><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${formatGameTime(g.time)}` : ""}</p>`,
       `<div class="rsvp-actions"></div>`
-    );
-    // Flyer para redes (ver js/flyers.js).
-    next.querySelector(".leader-hero-body").appendChild(
-      shareButton(() => openFlyer((format, color) => nextGameFlyer(g, format, color), `proximo-juego-${g.date}`, `Próximo juego: Caimanes de Villas vs ${g.opponent}`))
     );
     bottomRow.appendChild(next);
     wireRsvp(next, g.id);
