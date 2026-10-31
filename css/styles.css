@@ -6039,13 +6039,23 @@ a.home-sponsor-card:hover {
   grid-area: count;
   align-self: center;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 14px;
 }
 
-.home-next-side .share-flyer-btn {
+/* Solo el ícono y sin color hasta pasarle el cursor: el contador es lo importante. */
+.home-next-share {
   position: relative;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  gap: 0;
+  border-color: var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
 }
 
 .home-next-label {
@@ -6559,11 +6569,7 @@ a.home-sponsor-card:hover {
   }
 
   .home-next-side {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: space-between;
-    gap: 6px 10px;
     margin-top: 6px;
   }
 
@@ -6572,7 +6578,7 @@ a.home-sponsor-card:hover {
   }
 
   .home-hero {
-    padding-bottom: 216px;
+    padding-bottom: 200px;
   }
 
   .match-ticker {
