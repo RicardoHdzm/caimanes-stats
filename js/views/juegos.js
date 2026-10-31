@@ -1,6 +1,6 @@
 import { SCHEDULE } from "../data.js";
 import { seasonStatGames, gameResult } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, escapeHtml } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, escapeHtml, formatGameTime } from "../ui.js";
 
 const RESULT_BADGE = {
   W: '<span class="badge badge-win"><i class="fa-solid fa-check"></i> W</span>',
@@ -22,7 +22,7 @@ export function renderJuegos(container) {
     renderSortableTable(scheduleEl, {
       columns: [
         { key: "date", label: "Fecha" },
-        { key: "time", label: "Hora" },
+        { key: "time", label: "Hora", render: formatGameTime },
         { key: "opponent", label: "Rival" },
       ],
       rows: SCHEDULE,
@@ -59,7 +59,7 @@ export function renderJuegos(container) {
 
   const resultColumns = [
     { key: "date", label: "Fecha", sticky: true },
-    { key: "time", label: "Hora" },
+    { key: "time", label: "Hora", render: formatGameTime },
     {
       key: "opponent",
       label: "Rival",

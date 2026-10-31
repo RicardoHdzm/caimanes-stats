@@ -15,19 +15,13 @@ import {
   playoffSeasonStatus,
   playerName,
 } from "../stats.js";
-import { escapeHtml, renderAvatar, ordinalTemporada } from "../ui.js";
+import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime } from "../ui.js";
 import { suggestedStarters } from "../lineup.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 
 function fmtDate(dateStr, opts = { weekday: "short", day: "numeric", month: "short" }) {
   return new Date(`${dateStr}T00:00:00`).toLocaleDateString("es-MX", opts);
-}
-
-function fmtTime(timeStr) {
-  if (!timeStr) return "";
-  const [h, m] = timeStr.split(":").map(Number);
-  return new Date(2000, 0, 1, h, m).toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true });
 }
 
 // Título de sección: "PRÓXIMOS **JUEGOS** ///" con una palabra gigante y
@@ -214,7 +208,7 @@ export function renderHome(container) {
         <a class="home-next" href="#/calendario">
           <span class="home-next-label">Próximo juego</span>
           <span class="home-next-match">Caimanes <em>vs</em> ${escapeHtml(next.opponent ?? "Rival")}</span>
-          <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${fmtTime(next.time)}` : ""}</span>
+          <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
           <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
         </a>`
           : ""
@@ -256,7 +250,7 @@ export function renderHome(container) {
           <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
           <span class="home-match-tag">${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${playedThisSeason + i + 1}</span>
           ${matchTeams(g.opponent, `<span class="home-match-vs">vs</span>`)}
-          <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${fmtTime(g.time)}` : ""}</span>
+          <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${formatGameTime(g.time)}` : ""}</span>
           <span class="home-match-cta">Ver calendario ▸</span>
         </a>`
   );

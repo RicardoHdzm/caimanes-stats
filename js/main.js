@@ -19,7 +19,7 @@ import { renderMedallasGuide } from "./views/medallas.js";
 import { initAuth, mountAuthControl, getCurrentPlayerId, getSession, isCoach, signOut, leaveToSplash } from "./auth.js";
 import { getAvatarUrl } from "./db.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
-import { ordinalTemporada, escapeHtml } from "./ui.js";
+import { ordinalTemporada, escapeHtml, formatGameTime } from "./ui.js";
 import { allStatGames, gameResult } from "./stats.js";
 import { initTheme } from "./theme.js";
 import { initSplash } from "./splash.js";
@@ -342,9 +342,7 @@ function buildTicker() {
     .slice(0, 4);
   const items = [];
   if (next) {
-    const time = next.time
-      ? new Date(2000, 0, 1, ...next.time.split(":").map(Number)).toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true })
-      : "";
+    const time = formatGameTime(next.time);
     items.push(`<span class="ticker-item ticker-item--next">Próximo: <b>Caimanes vs ${escapeHtml(next.opponent ?? "")}</b> · ${fmt(next.date)}${time ? `, ${time}` : ""}</span>`);
   }
   for (const g of recent) {

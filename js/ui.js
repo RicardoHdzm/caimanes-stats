@@ -199,6 +199,14 @@ export function ordinalTemporada(n) {
   return `${n}${ORDINAL_SUFFIXES[n] ?? "va"}`;
 }
 
+// "19:00" -> "7:00 pm". Solo se usa para mostrar; el valor crudo (24h) es
+// el que se sigue guardando/capturando en Admin.
+export function formatGameTime(timeStr) {
+  if (!timeStr) return "";
+  const [h, m] = timeStr.split(":").map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "am" : "pm"}`;
+}
+
 // Fotos de perfil: un archivo por jugador en assets/players/, con el ID del
 // jugador como nombre — assets/players/p12.jpg (o .png). No hay que tocar
 // data.js: si el archivo existe se usa, si no salen las iniciales. Se

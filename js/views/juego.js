@@ -1,6 +1,6 @@
 import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
 import { playerName, gameResult, playoffStatus, gameMvp, gameHasMvp } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml } from "../ui.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml, formatGameTime } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
@@ -22,14 +22,6 @@ function formatGameDate(dateStr) {
   const date = new Date(`${dateStr}T00:00:00`);
   const text = date.toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-// "19:00" -> "7:00 pm". Solo se usa para mostrar; el valor crudo (24h) es
-// el que se sigue guardando/capturando en Admin.
-function formatGameTime(timeStr) {
-  const [h, m] = timeStr.split(":").map(Number);
-  const date = new Date(2000, 0, 1, h, m);
-  return date.toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
 }
 
 // El voto de MVP solo se acepta en el juego MÁS RECIENTE — en cuanto se

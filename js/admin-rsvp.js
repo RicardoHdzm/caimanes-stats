@@ -9,6 +9,7 @@
 // — solo para verla, que ya lo resuelve el contenedor.
 import { SCHEDULE, ROSTER } from "./data.js";
 import { getRsvps } from "./db.js";
+import { formatGameTime } from "./ui.js";
 
 const contentEl = document.getElementById("admin-rsvp-content");
 
@@ -48,7 +49,7 @@ async function render() {
   contentEl.innerHTML = SCHEDULE.map(
     (g) => `
       <div class="rsvp-admin-game">
-        <h3>${g.date}${g.time ? ` — ${g.time}` : ""} vs ${g.opponent}</h3>
+        <h3>${g.date}${g.time ? ` — ${formatGameTime(g.time)}` : ""} vs ${g.opponent}</h3>
         <div id="rsvp-admin-${g.id}" class="rsvp-admin-cols"></div>
       </div>
     `
