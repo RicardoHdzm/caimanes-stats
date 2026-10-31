@@ -235,9 +235,14 @@ export function renderHome(container) {
 
   // Flyer para redes (ver js/flyers.js).
   if (next) {
-    root.querySelector(".home-next-side").appendChild(
-      shareButton(() => openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`))
+    const shareBtn = shareButton(
+      () => openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`),
+      ""
     );
+    shareBtn.classList.add("home-next-share");
+    shareBtn.setAttribute("aria-label", "Compartir próximo juego");
+    shareBtn.title = "Compartir";
+    root.querySelector(".home-next-side").appendChild(shareBtn);
   }
 
   // ---- Historial de juegos: los próximos y los últimos 4 finalizados ----
