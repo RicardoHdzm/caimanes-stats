@@ -86,7 +86,7 @@ export const PLAYERS = [
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "good 4 u", artist: "Olivia Rodrigo" }, seasons: [1, 8] },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Shake It Off", artist: "Taylor Swift" }, seasons: [8] },
   { id: "p21", number: 0, name: "Alberto Solis", position: "RF", walkup: { title: "vampire", artist: "Olivia Rodrigo" }, seasons: [7, 9] },
-  { id: "p22", number: 0, name: "Luis", position: "CF", walkup: { title: "Cruel Summer", artist: "Taylor Swift" }, seasons: [9] },
+  { id: "p22", number: 0, name: "Luis Celis", position: "CF", walkup: { title: "Cruel Summer", artist: "Taylor Swift" }, seasons: [9] },
   { id: "p23", number: 0, name: "Emanuel Ramos", position: "RF", walkup: { title: "Nonsense", artist: "Sabrina Carpenter" }, seasons: [9] },
   { id: "p24", number: 3, name: "Alex Escalante", position: "RF", walkup: { title: "Espresso", artist: "Sabrina Carpenter" }, seasons: [9] },
   { id: "p25", number: 11, name: "Fernando Olivas", position: "RF", walkup: { title: "Please Please Please", artist: "Sabrina Carpenter" }, seasons: [1, 2 , 3, 4 ,5 ,6, 9] },
