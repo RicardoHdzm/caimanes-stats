@@ -745,7 +745,7 @@ export async function leadersFlyer(data, format = "post", color) {
 // Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y
 // número centrados en la fuente
 // de jersey Legend M54 (assets/fonts/legend-m54.ttf) y, debajo, la cabeza
-// del caimán (assets/logos/: caimanes-white.png en Clásico, redlogo@2x.png en Moderno). El
+// del caimán (assets/logos/: caimanes-white.png en Clásico, caimanes-red.png en Moderno). El
 // estilo Clásico lleva una sombra suave en las letras; el Moderno, plano.
 // 1170×2532 = proporción de los celulares actuales (19.5:9).
 const WALL_W = 1170;
@@ -764,7 +764,7 @@ function loadWallpaperAssets() {
     }
     const [white, red] = await Promise.all([
       loadImage(asset("assets/logos/caimanes-white.png")),
-      loadImage(asset("assets/logos/redlogo@2x.png")),
+      loadImage(asset("assets/logos/caimanes-red.png")),
     ]);
     return { logos: { white, red } };
   })();
@@ -965,9 +965,7 @@ export async function wallpaperCanvas({ name, number, style }) {
   const logo = logos[style.logo];
   if (logo) {
     // El logo también con la piel (a petición expresa), igual que las letras.
-    // El blanco trae también el texto "Caimanes de Villas": más ancho para
-    // que la cabeza no se vea más chica que la del rojo.
-    const w = style.logo === "white" ? 340 : 250;
+    const w = 340;
     const h = (w * logo.naturalHeight) / logo.naturalWidth;
     const layer = document.createElement("canvas");
     layer.width = WALL_W;
