@@ -797,8 +797,8 @@ function crocSkinLayer() {
 
   // Tamaño de cada escama (a media resolución). Antes 44×34; más grandes
   // a petición expresa.
-  const CELL_W = 66;
-  const CELL_H = 51;
+  const CELL_W = 96;
+  const CELL_H = 74;
   const SCALE_UP = CELL_W / 44; // surco y relieve crecen con la escama
   const cols = Math.ceil(SW / CELL_W) + 2;
   const rows = Math.ceil(SH / CELL_H) + 2;
