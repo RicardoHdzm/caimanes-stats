@@ -82,7 +82,7 @@ const APPS_TOP = [
 const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
-  { label: "Números", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
+  { label: "Stats", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
   { label: "Multimedia", tabs: ["playlist", "fanzone"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 

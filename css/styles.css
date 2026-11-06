@@ -5699,7 +5699,7 @@ body.menu-open {
   cursor: pointer;
 }
 
-/* Título de cada grupo del menú (Temporada, Equipo, Números, Multimedia, Más). */
+/* Título de cada grupo del menú (Temporada, Equipo, Stats, Multimedia, Más). */
 .more-sheet .more-sheet-group {
   margin: 26px 0 2px;
   font-family: var(--font-display);
@@ -6613,7 +6613,7 @@ a.home-sponsor-card:hover {
   letter-spacing: 0.06em;
 }
 
-/* ---- Grupos desplegables (Temporada, Equipo, Números, Multimedia) ---- */
+/* ---- Grupos desplegables (Temporada, Equipo, Stats, Multimedia) ---- */
 .nav-group {
   position: relative;
 }
