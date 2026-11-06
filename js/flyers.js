@@ -965,7 +965,9 @@ export async function wallpaperCanvas({ name, number, style }) {
   const logo = logos[style.logo];
   if (logo) {
     // El logo también con la piel (a petición expresa), igual que las letras.
-    const w = 190;
+    // El blanco trae también el texto "Caimanes de Villas": más ancho para
+    // que la cabeza no se vea más chica que la del rojo.
+    const w = style.logo === "white" ? 340 : 250;
     const h = (w * logo.naturalHeight) / logo.naturalWidth;
     const layer = document.createElement("canvas");
     layer.width = WALL_W;
