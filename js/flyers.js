@@ -795,8 +795,11 @@ function crocSkinLayer() {
   let seed = 20260;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
-  const CELL_W = 44;
-  const CELL_H = 34;
+  // Tamaño de cada escama (a media resolución). Antes 44×34; más grandes
+  // a petición expresa.
+  const CELL_W = 66;
+  const CELL_H = 51;
+  const SCALE_UP = CELL_W / 44; // surco y relieve crecen con la escama
   const cols = Math.ceil(SW / CELL_W) + 2;
   const rows = Math.ceil(SH / CELL_H) + 2;
   // Un punto por celda (con jitter); filas impares recorridas media celda.
@@ -846,14 +849,15 @@ function crocSkinLayer() {
       }
       const e = Math.sqrt(d2) - Math.sqrt(d1); // distancia al borde de la escama
       const o = (y * SW + x) * 4;
-      if (e < 1.6) {
+      const groove = 1.6 * SCALE_UP;
+      if (e < groove) {
         // Surco entre escamas.
-        data[o + 3] = 120 - e * 40;
+        data[o + 3] = 120 - (e / groove) * 64;
       } else {
         // Relieve redondeado, con la luz desde arriba: gradual de claro
         // (parte de arriba de la escama, ny < 0) a oscuro (parte de abajo),
         // y más oscuro cerca del surco.
-        const dome = Math.min(1, e / 12);
+        const dome = Math.min(1, e / (12 * SCALE_UP));
         const shade = Math.max(-1, Math.min(1, -ny / (CELL_H * 0.55)));
         if (shade > 0) {
           data[o] = data[o + 1] = data[o + 2] = 255;
