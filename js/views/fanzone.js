@@ -11,12 +11,13 @@ import { wallpaperCanvas, stripAccents } from "../flyers.js";
 const STORAGE_KEY = "caimanes-wallpaper";
 
 // Solo dos estilos (a petición expresa), con el diseño de Ricardo: Clásico
-// (azul marino, letras blancas con sombra) primero y Moderno (negro, rojo).
+// (azul marino, nombre blanco y número rojo, con sombra) primero y Moderno
+// (negro, nombre rojo y número blanco).
 const STYLES = [
-  { id: "clasico", label: "Clásico", bg: "#111827", fg: "#ffffff", logo: "white", shadow: true, skin: 0.55 },
+  { id: "clasico", label: "Clásico", bg: "#111827", fg: "#ffffff", numberFg: "#d31245", logo: "white", shadow: true, skin: 0.55 },
   // Moderno: negro apenas levantado (#101012) — en negro puro las sombras de
   // la piel no se ven y las escamas se veían borrosas.
-  { id: "moderno", label: "Moderno", bg: "#101012", fg: "#d31245", logo: "red", shadow: false, skin: 0.8 },
+  { id: "moderno", label: "Moderno", bg: "#101012", fg: "#d31245", numberFg: "#ffffff", logo: "red", shadow: false, skin: 0.8 },
 ];
 
 function loadState() {
@@ -88,7 +89,7 @@ export function renderFanzone(container) {
         ${STYLES.map(
           (st) => `
             <button type="button" class="fz-preset" data-style="${st.id}" title="${st.label}">
-              <span class="fz-swatch" style="background:${st.bg};color:${st.fg};">8</span>
+              <span class="fz-swatch" style="background:${st.bg};color:${st.numberFg};">8</span>
               <span>${st.label}</span>
             </button>
           `

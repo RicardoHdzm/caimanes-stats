@@ -960,7 +960,7 @@ export async function wallpaperCanvas({ name, number, style }) {
   const textSkin = style.textSkin ?? 0.9;
   if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow, skin: textSkin });
   const numText = String(number ?? "").trim();
-  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.fg, shadow: style.shadow, skin: textSkin });
+  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.numberFg ?? style.fg, shadow: style.shadow, skin: textSkin });
 
   const logo = logos[style.logo];
   if (logo) {
