@@ -745,7 +745,7 @@ export async function leadersFlyer(data, format = "post", color) {
 // Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y
 // número centrados en la fuente
 // de jersey Legend M54 (assets/fonts/legend-m54.ttf) y, debajo, la cabeza
-// del caimán (assets/logos/, versión blanca o roja según el estilo). El
+// del caimán (assets/logos/: caimanes-white.png en Clásico, redlogo@2x.png en Moderno). El
 // estilo Clásico lleva una sombra suave en las letras; el Moderno, plano.
 // 1170×2532 = proporción de los celulares actuales (19.5:9).
 const WALL_W = 1170;
@@ -763,7 +763,7 @@ function loadWallpaperAssets() {
       // Sin la fuente se dibuja con Barlow Condensed (respaldo de JERSEY_FONT).
     }
     const [white, red] = await Promise.all([
-      loadImage(asset("assets/logos/whitelogo@2x.png")),
+      loadImage(asset("assets/logos/caimanes-white.png")),
       loadImage(asset("assets/logos/redlogo@2x.png")),
     ]);
     return { logos: { white, red } };
