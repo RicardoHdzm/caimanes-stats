@@ -997,7 +997,7 @@ export const SCHEDULE = [
   // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
   // { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" }, // ya se jugó: es g13 en GAMES
   { id: "s3", date: "2026-11-07", time: "17:00", opponent: "Gallos" },
-  { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Por definir" },
+  { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Santara" },
 ];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
