@@ -13,6 +13,7 @@ import { renderStanding } from "./views/standing.js";
 import { renderAlineacion } from "./views/alineacion.js";
 import { renderPlaylist } from "./views/playlist.js";
 import { renderFanzone } from "./views/fanzone.js";
+import { renderVlogs } from "./views/vlogs.js";
 import { renderJuegoDetalle } from "./views/juego.js";
 import { renderJugadorDetalle } from "./views/jugador.js";
 import { renderMedallasGuide } from "./views/medallas.js";
@@ -41,6 +42,7 @@ const routes = {
   records: renderRecords,
   playlist: renderPlaylist,
   fanzone: renderFanzone,
+  vlogs: renderVlogs,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -67,6 +69,7 @@ const MORE_TABS = [
   { tab: "records", route: "#/records", label: "Récords", icon: "fa-crown" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
   { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
+  { tab: "vlogs", route: "#/vlogs", label: "Vlogs", icon: "fa-video" },
 ];
 
 // El menú ☰ (pantalla completa) es el mapa completo del sitio: arriba
@@ -83,7 +86,7 @@ const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
   { label: "Stats", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
-  { label: "Multimedia", tabs: ["playlist", "fanzone"] },
+  { label: "Multimedia", tabs: ["playlist", "fanzone", "vlogs"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 
 function appTile(t) {

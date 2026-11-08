@@ -247,6 +247,8 @@ export const MANAGERS = ["p15"];
 //       { inning: 5, type: "campo", playerOut: "p1", playerIn: "p3", position: "SS" },
 //     ],
 //     replayUrl: "https://youtube.com/...", // opcional, link al video del juego
+//     vlogUrl: "https://www.youtube.com/watch?v=...", // opcional, vlog del juego
+//     //   en YouTube — sale en Multimedia > Vlogs y en la página del juego
 //     mvp: "p3", // opcional — MVP OFICIAL del juego. Si está, manda sobre
 //     //   el voto del equipo en Supabase (mvp_votes) y cierra la votación
 //     //   de ese juego; sin él, el MVP sale del voto. Cuenta para el badge
@@ -883,6 +885,7 @@ export const GAMES = [
       { inning: 4, type: "campo", playerOut: "p21", playerIn: "p14", position: "2B" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1132555746302149/",
+    vlogUrl: "https://www.youtube.com/watch?v=j8CNVxhXgMA",
   },
 ];
 

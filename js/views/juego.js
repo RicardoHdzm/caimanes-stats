@@ -4,6 +4,7 @@ import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositi
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
+import { youtubeId } from "./vlogs.js";
 import { resultFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
@@ -362,6 +363,9 @@ export function renderJuegoDetalle(container, gameId) {
       })()
     : "";
 
+  // Vlog de YouTube del juego, si hay (ver js/views/vlogs.js).
+  const vlogId = youtubeId(game.vlogUrl);
+
   const hero = document.createElement("div");
   hero.className = "game-hero";
   hero.innerHTML = `
@@ -375,8 +379,16 @@ export function renderJuegoDetalle(container, gameId) {
       ${known ? `${game.scoreUs}<span class="sep">-</span>${game.scoreThem}` : "Marcador pendiente"}
     </div>
     ${
-      game.replayUrl
-        ? `<div class="game-hero-replay"><a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a></div>`
+      game.replayUrl || vlogId
+        ? `<div class="game-hero-replay">${
+            game.replayUrl
+              ? `<a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a>`
+              : ""
+          }${
+            vlogId
+              ? `<a href="https://www.youtube.com/watch?v=${vlogId}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-brands fa-youtube"></i> Ver vlog</a>`
+              : ""
+          }</div>`
         : ""
     }
     <div id="mvp-badge-slot"></div>
