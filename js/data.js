@@ -836,6 +836,7 @@ export const GAMES = [
     date: "2026-11-07",
     time: "17:00",
     opponent: "Gallos",
+    mvp: "p1",
     weCloseBatting: true,
     scoreUs: 20,
     scoreThem: 13,
