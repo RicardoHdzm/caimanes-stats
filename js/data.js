@@ -856,7 +856,7 @@ export const GAMES = [
       { playerId: "p16", IP: 7, H: 17, R: 13, ER: 0, BB: 1, SO: 1, HR: 2, decision: "W" },
     ],
     fielding: [
-      { playerId: "p4", PO: 2, A: 0, E: 0 },
+      { playerId: "p4", PO: 2, A: 0, E: 1 },
       { playerId: "p10", PO: 3, A: 0, E: 0 },
       { playerId: "p1", PO: 6, A: 5, E: 0 },
       { playerId: "p12", PO: 5, A: 1, E: 0 },
