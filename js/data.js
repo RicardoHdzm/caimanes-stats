@@ -830,6 +830,59 @@ export const GAMES = [
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1361225502573347",
   },
+  {
+    id: "g14",
+    season: 9,
+    date: "2026-11-07",
+    time: "17:00",
+    opponent: "Gallos",
+    weCloseBatting: null,
+    scoreUs: 20,
+    scoreThem: 13,
+    batting: [
+      { playerId: "p4", order: 1, position: "CF", AB: 5, H: 3, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p10", order: 2, position: "LF", AB: 5, H: 4, "2B": 2, "3B": 0, HR: 0, HRC: 0, RBI: 2, R: 4, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p1", order: 3, position: "SS", AB: 5, H: 4, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 7, R: 2, BB: 0, SO: 0, SB: 4 },
+      { playerId: "p12", order: 4, position: "1B", AB: 5, H: 2, "2B": 0, "3B": 0, HR: 1, HRC: 0, RBI: 5, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p15", order: 5, position: "3B", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p8", order: 6, position: "C", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p7", order: 7, position: "RF", AB: 4, H: 3, "2B": 0, "3B": 2, HR: 0, HRC: 0, RBI: 2, R: 3, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p21", order: 8, position: "2B", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p16", order: 9, position: "P", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 2, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p14", order: 8, position: "2B", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 1, BB: 0, SO: 0, SB: 0 },
+    ],
+    pitching: [
+      { playerId: "p16", IP: 7, H: 17, R: 13, ER: 0, BB: 1, SO: 1, HR: 2, decision: "W" },
+    ],
+    fielding: [
+      { playerId: "p4", PO: 2, A: 0, E: 0 },
+      { playerId: "p10", PO: 3, A: 0, E: 0 },
+      { playerId: "p1", PO: 6, A: 5, E: 0 },
+      { playerId: "p12", PO: 5, A: 1, E: 0 },
+      { playerId: "p15", PO: 2, A: 0, E: 1 },
+      { playerId: "p8", PO: 1, A: 0, E: 2 },
+      { playerId: "p7", PO: 0, A: 0, E: 0 },
+      { playerId: "p21", PO: 0, A: 0, E: 0 },
+      { playerId: "p16", PO: 1, A: 0, E: 0 },
+      { playerId: "p14", PO: 1, A: 1, E: 0 },
+    ],
+    outs: [
+      { playerId: "p4", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p10", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p1", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p12", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p15", GO: 1, FO: 1, LO: 1, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p8", GO: 1, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p7", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p21", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p16", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p14", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+    ],
+    substitutions: [
+      { inning: 4, type: "campo", playerOut: "p21", playerIn: "p14", position: "2B" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1132555746302149/",
+  },
 ];
 
 // Juegos de PLAYOFFS — solo temporadas que llegaron a esta fase tienen
@@ -996,7 +1049,7 @@ export const SCHEDULE = [
    // { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
   // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
   // { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" }, // ya se jugó: es g13 en GAMES
-  { id: "s3", date: "2026-11-07", time: "17:00", opponent: "Gallos" },
+  // { id: "s3", date: "2026-11-07", time: "17:00", opponent: "Gallos" }, // ya se jugó: es g14 en GAMES
   { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Santara" },
 ];
 
