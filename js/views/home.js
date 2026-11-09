@@ -403,19 +403,68 @@ export function renderHome(container) {
   if (mvpPlayer) {
     const words = mvpPlayer.name.split(" ");
     const last = words.length > 1 ? words.pop() : "";
-    const b = battingTotals([mvpGame]).find((r) => r.playerId === mvpPlayer.id);
-    const p = pitchingTotals([mvpGame]).find((r) => r.playerId === mvpPlayer.id && r.outs > 0);
+    const batRows = battingTotals([mvpGame]);
+    const pitRows = pitchingTotals([mvpGame]).filter((r) => r.outs > 0);
     const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-    const line = [
-      p ? plural(p.IP, "entrada", "entradas") : "",
-      b ? `${b.H} de ${b.AB}` : "",
-      b?.HR + b?.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
-      b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
-      b?.SB ? plural(b.SB, "robada", "robadas") : "",
-    ]
-      .filter(Boolean)
-      .slice(0, 4)
-      .join(" · ");
+    // "4 de 5 · 7 impulsadas · 4 robadas" — lo que hizo alguien en ese juego.
+    const statLine = (playerId, max = 4) => {
+      const b = batRows.find((r) => r.playerId === playerId);
+      const p = pitRows.find((r) => r.playerId === playerId);
+      return [
+        p ? plural(p.IP, "entrada", "entradas") : "",
+        b ? `${b.H} de ${b.AB}` : "",
+        b?.HR + b?.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
+        b?.["3B"] ? plural(b["3B"], "triple", "triples") : "",
+        b?.["2B"] ? plural(b["2B"], "doble", "dobles") : "",
+        b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
+        b?.SB ? plural(b.SB, "robada", "robadas") : "",
+      ]
+        .filter(Boolean)
+        .slice(0, max)
+        .join(" · ");
+    };
+    const line = statLine(mvpPlayer.id);
+
+    // Los otros destacados del juego (a petición expresa), en chico debajo
+    // del MVP: los 3 con más aporte al bat — hit 1, extra base +1 (doble),
+    // +2 (triple), +3 (HR), impulsada 1, carrera 0.5, robada 0.5, base por
+    // bola 0.5 — y el pitcher ganador suma 2 + media por entrada.
+    const impact = new Map();
+    for (const b of batRows) {
+      const hr = b.HR + b.HRC;
+      impact.set(b.playerId, b.H + b["2B"] + 2 * b["3B"] + 3 * hr + b.RBI + 0.5 * (b.R + b.SB + b.BB));
+    }
+    for (const line of mvpGame.pitching ?? []) {
+      if (line.decision !== "W") continue;
+      const p = pitRows.find((r) => r.playerId === line.playerId);
+      impact.set(line.playerId, (impact.get(line.playerId) ?? 0) + 2 + (p ? p.outs / 6 : 0));
+    }
+    const others = [...impact.entries()]
+      .filter(([id, score]) => id !== mvpPlayer.id && score > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([id]) => PLAYERS.find((p) => p.id === id))
+      .filter(Boolean);
+    const othersHtml = others.length
+      ? `
+      <div class="home-mvp-others">
+        <span class="home-mvp-others-title">También destacaron</span>
+        <div class="home-mvp-others-grid">
+          ${others
+            .map(
+              (o) => `
+            <a class="home-mvp-other" href="#/jugador/${o.id}">
+              <span class="home-mvp-other-photo">${renderAvatar(o, 76)}</span>
+              <span class="home-mvp-other-info">
+                <span class="home-mvp-other-name">${o.number ? `<b>${o.number}</b> ` : ""}${escapeHtml(o.name)}</span>
+                <span class="home-mvp-other-line">${escapeHtml(statLine(o.id, 3))}</span>
+              </span>
+            </a>`
+            )
+            .join("")}
+        </div>
+      </div>`
+      : "";
     const mvpSection = document.createElement("section");
     mvpSection.className = "home-section";
     mvpSection.innerHTML = `
@@ -434,6 +483,7 @@ export function renderHome(container) {
           </div>
         </div>
       </div>
+      ${othersHtml}
     `;
     root.appendChild(mvpSection);
   }
