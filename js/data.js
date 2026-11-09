@@ -248,7 +248,7 @@ export const MANAGERS = ["p15"];
 //     ],
 //     replayUrl: "https://youtube.com/...", // opcional, link al video del juego
 //     vlogUrl: "https://www.youtube.com/watch?v=...", // opcional, vlog del juego
-//     //   en YouTube — sale en Multimedia > Vlogs y en la página del juego
+//     //   en YouTube — sale en Multimedia > CaimaCam y en la página del juego
 //     mvp: "p3", // opcional — MVP OFICIAL del juego. Si está, manda sobre
 //     //   el voto del equipo en Supabase (mvp_votes) y cierra la votación
 //     //   de ese juego; sin él, el MVP sale del voto. Cuenta para el badge
