@@ -42,7 +42,8 @@ function ticketsHtml(todayStr) {
   if (!upcoming.length) return "";
   const played = GAMES.filter((g) => g.season === CURRENT_SEASON && !g.playoff).length;
   const ticket = (s, i) => {
-    const when = parseDate(s.date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+    const whenRaw = parseDate(s.date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
+    const when = whenRaw.charAt(0).toUpperCase() + whenRaw.slice(1);
     const [time, ampm] = s.time ? formatGameTime(s.time).split(" ") : ["", ""];
     return `
       <a class="ticket" href="#/resumen">
@@ -52,7 +53,7 @@ function ticketsHtml(todayStr) {
           <span class="ticket-when">${escapeHtml(when)}</span>
         </span>
         <span class="ticket-stub">
-          ${time ? `<b class="ticket-time">${time}</b><span class="ticket-ampm">${ampm}</span>` : '<b class="ticket-time">—</b><span class="ticket-ampm">Hora por definir</span>'}
+          ${time ? `<b class="ticket-time">${time.replace(":", "<i>:</i>")}</b><span class="ticket-ampm">${ampm}</span>` : '<b class="ticket-time">—</b><span class="ticket-ampm">Hora por definir</span>'}
         </span>
       </a>`;
   };

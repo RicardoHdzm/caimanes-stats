@@ -8036,7 +8036,16 @@ a.home-sponsor-card:hover {
   text-transform: uppercase;
 }
 
+/* display/color/::before: le gana al estilo general de main h3 (gris, en
+   fila y con rayita roja). */
+.home-mvp-name::before {
+  content: none;
+}
+
 .home-mvp-name {
+  display: block;
+  color: var(--text);
+  letter-spacing: 0.01em;
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.6rem, 6vw, 4.4rem);
@@ -8184,7 +8193,6 @@ a.home-sponsor-card:hover {
   color: var(--muted);
   font-size: var(--text-sm);
   font-weight: 700;
-  text-transform: capitalize;
 }
 
 /* Talón: rojo, separado por la línea perforada. */
@@ -8205,6 +8213,13 @@ a.home-sponsor-card:hover {
   font-size: 3rem;
   font-weight: 400;
   line-height: 1;
+}
+
+/* La fuente de jersey no dibuja ":" — va en Barlow. */
+.ticket-time i {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 700;
 }
 
 .ticket-ampm {
