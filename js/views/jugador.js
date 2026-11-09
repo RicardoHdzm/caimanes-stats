@@ -829,7 +829,10 @@ export function renderJugadorDetalle(container, playerId) {
   const seasonsWithTeam = player.seasons?.length ?? 0;
   hero.innerHTML = `
     ${player.number ? `<div class="profile-hero-ghost" aria-hidden="true"><span>${player.number}</span></div>` : ""}
-    <div id="profile-debut-badge">${renderDebut(player.seasons)}</div>
+    <div id="profile-debut-badge">
+      ${seasonsWithTeam ? `<div class="debut-badge"><i class="fa-solid fa-calendar-check"></i> ${ordinalTemporada(seasonsWithTeam)} temporada en el equipo</div>` : ""}
+      ${renderDebut(player.seasons)}
+    </div>
     <div class="profile-hero-top">
       <div class="profile-avatar-col">
         <div id="profile-avatar" class="profile-avatar-wrap">
@@ -844,7 +847,6 @@ export function renderJugadorDetalle(container, playerId) {
       <div class="profile-hero-info">
         <div class="profile-hero-kicker">
           ${player.number ? `<span class="profile-hero-number">${player.number}</span>` : ""}
-          ${seasonsWithTeam ? `<span class="profile-hero-seasons">${ordinalTemporada(seasonsWithTeam)} temporada en el equipo</span>` : ""}
         </div>
         <div class="profile-hero-name">${escapeHtml(nameWords.join(" "))}${lastName ? ` <span>${escapeHtml(lastName)}</span>` : ""}</div>
         <div class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</div>

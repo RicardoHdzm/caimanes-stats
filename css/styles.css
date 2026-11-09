@@ -1166,10 +1166,16 @@ main h3::before {
    (renderDebut() regresa ""). margin:0 en el .debut-badge de adentro:
    trae su propio margin (pensado para ir centrado en flujo normal, ver
    más abajo), que aquí sobra. */
+/* Arriba a la derecha: "Nva temporada en el equipo" + el debut (a petición
+   expresa, la temporada salió de junto al número). */
 #profile-debut-badge {
   position: absolute;
   top: 14px;
   right: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 #profile-debut-badge .debut-badge {
@@ -1187,6 +1193,7 @@ main h3::before {
     position: static;
     display: flex;
     justify-content: center;
+    gap: 6px;
     margin-bottom: 20px;
   }
 
@@ -8135,14 +8142,6 @@ a.home-sponsor-card:hover {
   line-height: 1;
 }
 
-.profile-hero-seasons {
-  color: var(--muted);
-  font-size: var(--text-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 /* Nombre enorme en dos tonos: el apellido en rojo, en su propio renglón. */
 .profile-hero-name {
   display: block;
@@ -8469,10 +8468,6 @@ a.home-sponsor-card:hover {
 
   .profile-hero-kicker .profile-hero-number {
     font-size: 2.6rem;
-  }
-
-  .profile-hero-seasons {
-    flex-basis: 100%;
   }
 
   .profile-hero-name {
