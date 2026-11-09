@@ -85,9 +85,12 @@ export async function hydrateAvatars(root) {
 // va junto al título (el valor grande, un párrafo, lo que sea); `bodyHtml`
 // (opcional) es contenido extra debajo del encabezado, fuera del degradado
 // — barra de progreso, chips de racha, botones de RSVP.
+// .leader-hero-watermark: el mismo ícono enorme y tenue de fondo (ver
+// styles.css) — a petición expresa, tarjetas más llamativas.
 function heroCardInnerHtml(icon, title, mainHtml, bodyHtml = "") {
   return `
     <div class="leader-hero">
+      <i class="fa-solid ${icon} leader-hero-watermark" aria-hidden="true"></i>
       <div class="leader-hero-main">
         <h3><i class="fa-solid ${icon}"></i>${title}</h3>
         ${mainHtml}

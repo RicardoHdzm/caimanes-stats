@@ -178,7 +178,7 @@ function renderSeasonMedals(container, statGames) {
 }
 
 export function renderTemporadas(container, seasonParam, tabParam) {
-  heading(container, "Temporadas anteriores");
+  heading(container, "Historial");
 
   const requested = Number(seasonParam);
   const season = Number.isInteger(requested) && requested >= 1 && requested <= SEASONS.length ? requested : defaultSeason();

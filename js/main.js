@@ -67,7 +67,7 @@ const MORE_TABS = [
   { tab: "alineacion", route: "#/alineacion", label: "Alineación", icon: "fa-clipboard-list" },
   { tab: "resumen", route: "#/resumen", label: "Resumen", icon: "fa-chart-line" },
   { tab: "estadisticas", route: "#/estadisticas", label: "Estadísticas", icon: "fa-chart-simple" },
-  { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
+  { tab: "temporadas", route: "#/temporadas", label: "Historial", icon: "fa-clock-rotate-left" },
   { tab: "records", route: "#/records", label: "Récords", icon: "fa-crown" },
   { tab: "power-ranking", route: "#/power-ranking", label: "Power Ranking", icon: "fa-bolt" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
@@ -86,9 +86,12 @@ const APPS_TOP = [
   { tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" },
 ];
 const NAV_GROUPS = [
-  { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
-  { label: "Equipo", tabs: ["roster", "alineacion"] },
-  { label: "Stats", tabs: ["resumen", "power-ranking", "estadisticas", "temporadas", "records"] },
+  // Reacomodo (a petición expresa): Resumen es el tablero de la temporada en
+  // curso → Temporada; Power Ranking habla de los jugadores → Equipo; y
+  // "Temporadas" se llama Historial (no confundir con el grupo Temporada).
+  { label: "Temporada", tabs: ["resumen", "calendario", "juegos", "standing", "playoffs"] },
+  { label: "Equipo", tabs: ["roster", "power-ranking", "alineacion"] },
+  { label: "Stats", tabs: ["estadisticas", "records", "temporadas"] },
   { label: "Multimedia", tabs: ["caimavlogs", "playlist", "wallpapers"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 
