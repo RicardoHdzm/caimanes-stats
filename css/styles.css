@@ -110,7 +110,7 @@
   --skin-texture: url("../assets/textures/croc-skin.png");
   --skin-size: 640px;
   /* Luna (negro): gris neutro — el azul solo le queda a Eclipse. */
-  --skin-line: rgba(255, 255, 255, 0.045);
+  --skin-line: rgba(255, 255, 255, 0.03);
 
   /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
      separado de --surface aunque hoy valga lo mismo, para que el tema
@@ -150,7 +150,7 @@
   --accent-glow: rgba(226, 32, 47, 0.25);
 
   --zebra: rgba(0, 0, 0, 0.025);
-  --skin-line: rgba(15, 23, 42, 0.05);
+  --skin-line: rgba(15, 23, 42, 0.035);
 
   --bg-glow: #ffffff;
 
@@ -186,7 +186,7 @@
   --accent-glow: rgba(191, 15, 53, 0.35);
 
   --bg-glow: #101622;
-  --skin-line: rgba(74, 158, 255, 0.06);
+  --skin-line: rgba(74, 158, 255, 0.04);
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
      --surface y --accent de este tema. */
