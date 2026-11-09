@@ -48,7 +48,7 @@ function rosterCard(player, duesMap) {
       <span class="roster-card-photo">
         <span class="roster-card-img" data-avatar="${player.id}" data-size="280">${renderAvatar(player, 280)}</span>
         <span class="roster-card-positions">${playerPositions(player).map((pos) => `<span>${pos}</span>`).join("")}</span>
-        ${player.number ? `<span class="roster-card-number">#${player.number}</span>` : ""}
+        ${player.number ? `<span class="roster-card-number">${player.number}</span>` : ""}
         <span class="roster-card-who">
           <span class="roster-card-name">${escapeHtml(player.name)}</span>
           <span class="roster-card-seasons">${playerSeasonLabel(player)}</span>

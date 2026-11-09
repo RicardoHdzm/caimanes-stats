@@ -815,7 +815,9 @@ export function renderJugadorDetalle(container, playerId) {
   // más abajo) — una sola constante evita que se desincronicen si cambia.
   const hero = document.createElement("div");
   hero.className = "profile-hero";
+  // .profile-hero-ghost: el número gigante y tenue de fondo (ver styles.css).
   hero.innerHTML = `
+    ${player.number ? `<div class="profile-hero-ghost" aria-hidden="true"><span>${player.number}</span></div>` : ""}
     <div id="profile-debut-badge">${renderDebut(player.seasons)}</div>
     <div class="profile-hero-top">
       <div class="profile-avatar-col">
@@ -830,7 +832,7 @@ export function renderJugadorDetalle(container, playerId) {
       </div>
       <div class="profile-hero-info">
         <div class="profile-hero-name">
-          <span class="profile-hero-number">#${player.number ?? "-"}</span>
+          <span class="profile-hero-number">${player.number ?? "-"}</span>
           <span>${escapeHtml(player.name)}</span>
           <span class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</span>
         </div>
