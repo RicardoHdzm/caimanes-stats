@@ -13,8 +13,9 @@
 // página) porque esto también lo usa lineup/index.html, que vive en una
 // subcarpeta. Las fuentes (Barlow Condensed) ya las declara css/styles.css
 // con @font-face; aquí solo se espera a que carguen antes de dibujar.
-import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS, PLAYOFFS } from "./data.js";
+import { TEAM, SEASONS, CURRENT_SEASON, SPONSORS, PLAYERS, PLAYOFFS, GAMES } from "./data.js";
 import { gameMvp, battingTotals, pitchingTotals, fieldingTotals } from "./stats.js";
+import { ordinalTemporada } from "./ui.js";
 
 const W = 1080;
 // H = alto del CONTENIDO (el diseño del post). En historia el lienzo mide
@@ -271,8 +272,8 @@ function drawLogo(ctx, logo, cx, y, size) {
 }
 
 // Liga + tira de patrocinadores, pegados abajo.
-function drawFooter(ctx, sponsors) {
-  text(ctx, leagueLine(), W / 2, H - 200, { size: 34, color: P.muted, weight: 600 });
+function drawFooter(ctx, sponsors, label = leagueLine()) {
+  text(ctx, label, W / 2, H - 200, { size: 34, color: P.muted, weight: 600 });
   if (sponsors.length === 0) return;
 
   // Mismo criterio que fitSponsorLogo() de la portada: peso visual
@@ -299,14 +300,47 @@ function drawFooter(ctx, sponsors) {
 // Lienzo del formato pedido, con la paleta del tema activo y el fondo ya
 // pintado de orilla a orilla. El logo y el desplazamiento del contenido los
 // pone placeLogo() (en historia el logo va más grande, arriba).
-function newFlyer(format, color) {
+function newFlyer(format, color, { skin = false } = {}) {
   P = flyerPalette(color);
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = FORMAT_HEIGHT[format] ?? H;
   const ctx = canvas.getContext("2d");
-  drawBackground(ctx, canvas.height);
+  (skin ? drawSkinBackground : drawBackground)(ctx, canvas.height);
   return { canvas, ctx, story: format === "story" };
+}
+
+// Fondo del diseño nuevo: la piel de caimán de los wallpapers de Fanzone
+// (crocSkinLayer, más abajo) sobre el color del fondo, brillo rojo detrás
+// del marcador, orillas oscuras y las mismas barras rojas arriba/abajo.
+function drawSkinBackground(ctx, CH) {
+  ctx.fillStyle = P.bg;
+  ctx.fillRect(0, 0, W, CH);
+  ctx.save();
+  ctx.globalAlpha = 0.7;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(crocSkinLayer(), (W - WALL_W) / 2, (CH - WALL_H) / 2, WALL_W, WALL_H);
+  ctx.restore();
+
+  const glow = ctx.createRadialGradient(W / 2, CH * 0.45, 60, W / 2, CH * 0.45, 820);
+  glow.addColorStop(0, rgba(P.accent, 0.3));
+  glow.addColorStop(1, rgba(P.accent, 0));
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, CH);
+
+  const vignette = ctx.createRadialGradient(W / 2, CH / 2, 300, W / 2, CH / 2, CH * 0.8);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.65)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, CH);
+
+  const bar = ctx.createLinearGradient(0, 0, W, 0);
+  bar.addColorStop(0, P.accentDark);
+  bar.addColorStop(0.5, P.accent);
+  bar.addColorStop(1, P.accentDark);
+  ctx.fillStyle = bar;
+  ctx.fillRect(0, CH - 14, W, 14);
+  ctx.fillRect(0, 0, W, 8);
 }
 
 // En post: el logo va donde dice el diseño (`y`, `size`). En historia
@@ -422,50 +456,219 @@ export async function lineupFlyer(order, game = null, format = "post", color) {
 
 // `game`: un juego de GAMES/PLAYOFFS. `playoffRound` (opcional): nombre de
 // la ronda si es de playoffs.
+//
+// Diseño "con más estilo" (a petición expresa): piel de caimán de fondo,
+// VICTORIA/DERROTA gigante en blanco, el marcador en la fuente de
+// jersey sobre una franja roja y la foto grande del MVP. La liga
+// y la fecha van arriba; abajo, el Instagram y el sitio.
+const INSTAGRAM = "@CAIMANES.SB";
+const SITE = "CAIMANES.TEAM";
+
+function jerseyFont(size) {
+  return `${size}px ${JERSEY_FONT}`;
+}
+
+// Foto (o iniciales) recortada en un paralelogramo — `skew` = cuánto se
+// recorre la orilla de arriba a la derecha.
+function drawSkewedPhoto(ctx, img, name, x, y, w, h, skew, border) {
+  const path = () => {
+    ctx.beginPath();
+    ctx.moveTo(x + skew, y);
+    ctx.lineTo(x + w + skew, y);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.closePath();
+  };
+  const bw = w + skew;
+  ctx.save();
+  path();
+  ctx.clip();
+  if (img) {
+    const scale = Math.max(bw / img.naturalWidth, h / img.naturalHeight);
+    const dw = img.naturalWidth * scale;
+    const dh = img.naturalHeight * scale;
+    ctx.drawImage(img, x + (bw - dw) / 2, y + (h - dh) / 2, dw, dh);
+  } else {
+    ctx.fillStyle = P.tint(0.12);
+    ctx.fillRect(x, y, bw, h);
+    const initials = (name ?? "")
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0].toUpperCase())
+      .join("");
+    ctx.fillStyle = P.text;
+    ctx.font = font(h * 0.4);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, x + bw / 2, y + h / 2);
+    ctx.textBaseline = "alphabetic";
+  }
+  ctx.restore();
+  path();
+  ctx.strokeStyle = border;
+  ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
+// "4 DE 5 · 7 IMPULSADAS · 4 ROBADAS" — lo que hizo el MVP en ese juego.
+function mvpLine(game, playerId) {
+  const parts = [];
+  const b = battingTotals([game]).find((r) => r.playerId === playerId);
+  if (b) {
+    parts.push(`${b.H} DE ${b.AB}`);
+    if (b.HR) parts.push(`${b.HR} HR`);
+    if (b.RBI) parts.push(`${b.RBI} ${b.RBI === 1 ? "IMPULSADA" : "IMPULSADAS"}`);
+    if (b.SB) parts.push(`${b.SB} ${b.SB === 1 ? "ROBADA" : "ROBADAS"}`);
+  }
+  const p = pitchingTotals([game]).find((r) => r.playerId === playerId && r.outs > 0);
+  if (p) parts.unshift(`${p.IP} ENTRADAS`);
+  return parts.slice(0, 4).join(" · ");
+}
+
+// Un lado del marcador: nombre del equipo arriba y las carreras en grande
+// (fuente de jersey). Ganador relleno; perdedor solo en contorno.
+function scoreSide(ctx, name, score, cx, solid) {
+  text(ctx, name, cx, 502, { size: 44, color: "#fff", maxWidth: 400 });
+  ctx.font = jerseyFont(210);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  if (solid) {
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetX = 8;
+    ctx.shadowOffsetY = 10;
+    ctx.fillStyle = "#fff";
+    ctx.fillText(String(score), cx, 692);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.fillText(String(score), cx, 692);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.lineWidth = 5;
+    ctx.strokeText(String(score), cx, 692);
+  }
+}
+
 export async function resultFlyer(game, playoffRound = null, format = "post", color) {
-  const { logo, sponsors } = await loadAssets();
-  const { canvas, ctx, story } = newFlyer(format, color);
-  placeLogo(ctx, logo, story, { y: 24, size: 240, contentTop: 300 });
+  const [{ logo, sponsors }] = await Promise.all([loadAssets(), loadWallpaperAssets()]);
+  const mvpId = gameMvp(game); // derrota = sin MVP (ver gameMvp en js/stats.js)
+  const mvp = mvpId ? playerById(mvpId) : null;
+  const mvpPhoto = mvpId ? await loadPlayerPhoto(mvpId) : null;
+  const { canvas, ctx, story } = newFlyer(format, color, { skin: true });
+  const CH = canvas.height;
 
   const us = game.scoreUs;
   const them = game.scoreThem;
-  // VICTORIA / DERROTA en grande y a color (verde / rojo), sin píldora de
-  // fondo — es lo primero que se tiene que leer.
-  const result = us > them ? "VICTORIA" : us < them ? "DERROTA" : "EMPATE";
-  const resultColor = us > them ? WIN : us < them ? P.accentText : P.muted;
-  ctx.save();
-  ctx.shadowColor = rgba(us > them ? WIN : P.accent, P.light ? 0.25 : 0.45);
-  ctx.shadowBlur = 40;
-  text(ctx, result, W / 2, 445, { size: 190, italic: true, color: resultColor, maxWidth: W - 140 });
-  ctx.restore();
-  if (playoffRound) text(ctx, `PLAYOFFS · ${playoffRound.toUpperCase()}`, W / 2, 505, { size: 36, color: P.light ? "#a87412" : GOLD });
+  const outcome = us > them ? "W" : us < them ? "L" : "T";
+  const result = { W: "VICTORIA", L: "DERROTA", T: "EMPATE" }[outcome];
+  const when = `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`;
+  // Encabezado: "JUEGO 2 · 9NA TEMPORADA" (el número sale de los juegos de
+  // temporada regular de esa temporada, por fecha) — en playoffs, "PLAYOFFS"
+  // y abajo el nombre de la ronda en dorado.
+  const seasonText = game.season ? ` · ${ordinalTemporada(game.season).toUpperCase()} TEMPORADA` : "";
+  const regular = GAMES.filter((g) => g.season === game.season && !g.playoff).sort(
+    (a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? "")
+  );
+  const gameNo = regular.findIndex((g) => g.id === game.id) + 1;
+  const title = playoffRound ? `PLAYOFFS${seasonText}` : gameNo ? `JUEGO ${gameNo}${seasonText}` : `RESULTADO${seasonText}`;
+  const league = playoffRound ? playoffRound.toUpperCase() : (SEASONS[game.season - 1]?.league ?? TEAM.league).toUpperCase();
+  const leagueColor = playoffRound ? GOLD : P.accentText;
 
-  // Marcador: Caimanes a la izquierda, rival a la derecha.
-  const colL = W * 0.27;
-  const colR = W * 0.73;
-  text(ctx, TEAM_NAME, colL, 585, { size: 50, maxWidth: 420 });
-  text(ctx, (game.opponent ?? "Rival").toUpperCase(), colR, 585, { size: 50, maxWidth: 420 });
-  text(ctx, String(us), colL, 790, { size: 220, italic: true, color: us >= them ? P.text : P.muted });
-  text(ctx, String(them), colR, 790, { size: 220, italic: true, color: them > us ? P.text : P.muted });
-  text(ctx, "-", W / 2, 750, { size: 130, color: P.accentText });
-  text(ctx, `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`, W / 2, 855, { size: 40, color: P.muted, weight: 600 });
-
-  // Solo el MVP (a petición expresa, ya sin "figuras del juego").
-  const mvpId = gameMvp(game); // derrota = sin MVP (ver gameMvp en js/stats.js)
-  if (mvpId) {
-    const mvp = playerById(mvpId);
-    const gold = P.light ? "#a87412" : GOLD;
-    const y = 905;
-    roundRect(ctx, 170, y, W - 340, 104, 52);
-    ctx.fillStyle = rgba(GOLD, P.light ? 0.2 : 0.14);
-    ctx.fill();
-    ctx.strokeStyle = gold;
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    text(ctx, `★ MVP: ${(mvp?.name ?? mvpId).toUpperCase()}`, W / 2, y + 70, { size: 56, color: gold, maxWidth: W - 420 });
+  // ---- encabezado: logo + resultado final, fecha y liga ----
+  if (story) {
+    // Historia: logo grande al centro y los datos debajo; el resto del
+    // diseño se recorre hacia abajo.
+    drawLogo(ctx, logo, W / 2, 110, 380);
+    text(ctx, title, W / 2, 565, { size: 48, italic: true });
+    text(ctx, when, W / 2, 615, { size: 34, color: P.muted, weight: 600 });
+    text(ctx, league, W / 2, 660, { size: 32, color: leagueColor });
+    ctx.translate(0, 500);
+  } else {
+    drawLogo(ctx, logo, 130, 40, 170);
+    const rx = W - 70;
+    text(ctx, title, rx, 98, { size: 50, italic: true, align: "right", maxWidth: 640 });
+    text(ctx, when, rx, 146, { size: 32, color: P.muted, weight: 600, align: "right", maxWidth: 640 });
+    text(ctx, league, rx, 190, { size: 30, color: leagueColor, align: "right", maxWidth: 640 });
   }
 
-  drawFooter(ctx, sponsors);
+  // ---- VICTORIA / DERROTA gigante, en blanco y sin eco (a petición
+  // expresa: antes verde/rojo según el resultado y con eco en contorno) ----
+  const rSize = fitFont(ctx, result, W - 120, 210, { italic: true });
+  ctx.font = font(rSize, { italic: true });
+  ctx.textAlign = "center";
+  ctx.save();
+  ctx.shadowColor = rgba(P.accent, 0.55);
+  ctx.shadowBlur = 45;
+  ctx.fillStyle = "#fff";
+  ctx.fillText(result, W / 2, 395);
+  ctx.restore();
+
+  // ---- franja roja derecha (antes inclinada) con el marcador ----
+  ctx.save();
+  const band = document.createElement("canvas");
+  band.width = W + 200;
+  band.height = 270;
+  const bctx = band.getContext("2d");
+  const grad = bctx.createLinearGradient(0, 0, band.width, 0);
+  grad.addColorStop(0, P.accentDark);
+  grad.addColorStop(0.5, P.accent);
+  grad.addColorStop(1, P.accentDark);
+  bctx.fillStyle = grad;
+  bctx.fillRect(0, 0, band.width, band.height);
+  applySkin(bctx, 0.9);
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 40;
+  ctx.drawImage(band, -100, 443);
+  ctx.restore();
+  // Separador: línea vertical delgada entre los dos marcadores, que se
+  // desvanece en las puntas (antes una "/"; a petición expresa, más sobrio).
+  const sep = ctx.createLinearGradient(0, 468, 0, 690);
+  sep.addColorStop(0, "rgba(255, 255, 255, 0)");
+  sep.addColorStop(0.5, "rgba(255, 255, 255, 0.55)");
+  sep.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = sep;
+  ctx.fillRect(W / 2 - 2, 468, 4, 222);
+  scoreSide(ctx, "CAIMANES", us, W * 0.27, us >= them);
+  scoreSide(ctx, (game.opponent ?? "Rival").toUpperCase(), them, W * 0.73, them >= us);
+  ctx.restore();
+
+  // ---- MVP: foto grande + nombre + lo que hizo ----
+  if (mvpId) {
+    const words = (mvp?.name ?? mvpId).toUpperCase().split(" ");
+    // "AXEL MEDINA" → AXEL / MEDINA; "LUIS FERNANDO LUGO" → LUIS FERNANDO / LUGO.
+    const last = words.length > 1 ? words.pop() : "";
+    const first = words.join(" ");
+    drawSkewedPhoto(ctx, mvpPhoto, mvp?.name, 110, 782, 260, 280, 32, GOLD);
+    const tx = 440;
+    const maxW = W - tx - 70;
+    text(ctx, "★ MVP DEL JUEGO", tx, 834, { size: 40, color: GOLD, align: "left", maxWidth: maxW });
+    text(ctx, first, tx, 920, { size: 92, italic: true, align: "left", maxWidth: maxW });
+    if (last) text(ctx, last, tx, 1002, { size: 92, italic: true, align: "left", maxWidth: maxW, color: P.accentText });
+    const line = mvpLine(game, mvpId);
+    if (line) text(ctx, line, tx, 1054, { size: 32, color: P.muted, weight: 600, align: "left", maxWidth: maxW });
+  } else {
+    // Sin MVP (derrota): lo que hizo el equipo en ese juego.
+    const rows = battingTotals([game]);
+    const sum = (k) => rows.reduce((acc, r) => acc + (r[k] ?? 0), 0);
+    statTiles(
+      ctx,
+      "EL EQUIPO",
+      [
+        { value: sum("H"), label: "HITS" },
+        { value: sum("HR"), label: "HR" },
+        { value: sum("RBI"), label: "IMPULSADAS" },
+        { value: sum("SB"), label: "ROBADAS" },
+      ],
+      840
+    );
+  }
+
+  // Pie siempre pegado a la orilla de abajo (también en historia).
+  ctx.setTransform(1, 0, 0, 1, 0, CH - H);
+  drawFooter(ctx, sponsors, `${INSTAGRAM} · ${SITE}`);
   return canvas;
 }
 
