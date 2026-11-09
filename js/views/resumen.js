@@ -19,6 +19,13 @@ import { getRsvps, setRsvp, getAvatarUrl } from "../db.js";
 import { SUPABASE_CONFIGURED } from "../supabase-config.js";
 import { leadersFlyer, openFlyer, shareButton } from "../flyers.js";
 
+// "5 H", "13 juegos": el número en grande y la unidad en chico (ver
+// .value-unit en styles.css) — con el número en Teko, la unidad del mismo
+// tamaño se comía la tarjeta y se bajaba de renglón.
+function valueWithUnit(value) {
+  return String(value).replace(/^([+-]?[\d.,/:°-]+)\s+(\S.*)$/, '$1 <small class="value-unit">$2</small>');
+}
+
 const FORM_CHIP = {
   W: { letter: "W", cls: "badge-win" },
   L: { letter: "L", cls: "badge-loss" },
@@ -134,7 +141,7 @@ export function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note 
       <div class="leader-hero">
         <div class="leader-hero-main">
           <h3><i class="fa-solid ${icon}"></i>${title}</h3>
-          <span class="leader-hero-value">${valueOf(first)}</span>
+          <span class="leader-hero-value">${valueWithUnit(valueOf(first))}</span>
           <span class="leader-hero-name">${escapeHtml(first.name)}</span>
           ${detailOf ? `<span class="leader-hero-detail">${detailOf(first)}</span>` : ""}
         </div>
@@ -503,7 +510,7 @@ export function renderRecordCards(container, records) {
         <div class="record-hero">
           <div class="record-hero-main">
             <span class="record-label"><i class="fa-solid ${r.icon}"></i>${r.label}</span>
-            <span class="record-value">${r.value}</span>
+            <span class="record-value">${valueWithUnit(r.value)}</span>
             <span class="record-detail">${r.detail}</span>
             <span class="record-note">${r.note}</span>
           </div>

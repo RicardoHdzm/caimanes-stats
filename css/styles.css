@@ -2387,6 +2387,17 @@ main h3::before {
   color: var(--text);
 }
 
+/* Unidad junto al número ("5 H", "13 juegos"): en chico y en Barlow. */
+.value-unit {
+  margin-left: 0.1em;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* El "vs" del próximo juego no es número: se queda en Barlow. */
 .leader-hero-value--text {
   font-family: var(--font-display);
