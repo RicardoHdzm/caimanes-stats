@@ -8114,9 +8114,36 @@ a.home-sponsor-card:hover {
   }
 }
 
-/* Los otros destacados del juego, en chico debajo del MVP. */
+/* Los otros destacados del juego, en chico: a la derecha del MVP en
+   escritorio (a petición expresa), uno sobre otro; debajo en pantallas
+   más angostas. */
+.home-mvp-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: stretch;
+  gap: 18px;
+}
+
 .home-mvp-others {
-  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.home-mvp-layout .home-mvp-others-grid {
+  flex: 1;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+}
+
+@media (max-width: 1100px) {
+  .home-mvp-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .home-mvp-layout .home-mvp-others-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+  }
 }
 
 .home-mvp-others-title {
@@ -8199,7 +8226,7 @@ a.home-sponsor-card:hover {
 }
 
 @media (max-width: 900px) {
-  .home-mvp-others-grid {
+  .home-mvp-layout .home-mvp-others-grid {
     grid-template-columns: 1fr;
   }
 }

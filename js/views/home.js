@@ -469,6 +469,7 @@ export function renderHome(container) {
     mvpSection.className = "home-section";
     mvpSection.innerHTML = `
       ${sectionHead("MVP del", "juego", "MVP", escapeHtml(gameTag(mvpGame)))}
+      <div class="home-mvp-layout">
       <div class="home-mvp">
         ${mvpPlayer.number ? `<span class="home-mvp-ghost" aria-hidden="true">${mvpPlayer.number}</span>` : ""}
         <a class="home-mvp-photo" href="#/jugador/${mvpPlayer.id}" aria-label="Perfil de ${escapeHtml(mvpPlayer.name)}">${renderAvatar(mvpPlayer, 300)}</a>
@@ -484,6 +485,7 @@ export function renderHome(container) {
         </div>
       </div>
       ${othersHtml}
+      </div>
     `;
     root.appendChild(mvpSection);
   }
