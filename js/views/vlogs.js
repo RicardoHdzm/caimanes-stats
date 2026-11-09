@@ -1,4 +1,4 @@
-// CaimaCam (antes "Vlogs"): los videos de YouTube de los juegos. No hay
+// Caimavlogs (antes "Vlogs"): los videos de YouTube de los juegos. No hay
 // lista aparte — sale de GAMES: todo juego con `vlogUrl` (ver data.js) es un
 // vlog. El número (#001, #002…) va por fecha, el más viejo es el #001, y la
 // página los muestra del más nuevo al más viejo.
@@ -60,13 +60,13 @@ function vlogCard({ game, number, videoId }) {
 }
 
 export function renderVlogs(container) {
-  heading(container, "CaimaCam");
+  heading(container, "Caimavlogs");
 
   const vlogs = vlogGames().reverse();
   const grid = document.createElement("div");
   grid.className = "vlog-grid";
   grid.innerHTML = vlogs.length
     ? vlogs.map(vlogCard).join("")
-    : '<p class="subtitle">Todavía no hay videos en CaimaCam. Pronto, desde la banca.</p>';
+    : '<p class="subtitle">Todavía no hay vlogs. Pronto, desde la banca.</p>';
   container.appendChild(grid);
 }

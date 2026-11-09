@@ -42,7 +42,7 @@ const routes = {
   records: renderRecords,
   playlist: renderPlaylist,
   fanzone: renderFanzone,
-  caimacam: renderVlogs,
+  caimavlogs: renderVlogs,
 };
 
 // Barra de pestañas de abajo (solo celular — ver @media en styles.css). La
@@ -69,7 +69,7 @@ const MORE_TABS = [
   { tab: "records", route: "#/records", label: "Récords", icon: "fa-crown" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
   { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
-  { tab: "caimacam", route: "#/caimacam", label: "CaimaCam", icon: "fa-video" },
+  { tab: "caimavlogs", route: "#/caimavlogs", label: "Caimavlogs", icon: "fa-video" },
 ];
 
 // El menú ☰ (pantalla completa) es el mapa completo del sitio: arriba
@@ -86,7 +86,7 @@ const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
   { label: "Stats", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
-  { label: "Multimedia", tabs: ["playlist", "fanzone", "caimacam"] },
+  { label: "Multimedia", tabs: ["playlist", "fanzone", "caimavlogs"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 
 function appTile(t) {
@@ -129,10 +129,10 @@ function renderNotFound(container) {
 function currentRoute() {
   const hash = location.hash.replace(/^#\//, "");
   const [first, second, third] = hash.split("/");
-  // "Vlogs" se llama ahora CaimaCam (a petición expresa): el link viejo
+  // "Vlogs" se llama ahora Caimavlogs (a petición expresa): el link viejo
   // #/vlogs sigue abriendo la misma página.
   if (first === "vlogs") {
-    return { tab: "caimacam", render: routes.caimacam };
+    return { tab: "caimavlogs", render: routes.caimavlogs };
   }
   if (first === "juegos" && second) {
     return { tab: "juegos", render: (container) => renderJuegoDetalle(container, second) };
