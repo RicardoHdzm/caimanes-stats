@@ -92,12 +92,30 @@ function loadImage(src) {
   });
 }
 
+// Números de los flyers en Teko, la misma letra de los números del sitio
+// (a petición expresa; antes Legend M54, que se quedó solo en los
+// wallpapers). La declara css/styles.css; si la página no la trae (o no
+// cargó), se agrega aquí desde el mismo archivo.
+const NUM_FONT = '"Teko", "Barlow Condensed", "Arial Narrow", sans-serif';
+async function loadNumberFont() {
+  try {
+    await document.fonts.load('600 40px "Teko"');
+    if (document.fonts.check('600 40px "Teko"')) return;
+    const face = new FontFace("Teko", `url("${asset("assets/fonts/teko-600.woff2")}")`, { weight: "400 700" });
+    await face.load();
+    document.fonts.add(face);
+  } catch {
+    // Sin la fuente se dibuja con Barlow Condensed (respaldo de NUM_FONT).
+  }
+}
+
 let assetsPromise = null;
 function loadAssets() {
   assetsPromise ??= (async () => {
-    await Promise.all(
-      ["600 40px", "700 40px", "italic 700 40px"].map((spec) => document.fonts?.load(`${spec} ${FONT}`).catch(() => null))
-    );
+    await Promise.all([
+      ...["600 40px", "700 40px", "italic 700 40px"].map((spec) => document.fonts?.load(`${spec} ${FONT}`).catch(() => null)),
+      loadNumberFont(),
+    ]);
     const [logo, ...sponsors] = await Promise.all([
       loadImage(asset("assets/logo.png")),
       ...SPONSORS.map((s) => loadImage(asset(s.logo))),
@@ -356,8 +374,10 @@ function fadeLine(ctx, x, y1, y2) {
   ctx.fillRect(x - 2, y1, 4, y2 - y1);
 }
 
+// Teko se ve ~30% más chica que la fuente de jersey al mismo tamaño: los
+// tamaños de abajo se pensaron para aquella, así que aquí se escalan.
 function jerseyFont(size) {
-  return `${size}px ${JERSEY_FONT}`;
+  return `600 ${Math.round(size * 1.3)}px ${NUM_FONT}`;
 }
 
 // Texto en la fuente de jersey, achicado hasta caber en maxWidth.
@@ -433,18 +453,17 @@ export async function nextGameFlyer(game, format = "post", color) {
 
   bigTitle(ctx, "PRÓXIMO JUEGO", 395, 180);
 
-  // Franja con los dos equipos en la fuente de jersey y "VS" al centro.
+  // Franja con los dos equipos y "VS" al centro.
   redBand(ctx, 443, 270);
-  jerseyText(ctx, "CAIMANES", W * 0.27, 610, { size: 120, maxWidth: 400 });
-  jerseyText(ctx, (game.opponent ?? "RIVAL").toUpperCase(), W * 0.73, 610, { size: 120, maxWidth: 400 });
+  text(ctx, "CAIMANES", W * 0.27, 612, { size: 100, italic: true, color: "#fff", maxWidth: 400 });
+  text(ctx, (game.opponent ?? "RIVAL").toUpperCase(), W * 0.73, 612, { size: 100, italic: true, color: "#fff", maxWidth: 400 });
   fadeLine(ctx, W / 2, 462, 548);
   fadeLine(ctx, W / 2, 610, 696);
   text(ctx, "VS", W / 2, 598, { size: 52, italic: true, color: "#fff" });
 
   // Día y hora, grandes.
   text(ctx, formatDate(game.date), W / 2, 850, { size: 78, italic: true, maxWidth: W - 140 });
-  // La hora en Barlow: la fuente de jersey no trae ":".
-  if (game.time) text(ctx, formatTime(game.time), W / 2, 1030, { size: 160, italic: true, color: P.accentText, maxWidth: W - 200 });
+  if (game.time) jerseyText(ctx, formatTime(game.time), W / 2, 1040, { size: 140, color: P.accentText, shadow: false, maxWidth: W - 200 });
 
   drawFooter(ctx, sponsors, CH);
   return canvas;
@@ -517,18 +536,21 @@ export async function lineupFlyer(order, game = null, format = "post", color) {
 
 // ---- resultado de un juego ----
 
-// Foto (o iniciales) recortada en un paralelogramo — `skew` = cuánto se
-// recorre la orilla de arriba a la derecha.
+// Foto (o iniciales) como en el perfil del sitio (a petición expresa; antes
+// en paralelogramo): rectángulo con esquinas redondeadas, marco de color y
+// un brillo del mismo color. Ocupa de `x` a `x + w + skew` (el ancho de
+// antes, para no mover lo que va alrededor).
 function drawSkewedPhoto(ctx, img, name, x, y, w, h, skew, border) {
-  const path = () => {
-    ctx.beginPath();
-    ctx.moveTo(x + skew, y);
-    ctx.lineTo(x + w + skew, y);
-    ctx.lineTo(x + w, y + h);
-    ctx.lineTo(x, y + h);
-    ctx.closePath();
-  };
   const bw = w + skew;
+  const radius = Math.round(Math.min(bw, h) * 0.08);
+  const path = () => roundRect(ctx, x, y, bw, h, radius);
+  ctx.save();
+  ctx.shadowColor = rgba(border, 0.45);
+  ctx.shadowBlur = 36;
+  path();
+  ctx.fillStyle = border;
+  ctx.fill();
+  ctx.restore();
   ctx.save();
   path();
   ctx.clip();
