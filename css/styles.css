@@ -108,7 +108,7 @@
      --skin-line, así cada tema elige el suyo. Perillas: --skin-line (subir
      el alfa la marca más) y --skin-size (tamaño de las escamas). */
   --skin-texture: url("../assets/textures/croc-skin.png");
-  --skin-size: 448px;
+  --skin-size: 640px;
   --skin-line: rgba(74, 158, 255, 0.09);
 
   /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
