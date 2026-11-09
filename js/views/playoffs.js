@@ -59,6 +59,7 @@ export function renderPlayoffEntry(container, entry) {
     const card = document.createElement("div");
     card.className = "leader-card player-standalone-card playoff-round-card";
     card.innerHTML = `
+      <i class="fa-solid fa-trophy leader-hero-watermark" aria-hidden="true"></i>
       <h3>${round.name}${round.isFinal ? ' <span class="badge badge-win">Final</span>' : ""}</h3>
       <p class="subtitle">vs ${round.opponent} · Serie ${ourWins}-${theirWins} · ${ROUND_STATUS_LABEL[status]}</p>
       <div class="playoff-games-list">${gamesHtml}</div>

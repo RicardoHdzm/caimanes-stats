@@ -8896,3 +8896,61 @@ a.home-sponsor-card:hover {
     font-size: 1.15rem;
   }
 }
+
+/* ---- Mismo estilo de tarjeta en más lugares (a petición expresa) ----
+   Inicio ("La temporada en números") y las rondas de Playoffs: brillo rojo
+   en la esquina, ícono enorme de fondo (.leader-hero-watermark) y efecto al
+   pasar el mouse. Historial de juegos (Inicio) y próximos juegos
+   (Calendario): solo brillo y efecto — ya llevan logos y marcadores. El
+   selector Bateo/Pitcheo/Fildeo: el ícono sube y brilla. */
+.home-card,
+.playoff-round-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(280px 170px at 0% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+    var(--surface);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.home-card > *:not(.leader-hero-watermark),
+.playoff-round-card > *:not(.leader-hero-watermark) {
+  position: relative;
+  z-index: 1;
+}
+
+.home-match,
+.ticket {
+  background:
+    radial-gradient(260px 160px at 0% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    var(--surface);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.home-card:hover,
+.playoff-round-card:hover,
+.home-match:hover,
+.ticket:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-top-color: var(--accent);
+  box-shadow: 0 18px 36px -16px var(--accent-glow);
+}
+
+/* El historial de juegos y los próximos juegos conservan su raya roja de
+   la izquierda al pasar el mouse. */
+.ticket:hover {
+  border-left-color: var(--accent);
+}
+
+.home-card:hover .leader-hero-watermark,
+.playoff-round-card:hover .leader-hero-watermark {
+  opacity: 0.08;
+  transform: rotate(-4deg) scale(1.06);
+}
+
+.stats-switcher-btn:hover .stats-switcher-icon {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 12px 24px -10px var(--accent-glow);
+}

@@ -441,6 +441,7 @@ export function renderHome(container) {
       ${sectionHead("La temporada", "en números", "STATS", `${ordinalTemporada(ref)} Temporada · ${escapeHtml(meta?.league ?? "")}`)}
       <div class="home-cards">
         <article class="home-card">
+          <i class="fa-solid fa-trophy leader-hero-watermark" aria-hidden="true"></i>
           <span class="home-card-kicker">${escapeHtml(meta?.league ?? "")} · ${ordinalTemporada(ref)} Temporada</span>
           <h3 class="home-card-title">Récord <span class="home-card-num">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</span></h3>
           <ul class="home-card-list">
@@ -451,6 +452,7 @@ export function renderHome(container) {
           <a class="home-card-link" href="#/temporadas/${ref}">Ver temporada →</a>
         </article>
         <article class="home-card">
+          <i class="fa-solid fa-baseball-bat-ball leader-hero-watermark" aria-hidden="true"></i>
           <span class="home-card-kicker">Bateo · mejor OPS</span>
           <h3 class="home-card-title">Top bateadores</h3>
           <ul class="home-card-list home-card-list--rank">
@@ -459,6 +461,7 @@ export function renderHome(container) {
           <a class="home-card-link" href="#/temporadas/${ref}/destacados">Ver top 5 →</a>
         </article>
         <article class="home-card">
+          <i class="fa-solid fa-star leader-hero-watermark" aria-hidden="true"></i>
           <span class="home-card-kicker">MVP del juego</span>
           <h3 class="home-card-title">Más veces MVP</h3>
           <ul class="home-card-list home-card-list--rank">
