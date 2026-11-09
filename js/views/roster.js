@@ -37,7 +37,7 @@ function playerPositions(player) {
 
 // Tarjeta de un jugador tipo barajita (a petición expresa): al frente su foto
 // de protagonista; al tocarla se voltea y atrás trae sus números de la
-// temporada, con el botón para ir a su perfil. El 0 en data.js es "todavía
+// temporada (6 fichas), con el botón para ir a su perfil. El 0 en data.js es "todavía
 // sin número", no se pinta. `data-avatar` va en su propio elemento porque
 // hydrateAvatars() reemplaza su contenido, y las posiciones, el número y el
 // nombre van encima de la foto. `stats`: { bat, pit } de la temporada.
@@ -47,14 +47,16 @@ function rosterCard(player, duesMap, stats) {
   const games = `<i class="${player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : ""}">${player.gamesPlayed}</i>/${TEAM.gamesInSeason}`;
   const tile = (value, label) => `<span class="roster-back-tile"><b>${value}</b><span>${label}</span></span>`;
   const { bat, pit } = stats;
+  // Siempre 6 fichas (con 9 no cabían en las tarjetas chicas del celular):
+  // juegos, AVG y hits para todos; luego HR/impulsadas/robadas, o
+  // entradas/ponches/récord si lanzó esta temporada.
   const tiles = [
     tile(player.gamesPlayed, "Juegos"),
     tile(bat?.AVG ?? ".000", "AVG"),
     tile(bat?.H ?? 0, "Hits"),
-    tile((bat?.HR ?? 0) + (bat?.HRC ?? 0), "HR"),
-    tile(bat?.RBI ?? 0, "Impulsadas"),
-    tile(bat?.SB ?? 0, "Robadas"),
-    ...(pit ? [tile(pit.IP, "Entradas"), tile(pit.SO, "Ponches"), tile(`${pit.W}-${pit.L}`, "Récord")] : []),
+    ...(pit
+      ? [tile(pit.IP, "Entradas"), tile(pit.SO, "Ponches"), tile(`${pit.W}-${pit.L}`, "Récord")]
+      : [tile((bat?.HR ?? 0) + (bat?.HRC ?? 0), "HR"), tile(bat?.RBI ?? 0, "Impulsadas"), tile(bat?.SB ?? 0, "Robadas")]),
   ];
   return `
     <div class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" data-player="${player.id}">
