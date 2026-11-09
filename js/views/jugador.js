@@ -798,7 +798,8 @@ export function renderJugadorDetalle(container, playerId) {
   // sigue usando para el editor de posiciones y como respaldo.
   const shownPositions = (registered) => {
     const shown = displayPositions(player.id, registered, { withDH: true });
-    return shown ? renderPositionBadges(shown) : "";
+    // En el perfil, con su nombre completo ("Shortstop", no "SS").
+    return shown ? renderPositionBadges(shown, { full: true }) : "";
   };
   // Bio + cumpleaños del perfil social (player_profiles), ya precargados
   // (ver preloadProfiles) — se leen SÍNCRONO, sin swap. `profile` puede ser

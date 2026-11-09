@@ -172,21 +172,41 @@ function positionBadgeClass(code) {
   return "";
 }
 
-export function renderPositionBadge(value) {
+// Nombre completo de cada posición (el perfil las muestra así, a petición
+// expresa; el resto del sitio sigue con la abreviatura).
+export const POSITION_NAMES = {
+  P: "Pitcher",
+  C: "Catcher",
+  "1B": "Primera base",
+  "2B": "Segunda base",
+  "3B": "Tercera base",
+  SS: "Shortstop",
+  LF: "Jardín izquierdo",
+  CF: "Jardín central",
+  RF: "Jardín derecho",
+  JD: "Jugador designado",
+  JC: "Jugador de cortesía",
+  DH: "Bateador designado",
+  UTIL: "Utility",
+};
+
+// `full`: el nombre completo en vez de la abreviatura (mismo color de badge).
+export function renderPositionBadge(value, { full = false } = {}) {
   if (!value) return "";
-  return `<span class="pos-badge ${positionBadgeClass(value)}">${value}</span>`;
+  const label = full ? (POSITION_NAMES[value] ?? value) : value;
+  return `<span class="pos-badge ${positionBadgeClass(value)}" title="${POSITION_NAMES[value] ?? value}">${label}</span>`;
 }
 
 // Un jugador puede jugar hasta 3 posiciones en el mismo juego (ej. "2B/SS").
 // Convierte ese string en uno o varios pos-badge, uno por posición.
-export function renderPositionBadges(value) {
+export function renderPositionBadges(value, opts) {
   if (!value) return "";
   return value
     .split("/")
     .map((v) => v.trim())
     .filter(Boolean)
     .slice(0, 3)
-    .map((v) => renderPositionBadge(v))
+    .map((v) => renderPositionBadge(v, opts))
     .join(" ");
 }
 
