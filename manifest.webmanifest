@@ -1,7 +1,7 @@
 {
-  "name": "Caimanes de Villas — Stats",
+  "name": "Caimanes de Villas",
   "short_name": "Caimanes",
-  "description": "Estadísticas de los Caimanes de Villas: roster, bateo, pitcheo, fildeo, calendario y resultados de la temporada.",
+  "description": "Caimanes de Villas, equipo de softbol de Culiacán en la Liga Valle Alto: roster, estadísticas, resultados, Power Ranking, vlogs y wallpapers.",
   "lang": "es-MX",
   "dir": "ltr",
   "start_url": "./",
