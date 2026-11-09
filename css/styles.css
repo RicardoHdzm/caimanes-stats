@@ -7698,10 +7698,9 @@ a.home-sponsor-card:hover {
   width: 54px;
   height: 5px;
   margin-bottom: 5px;
+  border-radius: var(--radius-pill);
   background: var(--accent);
   box-shadow: 0 0 12px var(--accent-glow);
-  transform: skewX(-24deg);
-  transform-origin: left;
 }
 
 .roster-card-name {
@@ -7863,99 +7862,10 @@ a.home-sponsor-card:hover {
 }
 
 /* ==========================================================================
-   Identidad (a petición expresa): botones con corte diagonal, próximos
-   juegos en Calendario y transición entre páginas.
+   Identidad (a petición expresa): próximos juegos en Calendario y
+   transición entre páginas. (Los botones con corte diagonal se quitaron:
+   todo el sitio va con esquinas redondeadas.)
    ========================================================================== */
-
-/* ---- Botones y filtros con corte diagonal ----
-   La forma la dibuja un ::before inclinado (skew) que HEREDA el fondo y el
-   borde del botón — así cada botón conserva sus colores y sus :hover/.active
-   sin reescribirlos. El fondo propio del botón se recorta al texto
-   (background-clip: text, queda tapado por las letras) y su borde se vuelve
-   transparente: lo que se ve es solo la forma inclinada. */
-.home-btn,
-.pos-filter-chip,
-.back-link,
-.share-flyer-btn:not(.home-next-share),
-.flyer-btn,
-.flyer-format,
-.replay-btn,
-.roster-back-link,
-.win-toast-link {
-  position: relative;
-  isolation: isolate;
-  border-color: transparent !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.home-btn::before,
-.pos-filter-chip::before,
-.back-link::before,
-.share-flyer-btn:not(.home-next-share)::before,
-.flyer-btn::before,
-.flyer-format::before,
-.replay-btn::before,
-.roster-back-link::before,
-.win-toast-link::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border: 1px solid;
-  border-radius: 3px;
-  transform: skewX(-14deg);
-  pointer-events: none;
-}
-
-/* El fondo y el color del borde: los del botón (con su :hover/.active). */
-.home-btn::before,
-.pos-filter-chip::before,
-.back-link::before,
-.share-flyer-btn:not(.home-next-share)::before,
-.flyer-btn::before,
-.flyer-format::before,
-.replay-btn::before,
-.roster-back-link::before,
-.win-toast-link::before {
-  background: inherit;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-}
-
-/* El color del borde se toma de --cut-border (el borde real del botón ya es
-   transparente). */
-.home-btn::before {
-  border-color: var(--cut-border, var(--border));
-}
-.home-btn--solid {
-  --cut-border: var(--accent);
-}
-.home-btn--solid::before {
-  box-shadow: 0 10px 26px -10px var(--accent-glow);
-}
-.pos-filter-chip::before,
-.back-link::before,
-.flyer-btn::before {
-  border-color: var(--cut-border, var(--border));
-}
-.pos-filter-chip.active {
-  --cut-border: var(--accent);
-}
-.back-link:hover {
-  --cut-border: var(--accent);
-}
-.share-flyer-btn:not(.home-next-share)::before {
-  border-color: var(--accent);
-}
-.flyer-format::before,
-.replay-btn::before,
-.roster-back-link::before,
-.win-toast-link::before {
-  border-color: transparent;
-}
 
 /* ---- Próximos juegos (ver ticketsHtml en calendario.js) ----
    Tarjeta normal (antes en forma de boleto con muescas y línea perforada;
@@ -8390,7 +8300,7 @@ a.home-sponsor-card:hover {
   color: var(--text);
 }
 
-/* Raya roja inclinada bajo la pestaña activa. */
+/* Raya roja bajo la pestaña activa. */
 .profile-tab.active {
   color: var(--text);
 }
@@ -8402,8 +8312,8 @@ a.home-sponsor-card:hover {
   right: 12px;
   bottom: -1px;
   height: 4px;
+  border-radius: var(--radius-pill);
   background: var(--accent);
-  transform: skewX(-24deg);
 }
 
 .profile-pane[hidden] {
@@ -8418,12 +8328,17 @@ a.home-sponsor-card:hover {
 /* ---- Stats de la temporada como hoja de números ----
    Valores grandes con su etiqueta, separados por líneas finas (como la
    parte de atrás de una barajita), en vez de tarjetas con íconos. */
+/* Esquinas redondeadas como el resto: las líneas entre números son el
+   fondo del contenedor asomando por un gap de 1px. */
 .stat-sheet {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
   margin-bottom: 8px;
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--border);
 }
 
 .sheet-cell {
@@ -8432,8 +8347,7 @@ a.home-sponsor-card:hover {
   flex-direction: column;
   gap: 6px;
   padding: 22px 18px 18px;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .sheet-value {
