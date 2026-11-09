@@ -6170,7 +6170,7 @@ h2.page-title {
   justify-content: center;
   padding: 13px 26px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text);
   font-family: var(--font-display);
