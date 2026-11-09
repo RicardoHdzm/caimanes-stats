@@ -18,6 +18,7 @@ import {
 import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime } from "../ui.js";
 import { suggestedStarters } from "../lineup.js";
 import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
+import { powerRankingTopHtml } from "./powerranking.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 
@@ -395,6 +396,15 @@ export function renderHome(container) {
     </div>
   `;
   root.appendChild(games);
+
+  // ---- Power Ranking: top 5 (ver js/views/powerranking.js) ----
+  const prHtml = powerRankingTopHtml();
+  if (prHtml) {
+    const pr = document.createElement("section");
+    pr.className = "home-section";
+    pr.innerHTML = `${sectionHead("Power", "Ranking", "TOP 5", `${ordinalTemporada(CURRENT_SEASON)} Temporada · quién viene más fuerte`)}${prHtml}`;
+    root.appendChild(pr);
+  }
 
   // ---- La temporada en números ----
   const ref = referenceSeason();

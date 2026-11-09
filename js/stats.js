@@ -754,3 +754,97 @@ export function teamFieldingTotals(games = GAMES) {
   const chances = PO + A + E;
   return { PO, A, E, FPCT: fmt3(div(PO + A, chances)) };
 }
+
+// ---- Power Ranking ----
+//
+// Quién viene más fuerte AHORA (a petición expresa) — no quién tiene las
+// mejores stats acumuladas (para eso están Líderes y Récords). Se recalcula
+// solo con cada juego capturado.
+//
+// 1) Aporte por juego (gameImpact): bateo — hit +1, doble +1 extra, triple
+//    +2 extra, HR (o HR de campo) +3 extra, impulsada +1, carrera / robada /
+//    base por bolas +0.5, ponche −0.5; fildeo — asistencia +0.25, error −1;
+//    pitcheo — +0.5 por entrada, victoria +2, salvamento +1, carrera limpia
+//    −0.5; MVP oficial del juego +2.
+// 2) Puntuación 0-100: 60% forma reciente (promedio de sus últimos 4 juegos,
+//    el más reciente pesa 40/30/20/10) + 30% su promedio de toda la
+//    temporada — los dos escalados contra el mejor del equipo — + 10%
+//    asistencia (juegos jugados de los capturados).
+// 3) Para entrar hay que haber jugado al menos 2 juegos de la temporada (o
+//    los que haya, si todavía van menos de 2).
+// El movimiento (▲/▼) compara contra el ranking SIN el último juego.
+export const POWER_WEIGHTS = { form: 0.6, season: 0.3, attendance: 0.1 };
+const FORM_WEIGHTS = [0.4, 0.3, 0.2, 0.1];
+
+const byGameDate = (a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? "");
+
+// Aporte de cada jugador en un juego → Map(playerId → puntos). Solo
+// aparecen quienes jugaron (bateo, pitcheo o fildeo).
+export function gameImpact(game) {
+  const pts = new Map();
+  const add = (id, n) => pts.set(id, (pts.get(id) ?? 0) + n);
+  for (const b of game.batting ?? []) {
+    const hr = (b.HR ?? 0) + (b.HRC ?? 0);
+    add(
+      b.playerId,
+      (b.H ?? 0) + (b["2B"] ?? 0) + 2 * (b["3B"] ?? 0) + 3 * hr + (b.RBI ?? 0) + 0.5 * ((b.R ?? 0) + (b.SB ?? 0) + (b.BB ?? 0)) - 0.5 * (b.SO ?? 0)
+    );
+  }
+  for (const f of game.fielding ?? []) add(f.playerId, 0.25 * (f.A ?? 0) - (f.E ?? 0));
+  for (const p of game.pitching ?? []) {
+    const decision = p.decision === "W" ? 2 : p.decision === "SV" ? 1 : 0;
+    add(p.playerId, 0.5 * (ipToOuts(p.IP ?? 0) / 3) + decision - 0.5 * (p.ER ?? 0));
+  }
+  const mvp = gameMvp(game);
+  if (mvp && pts.has(mvp)) add(mvp, 2);
+  return pts;
+}
+
+function rankFromGames(games) {
+  const ordered = [...games].sort(byGameDate);
+  const perPlayer = new Map(); // id → [{ game, pts }] en orden
+  for (const g of ordered) {
+    for (const [id, pts] of gameImpact(g)) {
+      if (!perPlayer.has(id)) perPlayer.set(id, []);
+      perPlayer.get(id).push({ game: g, pts });
+    }
+  }
+  const minGames = Math.min(2, ordered.length);
+  const rows = [];
+  for (const [playerId, list] of perPlayer) {
+    if (list.length < minGames || !PLAYERS.some((p) => p.id === playerId)) continue;
+    const recent = list.slice(-4).reverse();
+    const used = FORM_WEIGHTS.slice(0, recent.length);
+    const form = recent.reduce((sum, r, i) => sum + r.pts * used[i], 0) / used.reduce((a, b) => a + b, 0);
+    const seasonAvg = list.reduce((sum, r) => sum + r.pts, 0) / list.length;
+    rows.push({ playerId, name: playerName(playerId), games: list.length, form, seasonAvg, last: list[list.length - 1] });
+  }
+  const maxForm = Math.max(0.0001, ...rows.map((r) => r.form));
+  const maxSeason = Math.max(0.0001, ...rows.map((r) => r.seasonAvg));
+  for (const r of rows) {
+    const formPct = Math.max(0, r.form) / maxForm;
+    const seasonPct = Math.max(0, r.seasonAvg) / maxSeason;
+    const attendance = ordered.length ? r.games / ordered.length : 0;
+    r.score = Math.round(100 * (POWER_WEIGHTS.form * formPct + POWER_WEIGHTS.season * seasonPct + POWER_WEIGHTS.attendance * attendance));
+  }
+  rows.sort((a, b) => b.score - a.score || b.form - a.form || a.name.localeCompare(b.name));
+  rows.forEach((r, i) => (r.rank = i + 1));
+  return rows;
+}
+
+// Ranking de la temporada (regular + playoffs). Cada fila: { playerId, name,
+// rank, score (0-100), games, form, seasonAvg, last: { game, pts }, prevRank
+// (null si no estaba), move (lugares que subió; negativo = bajó) }.
+// `early`: true si van menos de 4 juegos (el ranking todavía brinca mucho).
+export function powerRanking(season = CURRENT_SEASON) {
+  const games = seasonStatGames(season).filter((g) => g.date);
+  const now = rankFromGames(games);
+  const ordered = [...games].sort(byGameDate);
+  const prev = ordered.length > 1 ? rankFromGames(ordered.slice(0, -1)) : [];
+  const prevRank = new Map(prev.map((r) => [r.playerId, r.rank]));
+  for (const r of now) {
+    r.prevRank = prevRank.get(r.playerId) ?? null;
+    r.move = r.prevRank == null ? null : r.prevRank - r.rank;
+  }
+  return { rows: now, gamesCount: ordered.length, lastGame: ordered[ordered.length - 1] ?? null, early: ordered.length < 4 };
+}
