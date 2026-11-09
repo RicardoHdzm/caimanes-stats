@@ -320,7 +320,7 @@ export function renderJuegoDetalle(container, gameId) {
   const { game, playoffContext } = findGame(gameId);
 
   if (!game) {
-    heading(container, "Juego no encontrado");
+    heading(container, "Ese juego no está en la libreta");
     const back = document.createElement("a");
     back.href = "#/juegos";
     back.className = "back-link";

@@ -234,7 +234,7 @@ export function renderFeed(container) {
           .slice(0, MAX_ITEMS)
           .map((it) => `<article class="feed-item feed-item--${it.kind}">${it.html}</article>`)
           .join("")
-      : '<p class="subtitle">Todavía no hay nada en el muro.</p>';
+      : '<p class="subtitle">El muro está tranquilo… por ahora. ¡Estrénalo!</p>';
 
     hydrateAvatars(listEl);
   }

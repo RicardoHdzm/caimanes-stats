@@ -1,5 +1,5 @@
-import { ROSTER, TEAM } from "../data.js";
-import { gamesPlayedByPlayer, currentSeasonGames, displayPositions } from "../stats.js";
+import { ROSTER, TEAM, CURRENT_SEASON } from "../data.js";
+import { gamesPlayedByPlayer, currentSeasonGames, displayPositions, seasonStatGames, battingTotals, pitchingTotals } from "../stats.js";
 import { heading, renderAvatar, renderGlossary, escapeHtml, ordinalTemporada } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getDuesMap, cachedPositionOverrides } from "../db.js";
@@ -35,30 +35,59 @@ function playerPositions(player) {
   return (player.position ?? "").split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-// Tarjeta de un jugador con su foto de protagonista; toda la tarjeta lleva a
-// su perfil. El 0 en data.js es "todavía sin número", no se pinta. `data-avatar`
-// va en su propio elemento porque hydrateAvatars() reemplaza su contenido, y
-// las posiciones, el número y el nombre van encima de la foto.
-function rosterCard(player, duesMap) {
+// Tarjeta de un jugador tipo barajita (a petición expresa): al frente su foto
+// de protagonista; al tocarla se voltea y atrás trae sus números de la
+// temporada, con el botón para ir a su perfil. El 0 en data.js es "todavía
+// sin número", no se pinta. `data-avatar` va en su propio elemento porque
+// hydrateAvatars() reemplaza su contenido, y las posiciones, el número y el
+// nombre van encima de la foto. `stats`: { bat, pit } de la temporada.
+function rosterCard(player, duesMap, stats) {
   const paid = duesMap.get(player.id) ?? false;
   const stat = (value, label) => `<span class="roster-card-stat"><b>${value}</b><span>${label}</span></span>`;
   const games = `<i class="${player.gamesPlayed >= PLAYOFF_MIN_GAMES ? "stat-green" : ""}">${player.gamesPlayed}</i>/${TEAM.gamesInSeason}`;
+  const tile = (value, label) => `<span class="roster-back-tile"><b>${value}</b><span>${label}</span></span>`;
+  const { bat, pit } = stats;
+  const tiles = [
+    tile(player.gamesPlayed, "Juegos"),
+    tile(bat?.AVG ?? ".000", "AVG"),
+    tile(bat?.H ?? 0, "Hits"),
+    tile((bat?.HR ?? 0) + (bat?.HRC ?? 0), "HR"),
+    tile(bat?.RBI ?? 0, "Impulsadas"),
+    tile(bat?.SB ?? 0, "Robadas"),
+    ...(pit ? [tile(pit.IP, "Entradas"), tile(pit.SO, "Ponches"), tile(`${pit.W}-${pit.L}`, "Récord")] : []),
+  ];
   return `
-    <a class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" href="#/jugador/${player.id}">
-      <span class="roster-card-photo">
-        <span class="roster-card-img" data-avatar="${player.id}" data-size="280">${renderAvatar(player, 280)}</span>
-        <span class="roster-card-positions">${playerPositions(player).map((pos) => `<span>${pos}</span>`).join("")}</span>
-        ${player.number ? `<span class="roster-card-number">${player.number}</span>` : ""}
-        <span class="roster-card-who">
-          <span class="roster-card-name">${escapeHtml(player.name)}</span>
-          <span class="roster-card-seasons">${playerSeasonLabel(player)}</span>
-        </span>
-      </span>
-      <span class="roster-card-stats">
-        ${stat(paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
-        ${stat(games, "Apariciones")}
-      </span>
-    </a>`;
+    <div class="roster-card${player.id === getCurrentPlayerId() ? " roster-card--you" : ""}" data-player="${player.id}">
+      <div class="roster-card-inner">
+        <div class="roster-card-face roster-card-front" role="button" tabindex="0" aria-label="Ver los números de ${escapeHtml(player.name)}">
+          <span class="roster-card-photo">
+            <span class="roster-card-img" data-avatar="${player.id}" data-size="280">${renderAvatar(player, 280)}</span>
+            <span class="roster-card-positions">${playerPositions(player).map((pos) => `<span>${pos}</span>`).join("")}</span>
+            ${player.number ? `<span class="roster-card-number">${player.number}</span>` : ""}
+            <span class="roster-card-who">
+              <span class="roster-card-name">${escapeHtml(player.name)}</span>
+              <span class="roster-card-seasons">${playerSeasonLabel(player)}</span>
+            </span>
+            <span class="roster-card-flip-hint" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
+          </span>
+          <span class="roster-card-stats">
+            ${stat(paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
+            ${stat(games, "Apariciones")}
+          </span>
+        </div>
+        <div class="roster-card-face roster-card-back" aria-hidden="true">
+          <div class="roster-back-head">
+            ${player.number ? `<span class="roster-back-number">${player.number}</span>` : ""}
+            <span class="roster-back-who">
+              <span class="roster-back-name">${escapeHtml(player.name)}</span>
+              <span class="roster-back-season">${ordinalTemporada(CURRENT_SEASON)} Temporada</span>
+            </span>
+          </div>
+          <div class="roster-back-grid">${tiles.join("")}</div>
+          <a class="roster-back-link" href="#/jugador/${player.id}" tabindex="-1">Ver perfil <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>`;
 }
 
 export function renderRoster(container) {
@@ -73,6 +102,10 @@ export function renderRoster(container) {
   // displayPositions en js/stats.js); la registrada solo desempata y sirve
   // de respaldo mientras no haya juegos.
   const positionOverrides = cachedPositionOverrides();
+  // Números de la temporada para la parte de atrás de las tarjetas.
+  const statGames = seasonStatGames();
+  const batById = new Map(battingTotals(statGames).map((r) => [r.playerId, r]));
+  const pitById = new Map(pitchingTotals(statGames).filter((r) => r.outs > 0).map((r) => [r.playerId, r]));
   // Por número; los que todavía no tienen van al final.
   const rows = ROSTER.map((p) => ({
     ...p,
@@ -110,9 +143,34 @@ export function renderRoster(container) {
         ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}`
         : `${filtered.length} de ${rows.length} jugadores`;
 
-    gridEl.innerHTML = filtered.map((row) => rosterCard(row, duesMap)).join("");
+    gridEl.innerHTML = filtered.map((row) => rosterCard(row, duesMap, { bat: batById.get(row.id), pit: pitById.get(row.id) })).join("");
     hydrateAvatars(gridEl);
   }
+
+  // Voltear: tocar la tarjeta (o Enter/espacio) la gira; el botón "Ver
+  // perfil" de atrás sí navega. Solo una volteada a la vez.
+  function flip(card) {
+    const flipped = !card.classList.contains("is-flipped");
+    for (const other of gridEl.querySelectorAll(".roster-card.is-flipped")) if (other !== card) setFlipped(other, false);
+    setFlipped(card, flipped);
+  }
+  function setFlipped(card, flipped) {
+    card.classList.toggle("is-flipped", flipped);
+    card.querySelector(".roster-card-back").setAttribute("aria-hidden", String(!flipped));
+    card.querySelector(".roster-back-link").tabIndex = flipped ? 0 : -1;
+  }
+  gridEl.addEventListener("click", (e) => {
+    if (e.target.closest(".roster-back-link")) return;
+    const card = e.target.closest(".roster-card");
+    if (card) flip(card);
+  });
+  gridEl.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const front = e.target.closest(".roster-card-front");
+    if (!front) return;
+    e.preventDefault();
+    flip(front.closest(".roster-card"));
+  });
 
   filterRow.addEventListener("click", (e) => {
     const btn = e.target.closest(".pos-filter-chip");

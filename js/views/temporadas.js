@@ -208,7 +208,7 @@ export function renderTemporadas(container, seasonParam, tabParam) {
   if (games.length === 0) {
     const p = document.createElement("p");
     p.className = "subtitle";
-    p.textContent = "No hay juegos capturados para esta temporada.";
+    p.textContent = "Esta temporada todavía no tiene juegos. El caimán está calentando.";
     container.appendChild(p);
     return;
   }

@@ -60,8 +60,15 @@ function rivalInitials(name) {
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
+// "2026-11-13" de HOY en la hora de aquí (no UTC: con toISOString, desde las
+// 5 pm de Culiacán ya era "mañana" y el juego del día desaparecía).
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function nextGame() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
   return [...SCHEDULE].filter((g) => g.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] ?? SCHEDULE[0] ?? null;
 }
 
@@ -73,7 +80,7 @@ function gameStart(g) {
 
 function countdownText(g) {
   const ms = gameStart(g) - Date.now();
-  if (ms <= 0) return "¡Hoy se juega!";
+  if (ms <= 0) return "¡En juego!";
   const secs = Math.floor(ms / 1000);
   const d = Math.floor(secs / 86400);
   const h = Math.floor((secs % 86400) / 3600);
@@ -169,10 +176,98 @@ function fitSponsorLogo(img) {
   img.style.width = `${(height * ratio).toFixed(1)}px`;
 }
 
+// ---- Festejo después de una victoria ----
+//
+// La primera vez que alguien abre la portada en los 2 días siguientes a una
+// victoria: confeti rojo y blanco + un aviso "¡Ganamos!" con link al juego.
+// Una sola vez por juego y por navegador (localStorage). Sin confeti si el
+// sistema pide menos movimiento (el aviso sí sale).
+const CELEBRATED_KEY = "caimanes-festejo-";
+
+function maybeCelebrate(allGames) {
+  const last = [...allGames].filter((g) => gameResult(g)).sort((a, b) => b.date.localeCompare(a.date))[0];
+  if (!last || gameResult(last) !== "W") return;
+  const days = (new Date(`${localToday()}T00:00:00`) - new Date(`${last.date}T00:00:00`)) / 86400000;
+  if (days < 0 || days > 2) return;
+  try {
+    if (localStorage.getItem(CELEBRATED_KEY + last.id)) return;
+    localStorage.setItem(CELEBRATED_KEY + last.id, "1");
+  } catch {
+    return; // Sin almacenamiento saldría en cada visita: mejor nada.
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "win-toast";
+  toast.setAttribute("role", "status");
+  toast.innerHTML = `
+    <span class="win-toast-title">¡Ganamos!</span>
+    <span class="win-toast-score">Caimanes ${last.scoreUs}-${last.scoreThem} ${escapeHtml(last.opponent ?? "")}</span>
+    <a class="win-toast-link" href="#/juegos/${last.id}">Ver juego</a>
+    <button type="button" class="win-toast-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>`;
+  document.body.appendChild(toast);
+  const close = () => toast.remove();
+  toast.querySelector(".win-toast-close").addEventListener("click", close);
+  toast.querySelector(".win-toast-link").addEventListener("click", close);
+  setTimeout(close, 9000);
+  window.addEventListener("hashchange", close, { once: true });
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) launchConfetti();
+}
+
+// Confeti en un <canvas> encima de todo, ~3.5 s, y se quita solo.
+function launchConfetti() {
+  const canvas = document.createElement("canvas");
+  canvas.className = "confetti-canvas";
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = innerWidth * dpr;
+  canvas.height = innerHeight * dpr;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const colors = ["#e2202f", "#bf0f35", "#ffffff", "#ff5a6e", "#f2f3f4"];
+  const pieces = Array.from({ length: 160 }, () => ({
+    x: innerWidth / 2 + (Math.random() - 0.5) * innerWidth * 0.3,
+    y: innerHeight * 0.35,
+    vx: (Math.random() - 0.5) * 16,
+    vy: -Math.random() * 15 - 5,
+    w: 6 + Math.random() * 6,
+    h: 8 + Math.random() * 8,
+    rot: Math.random() * Math.PI,
+    vr: (Math.random() - 0.5) * 0.3,
+    color: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  const start = performance.now();
+  function frame(now) {
+    const t = now - start;
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    ctx.globalAlpha = t > 2600 ? Math.max(0, 1 - (t - 2600) / 900) : 1;
+    for (const p of pieces) {
+      p.vy += 0.38;
+      p.vx *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    }
+    if (t < 3500) requestAnimationFrame(frame);
+    else canvas.remove();
+  }
+  requestAnimationFrame(frame);
+}
+
 export function renderHome(container) {
   const season = TEAM.seasonsTotal;
   const leagueLine = `${TEAM.league} · ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada`;
   const next = nextGame();
+  // Modo "día de juego" (a petición expresa): el día del partido la portada
+  // lo anuncia con una franja roja arriba del hero y la tarjeta del próximo
+  // juego en rojo.
+  const gameDay = next?.date === localToday();
   const allGames = allStatGames();
   // Franja de números: totales de TODOS los juegos capturados (regular +
   // playoffs, todas las temporadas).
@@ -186,12 +281,21 @@ export function renderHome(container) {
 
   // ---- Hero ----
   root.innerHTML = `
-    <section class="home-hero">
-      <!-- Fondo: assets/hero.mp4 = copia ligera de assets/video.mp4 (720p,
-           sin audio, ~1.5 MB en vez de 34 MB — con el velo encima no se nota
-           la diferencia). El poster es su primer cuadro: se ve al instante
-           mientras carga el video. Velo del color del tema: .home-hero-bg. -->
-      <video class="home-hero-video" src="assets/hero.mp4" poster="assets/hero-poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+    <section class="home-hero${gameDay ? " home-hero--gameday" : ""}">
+      ${
+        gameDay
+          ? `<div class="home-gameday" role="status">
+        <b>Hoy jugamos</b>
+        <span>vs ${escapeHtml(next.opponent ?? "Rival")}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
+      </div>`
+          : ""
+      }
+      <!-- Fondo: assets/hero.mp4 = copia ligera de assets/web-hero.mp4 (720p,
+           24 fps, sin audio, ~4 MB en vez de 183 MB — con el velo encima no
+           se nota la diferencia). El poster es su primer cuadro: se ve al
+           instante mientras carga el video. "?v=2": el video cambió y así
+           nadie se queda con el viejo en caché. Velo: .home-hero-bg. -->
+      <video class="home-hero-video" src="assets/hero.mp4?v=2" poster="assets/hero-poster.jpg?v=2" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="home-hero-bg" aria-hidden="true"></div>
       <div class="home-hero-content">
         <img src="assets/logo.png" alt="" class="home-hero-logo" />
@@ -206,9 +310,9 @@ export function renderHome(container) {
       ${
         next
           ? `
-        <div class="home-next">
+        <div class="home-next${gameDay ? " home-next--gameday" : ""}">
           <a class="home-next-link" href="#/calendario" aria-label="Ver calendario"></a>
-          <span class="home-next-label">Próximo juego</span>
+          <span class="home-next-label">${gameDay ? "Hoy · Día de juego" : "Próximo juego"}</span>
           <span class="home-next-match">Caimanes <em>vs</em> ${escapeHtml(next.opponent ?? "Rival")}</span>
           <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
           <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
@@ -410,6 +514,7 @@ export function renderHome(container) {
   });
 
   countUpWhenVisible(root.querySelector(".home-stats"));
+  maybeCelebrate(allGames);
 
   // Cuenta regresiva: se refresca cada segundo mientras la portada siga abierta.
   if (next) {

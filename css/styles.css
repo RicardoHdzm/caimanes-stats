@@ -83,6 +83,11 @@
      fuente del sistema, que se lee mejor en tamaños chicos. */
   --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --font-jersey: "Legend M54", "Barlow Condensed", "Arial Narrow", sans-serif;
+  /* Puntada de la costura de una pelota de softbol (una "V"). Se usa como
+     máscara repetida en horizontal, así el color lo pone cada lugar (rojo
+     del tema): orilla de arriba del footer. (Bajo los títulos se quitó a
+     petición expresa.) */
+  --stitch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath d='M2 2.2l6 5.6 6-5.6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --font-body: "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "Consolas", ui-monospace, monospace;
 
@@ -4243,11 +4248,26 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
 /* Fondo opaco propio: sin esto la piel de caimán del body se vería a través
    del footer, y la idea es que quede solo en el cuerpo. */
 .footer {
+  position: relative;
   color: var(--muted);
   font-size: var(--text-sm);
   padding: 44px 24px 28px;
   border-top: 1px solid var(--border);
   background: var(--bg);
+}
+
+/* Costura de pelota de orilla a orilla, montada sobre la línea de arriba. */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: var(--accent);
+  opacity: 0.7;
+  -webkit-mask: var(--stitch) center / 16px 10px repeat-x;
+  mask: var(--stitch) center / 16px 10px repeat-x;
 }
 
 .footer-inner {
@@ -5169,8 +5189,53 @@ a.comment-author-name:hover {
   letter-spacing: 0.04em;
 }
 
-.splash-loading .spinner {
-  font-size: 2.2rem;
+.splash-loading .spinner,
+.flyer-preview .spinner {
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 0;
+  background: url("../assets/logo.png") center / contain no-repeat;
+  animation: logo-beat 1s ease-in-out infinite;
+}
+
+@keyframes logo-beat {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Página que no existe (ver renderNotFound en js/main.js). */
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 60px 16px 80px;
+  text-align: center;
+}
+
+.not-found-logo {
+  width: 140px;
+  height: auto;
+  transform: rotate(-12deg);
+  opacity: 0.9;
+}
+
+.not-found h2 {
+  margin: 0;
+}
+
+.not-found p {
+  max-width: 420px;
+  margin: 0 0 8px;
+  color: var(--muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6002,6 +6067,8 @@ h2.page-title {
   letter-spacing: 0.01em;
 }
 
+
+
 .page-title-accent,
 .home-title span {
   color: var(--accent-text);
@@ -6346,6 +6413,160 @@ a.home-sponsor-card:hover {
   color: var(--muted);
 }
 
+/* ---- Día de juego (ver gameDay en js/views/home.js) ----
+   Franja roja con escamas pegada arriba del hero: "HOY JUGAMOS · vs Rival ·
+   hora". La tarjeta del próximo juego también se pinta de rojo. */
+.home-gameday {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, var(--accent-dark), var(--accent) 50%, var(--accent-dark));
+  color: #fff;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.home-gameday::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-mask: var(--skin-texture) center / 420px repeat;
+  mask: var(--skin-texture) center / 420px repeat;
+}
+
+.home-gameday b {
+  font-size: var(--text-xl);
+  font-style: italic;
+  animation: gameday-pulse 1.6s ease-in-out infinite;
+}
+
+.home-gameday span {
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+@keyframes gameday-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.home-hero--gameday .home-hero-content {
+  padding-top: 40px;
+}
+
+.home-next--gameday {
+  border-color: var(--accent) !important;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent)) !important;
+  box-shadow: 0 14px 40px var(--accent-glow);
+}
+
+.home-next--gameday .home-next-label,
+.home-next--gameday .home-next-when,
+.home-next--gameday .home-next-match em,
+.home-next--gameday .home-next-share {
+  color: #fff;
+}
+
+.home-next--gameday .home-next-countdown {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-gameday b {
+    animation: none;
+  }
+}
+
+/* ---- Festejo de victoria (ver maybeCelebrate en js/views/home.js) ---- */
+.confetti-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.win-toast {
+  position: fixed;
+  z-index: 201;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 2px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 14px 48px 14px 20px;
+  border-top: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+  animation: win-toast-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.win-toast-title {
+  grid-column: 1;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-style: italic;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.win-toast-score {
+  grid-column: 1;
+  font-weight: 700;
+}
+
+.win-toast-link {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.win-toast-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+@keyframes win-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+}
+
 /* Cinta en movimiento. Fondo opaco propio (a petición expresa): sin él se
    veían las escamas del body detrás de las letras. Un tono arriba de la
    franja de números (.home-stats, --surface) para que se distingan. */
@@ -6393,11 +6614,10 @@ a.home-sponsor-card:hover {
   color: rgba(255, 255, 255, 0.55);
 }
 
-/* Los hashtags (#CaimaWin, #Caimanation) en contorno blanco — sobre la
-   franja roja, el rojo de antes ya no se leía. */
+/* Los hashtags (#CaimaWin, #Caimanation) iguales que el resto: blanco
+   sólido (a petición expresa; antes en contorno). */
 .home-marquee-track .home-marquee-accent {
-  color: transparent;
-  -webkit-text-stroke: 1px #fff;
+  color: #fff;
 }
 
 .home-marquee-ghost {
@@ -7197,7 +7417,33 @@ a.home-sponsor-card:hover {
   margin-bottom: 18px;
 }
 
+/* Tarjeta tipo barajita: dos caras (.roster-card-front / -back) encimadas en
+   la misma celda de un grid y .roster-card-inner gira 180° al tocarla (clase
+   .is-flipped, ver flip() en js/views/roster.js). El borde, el fondo y las
+   esquinas van en cada cara, no en la tarjeta. */
 .roster-card {
+  perspective: 1400px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.roster-card:hover {
+  transform: translateY(-3px);
+}
+
+.roster-card-inner {
+  display: grid;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.roster-card.is-flipped .roster-card-inner {
+  transform: rotateY(180deg);
+}
+
+.roster-card-face {
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -7205,17 +7451,166 @@ a.home-sponsor-card:hover {
   border-radius: 16px;
   background: var(--surface);
   color: var(--text);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: border-color 0.15s;
+}
+
+.roster-card:hover .roster-card-face,
+.roster-card--you .roster-card-face {
+  border-color: var(--accent);
+}
+
+.roster-card-front:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Iconito de "voltear" en la esquina de abajo de la foto. */
+.roster-card-flip-hint {
+  position: absolute;
+  z-index: 1;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.75rem;
+  opacity: 0.75;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.roster-card:hover .roster-card-flip-hint {
+  opacity: 1;
+  background: var(--accent);
+}
+
+/* Atrás: número de jersey + nombre, los números de la temporada en fichas y
+   el botón al perfil. El logo tenue de fondo, como reverso de barajita. */
+.roster-card-back {
+  position: relative;
+  transform: rotateY(180deg);
+  gap: 12px;
+  padding: 18px 16px 16px;
+  border-top: 4px solid var(--accent);
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+}
+
+.roster-card-back::before {
+  content: "";
+  position: absolute;
+  right: -30px;
+  bottom: -20px;
+  width: 190px;
+  height: 190px;
+  background: url("../assets/logo.png") center / contain no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.roster-back-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.roster-back-number {
+  font-family: var(--font-jersey);
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--accent-text);
+}
+
+.roster-back-who {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.roster-back-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.roster-back-season {
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.roster-back-grid {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-content: center;
+  gap: 8px;
+}
+
+.roster-back-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.roster-back-tile b {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.roster-back-tile span {
+  color: var(--muted);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.roster-back-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: filter 0.15s;
 }
 
-.roster-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
+.roster-back-link:hover {
+  filter: brightness(1.15);
 }
 
-.roster-card--you {
-  border-color: var(--accent);
+@media (prefers-reduced-motion: reduce) {
+  .roster-card-inner {
+    transition: none;
+  }
 }
 
 .roster-card-photo {
@@ -7288,7 +7683,7 @@ a.home-sponsor-card:hover {
 .roster-card-who {
   position: absolute;
   z-index: 1;
-  right: 16px;
+  right: 48px;
   bottom: 12px;
   left: 16px;
   display: flex;
@@ -7363,8 +7758,65 @@ a.home-sponsor-card:hover {
     gap: 10px;
   }
 
-  .roster-card {
+  .roster-card-face {
     border-radius: 12px;
+  }
+
+  .roster-card-flip-hint {
+    right: 8px;
+    bottom: 8px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.6rem;
+  }
+
+  .roster-card-back {
+    gap: 8px;
+    padding: 12px 9px 10px;
+  }
+
+  .roster-card-back::before {
+    width: 120px;
+    height: 120px;
+  }
+
+  .roster-back-head {
+    gap: 8px;
+  }
+
+  .roster-back-number {
+    font-size: 2.1rem;
+  }
+
+  .roster-back-name {
+    font-size: 0.95rem;
+  }
+
+  .roster-back-season {
+    font-size: 0.52rem;
+  }
+
+  .roster-back-grid {
+    gap: 4px;
+  }
+
+  .roster-back-tile {
+    padding: 5px 2px;
+    border-radius: 7px;
+  }
+
+  .roster-back-tile b {
+    font-size: 1rem;
+  }
+
+  .roster-back-tile span {
+    font-size: 0.48rem;
+    letter-spacing: 0.02em;
+  }
+
+  .roster-back-link {
+    padding: 6px;
+    font-size: 0.75rem;
   }
 
   .roster-card-positions {
@@ -7385,7 +7837,7 @@ a.home-sponsor-card:hover {
   }
 
   .roster-card-who {
-    right: 10px;
+    right: 34px;
     bottom: 8px;
     left: 10px;
   }

@@ -116,6 +116,16 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
     </div>`
 ).join("");
 
+function renderNotFound(container) {
+  container.innerHTML = `
+    <div class="not-found">
+      <img src="assets/logo.png" alt="" class="not-found-logo" />
+      <h2 class="page-title">Se lo comió el caimán</h2>
+      <p>Esta página no existe (o ya no). Mejor regresa al dugout.</p>
+      <a href="#/" class="home-btn home-btn--solid">Volver al inicio</a>
+    </div>`;
+}
+
 function currentRoute() {
   const hash = location.hash.replace(/^#\//, "");
   const [first, second, third] = hash.split("/");
@@ -155,6 +165,12 @@ function currentRoute() {
   }
   if (first === "bateo" || first === "pitcheo" || first === "fildeo") {
     return { tab: "estadisticas", render: (container) => renderEstadisticas(container, first) };
+  }
+  // Ruta que no existe (#/algo-raro): página propia en vez de caer callada
+  // en la portada. Solo con "#/" — otros hashes (p. ej. los de Supabase al
+  // recuperar contraseña) siguen como antes.
+  if (location.hash.startsWith("#/") && first && !routes[first]) {
+    return { tab: null, render: renderNotFound };
   }
   const tab = routes[first] ? first : "home";
 

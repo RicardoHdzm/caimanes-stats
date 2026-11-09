@@ -76,7 +76,7 @@ export function renderPlayoffs(container) {
   if (!entry || entry.rounds.length === 0) {
     const p = document.createElement("p");
     p.className = "subtitle";
-    p.textContent = "Aún no hay juegos de playoffs capturados esta temporada.";
+    p.textContent = "Todavía no llegamos a playoffs esta temporada… pero ahí vamos.";
     container.appendChild(p);
     return;
   }

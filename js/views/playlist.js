@@ -81,13 +81,13 @@ export function renderPlaylist(container) {
 
   function drawCards() {
     if (rows.length === 0) {
-      listEl.innerHTML = '<p class="subtitle">Nadie ha registrado su canción de entrada todavía.</p>';
+      listEl.innerHTML = '<p class="subtitle">Nadie ha subido su canción de entrada todavía. ¿Quién abre el bat?</p>';
       return;
     }
     const shown = rows.filter((r) => matchesPlayer(r.player, input.value));
     listEl.innerHTML = shown.length
       ? shown.map((r) => playlistCard(r.player, r.walkup)).join("")
-      : '<p class="subtitle">Ningún jugador coincide con la búsqueda.</p>';
+      : '<p class="subtitle">Ese caimán no está en el roster.</p>';
     hydrateAvatars(listEl);
   }
 

@@ -67,6 +67,6 @@ export function renderVlogs(container) {
   grid.className = "vlog-grid";
   grid.innerHTML = vlogs.length
     ? vlogs.map(vlogCard).join("")
-    : '<p class="subtitle">Todavía no hay vlogs.</p>';
+    : '<p class="subtitle">Todavía no hay vlogs. Pronto, desde la banca.</p>';
   container.appendChild(grid);
 }

@@ -768,7 +768,7 @@ export function renderJugadorDetalle(container, playerId) {
   const player = PLAYERS.find((p) => p.id === playerId);
 
   if (!player) {
-    heading(container, "Jugador no encontrado");
+    heading(container, "Este caimán no está en el roster");
     const back = document.createElement("a");
     back.href = "#/roster";
     back.className = "back-link";
@@ -1922,7 +1922,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (!battingSeason && !pitchingSeason && !fieldingSeason) {
     const p = document.createElement("p");
     p.className = "subtitle";
-    p.textContent = "Todavía no tiene stats capturadas esta temporada.";
+    p.textContent = "Todavía no pisa el campo esta temporada.";
     container.appendChild(p);
   }
 

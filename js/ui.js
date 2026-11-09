@@ -115,7 +115,7 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
       const td = document.createElement("td");
       td.colSpan = columns.length;
       td.className = "empty";
-      td.textContent = "Sin datos todavía.";
+      td.textContent = "Sin datos todavía — el caimán está calentando.";
       tr.appendChild(td);
       tbody.appendChild(tr);
     }

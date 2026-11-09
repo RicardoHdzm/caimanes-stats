@@ -114,7 +114,7 @@ export function renderComments(container, { contextType, contextId }) {
         ? comments
             .map((c) => commentItem(c, rowsByComment.get(c.id) ?? [], !!myId, coach || c.player_id === myId))
             .join("")
-        : '<p class="subtitle">Sin comentarios todavía.</p>';
+        : '<p class="subtitle">Nadie ha comentado todavía. ¡Rompe el hielo, caimán!</p>';
 
     // El avatar ya pintado arriba es el de siempre (foto fija de data.js o
     // iniciales, ver renderAvatar) — si alguien subió una foto propia a
