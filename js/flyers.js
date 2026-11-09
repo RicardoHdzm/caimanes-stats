@@ -607,21 +607,16 @@ function mvpLine(game, playerId) {
 }
 
 // Un lado del marcador: nombre del equipo arriba y las carreras en grande
-// (fuente de jersey). Ganador relleno; perdedor solo en contorno.
+// (Teko). Ganador en blanco; perdedor en blanco apagado.
 function scoreSide(ctx, name, score, cx, solid) {
   text(ctx, name, cx, 502, { size: 44, color: "#fff", maxWidth: 400 });
   if (solid) {
     jerseyText(ctx, String(score), cx, 692, { size: 210 });
     return;
   }
-  ctx.font = jerseyFont(210);
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-  ctx.fillText(String(score), cx, 692);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
-  ctx.lineWidth = 5;
-  ctx.strokeText(String(score), cx, 692);
+  // El que pierde: relleno sólido pero apagado (blanco translúcido sobre la
+  // franja roja; a petición expresa, antes solo en contorno).
+  jerseyText(ctx, String(score), cx, 692, { size: 210, color: "rgba(255, 255, 255, 0.42)", shadow: false });
 }
 
 // `game`: un juego de GAMES/PLAYOFFS. `playoffRound` (opcional): nombre de
