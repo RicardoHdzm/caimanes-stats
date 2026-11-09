@@ -100,14 +100,17 @@
      canal: rayado invisible. */
   --zebra: rgba(255, 255, 255, 0.03);
 
-  /* Trama diagonal del fondo, tipo raya de uniforme. Es un azul (la misma
-     familia que --pos-pitcher) en vez de blanco: sobre un fondo tan oscuro
-     el blanco sale gris y pesa más. El azul carga casi todo su contraste en
-     el canal del azul, así que se distingue como tono sin aclarar la línea.
-     Estas dos son las perillas: subir --pattern-line la hace más marcada,
-     bajar --pattern-gap la hace más densa. */
-  --pattern-line: rgba(74, 158, 255, 0.05);
-  --pattern-gap: 16px;
+  /* Trama del fondo: piel de caimán (antes rayas diagonales; a petición
+     expresa, la misma piel de los flyers y los wallpapers de Fanzone).
+     assets/textures/croc-skin.png es un mosaico que se repite sin costuras,
+     gris + transparencia (claro arriba de cada escama, oscuro en el surco),
+     así que sirve en los tres temas. Perillas: --skin-size (tamaño de las
+     escamas) y --skin-veil (velo del color del fondo encima de la piel:
+     más opaco = piel más tenue; el tema claro lleva más velo porque ahí los
+     surcos oscuros resaltan mucho más). */
+  --skin-texture: url("../assets/textures/croc-skin.png");
+  --skin-size: 448px;
+  --skin-veil: rgba(13, 13, 13, 0.3);
 
   /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
      separado de --surface aunque hoy valga lo mismo, para que el tema
@@ -147,7 +150,7 @@
   --accent-glow: rgba(226, 32, 47, 0.25);
 
   --zebra: rgba(0, 0, 0, 0.025);
-  --pattern-line: rgba(74, 158, 255, 0.06);
+  --skin-veil: rgba(244, 245, 247, 0.72);
 
   --bg-glow: #ffffff;
 
@@ -183,6 +186,7 @@
   --accent-glow: rgba(191, 15, 53, 0.35);
 
   --bg-glow: #101622;
+  --skin-veil: rgba(10, 14, 24, 0.3);
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
      --surface y --accent de este tema. */
@@ -212,11 +216,8 @@ body {
   flex-direction: column;
   font-family: var(--font-body);
   background:
-    repeating-linear-gradient(
-      135deg,
-      var(--pattern-line) 0 1px,
-      transparent 1px var(--pattern-gap)
-    ),
+    linear-gradient(var(--skin-veil), var(--skin-veil)),
+    var(--skin-texture) center top / var(--skin-size) repeat,
     radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
     var(--bg);
   color: var(--text);
@@ -852,11 +853,12 @@ body {
     position: fixed;
     inset: 0;
     z-index: 45;
-    /* Misma trama diagonal + resplandor del <body> (ver más arriba) — un
+    /* Misma piel de caimán + resplandor del <body> (ver más arriba) — un
        fondo plano se sentía vacío con solo unos íconos flotando encima;
        esto le da la misma textura y profundidad que el resto del sitio. */
     background:
-      repeating-linear-gradient(135deg, var(--pattern-line) 0 1px, transparent 1px var(--pattern-gap)),
+      linear-gradient(var(--skin-veil), var(--skin-veil)),
+      var(--skin-texture) center top / var(--skin-size) repeat,
       radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
       var(--bg);
     padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
@@ -4127,7 +4129,7 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   }
 }
 
-/* Fondo opaco propio: sin esto la trama diagonal del body se vería a través
+/* Fondo opaco propio: sin esto la piel de caimán del body se vería a través
    del footer, y la idea es que quede solo en el cuerpo. */
 .footer {
   color: var(--muted);
@@ -5927,7 +5929,6 @@ h2.page-title {
   inset: 0;
   background:
     radial-gradient(900px 520px at 50% 30%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%),
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 26px),
     linear-gradient(180deg, transparent 60%, var(--bg));
 }
 
