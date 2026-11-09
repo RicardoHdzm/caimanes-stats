@@ -6250,11 +6250,14 @@ a.home-sponsor-card:hover {
   color: var(--muted);
 }
 
-/* Cinta en movimiento. */
+/* Cinta en movimiento. Fondo opaco propio (a petición expresa): sin él se
+   veían las escamas del body detrás de las letras. Un tono arriba de la
+   franja de números (.home-stats, --surface) para que se distingan. */
 .home-marquee {
   margin-inline: calc(50% - 50vw);
   padding: 14px 0;
   border-bottom: 1px solid var(--border);
+  background: var(--surface-alt);
   overflow: hidden;
 }
 
