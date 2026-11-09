@@ -763,7 +763,9 @@ export function teamFieldingTotals(games = GAMES) {
 //
 // 1) Aporte por juego (gameImpact): bateo — hit +1, doble +1 extra, triple
 //    +2 extra, HR (o HR de campo) +3 extra, impulsada +1, carrera / robada /
-//    base por bolas +0.5, ponche −0.5; fildeo — asistencia +0.25, error −1;
+//    base por bolas +0.5, ponche −0.5; fildeo — out hecho (PO) +0.15,
+//    asistencia +0.25, error −0.5 (antes −1 y sin contar outs; a petición
+//    expresa);
 //    pitcheo — +0.5 por entrada, victoria +2, salvamento +1, carrera limpia
 //    −0.5; MVP oficial del juego +2.
 // 2) Puntuación 0-100: 60% forma reciente (promedio de sus últimos 4 juegos,
@@ -790,7 +792,7 @@ export function gameImpact(game) {
       (b.H ?? 0) + (b["2B"] ?? 0) + 2 * (b["3B"] ?? 0) + 3 * hr + (b.RBI ?? 0) + 0.5 * ((b.R ?? 0) + (b.SB ?? 0) + (b.BB ?? 0)) - 0.5 * (b.SO ?? 0)
     );
   }
-  for (const f of game.fielding ?? []) add(f.playerId, 0.25 * (f.A ?? 0) - (f.E ?? 0));
+  for (const f of game.fielding ?? []) add(f.playerId, 0.15 * (f.PO ?? 0) + 0.25 * (f.A ?? 0) - 0.5 * (f.E ?? 0));
   for (const p of game.pitching ?? []) {
     const decision = p.decision === "W" ? 2 : p.decision === "SV" ? 1 : 0;
     add(p.playerId, 0.5 * (ipToOuts(p.IP ?? 0) / 3) + decision - 0.5 * (p.ER ?? 0));

@@ -95,7 +95,7 @@ export function renderPowerRanking(container) {
     <p>Cada juego suma puntos por lo que hizo cada jugador:</p>
     <ul>
       <li><b>Bateo:</b> hit +1, doble +1 extra, triple +2 extra, HR +3 extra, impulsada +1, carrera, robada o base por bolas +0.5, ponche −0.5.</li>
-      <li><b>Fildeo:</b> asistencia +0.25, error −1.</li>
+      <li><b>Fildeo:</b> out hecho +0.15, asistencia +0.25, error −0.5.</li>
       <li><b>Pitcheo:</b> +0.5 por entrada, victoria +2, salvamento +1, carrera limpia permitida −0.5.</li>
       <li><b>MVP del juego:</b> +2.</li>
     </ul>
