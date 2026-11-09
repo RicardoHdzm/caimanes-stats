@@ -83,11 +83,6 @@
      fuente del sistema, que se lee mejor en tamaños chicos. */
   --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --font-jersey: "Legend M54", "Barlow Condensed", "Arial Narrow", sans-serif;
-  /* Puntada de la costura de una pelota de softbol (una "V"). Se usa como
-     máscara repetida en horizontal, así el color lo pone cada lugar (rojo
-     del tema): orilla de arriba del footer. (Bajo los títulos se quitó a
-     petición expresa.) */
-  --stitch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath d='M2 2.2l6 5.6 6-5.6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --font-body: "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "Consolas", ui-monospace, monospace;
 
@@ -4270,26 +4265,11 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
 /* Fondo opaco propio: sin esto la piel de caimán del body se vería a través
    del footer, y la idea es que quede solo en el cuerpo. */
 .footer {
-  position: relative;
   color: var(--muted);
   font-size: var(--text-sm);
   padding: 44px 24px 28px;
   border-top: 1px solid var(--border);
   background: var(--bg);
-}
-
-/* Costura de pelota de orilla a orilla, montada sobre la línea de arriba. */
-.footer::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: var(--accent);
-  opacity: 0.7;
-  -webkit-mask: var(--stitch) center / 16px 10px repeat-x;
-  mask: var(--stitch) center / 16px 10px repeat-x;
 }
 
 .footer-inner {
