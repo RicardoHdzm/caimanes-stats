@@ -907,6 +907,76 @@ export async function leadersFlyer(data, format = "post", color) {
   return canvas;
 }
 
+// ---- Power Ranking (ver js/views/powerranking.js) ----
+
+const PODIUM_COLORS = { 1: GOLD, 2: "#c0c6cf", 3: "#cd7f4a" };
+
+// `data`: { seasonLabel ("9na Temporada"), gamesCount, early, rows: [{ rank,
+// move (null = nuevo), playerId, name, score, line }] } — se pintan los
+// primeros 5.
+export async function powerRankingFlyer(data, format = "post", color) {
+  const rows = data.rows.slice(0, 5);
+  const photos = await Promise.all(rows.map((r) => loadPlayerPhoto(r.playerId)));
+  const { canvas, ctx, story, CH, logo, sponsors } = await newFlyer(format, color);
+  drawHeader(ctx, logo, story, {
+    title: data.seasonLabel.toUpperCase(),
+    sub: `DESPUÉS DE ${data.gamesCount} ${data.gamesCount === 1 ? "JUEGO" : "JUEGOS"}${data.early ? " · TEMPORADA TEMPRANA" : ""}`,
+    league: seasonLeague(),
+  });
+
+  bigTitle(ctx, "POWER RANKING", 345, 160);
+
+  const left = 90;
+  const right = W - 90;
+  const rowH = 124;
+  const gap = 14;
+  const top = 392;
+  rows.forEach((r, i) => {
+    const y = top + i * (rowH + gap);
+    const mid = y + rowH / 2;
+    roundRect(ctx, left, y, right - left, rowH, 18);
+    ctx.fillStyle = P.tint(0.07);
+    ctx.fill();
+    ctx.strokeStyle = P.tint(0.12);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    const podium = PODIUM_COLORS[r.rank];
+    if (podium) {
+      ctx.save();
+      roundRect(ctx, left, y, right - left, rowH, 18);
+      ctx.clip();
+      ctx.fillStyle = podium;
+      ctx.fillRect(left, y, 8, rowH);
+      ctx.restore();
+    }
+
+    // Lugar (Teko) y movimiento debajo.
+    jerseyText(ctx, String(r.rank), left + 62, mid + 18, { size: 66, color: r.rank === 1 ? GOLD : "#fff", shadow: false, maxWidth: 90 });
+    const move =
+      r.move == null
+        ? { t: "NUEVO", c: GOLD }
+        : r.move > 0
+          ? { t: `▲${r.move}`, c: "#3fb56f" }
+          : r.move < 0
+            ? { t: `▼${-r.move}`, c: P.accentText }
+            : { t: "=", c: P.muted };
+    text(ctx, move.t, left + 62, mid + 50, { size: 27, color: move.c, maxWidth: 96 });
+
+    // Foto, nombre y su último juego.
+    drawSkewedPhoto(ctx, photos[i], r.name, left + 124, y + 14, 80, 96, 0, P.accent);
+    const tx = left + 238;
+    const maxW = right - 190 - tx;
+    text(ctx, (r.name ?? "").toUpperCase(), tx, mid - 4, { size: 42, italic: true, align: "left", maxWidth: maxW });
+    if (r.line) text(ctx, r.line.toUpperCase(), tx, mid + 34, { size: 24, weight: 600, color: P.muted, align: "left", maxWidth: maxW });
+
+    // Puntos.
+    jerseyText(ctx, String(r.score), right - 30, mid + 22, { size: 70, align: "right", shadow: false, maxWidth: 150 });
+  });
+
+  drawFooter(ctx, sponsors, CH);
+  return canvas;
+}
+
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
 // Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y

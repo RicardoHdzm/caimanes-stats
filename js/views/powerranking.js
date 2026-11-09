@@ -5,6 +5,7 @@
 import { PLAYERS, CURRENT_SEASON } from "../data.js";
 import { powerRanking, battingTotals, pitchingTotals, POWER_WEIGHTS } from "../stats.js";
 import { heading, renderAvatar, escapeHtml, ordinalTemporada } from "../ui.js";
+import { openFlyer, shareButton, powerRankingFlyer } from "../flyers.js";
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
@@ -78,6 +79,28 @@ export function renderPowerRanking(container) {
     early ? ' <span class="pr-early">Temporada temprana: el ranking se mueve mucho</span>' : ""
   }`;
   container.appendChild(meta);
+
+  // Compartir el top 5 como imagen (ver powerRankingFlyer en js/flyers.js).
+  if (rows.length) {
+    const seasonLabel = `${ordinalTemporada(CURRENT_SEASON)} Temporada`;
+    const shareRow = document.createElement("div");
+    shareRow.className = "share-flyer-row";
+    shareRow.appendChild(
+      shareButton(() =>
+        openFlyer(
+          (format, color) =>
+            powerRankingFlyer(
+              { seasonLabel, gamesCount, early, rows: rows.map((r) => ({ ...r, line: lastGameLine(r) })) },
+              format,
+              color
+            ),
+          `power-ranking-temporada-${CURRENT_SEASON}-juego-${gamesCount}`,
+          `Power Ranking de la ${seasonLabel} — Caimanes de Villas`
+        )
+      )
+    );
+    container.appendChild(shareRow);
+  }
 
   const list = document.createElement("div");
   list.className = "pr-list";
