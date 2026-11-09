@@ -3,13 +3,12 @@
 // franja de números, cinta en movimiento, historial de juegos (próximos +
 // últimos 4), la temporada en números, el roster y los patrocinadores.
 // Todo sale de data.js — no hay nada que mantener aparte.
-import { TEAM, SEASONS, SCHEDULE, ROSTER, PLAYERS, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
+import { TEAM, SEASONS, SCHEDULE, ROSTER, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
 import {
   allStatGames,
   gameResult,
   teamRecord,
   battingTotals,
-  pitchingTotals,
   gamesPlayedByPlayer,
   seasonStatGames,
   gameMvp,
@@ -394,101 +393,6 @@ export function renderHome(container) {
     </div>
   `;
   root.appendChild(games);
-
-  // ---- MVP del último juego (a petición expresa, estilo flyer) ----
-  // Foto grande en paralelogramo con marco dorado, el nombre en dos tonos y
-  // lo que hizo en ese juego. El último juego CON MVP oficial (ver gameMvp).
-  const mvpGame = [...allGames].filter((g) => gameMvp(g)).sort((a, b) => b.date.localeCompare(a.date))[0];
-  const mvpPlayer = mvpGame ? PLAYERS.find((p) => p.id === gameMvp(mvpGame)) : null;
-  if (mvpPlayer) {
-    const words = mvpPlayer.name.split(" ");
-    const last = words.length > 1 ? words.pop() : "";
-    const batRows = battingTotals([mvpGame]);
-    const pitRows = pitchingTotals([mvpGame]).filter((r) => r.outs > 0);
-    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-    // "4 de 5 · 7 impulsadas · 4 robadas" — lo que hizo alguien en ese juego.
-    const statLine = (playerId, max = 4) => {
-      const b = batRows.find((r) => r.playerId === playerId);
-      const p = pitRows.find((r) => r.playerId === playerId);
-      return [
-        p ? plural(p.IP, "entrada", "entradas") : "",
-        b ? `${b.H} de ${b.AB}` : "",
-        b?.HR + b?.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
-        b?.["3B"] ? plural(b["3B"], "triple", "triples") : "",
-        b?.["2B"] ? plural(b["2B"], "doble", "dobles") : "",
-        b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
-        b?.SB ? plural(b.SB, "robada", "robadas") : "",
-      ]
-        .filter(Boolean)
-        .slice(0, max)
-        .join(" · ");
-    };
-    const line = statLine(mvpPlayer.id);
-
-    // Los otros destacados del juego (a petición expresa), en chico debajo
-    // del MVP: los 3 con más aporte al bat — hit 1, extra base +1 (doble),
-    // +2 (triple), +3 (HR), impulsada 1, carrera 0.5, robada 0.5, base por
-    // bola 0.5 — y el pitcher ganador suma 2 + media por entrada.
-    const impact = new Map();
-    for (const b of batRows) {
-      const hr = b.HR + b.HRC;
-      impact.set(b.playerId, b.H + b["2B"] + 2 * b["3B"] + 3 * hr + b.RBI + 0.5 * (b.R + b.SB + b.BB));
-    }
-    for (const line of mvpGame.pitching ?? []) {
-      if (line.decision !== "W") continue;
-      const p = pitRows.find((r) => r.playerId === line.playerId);
-      impact.set(line.playerId, (impact.get(line.playerId) ?? 0) + 2 + (p ? p.outs / 6 : 0));
-    }
-    const others = [...impact.entries()]
-      .filter(([id, score]) => id !== mvpPlayer.id && score > 0)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([id]) => PLAYERS.find((p) => p.id === id))
-      .filter(Boolean);
-    const othersHtml = others.length
-      ? `
-      <div class="home-mvp-others">
-        <span class="home-mvp-others-title">También destacaron</span>
-        <div class="home-mvp-others-grid">
-          ${others
-            .map(
-              (o) => `
-            <a class="home-mvp-other" href="#/jugador/${o.id}">
-              <span class="home-mvp-other-photo">${renderAvatar(o, 76)}</span>
-              <span class="home-mvp-other-info">
-                <span class="home-mvp-other-name">${o.number ? `<b>${o.number}</b> ` : ""}${escapeHtml(o.name)}</span>
-                <span class="home-mvp-other-line">${escapeHtml(statLine(o.id, 3))}</span>
-              </span>
-            </a>`
-            )
-            .join("")}
-        </div>
-      </div>`
-      : "";
-    const mvpSection = document.createElement("section");
-    mvpSection.className = "home-section";
-    mvpSection.innerHTML = `
-      ${sectionHead("MVP del", "juego", "MVP", escapeHtml(gameTag(mvpGame)))}
-      <div class="home-mvp-layout">
-      <div class="home-mvp">
-        ${mvpPlayer.number ? `<span class="home-mvp-ghost" aria-hidden="true">${mvpPlayer.number}</span>` : ""}
-        <a class="home-mvp-photo" href="#/jugador/${mvpPlayer.id}" aria-label="Perfil de ${escapeHtml(mvpPlayer.name)}">${renderAvatar(mvpPlayer, 300)}</a>
-        <div class="home-mvp-info">
-          <span class="home-mvp-kicker">★ MVP del juego</span>
-          <h3 class="home-mvp-name">${escapeHtml(words.join(" "))}${last ? ` <span>${escapeHtml(last)}</span>` : ""}</h3>
-          ${line ? `<p class="home-mvp-line">${escapeHtml(line)}</p>` : ""}
-          <p class="home-mvp-game">Caimanes ${mvpGame.scoreUs}-${mvpGame.scoreThem} ${escapeHtml(mvpGame.opponent ?? "")} · ${escapeHtml(fmtDate(mvpGame.date, { weekday: "long", day: "numeric", month: "long" }))}</p>
-          <div class="home-mvp-ctas">
-            <a class="home-btn home-btn--solid" href="#/jugador/${mvpPlayer.id}">Ver perfil</a>
-            <a class="home-btn" href="#/juegos/${mvpGame.id}">Ver juego</a>
-          </div>
-        </div>
-      </div>
-      ${othersHtml}
-      </div>
-    `;
-    root.appendChild(mvpSection);
-  }
 
   // ---- La temporada en números ----
   const ref = referenceSeason();
