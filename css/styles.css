@@ -1471,9 +1471,18 @@ main h3::before {
   gap: 8px;
 }
 
+/* En el perfil las posiciones van con su nombre completo ("Primera base"):
+   ancho según el texto, en una sola línea y en la letra de títulos (la
+   abreviatura de siempre usa la monoespaciada, con ancho fijo). */
 .profile-hero-name-positions .pos-badge {
-  font-size: var(--text-xl);
+  width: auto;
   margin: 0;
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .profile-hero-info {
