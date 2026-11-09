@@ -232,9 +232,11 @@ if (typeof window !== "undefined") {
     }
     img.onerror = null;
     const span = document.createElement("span");
-    span.className = "avatar avatar-initials";
+    // Con número de jersey: el número (ver .avatar-number en styles.css);
+    // sin número, las iniciales de siempre.
+    span.className = `avatar avatar-initials${img.dataset.number ? " avatar-number" : ""}`;
     span.style.cssText = img.style.cssText;
-    span.textContent = img.dataset.initials ?? "";
+    span.textContent = img.dataset.number || img.dataset.initials || "";
     img.replaceWith(span);
   };
 }
@@ -254,14 +256,18 @@ export function renderAvatar(player, size = 40) {
   const style = `width:${size}px;height:${size}px;font-size:${size * 0.4}px;`;
   const initials = initialsOf(player);
   const alt = escapeHtml(player.name ?? "");
+  // El 0 es "todavía sin número": ese sigue con iniciales.
+  const numberAttr = player.number ? ` data-number="${player.number}"` : "";
   if (player.photo) {
-    return `<img class="avatar" src="${player.photo}" alt="${alt}" style="${style}" data-initials="${initials}" onerror="window.__avatarFallback(this)">`;
+    return `<img class="avatar" src="${player.photo}" alt="${alt}" style="${style}" data-initials="${initials}"${numberAttr} onerror="window.__avatarFallback(this)">`;
   }
   const id = player.id ?? player.playerId;
   if (id) {
-    return `<img class="avatar" src="${playerPhotoUrl(id, PLAYER_PHOTO_EXTS[0])}" alt="${alt}" style="${style}" data-player="${id}" data-ext="0" data-initials="${initials}" onerror="window.__avatarFallback(this)">`;
+    return `<img class="avatar" src="${playerPhotoUrl(id, PLAYER_PHOTO_EXTS[0])}" alt="${alt}" style="${style}" data-player="${id}" data-ext="0" data-initials="${initials}"${numberAttr} onerror="window.__avatarFallback(this)">`;
   }
-  return `<span class="avatar avatar-initials" style="${style}">${initials}</span>`;
+  return player.number
+    ? `<span class="avatar avatar-initials avatar-number" style="${style}">${player.number}</span>`
+    : `<span class="avatar avatar-initials" style="${style}">${initials}</span>`;
 }
 
 // Icono según de dónde venga el link de la canción de entrada (walk-up

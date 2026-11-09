@@ -3,12 +3,13 @@
 // franja de números, cinta en movimiento, historial de juegos (próximos +
 // últimos 4), la temporada en números, el roster y los patrocinadores.
 // Todo sale de data.js — no hay nada que mantener aparte.
-import { TEAM, SEASONS, SCHEDULE, ROSTER, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
+import { TEAM, SEASONS, SCHEDULE, ROSTER, PLAYERS, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
 import {
   allStatGames,
   gameResult,
   teamRecord,
   battingTotals,
+  pitchingTotals,
   gamesPlayedByPlayer,
   seasonStatGames,
   gameMvp,
@@ -393,6 +394,49 @@ export function renderHome(container) {
     </div>
   `;
   root.appendChild(games);
+
+  // ---- MVP del último juego (a petición expresa, estilo flyer) ----
+  // Foto grande en paralelogramo con marco dorado, el nombre en dos tonos y
+  // lo que hizo en ese juego. El último juego CON MVP oficial (ver gameMvp).
+  const mvpGame = [...allGames].filter((g) => gameMvp(g)).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const mvpPlayer = mvpGame ? PLAYERS.find((p) => p.id === gameMvp(mvpGame)) : null;
+  if (mvpPlayer) {
+    const words = mvpPlayer.name.split(" ");
+    const last = words.length > 1 ? words.pop() : "";
+    const b = battingTotals([mvpGame]).find((r) => r.playerId === mvpPlayer.id);
+    const p = pitchingTotals([mvpGame]).find((r) => r.playerId === mvpPlayer.id && r.outs > 0);
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const line = [
+      p ? plural(p.IP, "entrada", "entradas") : "",
+      b ? `${b.H} de ${b.AB}` : "",
+      b?.HR + b?.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
+      b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
+      b?.SB ? plural(b.SB, "robada", "robadas") : "",
+    ]
+      .filter(Boolean)
+      .slice(0, 4)
+      .join(" · ");
+    const mvpSection = document.createElement("section");
+    mvpSection.className = "home-section";
+    mvpSection.innerHTML = `
+      ${sectionHead("MVP del", "juego", "MVP", escapeHtml(gameTag(mvpGame)))}
+      <div class="home-mvp">
+        ${mvpPlayer.number ? `<span class="home-mvp-ghost" aria-hidden="true">${mvpPlayer.number}</span>` : ""}
+        <a class="home-mvp-photo" href="#/jugador/${mvpPlayer.id}" aria-label="Perfil de ${escapeHtml(mvpPlayer.name)}">${renderAvatar(mvpPlayer, 300)}</a>
+        <div class="home-mvp-info">
+          <span class="home-mvp-kicker">★ MVP del juego</span>
+          <h3 class="home-mvp-name">${escapeHtml(words.join(" "))}${last ? ` <span>${escapeHtml(last)}</span>` : ""}</h3>
+          ${line ? `<p class="home-mvp-line">${escapeHtml(line)}</p>` : ""}
+          <p class="home-mvp-game">Caimanes ${mvpGame.scoreUs}-${mvpGame.scoreThem} ${escapeHtml(mvpGame.opponent ?? "")} · ${escapeHtml(fmtDate(mvpGame.date, { weekday: "long", day: "numeric", month: "long" }))}</p>
+          <div class="home-mvp-ctas">
+            <a class="home-btn home-btn--solid" href="#/jugador/${mvpPlayer.id}">Ver perfil</a>
+            <a class="home-btn" href="#/juegos/${mvpGame.id}">Ver juego</a>
+          </div>
+        </div>
+      </div>
+    `;
+    root.appendChild(mvpSection);
+  }
 
   // ---- La temporada en números ----
   const ref = referenceSeason();

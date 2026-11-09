@@ -467,6 +467,11 @@ function render() {
 
   app.innerHTML = "";
   route.render(app);
+  // Entrada suave de la página nueva (ver .page-enter en styles.css): se
+  // quita y se vuelve a poner la clase para que la animación corra cada vez.
+  app.classList.remove("page-enter");
+  void app.offsetWidth;
+  app.classList.add("page-enter");
 }
 
 buildBottomTabs();
