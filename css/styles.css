@@ -237,11 +237,11 @@ body::before,
   background: var(--skin-line);
   -webkit-mask:
     var(--skin-texture) center top / var(--skin-size) repeat,
-    linear-gradient(180deg, #000 0%, transparent 80%);
+    linear-gradient(180deg, #000 0%, transparent 55%);
   -webkit-mask-composite: source-in;
   mask:
     var(--skin-texture) center top / var(--skin-size) repeat,
-    linear-gradient(180deg, #000 0%, transparent 80%);
+    linear-gradient(180deg, #000 0%, transparent 55%);
   mask-composite: intersect;
 }
 
