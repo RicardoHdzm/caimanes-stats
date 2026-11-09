@@ -269,8 +269,10 @@ export function renderHome(container) {
   // juego en rojo.
   const gameDay = next?.date === localToday();
   const allGames = allStatGames();
-  // Franja de números: totales de TODOS los juegos capturados (regular +
-  // playoffs, todas las temporadas).
+  // Franja de números: los 4 hablan de lo mismo — TODOS los juegos
+  // capturados, regular + playoffs (antes el primero era "9 Temporadas", la historia completa,
+  // y parecía que carreras/hits/robadas eran de las 9; a petición expresa).
+  const gamesLogged = allGames.filter((g) => g.scoreUs != null).length;
   const runs = allGames.reduce((sum, g) => sum + (g.scoreUs ?? 0), 0);
   const teamBatting = battingTotals(allGames);
   const hits = teamBatting.reduce((sum, r) => sum + (r.H ?? 0), 0);
@@ -322,7 +324,7 @@ export function renderHome(container) {
     </section>
 
     <section class="home-stats">
-      <div class="home-stat"><b data-count="${season}">${season}</b><span>Temporadas</span></div>
+      <div class="home-stat"><b data-count="${gamesLogged}">${gamesLogged}</b><span>Juegos registrados</span></div>
       <div class="home-stat"><b data-count="${runs}" data-plus>${runs}</b><span>Carreras anotadas</span></div>
       <div class="home-stat"><b data-count="${hits}" data-plus>${hits}</b><span>Hits</span></div>
       <div class="home-stat"><b data-count="${steals}" data-plus>${steals}</b><span>Bases robadas</span></div>
