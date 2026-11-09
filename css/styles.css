@@ -1478,8 +1478,17 @@ main h3::before {
 .profile-hero-info .profile-hero-name-positions {
   display: flex;
   flex-wrap: wrap;
+  align-self: flex-start;
+  justify-content: flex-start;
   gap: 8px;
   margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .profile-hero-info .profile-hero-name-positions {
+    align-self: center;
+    justify-content: center;
+  }
 }
 
 .profile-hero-name-positions .pos-badge {
