@@ -772,8 +772,10 @@ export function teamFieldingTotals(games = GAMES) {
 //    el más reciente pesa 40/30/20/10) + 30% su promedio de toda la
 //    temporada — los dos escalados contra el mejor del equipo — + 10%
 //    asistencia (juegos jugados de los capturados).
-// 3) Para entrar hay que haber jugado al menos 2 juegos de la temporada (o
-//    los que haya, si todavía van menos de 2).
+// 3) Entran todos los que han jugado al menos un juego (antes se pedían 2;
+//    a petición expresa, dejaba fuera a muchos al inicio). Quien lleva menos
+//    de la mitad de los juegos recibe un 20% de descuento, para que un solo
+//    buen partido no lo ponga arriba de alguien constante.
 // El movimiento (▲/▼) compara contra el ranking SIN el último juego.
 export const POWER_WEIGHTS = { form: 0.6, season: 0.3, attendance: 0.1 };
 const FORM_WEIGHTS = [0.4, 0.3, 0.2, 0.1];
@@ -811,10 +813,9 @@ function rankFromGames(games) {
       perPlayer.get(id).push({ game: g, pts });
     }
   }
-  const minGames = Math.min(2, ordered.length);
   const rows = [];
   for (const [playerId, list] of perPlayer) {
-    if (list.length < minGames || !PLAYERS.some((p) => p.id === playerId)) continue;
+    if (!PLAYERS.some((p) => p.id === playerId)) continue;
     const recent = list.slice(-4).reverse();
     const used = FORM_WEIGHTS.slice(0, recent.length);
     const form = recent.reduce((sum, r, i) => sum + r.pts * used[i], 0) / used.reduce((a, b) => a + b, 0);
@@ -827,7 +828,8 @@ function rankFromGames(games) {
     const formPct = Math.max(0, r.form) / maxForm;
     const seasonPct = Math.max(0, r.seasonAvg) / maxSeason;
     const attendance = ordered.length ? r.games / ordered.length : 0;
-    r.score = Math.round(100 * (POWER_WEIGHTS.form * formPct + POWER_WEIGHTS.season * seasonPct + POWER_WEIGHTS.attendance * attendance));
+    const raw = 100 * (POWER_WEIGHTS.form * formPct + POWER_WEIGHTS.season * seasonPct + POWER_WEIGHTS.attendance * attendance);
+    r.score = Math.round(attendance < 0.5 ? raw * 0.8 : raw);
   }
   rows.sort((a, b) => b.score - a.score || b.form - a.form || a.name.localeCompare(b.name));
   rows.forEach((r, i) => (r.rank = i + 1));

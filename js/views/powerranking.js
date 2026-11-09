@@ -124,6 +124,6 @@ export function renderPowerRanking(container) {
     </ul>
     <p>La puntuación (0 a 100) es <b>${pct(POWER_WEIGHTS.form)}</b> forma reciente (sus últimos 4 juegos, el más reciente pesa más), <b>${pct(
       POWER_WEIGHTS.season
-    )}</b> su promedio de toda la temporada y <b>${pct(POWER_WEIGHTS.attendance)}</b> asistencia. Para entrar hay que haber jugado al menos 2 juegos. La flecha compara contra el ranking antes del último juego.</p>`;
+    )}</b> su promedio de toda la temporada y <b>${pct(POWER_WEIGHTS.attendance)}</b> asistencia. Entran todos los que han jugado; quien lleva menos de la mitad de los juegos recibe un 20% de descuento. La flecha compara contra el ranking antes del último juego.</p>`;
   container.appendChild(how);
 }

@@ -913,9 +913,9 @@ const PODIUM_COLORS = { 1: GOLD, 2: "#c0c6cf", 3: "#cd7f4a" };
 
 // `data`: { seasonLabel ("9na Temporada"), gamesCount, early, rows: [{ rank,
 // move (null = nuevo), playerId, name, score, line }] } — se pintan los
-// primeros 5.
+// primeros 10 (antes 5; a petición expresa).
 export async function powerRankingFlyer(data, format = "post", color) {
-  const rows = data.rows.slice(0, 5);
+  const rows = data.rows.slice(0, 10);
   const photos = await Promise.all(rows.map((r) => loadPlayerPhoto(r.playerId)));
   const { canvas, ctx, story, CH, logo, sponsors } = await newFlyer(format, color);
   drawHeader(ctx, logo, story, {
@@ -928,13 +928,13 @@ export async function powerRankingFlyer(data, format = "post", color) {
 
   const left = 90;
   const right = W - 90;
-  const rowH = 124;
-  const gap = 14;
+  const rowH = 62;
+  const gap = 9;
   const top = 392;
   rows.forEach((r, i) => {
     const y = top + i * (rowH + gap);
     const mid = y + rowH / 2;
-    roundRect(ctx, left, y, right - left, rowH, 18);
+    roundRect(ctx, left, y, right - left, rowH, 12);
     ctx.fillStyle = P.tint(0.07);
     ctx.fill();
     ctx.strokeStyle = P.tint(0.12);
@@ -943,15 +943,15 @@ export async function powerRankingFlyer(data, format = "post", color) {
     const podium = PODIUM_COLORS[r.rank];
     if (podium) {
       ctx.save();
-      roundRect(ctx, left, y, right - left, rowH, 18);
+      roundRect(ctx, left, y, right - left, rowH, 12);
       ctx.clip();
       ctx.fillStyle = podium;
-      ctx.fillRect(left, y, 8, rowH);
+      ctx.fillRect(left, y, 7, rowH);
       ctx.restore();
     }
 
-    // Lugar (Teko) y movimiento debajo.
-    jerseyText(ctx, String(r.rank), left + 62, mid + 18, { size: 66, color: r.rank === 1 ? GOLD : "#fff", shadow: false, maxWidth: 90 });
+    // Lugar (Teko) y, a su lado, el movimiento.
+    jerseyText(ctx, String(r.rank), left + 46, mid + 17, { size: 40, color: r.rank === 1 ? GOLD : "#fff", shadow: false, maxWidth: 70 });
     const move =
       r.move == null
         ? { t: "NUEVO", c: GOLD }
@@ -960,17 +960,17 @@ export async function powerRankingFlyer(data, format = "post", color) {
           : r.move < 0
             ? { t: `▼${-r.move}`, c: P.accentText }
             : { t: "=", c: P.muted };
-    text(ctx, move.t, left + 62, mid + 50, { size: 27, color: move.c, maxWidth: 96 });
+    text(ctx, move.t, left + 112, mid + 8, { size: 22, color: move.c, maxWidth: 76 });
 
     // Foto, nombre y su último juego.
-    drawSkewedPhoto(ctx, photos[i], r.name, left + 124, y + 14, 80, 96, 0, P.accent);
-    const tx = left + 238;
-    const maxW = right - 190 - tx;
-    text(ctx, (r.name ?? "").toUpperCase(), tx, mid - 4, { size: 42, italic: true, align: "left", maxWidth: maxW });
-    if (r.line) text(ctx, r.line.toUpperCase(), tx, mid + 34, { size: 24, weight: 600, color: P.muted, align: "left", maxWidth: maxW });
+    drawSkewedPhoto(ctx, photos[i], r.name, left + 156, y + 6, 44, 50, 0, P.accent);
+    const tx = left + 222;
+    const maxW = right - 120 - tx;
+    text(ctx, (r.name ?? "").toUpperCase(), tx, mid + 1, { size: 30, italic: true, align: "left", maxWidth: maxW });
+    if (r.line) text(ctx, r.line.toUpperCase(), tx, mid + 23, { size: 17, weight: 600, color: P.muted, align: "left", maxWidth: maxW });
 
     // Puntos.
-    jerseyText(ctx, String(r.score), right - 30, mid + 22, { size: 70, align: "right", shadow: false, maxWidth: 150 });
+    jerseyText(ctx, String(r.score), right - 24, mid + 16, { size: 42, align: "right", shadow: false, maxWidth: 100 });
   });
 
   drawFooter(ctx, sponsors, CH);
