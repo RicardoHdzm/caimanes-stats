@@ -844,10 +844,10 @@ export function renderJugadorDetalle(container, playerId) {
       <div class="profile-hero-info">
         <div class="profile-hero-kicker">
           ${player.number ? `<span class="profile-hero-number">${player.number}</span>` : ""}
-          <span class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</span>
           ${seasonsWithTeam ? `<span class="profile-hero-seasons">${ordinalTemporada(seasonsWithTeam)} temporada en el equipo</span>` : ""}
         </div>
         <div class="profile-hero-name">${escapeHtml(nameWords.join(" "))}${lastName ? ` <span>${escapeHtml(lastName)}</span>` : ""}</div>
+        <div class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</div>
         <p class="profile-bio" id="profile-bio"${profile?.bio ? "" : " hidden"}>${profile?.bio ? escapeHtml(profile.bio) : ""}</p>
         <div class="profile-hero-meta-row" id="profile-birthday-slot">${renderBirthday(profile)}</div>
         <div id="walkup-display">${renderWalkup(player.walkup)}</div>
