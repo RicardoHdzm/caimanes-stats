@@ -5707,6 +5707,29 @@ body.is-row-dragging {
   margin-top: 4px;
 }
 
+.fz-formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Escritorio: el formulario arriba y la vista previa a todo lo ancho
+   debajo, dentro de un monitor (ver .fz-phone más abajo). */
+.fanzone--desktop {
+  grid-template-columns: 1fr;
+}
+
+.fanzone--desktop .fz-phone {
+  max-width: 760px;
+  aspect-ratio: 2560 / 1440;
+  padding: 10px;
+  border-radius: 14px;
+}
+
+.fanzone--desktop .fz-phone img {
+  border-radius: 6px;
+}
+
 .fanzone-preview {
   display: flex;
   justify-content: center;
@@ -5742,6 +5765,10 @@ body.is-row-dragging {
 
   .fz-phone {
     max-width: 240px;
+  }
+
+  .fanzone--desktop .fz-phone {
+    max-width: 100%;
   }
 }
 

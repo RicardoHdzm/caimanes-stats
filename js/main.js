@@ -41,7 +41,7 @@ const routes = {
   alineacion: renderAlineacion,
   records: renderRecords,
   playlist: renderPlaylist,
-  fanzone: renderFanzone,
+  wallpapers: renderFanzone,
   caimavlogs: renderVlogs,
 };
 
@@ -68,7 +68,7 @@ const MORE_TABS = [
   { tab: "temporadas", route: "#/temporadas", label: "Temporadas", icon: "fa-calendar-days" },
   { tab: "records", route: "#/records", label: "Récords", icon: "fa-crown" },
   { tab: "playlist", route: "#/playlist", label: "Playlist", icon: "fa-music" },
-  { tab: "fanzone", route: "#/fanzone", label: "Fanzone", icon: "fa-mobile-screen" },
+  { tab: "wallpapers", route: "#/wallpapers", label: "Wallpapers", icon: "fa-image" },
   { tab: "caimavlogs", route: "#/caimavlogs", label: "Caimavlogs", icon: "fa-video" },
 ];
 
@@ -86,7 +86,7 @@ const NAV_GROUPS = [
   { label: "Temporada", tabs: ["calendario", "juegos", "standing", "playoffs"] },
   { label: "Equipo", tabs: ["roster", "alineacion"] },
   { label: "Stats", tabs: ["resumen", "estadisticas", "temporadas", "records"] },
-  { label: "Multimedia", tabs: ["playlist", "fanzone", "caimavlogs"] },
+  { label: "Multimedia", tabs: ["caimavlogs", "playlist", "wallpapers"] },
 ].map((g) => ({ ...g, tabs: g.tabs.map((id) => ALL_TABS.get(id)) }));
 
 function appTile(t) {
@@ -133,6 +133,10 @@ function currentRoute() {
   // #/vlogs sigue abriendo la misma página.
   if (first === "vlogs") {
     return { tab: "caimavlogs", render: routes.caimavlogs };
+  }
+  // "Fanzone" se llama ahora Wallpapers: el link viejo sigue funcionando.
+  if (first === "fanzone") {
+    return { tab: "wallpapers", render: routes.wallpapers };
   }
   if (first === "juegos" && second) {
     return { tab: "juegos", render: (container) => renderJuegoDetalle(container, second) };

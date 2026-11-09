@@ -1,6 +1,7 @@
-// Fanzone: cualquier visitante arma un wallpaper para su celular con el
-// logo del equipo, un nombre y un número de jersey (estilo playera), y
-// elige entre dos estilos de color: Clásico y Moderno. El dibujo vive en
+// Wallpapers (antes "Fanzone"; a petición expresa, el nombre dice lo que
+// hay): cualquier visitante arma un wallpaper con el logo del equipo, un
+// nombre y un número de jersey (estilo playera), para celular o para
+// escritorio, y elige entre dos estilos de color: Clásico y Moderno. El dibujo vive en
 // wallpaperCanvas() de js/flyers.js; aquí solo el formulario, la vista
 // previa y Descargar/Compartir. Lo último que se eligió se recuerda en
 // este navegador (localStorage), para no volver a capturarlo.
@@ -18,6 +19,13 @@ const STYLES = [
   // Moderno: negro apenas levantado (#101012) — en negro puro las sombras de
   // la piel no se ven y las escamas se veían borrosas.
   { id: "moderno", label: "Moderno", bg: "#101012", fg: "#d31245", numberFg: "#ffffff", logo: "red", shadow: false, skin: 0.8 },
+];
+
+// Formatos: celular (vertical) o escritorio (horizontal, 2560×1440) — ver
+// WALL_LAYOUTS en js/flyers.js.
+const FORMATS = [
+  { id: "phone", label: "Celular", icon: "fa-mobile-screen" },
+  { id: "desktop", label: "Escritorio", icon: "fa-desktop" },
 ];
 
 function loadState() {
@@ -46,7 +54,7 @@ function surnameOf(player) {
 }
 
 export function renderFanzone(container) {
-  heading(container, "Fanzone");
+  heading(container, "Wallpapers");
 
   const saved = loadState() ?? {};
   const state = {
@@ -55,6 +63,7 @@ export function renderFanzone(container) {
     number: saved.number ?? "1",
     // Lo guardado de antes (colores sueltos) cae al primer estilo.
     style: STYLES.some((st) => st.id === saved.style) ? saved.style : STYLES[0].id,
+    format: FORMATS.some((f) => f.id === saved.format) ? saved.format : FORMATS[0].id,
   };
   const styleOf = () => STYLES.find((st) => st.id === state.style) ?? STYLES[0];
 
@@ -62,7 +71,13 @@ export function renderFanzone(container) {
   wrap.className = "fanzone";
   wrap.innerHTML = `
     <div class="leader-card fanzone-form">
-      <h3><i class="fa-solid fa-mobile-screen"></i>Wallpaper para tu celular</h3>
+      <h3><i class="fa-solid fa-image"></i>Arma tu wallpaper</h3>
+      <span class="fz-label">Para</span>
+      <div class="fz-formats">
+        ${FORMATS.map(
+          (f) => `<button type="button" class="pos-filter-chip fz-format" data-format="${f.id}"><i class="fa-solid ${f.icon}"></i> ${f.label}</button>`
+        ).join("")}
+      </div>
       <label class="fz-field">
         <span>Jugador</span>
         <select id="fz-player">
@@ -120,6 +135,9 @@ export function renderFanzone(container) {
     nameIn.value = state.name;
     numberIn.value = state.number;
     for (const btn of wrap.querySelectorAll(".fz-preset")) btn.classList.toggle("active", btn.dataset.style === state.style);
+    for (const btn of wrap.querySelectorAll(".fz-format")) btn.classList.toggle("active", btn.dataset.format === state.format);
+    // Escritorio: la vista previa pasa a un monitor ancho, debajo del formulario.
+    wrap.classList.toggle("fanzone--desktop", state.format === "desktop");
   }
 
   let currentFile = null;
@@ -131,13 +149,13 @@ export function renderFanzone(container) {
     timer = setTimeout(async () => {
       const mine = ++token;
       saveState(state);
-      const canvas = await wallpaperCanvas({ name: state.name, number: state.number, style: styleOf() });
+      const canvas = await wallpaperCanvas({ name: state.name, number: state.number, style: styleOf(), format: state.format });
       const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
       if (mine !== token || !blob || !img.isConnected) return;
       if (currentUrl) URL.revokeObjectURL(currentUrl);
       currentUrl = URL.createObjectURL(blob);
       img.src = currentUrl;
-      const filename = `wallpaper-caimanes-${(state.name || "fan").toLowerCase().replace(/[^a-z0-9ñáéíóú]+/gi, "-")}-${state.number || "0"}.png`;
+      const filename = `wallpaper-caimanes-${(state.name || "fan").toLowerCase().replace(/[^a-z0-9ñáéíóú]+/gi, "-")}-${state.number || "0"}${state.format === "desktop" ? "-escritorio" : ""}.png`;
       download.href = currentUrl;
       download.download = filename;
       currentFile = new File([blob], filename, { type: "image/png" });
@@ -167,6 +185,10 @@ export function renderFanzone(container) {
     numberIn.value = numberIn.value.replace(/\D/g, "").slice(0, 2);
     state.number = numberIn.value;
     render();
+  });
+  wrap.querySelector(".fz-formats").addEventListener("click", (e) => {
+    const btn = e.target.closest(".fz-format");
+    if (btn) update({ format: btn.dataset.format });
   });
   wrap.querySelector(".fz-presets").addEventListener("click", (e) => {
     const btn = e.target.closest(".fz-preset");

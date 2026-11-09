@@ -900,6 +900,11 @@ export async function leadersFlyer(data, format = "post", color) {
 // 1170×2532 = proporción de los celulares actuales (19.5:9).
 const WALL_W = 1170;
 const WALL_H = 2532;
+// Fondo de escritorio (a petición expresa): 2560×1440 (16:9, pantallas 2K;
+// en 1080p se ve igual de nítido, solo más chico). Mismo diseño que el de
+// celular, acomodado al centro de una pantalla ancha.
+const DESK_W = 2560;
+const DESK_H = 1440;
 const JERSEY_FONT = '"Legend M54", "Barlow Condensed", "Arial Narrow", sans-serif';
 
 let wallAssetsPromise = null;
@@ -937,11 +942,12 @@ export function stripAccents(str) {
 // píxel a media resolución y se escala — es una capa translúcida encima del
 // color de fondo, así que funciona igual en Clásico y Moderno. Semilla
 // fija: sale igual cada vez. Se cachea (es lo más pesado del wallpaper).
-let crocSkinCache = null;
-function crocSkinLayer() {
-  if (crocSkinCache) return crocSkinCache;
-  const SW = Math.round(WALL_W / 2);
-  const SH = Math.round(WALL_H / 2);
+const crocSkinCache = new Map();
+function crocSkinLayer(fullW = WALL_W, fullH = WALL_H) {
+  const key = `${fullW}x${fullH}`;
+  if (crocSkinCache.has(key)) return crocSkinCache.get(key);
+  const SW = Math.round(fullW / 2);
+  const SH = Math.round(fullH / 2);
   let seed = 20260;
   const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
@@ -1020,23 +1026,25 @@ function crocSkinLayer() {
     }
   }
   lctx.putImageData(img, 0, 0);
-  crocSkinCache = layer;
+  crocSkinCache.set(key, layer);
   return layer;
 }
 
 function drawCrocSkin(ctx, alpha = 0.55) {
+  const { width: cw, height: ch } = ctx.canvas;
   ctx.save();
   ctx.imageSmoothingQuality = "high";
   // Más transparente (a petición expresa): la piel se insinúa, no se impone.
   ctx.globalAlpha = alpha;
-  ctx.drawImage(crocSkinLayer(), 0, 0, WALL_W, WALL_H);
+  ctx.drawImage(crocSkinLayer(cw, ch), 0, 0, cw, ch);
   ctx.globalAlpha = 1;
   // Más oscuro en las orillas, para que la piel no se vea plana.
-  const vignette = ctx.createRadialGradient(WALL_W / 2, WALL_H * 0.47, 250, WALL_W / 2, WALL_H * 0.47, WALL_H * 0.75);
+  const reach = Math.max(cw, ch);
+  const vignette = ctx.createRadialGradient(cw / 2, ch * 0.47, 250, cw / 2, ch * 0.47, reach * 0.75);
   vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
   vignette.addColorStop(1, "rgba(0, 0, 0, 0.55)");
   ctx.fillStyle = vignette;
-  ctx.fillRect(0, 0, WALL_W, WALL_H);
+  ctx.fillRect(0, 0, cw, ch);
   ctx.restore();
 }
 
@@ -1055,19 +1063,23 @@ function applySkin(lctx, alpha, scale = 1) {
   lctx.save();
   lctx.globalCompositeOperation = "source-atop";
   lctx.globalAlpha = alpha;
-  const tile = crocSkinLayer();
-  const tw = WALL_W * scale;
-  const th = WALL_H * scale;
-  for (let y = 0; y < WALL_H; y += th) {
-    for (let x = 0; x < WALL_W; x += tw) lctx.drawImage(tile, x, y, tw, th);
+  const { width: cw, height: ch } = lctx.canvas;
+  // Los flyers (1080 de ancho) usan la piel de celular; los wallpapers, la
+  // de su propio tamaño.
+  const isDesk = cw === DESK_W && ch === DESK_H;
+  const tile = isDesk ? crocSkinLayer(DESK_W, DESK_H) : crocSkinLayer();
+  const tw = (isDesk ? DESK_W : WALL_W) * scale;
+  const th = (isDesk ? DESK_H : WALL_H) * scale;
+  for (let y = 0; y < ch; y += th) {
+    for (let x = 0; x < cw; x += tw) lctx.drawImage(tile, x, y, tw, th);
   }
   lctx.restore();
 }
 
 function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0, skinScale = 1 }) {
   const layer = document.createElement("canvas");
-  layer.width = WALL_W;
-  layer.height = WALL_H;
+  layer.width = ctx.canvas.width;
+  layer.height = ctx.canvas.height;
   const lctx = layer.getContext("2d");
   let s = size;
   lctx.font = `${s}px ${JERSEY_FONT}`;
@@ -1078,7 +1090,7 @@ function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0,
   lctx.fillStyle = color;
   lctx.textAlign = "center";
   lctx.textBaseline = "alphabetic";
-  lctx.fillText(str, WALL_W / 2, baseline);
+  lctx.fillText(str, layer.width / 2, baseline);
 
   applySkin(lctx, skin, skinScale);
 
@@ -1093,39 +1105,48 @@ function wallText(ctx, str, baseline, { size, maxWidth, color, shadow, skin = 0,
   ctx.restore();
 }
 
+// Acomodo de cada formato: dónde va la línea base del nombre y del número,
+// su tamaño y ancho máximo, y dónde y de qué ancho va el logo.
+const WALL_LAYOUTS = {
+  phone: { w: WALL_W, h: WALL_H, name: [955, 165, 0.62], number: [1490, 610, 0.72], logo: [1565, 340] },
+  desktop: { w: DESK_W, h: DESK_H, name: [455, 150, 0.36], number: [960, 540, 0.36], logo: [1025, 290] },
+};
+
 // `name`: apellido (o lo que se quiera). `number`: texto del número.
 // `style`: { bg, fg, logo: "white" | "red", shadow, skin, textSkin } — ver STYLES en
-// js/views/fanzone.js.
-export async function wallpaperCanvas({ name, number, style }) {
+// js/views/fanzone.js. `format`: "phone" (celular) o "desktop" (escritorio).
+export async function wallpaperCanvas({ name, number, style, format = "phone" }) {
   const { logos } = await loadWallpaperAssets();
+  const L = WALL_LAYOUTS[format] ?? WALL_LAYOUTS.phone;
   const canvas = document.createElement("canvas");
-  canvas.width = WALL_W;
-  canvas.height = WALL_H;
+  canvas.width = L.w;
+  canvas.height = L.h;
   const ctx = canvas.getContext("2d");
 
   ctx.fillStyle = style.bg;
-  ctx.fillRect(0, 0, WALL_W, WALL_H);
+  ctx.fillRect(0, 0, L.w, L.h);
   drawCrocSkin(ctx, style.skin ?? 0.55);
 
-  const maxWidth = WALL_W * 0.62;
   const nameText = stripAccents(name).trim().toUpperCase();
   // Piel también dentro de las letras (a petición expresa), más marcada que
   // en el fondo para que se lea sobre el color sólido.
   const textSkin = style.textSkin ?? 0.9;
-  if (nameText) wallText(ctx, nameText, 955, { size: 165, maxWidth, color: style.fg, shadow: style.shadow, skin: textSkin });
+  const [nameY, nameSize, nameMax] = L.name;
+  const [numY, numSize, numMax] = L.number;
+  if (nameText) wallText(ctx, nameText, nameY, { size: nameSize, maxWidth: L.w * nameMax, color: style.fg, shadow: style.shadow, skin: textSkin });
   const numText = String(number ?? "").trim();
-  if (numText) wallText(ctx, numText, 1490, { size: 610, maxWidth: WALL_W * 0.72, color: style.numberFg ?? style.fg, shadow: style.shadow, skin: textSkin });
+  if (numText) wallText(ctx, numText, numY, { size: numSize, maxWidth: L.w * numMax, color: style.numberFg ?? style.fg, shadow: style.shadow, skin: textSkin });
 
   const logo = logos[style.logo];
   if (logo) {
     // El logo también con la piel (a petición expresa), igual que las letras.
-    const w = 340;
+    const [logoY, w] = L.logo;
     const h = (w * logo.naturalHeight) / logo.naturalWidth;
     const layer = document.createElement("canvas");
-    layer.width = WALL_W;
-    layer.height = WALL_H;
+    layer.width = L.w;
+    layer.height = L.h;
     const lctx = layer.getContext("2d");
-    lctx.drawImage(logo, (WALL_W - w) / 2, 1565, w, h);
+    lctx.drawImage(logo, (L.w - w) / 2, logoY, w, h);
     applySkin(lctx, textSkin);
     ctx.drawImage(layer, 0, 0);
   }
