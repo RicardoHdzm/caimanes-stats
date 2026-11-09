@@ -72,6 +72,10 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
       const th = document.createElement("th");
       th.textContent = col.label;
       th.dataset.key = col.key;
+      // col-<key>: estilos por columna (p. ej. el nombre a la izquierda);
+      // sorted-col: la columna por la que se está ordenando (resaltada).
+      th.classList.add(`col-${col.key}`);
+      if (sortable && col.key === sortKey) th.classList.add("sorted-col");
       if (col.numeric) th.classList.add("numeric");
       th.classList.add(...stickyClasses(index));
       if (sortable) {
@@ -95,6 +99,8 @@ export function renderSortableTable(container, { columns, rows, defaultSort, def
       const tr = document.createElement("tr");
       for (const [index, col] of columns.entries()) {
         const td = document.createElement("td");
+        td.classList.add(`col-${col.key}`);
+        if (sortable && col.key === sortKey) td.classList.add("sorted-col");
         if (col.numeric) td.classList.add("numeric");
         td.classList.add(...stickyClasses(index));
         const value = row[col.key] ?? "";

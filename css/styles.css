@@ -8954,3 +8954,62 @@ a.home-sponsor-card:hover {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   box-shadow: 0 12px 24px -10px var(--accent-glow);
 }
+
+/* ---- Tablas al día con el diseño (a petición expresa) ----
+   Raya roja arriba como las tarjetas, encabezados en la letra de títulos,
+   los nombres a la izquierda en Barlow y la columna por la que se ordena
+   resaltada en rojo (th/td.sorted-col, ver renderSortableTable en
+   js/ui.js). */
+.table-wrap {
+  border-top: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.stats-table thead th {
+  padding-top: 13px;
+  padding-bottom: 13px;
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface-alt));
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+}
+
+.stats-table thead th.sorted-col,
+.stats-table thead th.sort-asc,
+.stats-table thead th.sort-desc {
+  color: var(--accent-text);
+}
+
+.stats-table thead th.sort-asc::after,
+.stats-table thead th.sort-desc::after {
+  color: var(--accent-text);
+}
+
+/* Columna ordenada: un velo rojo tenue y el número en negrita. */
+.stats-table td.sorted-col {
+  background-image: linear-gradient(color-mix(in srgb, var(--accent) 9%, transparent), color-mix(in srgb, var(--accent) 9%, transparent));
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* Nombre del jugador (o del equipo, en la tabla de posiciones): a la
+   izquierda, en la letra de títulos. */
+.stats-table th.col-name,
+.stats-table th.col-team {
+  text-align: left;
+}
+
+.stats-table td.col-name,
+.stats-table td.col-team {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stats-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface-alt));
+}
