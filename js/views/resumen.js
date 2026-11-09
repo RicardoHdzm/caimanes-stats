@@ -254,7 +254,7 @@ export function renderSeasonCards(container, { games, statGames, leaguePosition,
     next.innerHTML = heroCardInnerHtml(
       "fa-calendar-day",
       "Próximo juego",
-      `<p><span class="leader-hero-value">vs</span> ${g.opponent}</p><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${formatGameTime(g.time)}` : ""}</p>`,
+      `<p><span class="leader-hero-value leader-hero-value--text">vs</span> ${g.opponent}</p><p class="next-game-info">${formatGameDate(g.date)}${g.time ? ` — ${formatGameTime(g.time)}` : ""}</p>`,
       `<div class="rsvp-actions"></div>`
     );
     bottomRow.appendChild(next);

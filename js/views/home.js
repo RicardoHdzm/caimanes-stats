@@ -430,10 +430,10 @@ export function renderHome(container) {
       <div class="home-cards">
         <article class="home-card">
           <span class="home-card-kicker">${escapeHtml(meta?.league ?? "")} · ${ordinalTemporada(ref)} Temporada</span>
-          <h3 class="home-card-title">Récord ${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</h3>
+          <h3 class="home-card-title">Récord <span class="home-card-num">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</span></h3>
           <ul class="home-card-list">
             ${pos ? `<li>🏅 ${pos}° lugar${teamsCount ? ` de ${teamsCount}` : ""} en la tabla</li>` : ""}
-            <li>⚾ ${rec.RF} carreras anotadas · ${rec.RA} permitidas</li>
+            <li>⚾ <b class="home-card-num">${rec.RF}</b> carreras anotadas · <b class="home-card-num">${rec.RA}</b> permitidas</li>
             <li>🏆 ${escapeHtml(poText)}</li>
           </ul>
           <a class="home-card-link" href="#/temporadas/${ref}">Ver temporada →</a>

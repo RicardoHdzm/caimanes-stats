@@ -2380,12 +2380,19 @@ main h3::before {
 }
 
 .leader-hero-value {
+  font-family: var(--font-jersey);
+  font-size: calc(var(--text-4xl) * 1.3);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text);
+}
+
+/* El "vs" del próximo juego no es número: se queda en Barlow. */
+.leader-hero-value--text {
   font-family: var(--font-display);
   font-size: var(--text-4xl);
   font-weight: 700;
   font-style: italic;
-  line-height: 1;
-  color: var(--text);
 }
 
 .leader-hero-name {
@@ -3908,10 +3915,9 @@ button.mvp-vote-card:active {
 }
 
 .record-value {
-  font-family: var(--font-display);
-  font-size: var(--text-4xl);
-  font-weight: 700;
-  font-style: italic;
+  font-family: var(--font-jersey);
+  font-size: calc(var(--text-4xl) * 1.3);
+  font-weight: 600;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--text);
@@ -6354,10 +6360,9 @@ a.home-sponsor-card:hover {
 .home-next-countdown {
   grid-area: count;
   align-self: center;
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  font-style: italic;
+  font-family: var(--font-jersey);
+  font-size: calc(var(--text-3xl) * 1.3);
+  font-weight: 600;
   color: var(--text);
   /* Dígitos del mismo ancho: los segundos cambian sin que el texto "brinque". */
   font-variant-numeric: tabular-nums;
@@ -6773,8 +6778,8 @@ a.home-sponsor-card:hover {
 }
 
 .home-match-score {
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-family: var(--font-jersey);
+  font-size: calc(var(--text-3xl) * 1.3);
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -6830,6 +6835,15 @@ a.home-sponsor-card:hover {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
   text-transform: uppercase;
+}
+
+/* Números dentro de la tarjeta (récord, carreras) en la letra de los
+   números (Teko), un poco más grandes porque Teko se ve más chica. */
+.home-card-num {
+  font-family: var(--font-jersey);
+  font-size: 1.3em;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .home-card-list {
