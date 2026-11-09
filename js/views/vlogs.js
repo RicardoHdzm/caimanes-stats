@@ -4,7 +4,7 @@
 // página los muestra del más nuevo al más viejo.
 import { GAMES } from "../data.js";
 import { gameResult } from "../stats.js";
-import { heading, escapeHtml } from "../ui.js";
+import { escapeHtml } from "../ui.js";
 
 // Saca el id del video de cualquier link de YouTube: watch?v=, youtu.be/,
 // shorts/, live/ o embed/. Sin id válido el juego simplemente no sale.
@@ -60,7 +60,12 @@ function vlogCard({ game, number, videoId }) {
 }
 
 export function renderVlogs(container) {
-  heading(container, "Caimavlogs");
+  // Título a mano (heading() pinta en rojo la última PALABRA y aquí es una
+  // sola): "Caima" normal y "vlogs" en rojo, a petición expresa.
+  const title = document.createElement("h2");
+  title.className = "page-title";
+  title.innerHTML = 'Caima<span class="page-title-accent">vlogs</span> <i class="page-title-slashes" aria-hidden="true">///</i>';
+  container.appendChild(title);
 
   const vlogs = vlogGames().reverse();
   const grid = document.createElement("div");
