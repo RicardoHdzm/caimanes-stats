@@ -511,6 +511,7 @@ export function renderRecordCards(container, records) {
       return `
       <div class="record-card record-card--hero"${r.playerId ? ` data-player="${r.playerId}"` : ""}${r.gameId ? ` data-game="${r.gameId}"` : ""}>
         <div class="record-hero">
+          <i class="fa-solid ${r.icon} leader-hero-watermark" aria-hidden="true"></i>
           <div class="record-hero-main">
             <span class="record-label"><i class="fa-solid ${r.icon}"></i>${r.label}</span>
             <span class="record-value">${valueWithUnit(r.value)}</span>
