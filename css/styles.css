@@ -1382,20 +1382,16 @@ main h3::before {
   display: inline-block;
 }
 
-/* Paralelogramo con marco rojo, como las fotos de los flyers (a petición
-   expresa; antes un círculo con aro). El marco son cuatro drop-shadow sin
-   desenfoque (un borde normal no sigue el clip-path) + un brillo rojo.
-   !important en el tamaño: renderAvatar() lo pone en línea (cuadrado). */
-.profile-avatar-wrap {
-  filter: drop-shadow(3px 0 0 var(--accent)) drop-shadow(-3px 0 0 var(--accent)) drop-shadow(0 3px 0 var(--accent))
-    drop-shadow(0 -3px 0 var(--accent)) drop-shadow(0 10px 22px var(--accent-glow));
-}
-
+/* Foto vertical con esquinas redondeadas y marco rojo, como credencial (a
+   petición expresa: antes en paralelogramo, el único elemento en diagonal
+   del sitio). !important en el tamaño: renderAvatar() lo pone en línea
+   (cuadrado). */
 .profile-avatar-wrap .avatar {
   width: 168px !important;
   height: 200px !important;
-  border-radius: 0;
-  clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%);
+  border: 3px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px var(--accent-glow);
 }
 
 /* Overlay de cámara al pasar el mouse sobre tu propia foto — invisible
@@ -1406,7 +1402,7 @@ main h3::before {
 .profile-avatar-overlay {
   position: absolute;
   inset: 0;
-  clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
