@@ -8114,9 +8114,10 @@ a.home-sponsor-card:hover {
   }
 }
 
-/* ---- Próximos juegos como boletos (ver ticketsHtml en calendario.js) ----
-   Las muescas de la línea perforada son dos círculos recortados con
-   máscara (arriba y abajo, alineados con el talón). */
+/* ---- Próximos juegos (ver ticketsHtml en calendario.js) ----
+   Tarjeta normal (antes en forma de boleto con muescas y línea perforada;
+   a petición expresa, sin esa forma): raya roja a la izquierda, datos del
+   juego y la hora a la derecha en fuente de jersey. */
 .tickets {
   margin-bottom: 26px;
 }
@@ -8127,35 +8128,30 @@ a.home-sponsor-card:hover {
 }
 
 .ticket {
-  --stub: 170px;
   display: grid;
-  grid-template-columns: 1fr var(--stub);
-  min-height: 118px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 26px 18px 22px;
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
   color: var(--text);
   text-decoration: none;
-  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
-  -webkit-mask:
-    radial-gradient(circle 13px at calc(100% - var(--stub)) 0, transparent 98%, #000) top / 100% 51% no-repeat,
-    radial-gradient(circle 13px at calc(100% - var(--stub)) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
-  mask:
-    radial-gradient(circle 13px at calc(100% - var(--stub)) 0, transparent 98%, #000) top / 100% 51% no-repeat,
-    radial-gradient(circle 13px at calc(100% - var(--stub)) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
-  border-radius: 14px;
-  transition: transform 0.15s;
+  transition: border-color 0.15s, transform 0.15s;
 }
 
 .ticket:hover {
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
 .ticket-main {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 6px;
-  padding: 18px 22px;
-  border-left: 5px solid var(--accent);
-  border-radius: 14px 0 0 14px;
+  min-width: 0;
 }
 
 .ticket-kicker {
@@ -8195,17 +8191,12 @@ a.home-sponsor-card:hover {
   font-weight: 700;
 }
 
-/* Talón: rojo, separado por la línea perforada. */
 .ticket-stub {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 2px;
-  border-left: 2px dashed rgba(255, 255, 255, 0.35);
-  border-radius: 0 14px 14px 0;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: #fff;
+  color: var(--accent-text);
 }
 
 .ticket-time {
@@ -8223,6 +8214,7 @@ a.home-sponsor-card:hover {
 }
 
 .ticket-ampm {
+  color: var(--muted);
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 700;
@@ -8232,11 +8224,8 @@ a.home-sponsor-card:hover {
 
 @media (max-width: 640px) {
   .ticket {
-    --stub: 104px;
-  }
-
-  .ticket-main {
-    padding: 14px 14px;
+    gap: 10px;
+    padding: 14px 16px 14px 14px;
   }
 
   .ticket-teams {

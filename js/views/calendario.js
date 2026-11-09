@@ -34,8 +34,8 @@ function buildEventsByDate() {
   return map;
 }
 
-// Próximos juegos como boletos de estadio (a petición expresa): talón rojo
-// con la hora en fuente de jersey, línea perforada y muescas. Llevan a
+// Próximos juegos en tarjetas (antes en forma de boleto; se quitó a petición
+// expresa): la hora a la derecha en fuente de jersey. Llevan a
 // Resumen, donde vive el RSVP (igual que los días programados del calendario).
 function ticketsHtml(todayStr) {
   const upcoming = [...SCHEDULE].filter((s) => s.date >= todayStr).sort((a, b) => a.date.localeCompare(b.date));
