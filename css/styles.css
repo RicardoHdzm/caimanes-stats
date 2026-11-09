@@ -100,17 +100,16 @@
      canal: rayado invisible. */
   --zebra: rgba(255, 255, 255, 0.03);
 
-  /* Trama del fondo: piel de caimán (antes rayas diagonales; a petición
-     expresa, la misma piel de los flyers y los wallpapers de Fanzone).
-     assets/textures/croc-skin.png es un mosaico que se repite sin costuras,
-     gris + transparencia (claro arriba de cada escama, oscuro en el surco),
-     así que sirve en los tres temas. Perillas: --skin-size (tamaño de las
-     escamas) y --skin-veil (velo del color del fondo encima de la piel:
-     más opaco = piel más tenue; el tema claro lleva más velo porque ahí los
-     surcos oscuros resaltan mucho más). */
+  /* Trama del fondo: escamas de caimán en línea fina y plana (antes rayas
+     diagonales; a petición expresa, la idea de la piel de los flyers pero
+     sin relieve, que se veía anticuado). assets/textures/croc-skin.png es
+     solo el CONTORNO de las escamas, un mosaico que se repite sin costuras,
+     y se usa como máscara (ver body::before) — el color lo pone
+     --skin-line, así cada tema elige el suyo. Perillas: --skin-line (subir
+     el alfa la marca más) y --skin-size (tamaño de las escamas). */
   --skin-texture: url("../assets/textures/croc-skin.png");
   --skin-size: 448px;
-  --skin-veil: rgba(13, 13, 13, 0.3);
+  --skin-line: rgba(74, 158, 255, 0.09);
 
   /* Centro del resplandor radial detrás del header (ver `body` más abajo) —
      separado de --surface aunque hoy valga lo mismo, para que el tema
@@ -150,7 +149,7 @@
   --accent-glow: rgba(226, 32, 47, 0.25);
 
   --zebra: rgba(0, 0, 0, 0.025);
-  --skin-veil: rgba(244, 245, 247, 0.72);
+  --skin-line: rgba(15, 23, 42, 0.07);
 
   --bg-glow: #ffffff;
 
@@ -186,7 +185,6 @@
   --accent-glow: rgba(191, 15, 53, 0.35);
 
   --bg-glow: #101622;
-  --skin-veil: rgba(10, 14, 24, 0.3);
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
      --surface y --accent de este tema. */
@@ -215,12 +213,36 @@ body {
   display: flex;
   flex-direction: column;
   font-family: var(--font-body);
+  /* isolation: la trama (body::before, z-index -1) queda encima del fondo
+     del body pero debajo de todo el contenido. */
+  position: relative;
+  isolation: isolate;
   background:
-    linear-gradient(var(--skin-veil), var(--skin-veil)),
-    var(--skin-texture) center top / var(--skin-size) repeat,
     radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
     var(--bg);
   color: var(--text);
+}
+
+/* Las escamas: el color de --skin-line recortado con la forma del mosaico
+   (máscara), fijas a la pantalla y desvaneciéndose hacia abajo — se ven
+   arriba, detrás de los títulos, y no estorban en las tablas. También en el
+   menú ☰ del celular (.more-sheet). */
+body::before,
+.more-sheet::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--skin-line);
+  -webkit-mask:
+    var(--skin-texture) center top / var(--skin-size) repeat,
+    linear-gradient(180deg, #000 0%, transparent 80%);
+  -webkit-mask-composite: source-in;
+  mask:
+    var(--skin-texture) center top / var(--skin-size) repeat,
+    linear-gradient(180deg, #000 0%, transparent 80%);
+  mask-composite: intersect;
 }
 
 /* `position: relative` es lo que ancla al ícono de Instagram (position:
@@ -853,12 +875,10 @@ body {
     position: fixed;
     inset: 0;
     z-index: 45;
-    /* Misma piel de caimán + resplandor del <body> (ver más arriba) — un
-       fondo plano se sentía vacío con solo unos íconos flotando encima;
-       esto le da la misma textura y profundidad que el resto del sitio. */
+    /* Mismas escamas (.more-sheet::before, junto a body::before) +
+       resplandor del <body> — un fondo plano se sentía vacío con solo unos
+       íconos flotando encima. */
     background:
-      linear-gradient(var(--skin-veil), var(--skin-veil)),
-      var(--skin-texture) center top / var(--skin-size) repeat,
       radial-gradient(1200px 500px at 50% -10%, var(--bg-glow) 0%, var(--bg) 60%),
       var(--bg);
     padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
