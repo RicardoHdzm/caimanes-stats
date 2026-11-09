@@ -12,6 +12,7 @@ import {
   attendanceStreaks,
   displayPositions,
   gameHasMvp,
+  gameResult,
 } from "../stats.js";
 import {
   heading,
@@ -816,6 +817,15 @@ export function renderJugadorDetalle(container, playerId) {
   const hero = document.createElement("div");
   hero.className = "profile-hero";
   // .profile-hero-ghost: el número gigante y tenue de fondo (ver styles.css).
+  // Ficha de jugador (a petición expresa): hero a todo lo ancho, sin caja —
+  // foto grande en diagonal, número gigante de fondo, el nombre enorme en
+  // dos tonos (apellido en rojo) y abajo los 4 números clave de la
+  // temporada (#profile-keystats, se llena más abajo, cuando ya están los
+  // totales). Los ids de siempre (#profile-avatar-img, #position-display,
+  // #walkup-display…) se conservan: el resto de la vista los usa.
+  const nameWords = player.name.split(" ");
+  const lastName = nameWords.length > 1 ? nameWords.pop() : "";
+  const seasonsWithTeam = player.seasons?.length ?? 0;
   hero.innerHTML = `
     ${player.number ? `<div class="profile-hero-ghost" aria-hidden="true"><span>${player.number}</span></div>` : ""}
     <div id="profile-debut-badge">${renderDebut(player.seasons)}</div>
@@ -831,11 +841,12 @@ export function renderJugadorDetalle(container, playerId) {
         </div>
       </div>
       <div class="profile-hero-info">
-        <div class="profile-hero-name">
-          <span class="profile-hero-number">${player.number ?? "-"}</span>
-          <span>${escapeHtml(player.name)}</span>
+        <div class="profile-hero-kicker">
+          ${player.number ? `<span class="profile-hero-number">${player.number}</span>` : ""}
           <span class="profile-hero-name-positions" id="position-display">${shownPositions(currentPosition)}</span>
+          ${seasonsWithTeam ? `<span class="profile-hero-seasons">${ordinalTemporada(seasonsWithTeam)} temporada en el equipo</span>` : ""}
         </div>
+        <div class="profile-hero-name">${escapeHtml(nameWords.join(" "))}${lastName ? ` <span>${escapeHtml(lastName)}</span>` : ""}</div>
         <p class="profile-bio" id="profile-bio"${profile?.bio ? "" : " hidden"}>${profile?.bio ? escapeHtml(profile.bio) : ""}</p>
         <div class="profile-hero-meta-row" id="profile-birthday-slot">${renderBirthday(profile)}</div>
         <div id="walkup-display">${renderWalkup(player.walkup)}</div>
@@ -849,8 +860,117 @@ export function renderJugadorDetalle(container, playerId) {
         <div id="profile-edit-slot"></div>
       </div>
     </div>
+    <div class="profile-keystats" id="profile-keystats" hidden></div>
   `;
   container.appendChild(hero);
+
+  // ---- Último juego: lo que hizo en el juego más reciente en que jugó ----
+  const myGamesDesc = games
+    .filter((g) => [g.batting, g.pitching, g.fielding].some((lines) => lines?.some((l) => l.playerId === player.id)))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  const lastGame = myGamesDesc[0];
+  if (lastGame) {
+    const b = battingTotals([lastGame]).find((r) => r.playerId === player.id);
+    const p = pitchingTotals([lastGame]).find((r) => r.playerId === player.id && r.outs > 0);
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const line = [
+      p ? plural(p.IP, "entrada", "entradas") : "",
+      p?.SO ? plural(p.SO, "ponche", "ponches") : "",
+      b && b.AB + b.BB > 0 ? `${b.H} de ${b.AB}` : "",
+      b && b.HR + b.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
+      b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
+      b?.SB ? plural(b.SB, "robada", "robadas") : "",
+    ]
+      .filter(Boolean)
+      .slice(0, 4)
+      .join(" · ");
+    const r = gameResult(lastGame);
+    const resultLabel = { W: "Victoria", L: "Derrota", T: "Empate" }[r] ?? "";
+    const when = new Date(`${lastGame.date}T00:00:00`).toLocaleDateString("es-MX", { weekday: "short", day: "numeric", month: "short" });
+    const lastEl = document.createElement("a");
+    lastEl.className = "profile-last-game";
+    lastEl.href = `#/juegos/${lastGame.id}`;
+    lastEl.innerHTML = `
+      <span class="profile-last-label">Último juego</span>
+      <span class="profile-last-match">vs ${escapeHtml(lastGame.opponent ?? "")}${
+        resultLabel ? ` · <b class="profile-last-result profile-last-result--${r}">${resultLabel} ${lastGame.scoreUs}-${lastGame.scoreThem}</b>` : ""
+      } · ${escapeHtml(when)}</span>
+      ${line ? `<span class="profile-last-line">${escapeHtml(line)}</span>` : ""}
+      <span class="profile-last-cta">Ver juego <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>`;
+    container.appendChild(lastEl);
+  }
+
+  // ---- Medallas ganadas al frente (las primeras 8) — el medallero completo
+  // vive en la pestaña "Medallas". Se repinta cada vez que llega una medalla
+  // async (ver addAchievementMedal). ----
+  const medalStrip = document.createElement("div");
+  medalStrip.className = "profile-medal-strip";
+  medalStrip.hidden = true;
+  container.appendChild(medalStrip);
+
+  // ---- Pestañas: Temporada | Juego por juego | Medallas ----
+  const PANES = [
+    { id: "temporada", label: "Temporada" },
+    { id: "juegos", label: "Juego por juego" },
+    { id: "medallas", label: "Medallas" },
+  ];
+  const tabsBar = document.createElement("div");
+  tabsBar.className = "profile-tabs";
+  tabsBar.setAttribute("role", "tablist");
+  tabsBar.innerHTML = PANES.map(
+    (p, i) => `<button type="button" class="profile-tab${i === 0 ? " active" : ""}" role="tab" data-pane="${p.id}" aria-selected="${i === 0}">${p.label}</button>`
+  ).join("");
+  container.appendChild(tabsBar);
+  const panes = Object.fromEntries(
+    PANES.map((p, i) => {
+      const el = document.createElement("div");
+      el.className = "profile-pane";
+      el.dataset.pane = p.id;
+      el.setAttribute("role", "tabpanel");
+      el.hidden = i !== 0;
+      container.appendChild(el);
+      return [p.id, el];
+    })
+  );
+  const paneSeason = panes.temporada;
+  const paneGames = panes.juegos;
+  const paneMedals = panes.medallas;
+  function showPane(id) {
+    for (const btn of tabsBar.querySelectorAll(".profile-tab")) {
+      const on = btn.dataset.pane === id;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-selected", String(on));
+    }
+    for (const [pid, el] of Object.entries(panes)) el.hidden = pid !== id;
+  }
+  tabsBar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".profile-tab");
+    if (btn) showPane(btn.dataset.pane);
+  });
+
+  const medalsEmpty = document.createElement("p");
+  medalsEmpty.className = "subtitle";
+  medalsEmpty.innerHTML = `Todavía no gana medallas. <a href="#/medallas/${player.id}">Ver la guía de medallas</a>`;
+  paneMedals.appendChild(medalsEmpty);
+
+  function updateMedalStrip() {
+    // Solo se llama después de que existe achievementChips (más abajo).
+    const chips = achievementChips;
+    medalsEmpty.hidden = chips.length > 0;
+    medalStrip.hidden = chips.length === 0;
+    if (!chips.length) return;
+    const sorted = [...chips].sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind));
+    const shown = sorted.slice(0, 8);
+    const more = sorted.length - shown.length;
+    medalStrip.innerHTML = `
+      <span class="profile-medal-strip-title">Medallas <b>${chips.length}</b></span>
+      <div class="profile-medal-strip-row">${shown.map(achievementMedalHtml).join("")}${more > 0 ? `<span class="profile-medal-more">+${more}</span>` : ""}</div>
+      <button type="button" class="profile-medal-all">Ver todas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>`;
+    medalStrip.querySelector(".profile-medal-all").addEventListener("click", () => {
+      showPane("medallas");
+      tabsBar.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
 
   // Medallero visible para TODOS (con o sin sesión), a petición expresa —
   // antes era exclusivo de cuentas. Excepción: la medalla de inscripción
@@ -867,8 +987,9 @@ export function renderJugadorDetalle(container, playerId) {
     achievementsCard = document.createElement("div");
     achievementsCard.className = "leader-card player-standalone-card medallero-card";
     achievementsCard.innerHTML = `${MEDALLERO_HEADER(achievementChips.length)}<div class="achievements-grid">${sortedAchievementsHtml(achievementChips)}</div>${MEDALLERO_GUIDE_BTN(player.id)}`;
-    container.appendChild(achievementsCard);
+    paneMedals.prepend(achievementsCard);
   }
+  updateMedalStrip();
 
   // Logros "profile"/"social" (foto, walkup y like a un anuncio, ver más
   // abajo): a diferencia de los de renderAchievements(), dependen de una
@@ -883,7 +1004,7 @@ export function renderJugadorDetalle(container, playerId) {
       achievementsCard = document.createElement("div");
       achievementsCard.className = "leader-card player-standalone-card medallero-card";
       achievementsCard.innerHTML = `${MEDALLERO_HEADER(achievementChips.length)}<div class="achievements-grid"></div>${MEDALLERO_GUIDE_BTN(player.id)}`;
-      hero.after(achievementsCard);
+      paneMedals.prepend(achievementsCard);
     }
     achievementsCard.querySelector(".achievements-grid").innerHTML = sortedAchievementsHtml(achievementChips);
     // La tarjeta ya pudo haber nacido con un conteo viejo (arriba, o en el
@@ -891,6 +1012,7 @@ export function renderJugadorDetalle(container, playerId) {
     // más, async, después de ese primer pintado.
     const countEl = achievementsCard.querySelector("#medallero-count");
     if (countEl) countEl.textContent = `${achievementChips.length}/${TOTAL_MEDALS}`;
+    updateMedalStrip();
   }
 
   // ---- Foto de perfil personalizada: lectura pública, edición propia ----
@@ -1021,7 +1143,7 @@ export function renderJugadorDetalle(container, playerId) {
       <p>Próximo juego: ${g.date} vs ${g.opponent}</p>
       <div class="rsvp-actions"></div>
     `;
-    container.appendChild(summaryEl);
+    paneSeason.appendChild(summaryEl);
     wireRsvp(summaryEl, g.id);
   }
 
@@ -1453,6 +1575,34 @@ export function renderJugadorDetalle(container, playerId) {
   const myOuts = outsTotals(games).find((r) => r.playerId === player.id);
   const totalOuts = (battingSeason?.SO ?? 0) + (myOuts?.TOTAL ?? 0);
 
+  // Los 4 números clave en el hero (fuente de jersey). Pitcher (su posición
+  // registrada empieza con P) con entradas lanzadas: récord, entradas,
+  // ponches y WHIP; los demás: AVG, HR, impulsadas y OPS. El "-" del récord
+  // va en Barlow: la fuente de jersey no lo dibuja.
+  {
+    const isPitcher = /^P\b/.test(player.position ?? "") && pitchingSeason?.outs > 0;
+    const stats = isPitcher
+      ? [
+          [`${pitchingSeason.W}<i>-</i>${pitchingSeason.L}`, "Récord"],
+          [pitchingSeason.IP, "Entradas"],
+          [pitchingSeason.SO, "Ponches"],
+          [pitchingSeason.WHIP, "WHIP"],
+        ]
+      : battingSeason
+        ? [
+            [battingSeason.AVG, "AVG"],
+            [battingSeason.HR + battingSeason.HRC, "HR"],
+            [battingSeason.RBI, "Impulsadas"],
+            [battingSeason.OPS, "OPS"],
+          ]
+        : [];
+    const keyEl = hero.querySelector("#profile-keystats");
+    if (keyEl && stats.length) {
+      keyEl.innerHTML = stats.map(([v, l]) => `<div class="profile-keystat"><b>${v}</b><span>${l}</span></div>`).join("");
+      keyEl.hidden = false;
+    }
+  }
+
   // Insignia "en qué lugar del equipo vas" en la esquina de cada tarjeta —
   // SOLO en tu propio perfil, nunca en el de alguien más (cada quien ve
   // nomás la suya, como pidió el coach). Rate stats (AVG/OPS/ERA/FPCT) se
@@ -1475,121 +1625,111 @@ export function renderJugadorDetalle(container, playerId) {
   if (battingSeason) {
     const h3 = document.createElement("h3");
     h3.textContent = "Bateo — temporada";
-    container.appendChild(h3);
+    paneSeason.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards grid-4";
+    cards.className = "stat-sheet";
     cards.innerHTML = `
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(qualifiedBatters, "AVG", "desc")}
-        <i class="fa-solid fa-baseball-bat-ball card-icon"></i>
-        <span class="card-value">${battingSeason.AVG}</span>
-        <span class="card-label">AVG</span>
+        <span class="sheet-value">${battingSeason.AVG}</span>
+        <span class="sheet-label">AVG</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
+        ${rankBadge(battingList, "H", "desc")}
+        <span class="sheet-value">${battingSeason.H}</span>
+        <span class="sheet-label">Hits</span>
+      </div>
+      <div class="sheet-cell">
         ${rankBadge(battingList, "HR", "desc")}
-        <i class="fa-solid fa-fire card-icon"></i>
-        <span class="card-value">${battingSeason.HR}</span>
-        <span class="card-label">Home runs</span>
+        <span class="sheet-value">${battingSeason.HR}</span>
+        <span class="sheet-label">Home runs</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(battingList, "R", "desc")}
-        <i class="fa-solid fa-bolt card-icon"></i>
-        <span class="card-value">${battingSeason.R}</span>
-        <span class="card-label">Carreras</span>
+        <span class="sheet-value">${battingSeason.R}</span>
+        <span class="sheet-label">Carreras</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(battingList, "RBI", "desc")}
-        <i class="fa-solid fa-tornado card-icon"></i>
-        <span class="card-value">${battingSeason.RBI}</span>
-        <span class="card-label">Impulsadas</span>
+        <span class="sheet-value">${battingSeason.RBI}</span>
+        <span class="sheet-label">Impulsadas</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(battingList, "SB", "desc")}
-        <i class="fa-solid fa-person-running card-icon"></i>
-        <span class="card-value">${battingSeason.SB}</span>
-        <span class="card-label">Bases robadas</span>
+        <span class="sheet-value">${battingSeason.SB}</span>
+        <span class="sheet-label">Bases robadas</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(qualifiedBatters, "OPS", "desc")}
-        <i class="fa-solid fa-chart-line card-icon"></i>
-        <span class="card-value">${battingSeason.OPS}</span>
-        <span class="card-label">OPS</span>
+        <span class="sheet-value">${battingSeason.OPS}</span>
+        <span class="sheet-label">OPS</span>
       </div>
-      <div class="card" title="Ponche + rodado/elevado/línea/base/regla (ver desglose en Bateo)">
-        <i class="fa-solid fa-ban card-icon"></i>
-        <span class="card-value">${totalOuts}</span>
-        <span class="card-label">Outs</span>
+      <div class="sheet-cell" title="Ponche + rodado/elevado/línea/base/regla (ver desglose en Bateo)">
+        <span class="sheet-value">${totalOuts}</span>
+        <span class="sheet-label">Outs</span>
       </div>
     `;
-    container.appendChild(cards);
+    paneSeason.appendChild(cards);
   }
 
   if (pitchingSeason) {
     const h3 = document.createElement("h3");
     h3.textContent = "Pitcheo — temporada";
-    container.appendChild(h3);
+    paneSeason.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards grid-4";
+    cards.className = "stat-sheet";
     cards.innerHTML = `
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(activePitchers, "WHIP", "asc")}
-        <i class="fa-solid fa-baseball card-icon"></i>
-        <span class="card-value">${pitchingSeason.WHIP}</span>
-        <span class="card-label">WHIP</span>
+        <span class="sheet-value">${pitchingSeason.WHIP}</span>
+        <span class="sheet-label">WHIP</span>
       </div>
-      <div class="card">
-        <i class="fa-solid fa-trophy card-icon"></i>
-        <span class="card-value">${pitchingSeason.W}-${pitchingSeason.L}</span>
-        <span class="card-label">Record</span>
+      <div class="sheet-cell">
+        <span class="sheet-value">${pitchingSeason.W}<i>-</i>${pitchingSeason.L}</span>
+        <span class="sheet-label">Record</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(pitchingList, "SO", "desc")}
-        <i class="fa-solid fa-fire card-icon"></i>
-        <span class="card-value">${pitchingSeason.SO}</span>
-        <span class="card-label">Ponches</span>
+        <span class="sheet-value">${pitchingSeason.SO}</span>
+        <span class="sheet-label">Ponches</span>
       </div>
-      <div class="card">
-        <i class="fa-solid fa-hourglass-half card-icon"></i>
-        <span class="card-value">${pitchingSeason.IP}</span>
-        <span class="card-label">Entradas</span>
+      <div class="sheet-cell">
+        <span class="sheet-value">${pitchingSeason.IP}</span>
+        <span class="sheet-label">Entradas</span>
       </div>
     `;
-    container.appendChild(cards);
+    paneSeason.appendChild(cards);
   }
 
   if (fieldingSeason) {
     const h3 = document.createElement("h3");
     h3.textContent = "Fildeo — temporada";
-    container.appendChild(h3);
+    paneSeason.appendChild(h3);
     const cards = document.createElement("div");
-    cards.className = "cards grid-4";
+    cards.className = "stat-sheet";
     cards.innerHTML = `
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(activeFielders, "FPCT", "desc")}
-        <i class="fa-solid fa-shield card-icon"></i>
-        <span class="card-value">${fieldingSeason.FPCT}</span>
-        <span class="card-label">FPCT</span>
+        <span class="sheet-value">${fieldingSeason.FPCT}</span>
+        <span class="sheet-label">FPCT</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(fieldingList, "PO", "desc")}
-        <i class="fa-solid fa-mitten card-icon"></i>
-        <span class="card-value">${fieldingSeason.PO}</span>
-        <span class="card-label">Outs (PO)</span>
+        <span class="sheet-value">${fieldingSeason.PO}</span>
+        <span class="sheet-label">Outs (PO)</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(fieldingList, "A", "desc")}
-        <i class="fa-solid fa-arrow-right-arrow-left card-icon"></i>
-        <span class="card-value">${fieldingSeason.A}</span>
-        <span class="card-label">Asistencias</span>
+        <span class="sheet-value">${fieldingSeason.A}</span>
+        <span class="sheet-label">Asistencias</span>
       </div>
-      <div class="card">
+      <div class="sheet-cell">
         ${rankBadge(fieldingList, "E", "asc")}
-        <i class="fa-solid fa-xmark card-icon"></i>
-        <span class="card-value">${fieldingSeason.E}</span>
-        <span class="card-label">Errores</span>
+        <span class="sheet-value">${fieldingSeason.E}</span>
+        <span class="sheet-label">Errores</span>
       </div>
     `;
-    container.appendChild(cards);
+    paneSeason.appendChild(cards);
   }
 
   // Compartir las stats de la temporada como imagen (ver playerStatsFlyer
@@ -1624,7 +1764,7 @@ export function renderJugadorDetalle(container, playerId) {
         "Compartir estadísticas"
       )
     );
-    container.appendChild(shareRow);
+    paneSeason.appendChild(shareRow);
   }
 
   // Compartir la línea de UN juego: botón al final de cada fila de "Bateo
@@ -1730,7 +1870,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (battedGames.length > 1) {
     const h3 = document.createElement("h3");
     h3.textContent = "Tendencia de bateo";
-    container.appendChild(h3);
+    paneSeason.appendChild(h3);
 
     let cumulativeH = 0;
     let cumulativeAB = 0;
@@ -1748,13 +1888,13 @@ export function renderJugadorDetalle(container, playerId) {
       };
     });
 
-    renderTrendChart(container, points);
+    renderTrendChart(paneSeason, points);
   }
 
   if (battingRows.length > 0) {
     const h3 = document.createElement("h3");
     h3.textContent = "Bateo por juego";
-    container.appendChild(h3);
+    paneGames.appendChild(h3);
 
     const battingColumns = [
       { key: "date", label: "Fecha", sticky: true },
@@ -1774,7 +1914,7 @@ export function renderJugadorDetalle(container, playerId) {
     ];
 
     const el = document.createElement("div");
-    container.appendChild(el);
+    paneGames.appendChild(el);
     wireGameShare(el);
     renderSortableTable(el, {
       columns: [...battingColumns, shareGameColumn],
@@ -1785,13 +1925,13 @@ export function renderJugadorDetalle(container, playerId) {
         location.hash = `#/juegos/${row.gameId}`;
       },
     });
-    renderGlossary(container, battingColumns);
+    renderGlossary(paneGames, battingColumns);
   }
 
   if (outsRows.length > 0) {
     const h3 = document.createElement("h3");
     h3.textContent = "Outs por juego";
-    container.appendChild(h3);
+    paneGames.appendChild(h3);
 
     const outsColumns = [
       { key: "date", label: "Fecha", sticky: true },
@@ -1807,7 +1947,7 @@ export function renderJugadorDetalle(container, playerId) {
     ];
 
     const outsEl = document.createElement("div");
-    container.appendChild(outsEl);
+    paneGames.appendChild(outsEl);
     renderSortableTable(outsEl, {
       columns: outsColumns,
       rows: outsRows,
@@ -1817,7 +1957,7 @@ export function renderJugadorDetalle(container, playerId) {
         location.hash = `#/juegos/${row.gameId}`;
       },
     });
-    renderGlossary(container, outsColumns);
+    renderGlossary(paneGames, outsColumns);
   }
 
   // ---- Pitcheo juego por juego ----
@@ -1844,7 +1984,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (pitchingRows.length > 0) {
     const h3 = document.createElement("h3");
     h3.textContent = "Pitcheo por juego";
-    container.appendChild(h3);
+    paneGames.appendChild(h3);
 
     const pitchingColumns = [
       { key: "date", label: "Fecha", sticky: true },
@@ -1860,7 +2000,7 @@ export function renderJugadorDetalle(container, playerId) {
     ];
 
     const el = document.createElement("div");
-    container.appendChild(el);
+    paneGames.appendChild(el);
     // El botón de compartir el juego va en Bateo; aquí solo si nunca bateó.
     const sharesHere = battingRows.length === 0;
     if (sharesHere) wireGameShare(el);
@@ -1873,7 +2013,7 @@ export function renderJugadorDetalle(container, playerId) {
         location.hash = `#/juegos/${row.gameId}`;
       },
     });
-    renderGlossary(container, pitchingColumns);
+    renderGlossary(paneGames, pitchingColumns);
   }
 
   // ---- Fildeo juego por juego ----
@@ -1895,7 +2035,7 @@ export function renderJugadorDetalle(container, playerId) {
   if (fieldingRows.length > 0) {
     const h3 = document.createElement("h3");
     h3.textContent = "Fildeo por juego";
-    container.appendChild(h3);
+    paneGames.appendChild(h3);
 
     const fieldingColumns = [
       { key: "date", label: "Fecha", sticky: true },
@@ -1906,7 +2046,7 @@ export function renderJugadorDetalle(container, playerId) {
     ];
 
     const el = document.createElement("div");
-    container.appendChild(el);
+    paneGames.appendChild(el);
     renderSortableTable(el, {
       columns: fieldingColumns,
       rows: fieldingRows,
@@ -1916,14 +2056,21 @@ export function renderJugadorDetalle(container, playerId) {
         location.hash = `#/juegos/${row.gameId}`;
       },
     });
-    renderGlossary(container, fieldingColumns);
+    renderGlossary(paneGames, fieldingColumns);
   }
 
   if (!battingSeason && !pitchingSeason && !fieldingSeason) {
     const p = document.createElement("p");
     p.className = "subtitle";
     p.textContent = "Todavía no pisa el campo esta temporada.";
-    container.appendChild(p);
+    paneSeason.appendChild(p);
+  }
+
+  if (!paneGames.children.length) {
+    const p = document.createElement("p");
+    p.className = "subtitle";
+    p.textContent = "Todavía no pisa el campo esta temporada.";
+    paneGames.appendChild(p);
   }
 
   // ---- Comparación contigo: solo con sesión y viendo a OTRO jugador ----
@@ -1934,7 +2081,7 @@ export function renderJugadorDetalle(container, playerId) {
   const myId = getCurrentPlayerId();
   if (myId && myId !== player.id) {
     const compareEl = document.createElement("div");
-    container.appendChild(compareEl);
+    paneSeason.appendChild(compareEl);
     renderLockedComparison(compareEl, myId, player.id);
   }
 }

@@ -8123,3 +8123,444 @@ a.home-sponsor-card:hover {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Ficha de jugador (perfil, js/views/jugador.js) — rediseño a petición
+   expresa. Va al final para mandar sobre los estilos viejos de .profile-hero.
+   ========================================================================== */
+
+/* Hero a todo lo ancho, sin caja: se sale de <main> hasta las orillas de la
+   pantalla (margin negativo) y con padding devuelve el contenido a la misma
+   columna que el resto de la página. */
+.profile-hero {
+  margin: 6px calc(50% - 50vw) 0;
+  padding: 44px calc(50vw - 50%) 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background:
+    radial-gradient(900px 420px at 18% 30%, var(--accent-glow), transparent 70%),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--surface) 70%, transparent));
+  box-shadow: none;
+}
+
+.profile-hero-ghost {
+  border-radius: 0;
+}
+
+.profile-hero-ghost span {
+  left: auto;
+  right: 4%;
+  font-size: 460px;
+  opacity: 0.05;
+}
+
+.profile-hero-top {
+  align-items: center;
+  gap: 44px;
+}
+
+.profile-avatar-wrap .avatar {
+  width: 230px !important;
+  height: 272px !important;
+}
+
+.profile-hero-info {
+  gap: 10px;
+}
+
+.profile-hero-kicker {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.profile-hero-kicker .profile-hero-number {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.profile-hero-seasons {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Nombre enorme en dos tonos: el apellido en rojo, en su propio renglón. */
+.profile-hero-name {
+  display: block;
+  font-size: clamp(2.8rem, 6.5vw, 5rem);
+  font-style: italic;
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+}
+
+.profile-hero-name span {
+  display: block;
+  color: var(--accent-text);
+}
+
+/* Barra de los 4 números clave, pegada abajo del hero. */
+.profile-keystats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 30px;
+  border-top: 1px solid var(--border);
+}
+
+.profile-keystat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 8px 20px;
+}
+
+.profile-keystat + .profile-keystat {
+  border-left: 1px solid var(--border);
+}
+
+.profile-keystat b {
+  font-family: var(--font-jersey);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.profile-keystat b i,
+.sheet-value i {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.profile-keystat span {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---- Último juego ---- */
+.profile-last-game {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "label match cta" "label line cta";
+  align-items: center;
+  column-gap: 22px;
+  row-gap: 2px;
+  margin: 22px 0 0;
+  padding: 16px 22px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.profile-last-game:hover {
+  border-color: var(--accent);
+}
+
+.profile-last-label {
+  grid-area: label;
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.profile-last-match {
+  grid-area: match;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.profile-last-result--W {
+  color: var(--win);
+}
+
+.profile-last-result--L {
+  color: var(--loss);
+}
+
+.profile-last-line {
+  grid-area: line;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.profile-last-cta {
+  grid-area: cta;
+  color: var(--accent-text);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Medallas al frente ---- */
+.profile-medal-strip {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 12px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.profile-medal-strip-title {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.profile-medal-strip-title b {
+  color: var(--accent-text);
+}
+
+.profile-medal-strip-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Las medallas del medallero, en chico y sin su etiqueta. */
+.profile-medal-strip .achievement-medal {
+  flex-shrink: 0;
+  width: auto;
+  padding: 0;
+}
+
+.profile-medal-strip .achievement-medal-label {
+  display: none;
+}
+
+.profile-medal-strip .achievement-medal-icon {
+  width: 38px;
+  height: 38px;
+  font-size: 0.95rem;
+}
+
+.profile-medal-more {
+  color: var(--muted);
+  font-weight: 800;
+  font-size: var(--text-sm);
+}
+
+.profile-medal-all {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* ---- Pestañas del perfil ---- */
+.profile-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 28px 0 6px;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 90px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.profile-tab {
+  position: relative;
+  padding: 12px 18px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.profile-tab:hover {
+  color: var(--text);
+}
+
+/* Raya roja inclinada bajo la pestaña activa. */
+.profile-tab.active {
+  color: var(--text);
+}
+
+.profile-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -1px;
+  height: 4px;
+  background: var(--accent);
+  transform: skewX(-24deg);
+}
+
+.profile-pane[hidden] {
+  display: none;
+}
+
+/* El medallero dentro de su pestaña ya no necesita separarse del hero. */
+.profile-pane .medallero-card {
+  margin-top: 18px;
+}
+
+/* ---- Stats de la temporada como hoja de números ----
+   Valores grandes con su etiqueta, separados por líneas finas (como la
+   parte de atrás de una barajita), en vez de tarjetas con íconos. */
+.stat-sheet {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 8px;
+  border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border);
+}
+
+.sheet-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 18px 18px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.sheet-value {
+  font-family: var(--font-jersey);
+  font-size: 2.4rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.sheet-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sheet-cell .card-rank {
+  top: 8px;
+  right: 8px;
+}
+
+@media (max-width: 640px) {
+  .profile-hero {
+    padding-top: 30px;
+  }
+
+  .profile-hero-top {
+    gap: 22px;
+  }
+
+  .profile-avatar-wrap .avatar {
+    width: 168px !important;
+    height: 200px !important;
+  }
+
+  .profile-hero-kicker {
+    justify-content: center;
+    gap: 8px 10px;
+  }
+
+  /* La regla vieja de celular manda las posiciones a su propio renglón. */
+  .profile-hero-kicker .profile-hero-name-positions {
+    flex-basis: auto;
+  }
+
+  .profile-hero-kicker .profile-hero-number {
+    font-size: 2rem;
+  }
+
+  .profile-hero-seasons {
+    flex-basis: 100%;
+  }
+
+  .profile-hero-name {
+    font-size: 2.6rem;
+  }
+
+  .profile-keystats {
+    margin-top: 22px;
+  }
+
+  .profile-keystat {
+    padding: 14px 4px 16px;
+  }
+
+  .profile-keystat b {
+    font-size: 1.9rem;
+  }
+
+  .profile-keystat span {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+  }
+
+  .profile-last-game {
+    grid-template-columns: 1fr;
+    grid-template-areas: "label" "match" "line" "cta";
+    padding: 14px 16px;
+  }
+
+  .profile-medal-strip {
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .profile-medal-strip-row {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .profile-medal-all {
+    margin-left: auto;
+  }
+
+  .profile-tab {
+    padding: 10px 12px;
+    font-size: var(--text-md);
+  }
+
+  .stat-sheet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sheet-value {
+    font-size: 2rem;
+  }
+}
