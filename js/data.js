@@ -121,7 +121,7 @@ export const DUES_PAID = {
   9: {
     p1: false, // Axel Medina
     p3: false, // Omar Ramirez
-    p4: false, // Carlos Borboa
+    p4: true, // Carlos Borboa
     p5: false, // Christopher Felix
     p6: false, // Edwyn Pompa
     p7: false, // Francois Cardenas
