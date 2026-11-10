@@ -9013,3 +9013,39 @@ a.home-sponsor-card:hover {
 .stats-table tbody tr:hover {
   background: color-mix(in srgb, var(--accent) 7%, var(--surface-alt));
 }
+
+/* ---- Botones rectangulares con esquinas redondeadas (a petición
+   expresa: antes en forma de píldora; así combinan con las tarjetas,
+   tablas y demás elementos del sitio). Las etiquetas (posiciones, badges,
+   chips de datos) se quedan como píldora: no son botones. ---- */
+:root {
+  --radius-btn: 10px;
+}
+
+.home-btn,
+.replay-btn,
+.back-link,
+.share-flyer-btn,
+.flyer-btn,
+.pos-filter-chip,
+.walkup-edit-btn,
+.rsvp-btn,
+.splash-btn,
+.medallero-guide-btn,
+.roster-back-link,
+.win-toast-link,
+.auth-submit,
+.auth-btn-named,
+.avatar-edit-label {
+  border-radius: var(--radius-btn);
+}
+
+/* El grupo Post/Historia y Clásico/Moderno de la vista previa de imágenes:
+   la caja un poco más redondeada que los botones de adentro. */
+.flyer-formats {
+  border-radius: 12px;
+}
+
+.flyer-format {
+  border-radius: 8px;
+}
