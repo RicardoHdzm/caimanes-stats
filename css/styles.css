@@ -41,7 +41,7 @@
 
 :root {
   /* Ancho máximo del cuerpo del sitio (main y el contenido del footer). */
-  --content-max: 1500px;
+  --content-max: 1280px;
   /* ---- color ---- */
   /* Esto es el tema "Luna" (oscuro, el default — sin atributo en <html>,
      ver js/theme.js). Gris neutro (R=G=B), no azul marino — antes tenían
@@ -9048,4 +9048,18 @@ a.home-sponsor-card:hover {
 
 .flyer-format {
   border-radius: 8px;
+}
+
+/* Margen lateral en celular: 16px (antes 24px; a petición expresa, para
+   ganar espacio en pantallas angostas). El ancho máximo en escritorio
+   (--content-max) bajó de 1500 a 1280px, arriba en :root. */
+@media (max-width: 640px) {
+  main {
+    padding: 22px 16px 40px;
+  }
+
+  .footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
