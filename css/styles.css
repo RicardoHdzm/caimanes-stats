@@ -9081,3 +9081,14 @@ a.home-sponsor-card:hover {
     padding-right: 16px;
   }
 }
+
+/* Interruptor de tema (eclipse / luna): rectángulo con esquinas
+   redondeadas, igual que los botones (antes una píldora con un círculo
+   adentro; a petición expresa). */
+.theme-switch {
+  border-radius: var(--radius-btn);
+}
+
+.theme-switch-thumb {
+  border-radius: 7px;
+}
