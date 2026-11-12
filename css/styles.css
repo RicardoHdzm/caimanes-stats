@@ -6301,7 +6301,8 @@ h2.page-title {
    (los dos oscuros, ver js/theme.js) se invierten a blanco solos, sin
    necesidad de guardar una segunda versión de cada logo. */
 .home-sponsors {
-  --sponsor-cols: 5;
+  /* 6: los 5 patrocinadores + la tarjeta "¿Quieres apoyar al equipo?". */
+  --sponsor-cols: 6;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -6853,66 +6854,6 @@ a.home-sponsor-card:hover {
 }
 
 /* Roster. */
-.home-roster {
-  display: grid;
-  /* 3 columnas fijas: los 9 titulares quedan en 3 filas de 3. */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-/* Tarjeta: foto a la izquierda, nombre y número a un lado. */
-.home-player {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 18px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: var(--surface);
-  color: var(--text);
-  text-decoration: none;
-  transition: border-color 0.15s, transform 0.15s;
-}
-
-.home-player > :first-child {
-  flex-shrink: 0;
-}
-
-.home-player-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-/* En celular no caben 3 tarjetas horizontales: una por fila. */
-@media (max-width: 640px) {
-  .home-roster {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-  }
-
-  .home-player {
-    padding: 12px 14px;
-  }
-}
-
-.home-player:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
-}
-
-.home-player-num {
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  color: var(--accent-text);
-}
-
-.home-player-name {
-  font-weight: 700;
-  font-size: var(--text-lg);
-}
-
 /* Historia. */
 .home-timeline {
   position: relative;
@@ -9286,4 +9227,157 @@ a.home-sponsor-card:hover {
 .home-rank-empty {
   color: var(--muted);
   font-size: var(--text-sm);
+}
+
+/* ---- "Somos Caimanes" (Inicio): los 9 titulares como mini barajitas ----
+   Foto rectangular con esquinas redondeadas, el número en Teko en la esquina
+   y la posición debajo del nombre (a petición expresa; antes fotos en
+   círculo). En una sola fila; en pantallas angostas se desliza de lado. */
+.home-roster {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(118px, 1fr);
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.home-player {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  scroll-snap-align: start;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.home-player:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 18px 36px -16px var(--accent-glow);
+}
+
+.home-player-photo {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--surface-alt);
+}
+
+.home-player-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 45%);
+}
+
+.home-player-photo .avatar {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0;
+  object-position: center 20%;
+}
+
+.home-player-num {
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  right: 10px;
+  color: #fff;
+  font-family: var(--font-jersey);
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.home-player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 12px 12px;
+  min-width: 0;
+}
+
+.home-player-name {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.home-player-pos {
+  overflow: hidden;
+  color: var(--accent-text);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Patrocinadores: más presencia + tarjeta para conseguir más ---- */
+.home-sponsor-card {
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.home-sponsor-logo {
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+a.home-sponsor-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 18px 36px -16px var(--accent-glow);
+}
+
+a.home-sponsor-card:hover .home-sponsor-logo {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* "¿Quieres apoyar al equipo?": borde punteado rojo, abre un mensaje
+   directo de Instagram al equipo. */
+.home-sponsor-cta {
+  flex-direction: column;
+  gap: 6px;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  color: var(--text);
+  text-align: center;
+  text-decoration: none;
+}
+
+.home-sponsor-cta i {
+  color: var(--accent-text);
+  font-size: 1.6rem;
+}
+
+.home-sponsor-cta b {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.home-sponsor-cta span {
+  color: var(--accent-text);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

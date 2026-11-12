@@ -15,8 +15,8 @@ import {
   playoffSeasonStatus,
   playerName,
 } from "../stats.js";
-import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime } from "../ui.js";
-import { suggestedStarters } from "../lineup.js";
+import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime, POSITION_NAMES } from "../ui.js";
+import { suggestedStartersWithPos } from "../lineup.js";
 import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
 import { powerRankingTopHtml } from "./powerranking.js";
 
@@ -528,17 +528,20 @@ export function renderHome(container) {
   roster.innerHTML = `
     ${sectionHead("Somos", "Caimanes", "ROSTER")}
     <div class="home-roster">
-      ${suggestedStarters()
-        .map((p) => {
-          return `
+      ${suggestedStartersWithPos()
+        .map(
+          ({ player: p, pos }) => `
         <a class="home-player" href="#/jugador/${p.id}">
-          ${renderAvatar(p, 72)}
+          <span class="home-player-photo">
+            ${renderAvatar(p, 220)}
+            ${p.number ? `<span class="home-player-num">${p.number}</span>` : ""}
+          </span>
           <span class="home-player-info">
             <span class="home-player-name">${escapeHtml(p.name)}</span>
-            <span class="home-player-num">#${p.number ?? "-"}</span>
+            <span class="home-player-pos">${escapeHtml(POSITION_NAMES[pos] ?? pos)}</span>
           </span>
-        </a>`;
-        })
+        </a>`
+        )
         .join("")}
     </div>
     <a class="home-btn home-btn--ghost home-center" href="#/roster">Ver roster completo →</a>
@@ -558,6 +561,11 @@ export function renderHome(container) {
             ? `<a class="home-sponsor-card" href="${s.url}" target="_blank" rel="noopener noreferrer">${logo}</a>`
             : `<div class="home-sponsor-card">${logo}</div>`;
         }).join("")}
+        <a class="home-sponsor-card home-sponsor-cta" href="https://ig.me/m/caimanes.sb" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+          <b>¿Quieres apoyar al equipo?</b>
+          <span>Escríbenos</span>
+        </a>
       </div>
     `;
     root.appendChild(sponsors);

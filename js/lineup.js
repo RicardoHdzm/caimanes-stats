@@ -365,9 +365,15 @@ export function alineacionRoster() {
 // JD ni JC), en orden P, C, 1B… — los usa el roster de la portada. Mismo
 // cálculo que la pestaña: `roster` ya trae las posiciones más jugadas.
 export function suggestedStarters(roster = alineacionRoster()) {
+  return suggestedStartersWithPos(roster).map((s) => s.player);
+}
+
+// Igual que suggestedStarters, pero con la posición de cada quien:
+// [{ player, pos }] (la portada la muestra en la tarjeta).
+export function suggestedStartersWithPos(roster = alineacionRoster()) {
   const assignment = assignDefense(roster, lineupStatsById(roster));
   const byId = new Map(roster.map((p) => [p.id, p]));
-  return DEFENSE_POSITIONS.map((pos) => assignment[pos] && byId.get(assignment[pos].playerId)).filter(Boolean);
+  return DEFENSE_POSITIONS.map((pos) => ({ pos, player: assignment[pos] && byId.get(assignment[pos].playerId) })).filter((s) => s.player);
 }
 
 // La alineación sugerida ya "en limpio" para la pestaña pública Alineación
