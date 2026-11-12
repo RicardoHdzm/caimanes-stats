@@ -3695,10 +3695,10 @@ body.modal-open {
    (ver .more-sheet-grid button en este mismo archivo). */
 .mvp-vote-grid {
   display: grid;
-  /* 150px de mínimo — a propósito, para que como mucho quepan 6 columnas
-     por renglón (con 7 se veían muy apretadas) en el ancho normal de
-     `main` (ver css/styles.css). */
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  /* auto-fit (no auto-fill): las tarjetas se estiran para ocupar todo el
+     ancho aunque sean pocas (a petición expresa; con auto-fill quedaban
+     huecos vacíos a la derecha). 150px de mínimo. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
