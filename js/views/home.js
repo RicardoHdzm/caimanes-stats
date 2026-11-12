@@ -19,8 +19,8 @@ import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime, POSITION_NA
 import { suggestedStartersWithPos } from "../lineup.js";
 import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
 import { powerRankingTopHtml } from "./powerranking.js";
+import { upcomingCardHtml, resultCardHtml } from "../scorecards.js";
 
-const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 
 function fmtDate(dateStr, opts = { weekday: "short", day: "numeric", month: "short" }) {
   return new Date(`${dateStr}T00:00:00`).toLocaleDateString("es-MX", opts);
@@ -28,20 +28,6 @@ function fmtDate(dateStr, opts = { weekday: "short", day: "numeric", month: "sho
 
 // Título de sección: "PRÓXIMOS **JUEGOS** ///" con una palabra gigante y
 // tenue detrás (como "ARENA" / "ADN" en lyon.gg).
-// "8va Temporada · Juego 9" — número de juego dentro de su temporada (por
-// fecha). Los de playoffs se cuentan dentro de su serie, con el nombre de la
-// ronda: "8va Temporada · Cuartos de Final · Juego 2".
-function gameTag(g) {
-  const season = `${ordinalTemporada(g.season)} Temporada`;
-  if (g.playoff) {
-    const round = PLAYOFFS.find((e) => e.season === g.season)?.rounds.find((r) => r.games?.some((x) => x.id === g.id));
-    const n = round ? round.games.findIndex((x) => x.id === g.id) + 1 : 0;
-    return [season, round?.name ?? "Playoffs", n ? `Juego ${n}` : ""].filter(Boolean).join(" · ");
-  }
-  const n = GAMES.filter((x) => x.season === g.season).sort((a, b) => a.date.localeCompare(b.date)).findIndex((x) => x.id === g.id) + 1;
-  return n ? `${season} · Juego ${n}` : season;
-}
-
 function sectionHead(first, accent, bgWord, sub = "") {
   return `
     <div class="home-section-head">
@@ -50,15 +36,6 @@ function sectionHead(first, accent, bgWord, sub = "") {
       ${sub ? `<p class="home-sub">${sub}</p>` : ""}
     </div>
   `;
-}
-
-// "Rockin Roll" -> "RR", "Blockreto" -> "BL": el "logo" del rival (no
-// tenemos los escudos de los demás equipos).
-function rivalInitials(name) {
-  const words = (name ?? "").trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
 }
 
 // "2026-11-13" de HOY en la hora de aquí (no UTC: con toISOString, desde las
@@ -354,66 +331,12 @@ export function renderHome(container) {
   games.id = "home-games";
   const upcoming = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date));
   const recent = [...allGames].filter((g) => g.date && g.scoreUs != null).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
-  // Tarjetas estilo marcador de transmisión (a petición expresa): un
-  // renglón por equipo con su marcador en Teko a la derecha — el ganador en
-  // blanco, el que pierde apagado —, raya del color del resultado a la
-  // izquierda y arriba el estado ("Victoria"/"Derrota"/"Próximo") con la
-  // fecha. Los próximos llevan la hora en grande en lugar del marcador.
-  const teamRow = (logoHtml, name, runs, state) => `
-          <span class="score-row${state ? ` score-row--${state}` : ""}">
-            ${logoHtml}
-            <span class="score-row-name">${escapeHtml(name)}</span>
-            ${runs != null ? `<b class="score-row-runs">${runs}</b>` : ""}
-          </span>`;
-  const usLogo = '<img class="score-row-logo" src="assets/logo.png" alt="" />';
-  const rivalLogo = (opponent) => `<i class="score-row-logo score-row-logo--rival">${escapeHtml(rivalInitials(opponent))}</i>`;
-  const shortDate = (d) => fmtDate(d, { weekday: "short", day: "numeric", month: "short" });
+  // Tarjetas estilo marcador (ver js/scorecards.js, las mismas de Juegos).
   // Los programados son de la temporada actual y siguen la numeración de los
   // juegos de temporada regular que ya se capturaron en GAMES.
   const playedThisSeason = GAMES.filter((g) => g.season === CURRENT_SEASON).length;
-  const upcomingCards = upcoming.map((g, i) => {
-    const [time, ampm] = g.time ? formatGameTime(g.time).split(" ") : ["", ""];
-    return `
-        <a class="score-card score-card--next" href="#/calendario">
-          <span class="score-card-top">
-            <span class="score-card-status">Próximo</span>
-            <span>${escapeHtml(shortDate(g.date))}</span>
-          </span>
-          <span class="score-card-body">
-            <span class="score-card-rows">
-              ${teamRow(usLogo, "Caimanes")}
-              ${teamRow(rivalLogo(g.opponent), g.opponent ?? "Rival")}
-            </span>
-            ${time ? `<span class="score-card-time"><b>${time}</b><small>${ampm}</small></span>` : ""}
-          </span>
-          <span class="score-card-foot">
-            <span>${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${playedThisSeason + i + 1}</span>
-            <span class="score-card-cta">Calendario <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-          </span>
-        </a>`;
-  });
-  const recentCards = recent.map((g) => {
-    const r = gameResult(g);
-    const us = r === "W" ? "win" : r === "L" ? "lose" : "";
-    const them = r === "L" ? "win" : r === "W" ? "lose" : "";
-    return `
-        <a class="score-card score-card--${r ?? "unknown"}" href="#/juegos/${g.id}">
-          <span class="score-card-top">
-            <span class="score-card-status">${RESULT_LABEL[r] ?? "Final"}</span>
-            <span>${escapeHtml(shortDate(g.date))}</span>
-          </span>
-          <span class="score-card-body">
-            <span class="score-card-rows">
-              ${teamRow(usLogo, "Caimanes", g.scoreUs, us)}
-              ${teamRow(rivalLogo(g.opponent), g.opponent ?? "Rival", g.scoreThem, them)}
-            </span>
-          </span>
-          <span class="score-card-foot">
-            <span>${escapeHtml(gameTag(g))}</span>
-            <span class="score-card-cta">Ver juego <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-          </span>
-        </a>`;
-  });
+  const upcomingCards = upcoming.map((g, i) => upcomingCardHtml(g, playedThisSeason + i + 1));
+  const recentCards = recent.map(resultCardHtml);
   const cards = [...upcomingCards, ...recentCards];
   games.innerHTML = `
     ${sectionHead("Historial de", "juegos", "JUEGOS")}

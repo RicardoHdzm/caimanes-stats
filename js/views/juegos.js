@@ -1,85 +1,39 @@
-import { SCHEDULE } from "../data.js";
-import { seasonStatGames, gameResult } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, escapeHtml, formatGameTime } from "../ui.js";
-
-const RESULT_BADGE = {
-  W: '<span class="badge badge-win"><i class="fa-solid fa-check"></i> W</span>',
-  L: '<span class="badge badge-loss"><i class="fa-solid fa-xmark"></i> L</span>',
-  T: '<span class="badge badge-tie"><i class="fa-solid fa-equals"></i> E</span>',
-};
-const UNKNOWN_BADGE = '<span class="badge badge-unknown">?</span>';
+// Juegos (a petición expresa, con las mismas tarjetas estilo marcador del
+// historial de la portada — ver js/scorecards.js — en lugar de tablas):
+// los próximos arriba y los resultados de la temporada actual (regular +
+// playoffs), del más reciente al más viejo.
+import { SCHEDULE, GAMES, CURRENT_SEASON } from "../data.js";
+import { seasonStatGames } from "../stats.js";
+import { heading } from "../ui.js";
+import { upcomingCardHtml, resultCardHtml } from "../scorecards.js";
 
 export function renderJuegos(container) {
   heading(container, "Juegos");
 
-  if (SCHEDULE.length > 0) {
-    const scheduleHeading = document.createElement("h3");
-    scheduleHeading.textContent = "Próximos juegos";
-    container.appendChild(scheduleHeading);
-
-    const scheduleEl = document.createElement("div");
-    container.appendChild(scheduleEl);
-    renderSortableTable(scheduleEl, {
-      columns: [
-        { key: "date", label: "Fecha" },
-        { key: "time", label: "Hora", render: formatGameTime },
-        { key: "opponent", label: "Rival" },
-      ],
-      rows: SCHEDULE,
-      defaultSort: "date",
-      defaultDir: 1,
-    });
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const upcoming = [...SCHEDULE].filter((g) => g.date >= todayStr).sort((a, b) => a.date.localeCompare(b.date));
+  if (upcoming.length > 0) {
+    const h = document.createElement("h3");
+    h.textContent = "Próximos juegos";
+    container.appendChild(h);
+    const played = GAMES.filter((g) => g.season === CURRENT_SEASON && !g.playoff).length;
+    const grid = document.createElement("div");
+    grid.className = "home-match-grid";
+    grid.innerHTML = upcoming.map((g, i) => upcomingCardHtml(g, played + i + 1)).join("");
+    container.appendChild(grid);
   }
 
-  const resultsHeading = document.createElement("h3");
-  resultsHeading.textContent = "Resultados (clic en un juego para ver el detalle)";
-  container.appendChild(resultsHeading);
-
-  // Temporada regular + playoffs de la temporada actual (seasonStatGames
-  // marca los de playoffs con `playoff`, que llevan su etiqueta dorada).
-  const rows = seasonStatGames().map((g) => {
-    const known = g.scoreUs != null && g.scoreThem != null;
-    return {
-      id: g.id,
-      date: g.date,
-      time: g.time ?? "",
-      opponent: g.opponent,
-      playoff: !!g.playoff,
-      // No es una sede: en esta liga no hay local/visitante, solo en qué
-      // parte de la entrada bateamos. Cerrar bateando = batear en la parte
-      // baja; si cierra el rival, nosotros bateamos en la alta.
-      close: g.weCloseBatting == null ? "?" : g.weCloseBatting ? "Baja" : "Alta",
-      score: known ? `${g.scoreUs} - ${g.scoreThem}` : "Pendiente",
-      result: gameResult(g) ?? "",
-    };
-  });
-
-  const tableEl = document.createElement("div");
-  container.appendChild(tableEl);
-
-  const resultColumns = [
-    { key: "date", label: "Fecha", sticky: true },
-    { key: "time", label: "Hora", render: formatGameTime },
-    {
-      key: "opponent",
-      label: "Rival",
-      render: (value, row) =>
-        `${escapeHtml(value ?? "")}${row.playoff ? ' <span class="playoff-tag"><i class="fa-solid fa-trophy"></i> Playoffs</span>' : ""}`,
-    },
-    { key: "close", label: "Entrada", full: "Parte de la entrada en que bateamos — baja = cerramos, alta = abrimos" },
-    { key: "score", label: "Marcador" },
-    { key: "result", label: "Resultado", render: (value) => RESULT_BADGE[value] ?? UNKNOWN_BADGE },
-  ];
-
-  renderSortableTable(tableEl, {
-    columns: resultColumns,
-    rows,
-    defaultSort: "date",
-    defaultDir: 1,
-    onRowClick: (row) => {
-      location.hash = `#/juegos/${row.id}`;
-    },
-  });
-
-  renderGlossary(container, resultColumns);
+  const h = document.createElement("h3");
+  h.textContent = "Resultados";
+  container.appendChild(h);
+  const results = seasonStatGames()
+    .filter((g) => g.date)
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.time ?? "").localeCompare(a.time ?? ""));
+  const grid = document.createElement("div");
+  grid.className = "home-match-grid";
+  grid.innerHTML = results.length
+    ? results.map(resultCardHtml).join("")
+    : '<p class="subtitle">Todavía no hay juegos esta temporada. El caimán está calentando.</p>';
+  container.appendChild(grid);
 }
