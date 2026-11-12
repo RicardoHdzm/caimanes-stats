@@ -110,6 +110,7 @@ export function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note 
     return `
       <div class="leader-card leader-card--hero">
         <div class="leader-hero">
+          <i class="fa-solid ${icon} leader-hero-watermark" aria-hidden="true"></i>
           <div class="leader-hero-main">
             <h3><i class="fa-solid ${icon}"></i>${title}</h3>
             <p>Sin datos todavía.</p>
@@ -142,6 +143,7 @@ export function teamLeaderCardHtml({ icon, title, list, valueOf, detailOf, note 
   return `
     <div class="leader-card leader-card--hero">
       <div class="leader-hero">
+        <i class="fa-solid ${icon} leader-hero-watermark" aria-hidden="true"></i>
         <div class="leader-hero-main">
           <h3><i class="fa-solid ${icon}"></i>${title}</h3>
           <span class="leader-hero-value">${valueWithUnit(valueOf(first))}</span>

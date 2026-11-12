@@ -9381,3 +9381,22 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Tarjetas de líderes (Resumen, Récords "En una temporada"): también llevan
+   el ícono de fondo; la foto va encima de él. */
+.leader-hero-avatar {
+  position: relative;
+  z-index: 1;
+}
+
+/* Con foto a la derecha, el ícono de fondo se recorre a la izquierda de
+   ella para que no quede tapado. */
+.leader-hero:has(.leader-hero-avatar) .leader-hero-watermark {
+  right: 112px;
+}
+
+@media (max-width: 640px) {
+  .leader-hero:has(.leader-hero-avatar) .leader-hero-watermark {
+    right: 96px;
+  }
+}
