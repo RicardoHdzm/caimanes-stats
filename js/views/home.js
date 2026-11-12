@@ -354,37 +354,64 @@ export function renderHome(container) {
   games.id = "home-games";
   const upcoming = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date));
   const recent = [...allGames].filter((g) => g.date && g.scoreUs != null).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
-  const matchTeams = (opponent, middle) => `
-          <div class="home-match-teams">
-            <span class="home-match-team"><img src="assets/logo.png" alt="" /> Caimanes</span>
-            ${middle}
-            <span class="home-match-team home-match-team--rival"><i class="home-match-rival-badge">${escapeHtml(rivalInitials(opponent))}</i>${escapeHtml(opponent ?? "Rival")}</span>
-          </div>`;
+  // Tarjetas estilo marcador de transmisión (a petición expresa): un
+  // renglón por equipo con su marcador en Teko a la derecha — el ganador en
+  // blanco, el que pierde apagado —, raya del color del resultado a la
+  // izquierda y arriba el estado ("Victoria"/"Derrota"/"Próximo") con la
+  // fecha. Los próximos llevan la hora en grande en lugar del marcador.
+  const teamRow = (logoHtml, name, runs, state) => `
+          <span class="score-row${state ? ` score-row--${state}` : ""}">
+            ${logoHtml}
+            <span class="score-row-name">${escapeHtml(name)}</span>
+            ${runs != null ? `<b class="score-row-runs">${runs}</b>` : ""}
+          </span>`;
+  const usLogo = '<img class="score-row-logo" src="assets/logo.png" alt="" />';
+  const rivalLogo = (opponent) => `<i class="score-row-logo score-row-logo--rival">${escapeHtml(rivalInitials(opponent))}</i>`;
+  const shortDate = (d) => fmtDate(d, { weekday: "short", day: "numeric", month: "short" });
   // Los programados son de la temporada actual y siguen la numeración de los
   // juegos de temporada regular que ya se capturaron en GAMES.
   const playedThisSeason = GAMES.filter((g) => g.season === CURRENT_SEASON).length;
-  const upcomingCards = upcoming.map(
-    (g, i) => `
-        <a class="home-match home-match--next" href="#/calendario">
-          <span class="home-match-league">${escapeHtml(TEAM.league)}</span>
-          <span class="home-match-tag">${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${playedThisSeason + i + 1}</span>
-          ${matchTeams(g.opponent, `<span class="home-match-vs">vs</span>`)}
-          <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}${g.time ? ` · ${formatGameTime(g.time)}` : ""}</span>
-          <span class="home-match-cta">Ver calendario ▸</span>
-        </a>`
-  );
+  const upcomingCards = upcoming.map((g, i) => {
+    const [time, ampm] = g.time ? formatGameTime(g.time).split(" ") : ["", ""];
+    return `
+        <a class="score-card score-card--next" href="#/calendario">
+          <span class="score-card-top">
+            <span class="score-card-status">Próximo</span>
+            <span>${escapeHtml(shortDate(g.date))}</span>
+          </span>
+          <span class="score-card-body">
+            <span class="score-card-rows">
+              ${teamRow(usLogo, "Caimanes")}
+              ${teamRow(rivalLogo(g.opponent), g.opponent ?? "Rival")}
+            </span>
+            ${time ? `<span class="score-card-time"><b>${time}</b><small>${ampm}</small></span>` : ""}
+          </span>
+          <span class="score-card-foot">
+            <span>${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${playedThisSeason + i + 1}</span>
+            <span class="score-card-cta">Calendario <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </span>
+        </a>`;
+  });
   const recentCards = recent.map((g) => {
     const r = gameResult(g);
+    const us = r === "W" ? "win" : r === "L" ? "lose" : "";
+    const them = r === "L" ? "win" : r === "W" ? "lose" : "";
     return `
-        <a class="home-match" href="#/juegos/${g.id}">
-          <span class="home-match-league">
-            ${escapeHtml(TEAM.league)}
-            <span class="home-match-badge home-match-badge--${r}">${RESULT_LABEL[r] ?? "—"}</span>
+        <a class="score-card score-card--${r ?? "unknown"}" href="#/juegos/${g.id}">
+          <span class="score-card-top">
+            <span class="score-card-status">${RESULT_LABEL[r] ?? "Final"}</span>
+            <span>${escapeHtml(shortDate(g.date))}</span>
           </span>
-          <span class="home-match-tag">${escapeHtml(gameTag(g))}</span>
-          ${matchTeams(g.opponent, `<span class="home-match-score">${g.scoreUs}–${g.scoreThem}</span>`)}
-          <span class="home-match-when">${escapeHtml(fmtDate(g.date, { weekday: "long", day: "numeric", month: "long" }))}</span>
-          <span class="home-match-cta">Ver juego ▸</span>
+          <span class="score-card-body">
+            <span class="score-card-rows">
+              ${teamRow(usLogo, "Caimanes", g.scoreUs, us)}
+              ${teamRow(rivalLogo(g.opponent), g.opponent ?? "Rival", g.scoreThem, them)}
+            </span>
+          </span>
+          <span class="score-card-foot">
+            <span>${escapeHtml(gameTag(g))}</span>
+            <span class="score-card-cta">Ver juego <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+          </span>
         </a>`;
   });
   const cards = [...upcomingCards, ...recentCards];
