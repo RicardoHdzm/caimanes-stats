@@ -9666,3 +9666,9 @@ a.home-sponsor-card:hover .home-sponsor-logo {
 .cal-upcoming {
   margin-bottom: 26px;
 }
+
+/* El título del vlog no lleva la rayita roja de los h3: la tarjeta ya trae
+   su borde rojo arriba. */
+.vlog-card-title::before {
+  content: none;
+}
