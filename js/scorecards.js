@@ -51,10 +51,12 @@ const US_LOGO = '<img class="score-row-logo" src="assets/logo.png" alt="" />';
 const rivalLogo = (opponent) => `<i class="score-row-logo score-row-logo--rival">${escapeHtml(rivalInitials(opponent))}</i>`;
 
 // `g`: una entrada de SCHEDULE. `gameNo`: su número dentro de la temporada.
-export function upcomingCardHtml(g, gameNo) {
+// `href`/`cta`: a dónde lleva (en el Calendario, a Resumen para confirmar
+// asistencia; en los demás, al Calendario).
+export function upcomingCardHtml(g, gameNo, { href = "#/calendario", cta = "Calendario" } = {}) {
   const [time, ampm] = g.time ? formatGameTime(g.time).split(" ") : ["", ""];
   return `
-        <a class="score-card score-card--next" href="#/calendario">
+        <a class="score-card score-card--next" href="${href}">
           <span class="score-card-top">
             <span class="score-card-status">Próximo</span>
             <span>${escapeHtml(shortDate(g.date))}</span>
@@ -68,7 +70,7 @@ export function upcomingCardHtml(g, gameNo) {
           </span>
           <span class="score-card-foot">
             <span>${ordinalTemporada(CURRENT_SEASON)} Temporada${gameNo ? ` · Juego ${gameNo}` : ""}</span>
-            <span class="score-card-cta">Calendario <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+            <span class="score-card-cta">${cta} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
           </span>
         </a>`;
 }

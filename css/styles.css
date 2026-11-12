@@ -7784,132 +7784,6 @@ a.home-sponsor-card:hover {
    todo el sitio va con esquinas redondeadas.)
    ========================================================================== */
 
-/* ---- Próximos juegos (ver ticketsHtml en calendario.js) ----
-   Tarjeta normal (antes en forma de boleto con muescas y línea perforada;
-   a petición expresa, sin esa forma): raya roja a la izquierda, datos del
-   juego y la hora a la derecha en fuente de jersey. */
-.tickets {
-  margin-bottom: 26px;
-}
-
-.ticket-list {
-  display: grid;
-  gap: 14px;
-}
-
-.ticket {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 18px;
-  padding: 18px 26px 18px 22px;
-  border: 1px solid var(--border);
-  border-left: 5px solid var(--accent);
-  border-radius: var(--radius-md);
-  background: linear-gradient(160deg, var(--surface-raised), var(--surface));
-  color: var(--text);
-  text-decoration: none;
-  transition: border-color 0.15s, transform 0.15s;
-}
-
-.ticket:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.ticket-main {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.ticket-kicker {
-  color: var(--accent-text);
-  font-size: var(--text-xs);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.ticket-teams {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3.4vw, 2rem);
-  font-style: italic;
-  font-weight: 700;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-
-.ticket-teams img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.ticket-teams em {
-  color: var(--accent-text);
-  font-size: 0.6em;
-}
-
-.ticket-when {
-  color: var(--muted);
-  font-size: var(--text-sm);
-  font-weight: 700;
-}
-
-.ticket-stub {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  color: var(--accent-text);
-}
-
-.ticket-time {
-  font-family: var(--font-jersey);
-  font-size: 3.9rem;
-  font-weight: 400;
-  line-height: 1;
-}
-
-.ticket-time i {
-  font-style: normal;
-}
-
-.ticket-ampm {
-  color: var(--muted);
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 640px) {
-  .ticket {
-    gap: 10px;
-    padding: 14px 16px 14px 14px;
-  }
-
-  .ticket-teams {
-    flex-wrap: wrap;
-    gap: 4px 8px;
-  }
-
-  .ticket-teams img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .ticket-time {
-    font-size: 2.86rem;
-  }
-}
-
 /* ---- Transición entre páginas (ver render() en js/main.js) ---- */
 .page-enter {
   animation: page-enter 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -8755,8 +8629,7 @@ a.home-sponsor-card:hover {
   z-index: 1;
 }
 
-.score-card,
-.ticket {
+.score-card {
   background:
     radial-gradient(260px 160px at 0% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
     var(--surface);
@@ -8765,18 +8638,11 @@ a.home-sponsor-card:hover {
 
 .home-card:hover,
 .playoff-round-card:hover,
-.score-card:hover,
-.ticket:hover {
+.score-card:hover {
   transform: translateY(-4px);
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   border-top-color: var(--accent);
   box-shadow: 0 18px 36px -16px var(--accent-glow);
-}
-
-/* El historial de juegos y los próximos juegos conservan su raya roja de
-   la izquierda al pasar el mouse. */
-.ticket:hover {
-  border-left-color: var(--accent);
 }
 
 .home-card:hover .leader-hero-watermark,
@@ -9793,4 +9659,8 @@ a.home-sponsor-card:hover .home-sponsor-logo {
 .vlog-card-title {
   font-size: var(--text-2xl);
   text-transform: uppercase;
+}
+
+.cal-upcoming {
+  margin-bottom: 26px;
 }

@@ -1,6 +1,7 @@
-import { SCHEDULE, GAMES, TEAM, CURRENT_SEASON } from "../data.js";
+import { SCHEDULE, GAMES, CURRENT_SEASON } from "../data.js";
 import { allStatGames, gameResult } from "../stats.js";
-import { heading, escapeHtml, formatGameTime, ordinalTemporada } from "../ui.js";
+import { heading, escapeHtml, formatGameTime } from "../ui.js";
+import { upcomingCardHtml } from "../scorecards.js";
 
 const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -34,33 +35,19 @@ function buildEventsByDate() {
   return map;
 }
 
-// Próximos juegos en tarjetas (antes en forma de boleto; se quitó a petición
-// expresa): la hora a la derecha en fuente de jersey. Llevan a
+// Próximos juegos con la misma tarjeta de marcador del resto del sitio (ver
+// js/scorecards.js; antes un boleto y luego una tarjeta propia). Llevan a
 // Resumen, donde vive el RSVP (igual que los días programados del calendario).
-function ticketsHtml(todayStr) {
+function upcomingHtml(todayStr) {
   const upcoming = [...SCHEDULE].filter((s) => s.date >= todayStr).sort((a, b) => a.date.localeCompare(b.date));
   if (!upcoming.length) return "";
   const played = GAMES.filter((g) => g.season === CURRENT_SEASON && !g.playoff).length;
-  const ticket = (s, i) => {
-    const whenRaw = parseDate(s.date).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
-    const when = whenRaw.charAt(0).toUpperCase() + whenRaw.slice(1);
-    const [time, ampm] = s.time ? formatGameTime(s.time).split(" ") : ["", ""];
-    return `
-      <a class="ticket" href="#/resumen">
-        <span class="ticket-main">
-          <span class="ticket-kicker">${escapeHtml(TEAM.league)} · ${ordinalTemporada(CURRENT_SEASON)} Temporada · Juego ${played + i + 1}</span>
-          <span class="ticket-teams"><img src="assets/logo.png" alt="" /> Caimanes <em>vs</em> ${escapeHtml(s.opponent ?? "Rival")}</span>
-          <span class="ticket-when">${escapeHtml(when)}</span>
-        </span>
-        <span class="ticket-stub">
-          ${time ? `<b class="ticket-time">${time.replace(":", "<i>:</i>")}</b><span class="ticket-ampm">${ampm}</span>` : '<b class="ticket-time">—</b><span class="ticket-ampm">Hora por definir</span>'}
-        </span>
-      </a>`;
-  };
   return `
-    <section class="tickets">
+    <section class="cal-upcoming">
       <h3>Próximos juegos</h3>
-      <div class="ticket-list">${upcoming.map(ticket).join("")}</div>
+      <div class="home-match-grid">${upcoming
+        .map((s, i) => upcomingCardHtml(s, played + i + 1, { href: "#/resumen", cta: "Asistencia" }))
+        .join("")}</div>
     </section>`;
 }
 
@@ -69,7 +56,7 @@ export function renderCalendario(container) {
 
   const events = buildEventsByDate();
   const today = new Date();
-  container.insertAdjacentHTML("beforeend", ticketsHtml(formatDate(today)));
+  container.insertAdjacentHTML("beforeend", upcomingHtml(formatDate(today)));
 
   // Arranca en el mes del próximo juego programado; si no hay, en el de hoy.
   const upcoming = [...SCHEDULE].sort((a, b) => a.date.localeCompare(b.date))[0];
