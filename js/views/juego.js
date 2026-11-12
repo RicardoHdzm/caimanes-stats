@@ -1,6 +1,6 @@
 import { GAMES, TEAM, PLAYERS, PLAYOFFS } from "../data.js";
-import { playerName, gameResult, playoffStatus, gameMvp, gameHasMvp } from "../stats.js";
-import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml, formatGameTime } from "../ui.js";
+import { playerName, gameResult, playoffStatus, gameMvp, gameHasMvp, battingTotals, pitchingTotals } from "../stats.js";
+import { heading, renderSortableTable, renderGlossary, coloredStat, renderPositionBadge, renderAvatar, escapeHtml, formatGameTime, ordinalTemporada } from "../ui.js";
 import { getCurrentPlayerId } from "../auth.js";
 import { getMvpVotes, setMvpVote, deleteMvpVote, getAvatarUrl } from "../db.js";
 import { renderComments } from "./comments.js";
@@ -8,7 +8,6 @@ import { youtubeId } from "./vlogs.js";
 import { resultFlyer, openFlyer, shareButton } from "../flyers.js";
 
 const RESULT_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
-const RESULT_BADGE_CLASS = { W: "badge-win", L: "badge-loss", T: "badge-tie" };
 const FIELD_ORDER = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 
 function formatAvg(h, ab) {
@@ -88,6 +87,24 @@ export function isLatestGame(game) {
 // rankParticipants) — salvo un pitcher con decisión de Victoria o Salvamento,
 // que siempre aparece aunque su noche al bat/campo haya sido floja.
 const MAX_MVP_CANDIDATES = 6;
+
+// "4 de 5 · 7 impulsadas · 4 robadas" — lo que hizo en este juego (para la
+// franja dorada del MVP en el hero).
+function mvpStripLine(game, playerId) {
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const b = battingTotals([game]).find((r) => r.playerId === playerId);
+  const p = pitchingTotals([game]).find((r) => r.playerId === playerId && r.outs > 0);
+  return [
+    p ? plural(p.IP, "entrada", "entradas") : "",
+    b && b.AB + b.BB > 0 ? `${b.H} de ${b.AB}` : "",
+    b && b.HR + b.HRC ? plural(b.HR + b.HRC, "HR", "HR") : "",
+    b?.RBI ? plural(b.RBI, "impulsada", "impulsadas") : "",
+    b?.SB ? plural(b.SB, "robada", "robadas") : "",
+  ]
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" · ");
+}
 
 function mvpCardStats(game, playerId) {
   const batting = game.batting?.find((l) => l.playerId === playerId);
@@ -293,8 +310,15 @@ function renderMvpVote(container, game, participantIds, mvpBadgeSlot, isLatest) 
       .join("");
 
     if (mvpBadgeSlot) {
+      // Franja dorada (a petición expresa; antes una pastilla "MVP: nombre").
+      const line = displayLeaderId ? mvpStripLine(game, displayLeaderId) : "";
       mvpBadgeSlot.innerHTML = displayLeaderId
-        ? `<div class="mvp-badge"><i class="fa-solid fa-star"></i> MVP: ${playerName(displayLeaderId)}</div>`
+        ? `<a class="game-mvp-strip" href="#/jugador/${displayLeaderId}">
+            <i class="fa-solid fa-star" aria-hidden="true"></i>
+            <span class="game-mvp-label">MVP del juego</span>
+            <b class="game-mvp-name">${escapeHtml(playerName(displayLeaderId))}</b>
+            ${line ? `<span class="game-mvp-line">${escapeHtml(line)}</span>` : ""}
+          </a>`
         : "";
     }
 
@@ -332,7 +356,6 @@ export function renderJuegoDetalle(container, gameId) {
   const known = game.scoreUs != null && game.scoreThem != null;
   const resultCode = gameResult(game);
   const resultText = RESULT_LABEL[resultCode] ?? "Pendiente";
-  const resultBadgeClass = RESULT_BADGE_CLASS[resultCode] ?? "badge-unknown";
 
   const back = document.createElement("a");
   back.href = "#/juegos";
@@ -340,18 +363,30 @@ export function renderJuegoDetalle(container, gameId) {
   back.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Volver a juegos';
   container.appendChild(back);
 
-  // Quién abre la entrada va primero, en su propio renglón chico (+ "VS")
-  // — el nuestro siempre en grande, arriba si abrimos o abajo si cerramos.
-  // `weCloseBatting === true` es nosotros cerrando (bateamos en la baja), o
-  // sea el rival abre; `false` es al revés, nosotros abrimos. Sin dato
-  // (null) se deja el orden de siempre (nosotros arriba) — ver el
-  // comentario de weCloseBatting en data.js.
-  const usHtml = `<div class="game-hero-team--us">${TEAM.name}</div>`;
-  const themHtml = (vsAfter) =>
-    vsAfter
-      ? `<div class="game-hero-team--them">${game.opponent} <span class="game-hero-vs">VS</span></div>`
-      : `<div class="game-hero-team--them"><span class="game-hero-vs">VS</span> ${game.opponent}</div>`;
-  const teamsHtml = game.weCloseBatting === true ? themHtml(true) + usHtml : usHtml + themHtml(false);
+  // Hero estilo marcador de transmisión (a petición expresa): VICTORIA /
+  // DERROTA en grande y en su color, un renglón por equipo con su marcador
+  // en Teko (el que pierde, apagado) y abajo los botones en una sola fila.
+  // Renglones en el orden de un marcador de estadio: arriba quien abre la
+  // entrada — `weCloseBatting === true` es el rival abriendo; sin dato,
+  // nosotros arriba (ver weCloseBatting en data.js).
+  const initials = (name) => {
+    const words = String(name ?? "").trim().split(/\s+/).filter(Boolean);
+    return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? "?").slice(0, 2)).toUpperCase();
+  };
+  const rowState = (ours) => (!known || resultCode === "T" ? "" : ours === (resultCode === "W") ? " game-board-row--win" : " game-board-row--lose");
+  const usRow = `
+      <div class="game-board-row${rowState(true)}">
+        <img class="game-board-logo" src="assets/logo.png" alt="" />
+        <span class="game-board-name">${escapeHtml(TEAM.name)}</span>
+        <b class="game-board-runs">${known ? game.scoreUs : "—"}</b>
+      </div>`;
+  const themRow = `
+      <div class="game-board-row${rowState(false)}">
+        <i class="game-board-logo game-board-logo--rival">${escapeHtml(initials(game.opponent))}</i>
+        <span class="game-board-name">${escapeHtml(game.opponent ?? "Rival")}</span>
+        <b class="game-board-runs">${known ? game.scoreThem : "—"}</b>
+      </div>`;
+  const boardHtml = game.weCloseBatting === true ? themRow + usRow : usRow + themRow;
 
   // Badge extra solo si el juego viene de PLAYOFFS (findGame arriba) — el
   // marcador de la serie se recalcula en vivo con playoffStatus() a partir
@@ -363,53 +398,55 @@ export function renderJuegoDetalle(container, gameId) {
       })()
     : "";
 
+  // "Juego 2 · 9na Temporada" (los de playoffs ya llevan su ronda arriba).
+  const regular = GAMES.filter((g) => g.season === game.season && !g.playoff).sort(
+    (a, b) => a.date.localeCompare(b.date) || (a.time ?? "").localeCompare(b.time ?? "")
+  );
+  const gameNo = playoffContext ? 0 : regular.findIndex((g) => g.id === game.id) + 1;
+  const tagText = [gameNo ? `Juego ${gameNo}` : "", game.season ? `${ordinalTemporada(game.season)} Temporada` : ""].filter(Boolean).join(" · ");
+
   // Vlog de YouTube del juego, si hay (ver js/views/vlogs.js).
   const vlogId = youtubeId(game.vlogUrl);
 
   const hero = document.createElement("div");
-  hero.className = "game-hero";
+  hero.className = `game-hero game-hero--${known ? resultCode : "pending"}`;
   hero.innerHTML = `
     ${playoffBadgeHtml}
-    <div class="game-hero-date">${formatGameDate(game.date)}${game.time ? ` · ${formatGameTime(game.time)}` : ""}</div>
-    <div class="game-hero-meta">
-      <span class="badge badge-blink ${resultBadgeClass}">${resultText}</span>
-    </div>
-    <div class="game-hero-teams">${teamsHtml}</div>
-    <div class="game-hero-score${known ? "" : " pending"}">
-      ${known ? `${game.scoreUs}<span class="sep">-</span>${game.scoreThem}` : "Marcador pendiente"}
-    </div>
-    ${
-      game.replayUrl || vlogId
-        ? `<div class="game-hero-replay">${
-            game.replayUrl
-              ? `<a href="${game.replayUrl}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-solid fa-circle-play"></i> Ver replay</a>`
-              : ""
-          }${
-            vlogId
-              ? `<a href="https://www.youtube.com/watch?v=${vlogId}" target="_blank" rel="noopener" class="replay-btn"><i class="fa-brands fa-youtube"></i> Ver vlog</a>`
-              : ""
-          }</div>`
-        : ""
-    }
+    <div class="game-hero-result">${known ? resultText : "Marcador pendiente"}</div>
+    <div class="game-hero-date">${tagText ? `${tagText} · ` : ""}${formatGameDate(game.date)}${game.time ? ` · ${formatGameTime(game.time)}` : ""}</div>
+    <div class="game-board">${boardHtml}</div>
     <div id="mvp-badge-slot"></div>
+    <div class="game-hero-actions"></div>
   `;
   container.appendChild(hero);
 
-  // Flyer del resultado para redes (ver js/flyers.js) — solo con marcador.
+  // Botones en una sola fila, mismo tamaño: replay, vlog y compartir (el
+  // flyer del resultado, ver js/flyers.js — solo con marcador).
+  const actions = hero.querySelector(".game-hero-actions");
+  if (game.replayUrl) {
+    actions.insertAdjacentHTML(
+      "beforeend",
+      `<a href="${game.replayUrl}" target="_blank" rel="noopener" class="game-action"><i class="fa-solid fa-circle-play"></i> Replay</a>`
+    );
+  }
+  if (vlogId) {
+    actions.insertAdjacentHTML(
+      "beforeend",
+      `<a href="https://www.youtube.com/watch?v=${vlogId}" target="_blank" rel="noopener" class="game-action"><i class="fa-brands fa-youtube"></i> Vlog</a>`
+    );
+  }
   if (known) {
-    const shareRow = document.createElement("div");
-    shareRow.className = "share-flyer-row share-flyer-row--center";
-    shareRow.appendChild(
-      shareButton(() =>
-        openFlyer(
-          (format, color) => resultFlyer(game, playoffContext?.round.name ?? null, format, color),
-          `resultado-${game.date}`,
-          `Caimanes de Villas ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
-        )
+    const share = shareButton(() =>
+      openFlyer(
+        (format, color) => resultFlyer(game, playoffContext?.round.name ?? null, format, color),
+        `resultado-${game.date}`,
+        `Caimanes de Villas ${game.scoreUs} - ${game.scoreThem} ${game.opponent}`
       )
     );
-    hero.appendChild(shareRow);
+    share.classList.add("game-action");
+    actions.appendChild(share);
   }
+  if (!actions.children.length) actions.remove();
 
   // Sin marcador todavía no hay a quién votar — el line-up ni siquiera
   // existe hasta que se captura el juego.
@@ -423,9 +460,41 @@ export function renderJuegoDetalle(container, gameId) {
     if (gameHasMvp(game)) renderMvpVote(container, game, participantIds, hero.querySelector("#mvp-badge-slot"), isLatestGame(game));
   }
 
-  const lineupHeading = document.createElement("h3");
-  lineupHeading.textContent = "Line-up y bateo";
-  container.appendChild(lineupHeading);
+  // Tablas en pestañas (a petición expresa: una tras otra, la página pasaba
+  // de 4,000 px). Mismo estilo de pestañas que el perfil. Las de Outs y
+  // Cambios solo salen si el juego las tiene.
+  const PANES = [
+    { id: "bateo", label: "Bateo" },
+    { id: "pitcheo", label: "Pitcheo" },
+    { id: "fildeo", label: "Fildeo" },
+    { id: "outs", label: "Outs" },
+    { id: "cambios", label: "Cambios" },
+  ];
+  const tabsBar = document.createElement("div");
+  tabsBar.className = "profile-tabs game-tabs";
+  tabsBar.setAttribute("role", "tablist");
+  container.appendChild(tabsBar);
+  const panes = {};
+  for (const [i, p] of PANES.entries()) {
+    const el = document.createElement("div");
+    el.className = "profile-pane";
+    el.setAttribute("role", "tabpanel");
+    el.hidden = i !== 0;
+    container.appendChild(el);
+    panes[p.id] = el;
+  }
+  function showPane(id) {
+    for (const btn of tabsBar.querySelectorAll(".profile-tab")) {
+      const on = btn.dataset.pane === id;
+      btn.classList.toggle("active", on);
+      btn.setAttribute("aria-selected", String(on));
+    }
+    for (const [pid, el] of Object.entries(panes)) el.hidden = pid !== id;
+  }
+  tabsBar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".profile-tab");
+    if (btn) showPane(btn.dataset.pane);
+  });
 
   // Un jugador puede reingresar (solo por quien lo sustituyó), así que un
   // mismo jugador puede tener varios eventos en el juego; el color del turno
@@ -516,7 +585,7 @@ export function renderJuegoDetalle(container, gameId) {
   ];
 
   const lineupEl = document.createElement("div");
-  container.appendChild(lineupEl);
+  panes.bateo.appendChild(lineupEl);
   renderSortableTable(lineupEl, {
     columns: lineupColumns,
     rows: lineupRows,
@@ -528,11 +597,8 @@ export function renderJuegoDetalle(container, gameId) {
     },
     rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
-  renderGlossary(container, lineupColumns);
+  renderGlossary(panes.bateo, lineupColumns);
 
-  const pitchingHeading = document.createElement("h3");
-  pitchingHeading.textContent = "Pitcheo";
-  container.appendChild(pitchingHeading);
 
   const pitchingRows = (game.pitching ?? []).map((line) => ({
     playerId: line.playerId,
@@ -560,7 +626,7 @@ export function renderJuegoDetalle(container, gameId) {
   ];
 
   const pitchingEl = document.createElement("div");
-  container.appendChild(pitchingEl);
+  panes.pitcheo.appendChild(pitchingEl);
   renderSortableTable(pitchingEl, {
     columns: pitchingColumns,
     rows: pitchingRows,
@@ -571,11 +637,8 @@ export function renderJuegoDetalle(container, gameId) {
     },
     rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
-  renderGlossary(container, pitchingColumns);
+  renderGlossary(panes.pitcheo, pitchingColumns);
 
-  const fieldingHeading = document.createElement("h3");
-  fieldingHeading.textContent = "Fildeo";
-  container.appendChild(fieldingHeading);
 
   const battingPositionByPlayer = new Map((game.batting ?? []).map((l) => [l.playerId, l.position]));
   const pitcherIds = new Set((game.pitching ?? []).map((l) => l.playerId));
@@ -609,7 +672,7 @@ export function renderJuegoDetalle(container, gameId) {
   ];
 
   const fieldingEl = document.createElement("div");
-  container.appendChild(fieldingEl);
+  panes.fildeo.appendChild(fieldingEl);
   renderSortableTable(fieldingEl, {
     columns: fieldingColumns,
     rows: fieldingRows,
@@ -621,7 +684,7 @@ export function renderJuegoDetalle(container, gameId) {
     },
     rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
   });
-  renderGlossary(container, fieldingColumns);
+  renderGlossary(panes.fildeo, fieldingColumns);
 
   const outsRows = (game.outs ?? []).map((line) => {
     const GO = line.GO ?? 0;
@@ -644,9 +707,6 @@ export function renderJuegoDetalle(container, gameId) {
   });
 
   if (outsRows.length > 0) {
-    const outsHeading = document.createElement("h3");
-    outsHeading.textContent = "Outs";
-    container.appendChild(outsHeading);
 
     const outsColumns = [
       { key: "name", label: "Jugador", sticky: true },
@@ -660,7 +720,7 @@ export function renderJuegoDetalle(container, gameId) {
     ];
 
     const outsEl = document.createElement("div");
-    container.appendChild(outsEl);
+    panes.outs.appendChild(outsEl);
     renderSortableTable(outsEl, {
       columns: outsColumns,
       rows: outsRows,
@@ -670,14 +730,11 @@ export function renderJuegoDetalle(container, gameId) {
       },
       rowClass: (row) => (row.playerId === getCurrentPlayerId() ? "row-you" : ""),
     });
-    renderGlossary(container, outsColumns);
+    renderGlossary(panes.outs, outsColumns);
   }
 
   const substitutions = game.substitutions ?? [];
   if (substitutions.length > 0) {
-    const subsHeading = document.createElement("h3");
-    subsHeading.textContent = "Cambios";
-    container.appendChild(subsHeading);
 
     const subsRows = [...substitutions]
       .sort((a, b) => (a.inning ?? 99) - (b.inning ?? 99))
@@ -703,7 +760,7 @@ export function renderJuegoDetalle(container, gameId) {
     ];
 
     const subsEl = document.createElement("div");
-    container.appendChild(subsEl);
+    panes.cambios.appendChild(subsEl);
     renderSortableTable(subsEl, {
       columns: subsColumns,
       rows: subsRows,
@@ -711,8 +768,18 @@ export function renderJuegoDetalle(container, gameId) {
       defaultDir: 1,
       sortable: false,
     });
-    renderGlossary(container, subsColumns);
+    renderGlossary(panes.cambios, subsColumns);
   }
+
+  // Solo las pestañas que tienen algo.
+  const shown = PANES.filter((p) => panes[p.id].children.length);
+  for (const p of PANES) if (!panes[p.id].children.length) panes[p.id].remove();
+  tabsBar.innerHTML = shown
+    .map(
+      (p, i) =>
+        `<button type="button" class="profile-tab${i === 0 ? " active" : ""}" role="tab" data-pane="${p.id}" aria-selected="${i === 0}">${p.label}</button>`
+    )
+    .join("");
 
   renderComments(container, { contextType: "game", contextId: game.id });
 }
