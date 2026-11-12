@@ -3,7 +3,7 @@
 // franja de números, cinta en movimiento, historial de juegos (próximos +
 // últimos 4), la temporada en números, el roster y los patrocinadores.
 // Todo sale de data.js — no hay nada que mantener aparte.
-import { TEAM, SEASONS, SCHEDULE, ROSTER, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
+import { TEAM, SEASONS, SCHEDULE, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
 import {
   allStatGames,
   gameResult,
@@ -262,7 +262,6 @@ function launchConfetti() {
 }
 
 export function renderHome(container) {
-  const season = TEAM.seasonsTotal;
   const leagueLine = `${TEAM.league} · ${ordinalTemporada(TEAM.seasonsInLeague)} Temporada`;
   const next = nextGame();
   // Modo "día de juego" (a petición expresa): el día del partido la portada
@@ -390,7 +389,7 @@ export function renderHome(container) {
   });
   const cards = [...upcomingCards, ...recentCards];
   games.innerHTML = `
-    ${sectionHead("Historial de", "juegos", "JUEGOS", "Próximos juegos y resultados recientes")}
+    ${sectionHead("Historial de", "juegos", "JUEGOS")}
     <div class="home-match-grid">
       ${cards.length ? cards.join("") : `<p class="home-empty">No hay juegos todavía.</p>`}
     </div>
@@ -402,7 +401,7 @@ export function renderHome(container) {
   if (prHtml) {
     const pr = document.createElement("section");
     pr.className = "home-section";
-    pr.innerHTML = `${sectionHead("Power", "Ranking", "TOP 5", `${ordinalTemporada(CURRENT_SEASON)} Temporada · quién viene más fuerte`)}${prHtml}`;
+    pr.innerHTML = `${sectionHead("Power", "Ranking", "TOP 5")}${prHtml}`;
     root.appendChild(pr);
   }
 
@@ -438,7 +437,7 @@ export function renderHome(container) {
     const nums = document.createElement("section");
     nums.className = "home-section";
     nums.innerHTML = `
-      ${sectionHead("La temporada", "en números", "STATS", `${ordinalTemporada(ref)} Temporada · ${escapeHtml(meta?.league ?? "")}`)}
+      ${sectionHead("La temporada", "en números", "STATS")}
       <div class="home-cards">
         <article class="home-card">
           <i class="fa-solid fa-trophy leader-hero-watermark" aria-hidden="true"></i>
@@ -480,7 +479,7 @@ export function renderHome(container) {
   const roster = document.createElement("section");
   roster.className = "home-section";
   roster.innerHTML = `
-    ${sectionHead("Somos", "Caimanes", "ROSTER", `${ordinalTemporada(season)} Temporada · ${ROSTER.length} jugadores`)}
+    ${sectionHead("Somos", "Caimanes", "ROSTER")}
     <div class="home-roster">
       ${suggestedStarters()
         .map((p) => {
@@ -504,7 +503,7 @@ export function renderHome(container) {
     const sponsors = document.createElement("section");
     sponsors.className = "home-section";
     sponsors.innerHTML = `
-      ${sectionHead("Nuestros", "patrocinadores", "SPONSORS", "Las marcas que apoyan al equipo")}
+      ${sectionHead("Nuestros", "patrocinadores", "SPONSORS")}
       <div class="home-sponsors">
         ${SPONSORS.map((s) => {
           const logo = `<img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy">`;
