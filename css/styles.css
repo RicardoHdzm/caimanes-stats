@@ -9562,6 +9562,7 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   font-size: 1.7rem;
   font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .cal-day--W .cal-opponent,
@@ -9577,7 +9578,8 @@ a.home-sponsor-card:hover .home-sponsor-logo {
 
 @media (max-width: 640px) {
   .cal-score {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
   }
 
   .cal-day--W,
