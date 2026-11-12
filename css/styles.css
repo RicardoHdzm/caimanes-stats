@@ -9132,3 +9132,19 @@ a.home-sponsor-card:hover {
 .score-card--L:hover {
   border-left-color: var(--loss);
 }
+
+/* Próximo juego en el color de "Programado" del calendario (ámbar), no en
+   rojo: en rojo se confundía con las derrotas (a petición expresa). */
+.score-card--next,
+.score-card--next:hover {
+  border-left-color: var(--scheduled);
+}
+
+.score-card--next .score-card-status {
+  background: color-mix(in srgb, var(--scheduled) 18%, transparent);
+  color: var(--scheduled);
+}
+
+.score-card--next .score-card-time {
+  color: var(--scheduled);
+}
