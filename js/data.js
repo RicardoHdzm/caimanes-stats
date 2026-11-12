@@ -263,9 +263,9 @@ export const GAMES = [
     time: "21:00",
     opponent: "BNG Agroproductos",
     weCloseBatting: null,
-    result: "L", // marcador todavía no capturado
-    scoreUs: null,
-    scoreThem: null,
+    result: "L",
+    scoreUs: 11,
+    scoreThem: 21,
     batting: [
       { playerId: "p1", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
       { playerId: "p5", order: 0, position: "", AB: 0, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 0 },
