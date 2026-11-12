@@ -9148,3 +9148,142 @@ a.home-sponsor-card:hover {
 .score-card--next .score-card-time {
   color: var(--scheduled);
 }
+
+/* ---- "La temporada en números" (Inicio), rediseño ---- */
+.home-card-big {
+  font-family: var(--font-jersey);
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 0.9;
+}
+
+.home-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.home-card-stats span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.home-card-stats b {
+  font-family: var(--font-jersey);
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.home-card-stats small {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.home-card-diff--up b {
+  color: var(--win);
+}
+
+.home-card-diff--down b {
+  color: var(--loss);
+}
+
+.home-card-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.home-card-lines i {
+  width: 18px;
+  margin-right: 6px;
+  color: var(--accent-text);
+  text-align: center;
+}
+
+.home-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-rank {
+  display: grid;
+  grid-template-columns: 18px 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--surface-alt);
+}
+
+.home-rank-n {
+  color: var(--muted);
+  font-family: var(--font-jersey);
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.home-rank--first .home-rank-n {
+  color: #f5b942;
+}
+
+.home-rank--first {
+  box-shadow: inset 3px 0 0 #f5b942;
+}
+
+.home-rank-photo .avatar {
+  border: 2px solid var(--accent);
+  border-radius: 9px !important;
+}
+
+.home-rank-name {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.home-rank-val {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-jersey);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.home-rank-val small {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: var(--text-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.home-rank-empty {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}

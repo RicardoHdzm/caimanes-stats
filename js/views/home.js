@@ -3,7 +3,7 @@
 // franja de números, cinta en movimiento, historial de juegos (próximos +
 // últimos 4), la temporada en números, el roster y los patrocinadores.
 // Todo sale de data.js — no hay nada que mantener aparte.
-import { TEAM, SEASONS, SCHEDULE, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
+import { TEAM, SCHEDULE, PLAYERS, CURRENT_SEASON, GAMES, PLAYOFFS, STANDINGS_HISTORY, SPONSORS } from "../data.js";
 import {
   allStatGames,
   gameResult,
@@ -442,7 +442,9 @@ export function renderHome(container) {
     const pos = ref === CURRENT_SEASON ? TEAM.leaguePosition : table?.teams.find((t) => t.us)?.pos;
     const teamsCount = ref === CURRENT_SEASON ? TEAM.leagueTeams : table?.teams.length;
     const po = PLAYOFFS.find((p) => p.season === ref);
-    let poText = "Sin playoffs";
+    // A media temporada todavía no hay playoffs que decir: "por jugarse".
+    const seasonOver = ref < CURRENT_SEASON || refGames.length >= TEAM.gamesInSeason;
+    let poText = seasonOver ? "Sin playoffs" : "Playoffs: por jugarse";
     if (po?.rounds.length) {
       const st = playoffSeasonStatus(po);
       const lastRound = st.rounds[st.rounds.length - 1]?.round?.name ?? "";
@@ -459,7 +461,21 @@ export function renderHome(container) {
       if (id) mvpCounts.set(id, (mvpCounts.get(id) ?? 0) + 1);
     }
     const mvps = [...mvpCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
-    const meta = SEASONS[ref - 1];
+
+    // Rediseño (a petición expresa): íconos en lugar de emojis, el récord en
+    // grande con a favor / en contra / diferencia, y los tops con foto y el
+    // número en Teko (el #1 en dorado), como el Power Ranking.
+    const diff = rec.RF - rec.RA;
+    const rankRow = (i, playerId, name, value, unit) => {
+      const player = PLAYERS.find((p) => p.id === playerId) ?? { id: playerId, name };
+      return `
+            <li class="home-rank${i === 0 ? " home-rank--first" : ""}">
+              <b class="home-rank-n">${i + 1}</b>
+              <span class="home-rank-photo">${renderAvatar(player, 34)}</span>
+              <span class="home-rank-name">${escapeHtml(name)}</span>
+              <span class="home-rank-val">${value}<small>${unit}</small></span>
+            </li>`;
+    };
 
     const nums = document.createElement("section");
     nums.className = "home-section";
@@ -468,30 +484,34 @@ export function renderHome(container) {
       <div class="home-cards">
         <article class="home-card">
           <i class="fa-solid fa-trophy leader-hero-watermark" aria-hidden="true"></i>
-          <span class="home-card-kicker">${escapeHtml(meta?.league ?? "")} · ${ordinalTemporada(ref)} Temporada</span>
-          <h3 class="home-card-title">Récord <span class="home-card-num">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</span></h3>
-          <ul class="home-card-list">
-            ${pos ? `<li>🏅 ${pos}° lugar${teamsCount ? ` de ${teamsCount}` : ""} en la tabla</li>` : ""}
-            <li>⚾ <b class="home-card-num">${rec.RF}</b> carreras anotadas · <b class="home-card-num">${rec.RA}</b> permitidas</li>
-            <li>🏆 ${escapeHtml(poText)}</li>
+          <span class="home-card-kicker">Récord</span>
+          <b class="home-card-big">${rec.W}-${rec.L}${rec.T ? `-${rec.T}` : ""}</b>
+          <div class="home-card-stats">
+            <span><b>${rec.RF}</b><small>A favor</small></span>
+            <span><b>${rec.RA}</b><small>En contra</small></span>
+            <span class="home-card-diff home-card-diff--${diff > 0 ? "up" : diff < 0 ? "down" : "even"}"><b>${diff > 0 ? "+" : ""}${diff}</b><small>Diferencia</small></span>
+          </div>
+          <ul class="home-card-lines">
+            ${pos ? `<li><i class="fa-solid fa-ranking-star"></i> ${pos}° lugar${teamsCount ? ` de ${teamsCount}` : ""} en la tabla</li>` : ""}
+            <li><i class="fa-solid fa-trophy"></i> ${escapeHtml(poText)}</li>
           </ul>
           <a class="home-card-link" href="#/temporadas/${ref}">Ver temporada →</a>
         </article>
         <article class="home-card">
           <i class="fa-solid fa-baseball-bat-ball leader-hero-watermark" aria-hidden="true"></i>
-          <span class="home-card-kicker">Bateo · mejor OPS</span>
+          <span class="home-card-kicker">Bateo · OPS</span>
           <h3 class="home-card-title">Top bateadores</h3>
-          <ul class="home-card-list home-card-list--rank">
-            ${top.map((r, i) => `<li><b>${i + 1}</b> ${escapeHtml(r.name)} <em>${r.OPS} OPS</em></li>`).join("") || "<li>Sin datos todavía.</li>"}
+          <ul class="home-rank-list">
+            ${top.map((r, i) => rankRow(i, r.playerId, r.name, r.OPS, "OPS")).join("") || '<li class="home-rank-empty">Sin datos todavía.</li>'}
           </ul>
           <a class="home-card-link" href="#/temporadas/${ref}/destacados">Ver top 5 →</a>
         </article>
         <article class="home-card">
           <i class="fa-solid fa-star leader-hero-watermark" aria-hidden="true"></i>
-          <span class="home-card-kicker">MVP del juego</span>
+          <span class="home-card-kicker">MVP</span>
           <h3 class="home-card-title">Más veces MVP</h3>
-          <ul class="home-card-list home-card-list--rank">
-            ${mvps.map(([id, n], i) => `<li><b>${i + 1}</b> ${escapeHtml(playerName(id))} <em>${n} MVP${n === 1 ? "" : "s"}</em></li>`).join("") || "<li>Sin MVPs todavía.</li>"}
+          <ul class="home-rank-list">
+            ${mvps.map(([id, n], i) => rankRow(i, id, playerName(id), n, n === 1 ? "MVP" : "MVPs")).join("") || '<li class="home-rank-empty">Sin MVPs todavía.</li>'}
           </ul>
           <a class="home-card-link" href="#/temporadas/${ref}/destacados">Ver destacados →</a>
         </article>
