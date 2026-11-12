@@ -139,10 +139,17 @@ export function renderCalendario(container) {
       cell.className = "cal-day";
       if (dateStr === todayStr) cell.classList.add("cal-day-today");
 
+      // Día con juego (a petición expresa, como las tarjetas de marcador):
+      // la celda se pinta del color del resultado (o ámbar si está
+      // programado) y lleva el marcador — o la hora — en Teko.
       let inner = `<span class="cal-daynum">${day}</span>`;
       if (event?.type === "played") {
-        const cls = RESULT_CLASS[gameResult(event.game)] ?? "cal-unknown";
-        inner += `<span class="cal-dot ${cls}"></span><span class="cal-opponent">${event.game.opponent}</span>`;
+        const result = gameResult(event.game);
+        const cls = RESULT_CLASS[result] ?? "cal-unknown";
+        if (result) cell.classList.add(`cal-day--${result}`);
+        const g = event.game;
+        const score = g.scoreUs != null && g.scoreThem != null ? `<span class="cal-score">${g.scoreUs}-${g.scoreThem}</span>` : "";
+        inner += `<span class="cal-dot ${cls}"></span>${score}<span class="cal-opponent">${escapeHtml(g.opponent ?? "")}</span>`;
         if (event.game.playoff) {
           cell.classList.add("cal-day-playoff");
           inner += `<i class="fa-solid fa-trophy cal-playoff-icon" aria-label="Playoffs"></i>`;
@@ -152,7 +159,9 @@ export function renderCalendario(container) {
           location.hash = `#/juegos/${event.game.id}`;
         });
       } else if (event?.type === "scheduled") {
-        inner += `<span class="cal-dot cal-scheduled"></span><span class="cal-opponent">${event.game.opponent}</span>`;
+        cell.classList.add("cal-day--next");
+        const time = event.game.time ? formatGameTime(event.game.time).split(" ")[0] : "";
+        inner += `<span class="cal-dot cal-scheduled"></span>${time ? `<span class="cal-score">${time}</span>` : ""}<span class="cal-opponent">${escapeHtml(event.game.opponent ?? "")}</span>`;
         // El RSVP vive en Resumen (ver js/views/resumen.js), no aquí — evita
         // inventar una segunda pantalla de detalle solo para confirmar
         // asistencia.

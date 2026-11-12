@@ -9627,3 +9627,170 @@ a.home-sponsor-card:hover .home-sponsor-logo {
     padding: 10px 8px;
   }
 }
+
+/* ---- Calendario del mes, al estilo de las tarjetas de marcador ----
+   Días con juego teñidos del color del resultado (verde, rojo, ámbar si
+   está programado), con el marcador o la hora en Teko; el puntito de color
+   se queda solo en la leyenda. */
+.cal-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+.cal-nav {
+  border-radius: var(--radius-btn);
+}
+
+.cal-day--W,
+.cal-day--L,
+.cal-day--T,
+.cal-day--next {
+  border-left-width: 4px;
+}
+
+.cal-day--W {
+  border-color: color-mix(in srgb, var(--win) 40%, var(--border));
+  border-left-color: var(--win);
+  background: color-mix(in srgb, var(--win) 10%, var(--surface));
+}
+
+.cal-day--L {
+  border-color: color-mix(in srgb, var(--loss) 40%, var(--border));
+  border-left-color: var(--loss);
+  background: color-mix(in srgb, var(--loss) 10%, var(--surface));
+}
+
+.cal-day--T {
+  border-left-color: var(--muted);
+}
+
+.cal-day--next {
+  border-color: color-mix(in srgb, var(--scheduled) 40%, var(--border));
+  border-left-color: var(--scheduled);
+  background: color-mix(in srgb, var(--scheduled) 10%, var(--surface));
+}
+
+.cal-day--W .cal-dot,
+.cal-day--L .cal-dot,
+.cal-day--T .cal-dot,
+.cal-day--next .cal-dot {
+  display: none;
+}
+
+.cal-day--W .cal-daynum {
+  color: var(--win);
+}
+
+.cal-day--L .cal-daynum {
+  color: var(--loss);
+}
+
+.cal-day--next .cal-daynum,
+.cal-day--next .cal-score {
+  color: var(--scheduled);
+}
+
+.cal-score {
+  font-family: var(--font-jersey);
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cal-day--W .cal-opponent,
+.cal-day--L .cal-opponent,
+.cal-day--next .cal-opponent {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.cal-clickable:hover {
+  box-shadow: 0 12px 24px -12px var(--accent-glow);
+}
+
+@media (max-width: 640px) {
+  .cal-score {
+    font-size: 1.05rem;
+  }
+
+  .cal-day--W,
+  .cal-day--L,
+  .cal-day--T,
+  .cal-day--next {
+    border-left-width: 3px;
+  }
+}
+
+/* Día de playoffs: conserva el borde dorado (la raya de la izquierda sigue
+   siendo la del resultado). */
+.cal-day-playoff.cal-day--W,
+.cal-day-playoff.cal-day--L,
+.cal-day-playoff.cal-day--T {
+  border-top-color: #d4a017;
+  border-right-color: #d4a017;
+  border-bottom-color: #d4a017;
+}
+
+/* ---- Playlist y Caimavlogs con el lenguaje del resto (a petición
+   expresa): fotos con esquinas redondeadas, brillo rojo en la esquina y
+   efecto al pasar el mouse; el número de vlog en Teko. ---- */
+.playlist-card {
+  background:
+    radial-gradient(240px 140px at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    var(--surface-alt);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.playlist-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: 0 18px 36px -16px var(--accent-glow);
+}
+
+.playlist-card-avatar .avatar {
+  border: 2px solid var(--accent);
+  border-radius: 14px !important;
+  box-shadow: 0 8px 18px -8px var(--accent-glow);
+}
+
+.playlist-card-name {
+  text-transform: uppercase;
+}
+
+.playlist-card-play {
+  transition: transform 0.15s;
+}
+
+.playlist-card:hover .playlist-card-play {
+  transform: scale(1.12);
+}
+
+.vlog-card {
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(280px 170px at 0% 100%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    var(--surface);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.vlog-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-top-color: var(--accent);
+  box-shadow: 0 18px 36px -16px var(--accent-glow);
+}
+
+.vlog-card-number {
+  font-family: var(--font-jersey);
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.vlog-card-title {
+  font-size: var(--text-2xl);
+  text-transform: uppercase;
+}
