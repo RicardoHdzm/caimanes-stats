@@ -20,17 +20,23 @@
 <link rel="stylesheet" href="css/styles.css" />
 <link rel="stylesheet" href="css/admin.css" />
 </head>
-<body>
-<header class="topbar">
-  <!-- Solo para reconocer la cuenta del coach — el resto de esta página
-       sigue siendo pública y funciona igual sin sesión, como siempre. -->
-  <div id="auth-slot" class="auth-slot"></div>
-  <div class="topbar-inner">
-    <img src="assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
+<body class="admin-page">
+<!-- Mismo header delgado del sitio (logo blanco a la izquierda). Estilos:
+     "Admin al estilo del sitio" al final de css/admin.css. -->
+<header class="site-header">
+  <a href="index.html" class="site-brand" aria-label="Caimanes de Villas — volver al sitio">
+    <img src="assets/logos/whitelogo@2x.png" alt="" class="site-brand-logo" />
+  </a>
+  <div class="site-header-actions">
+    <a href="index.html" class="lu-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> <span>Volver al sitio</span></a>
+    <!-- Para reconocer la cuenta del coach (ver js/admin-dues.js). -->
+    <div id="auth-slot" class="auth-slot"></div>
   </div>
 </header>
 
 <main id="admin-app" class="admin-main">
+  <h2 class="page-title">Panel <span class="page-title-accent">admin</span> <i class="page-title-slashes" aria-hidden="true">///</i></h2>
+
   <!-- Toda la herramienta (no solo el estado de pago) es solo para la
        cuenta del coach — ver js/admin-dues.js, que decide cuál de los dos
        bloques de abajo mostrar según isCoach(). admin.js sigue armando los
@@ -41,8 +47,6 @@
   </p>
 
   <div id="admin-protected" hidden>
-    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
-
     <!-- Un botón por sección — antes estaba todo junto en una sola página
          larguísima. Enlaces reales (href="#id"), no botones con JS: el
          cambio de sección es solo la URL (#pagos, #rsvp, ...) y un
@@ -201,13 +205,6 @@
     </section>
   </div>
 </main>
-
-<footer class="footer">
-  <div class="season-row">
-    <span class="season">Herramienta local para generar código de data.js</span>
-  </div>
-  Herramienta local — no guarda nada, solo genera el código para pegar en <code>js/data.js</code>
-</footer>
 
 <script type="module" src="js/admin-dues.js"></script>
 <script type="module" src="js/admin-rsvp.js"></script>
