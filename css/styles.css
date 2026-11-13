@@ -5992,7 +5992,9 @@ body.menu-open {
   gap: 16px;
   height: 64px;
   padding: 0 clamp(16px, 4vw, 48px);
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  /* Sólido, del mismo color que el footer (a petición expresa): semitransparente
+     se aclaraba al pasar sobre el contenido, sobre todo en el tema Sol. */
+  background: var(--bg);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
