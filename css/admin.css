@@ -626,3 +626,246 @@
 .copy-batting-btn {
   margin-left: 6px;
 }
+
+/* ==========================================================================
+   Admin al estilo del sitio (a petición expresa): header delgado, título en
+   dos tonos, pestañas y botones rectangulares con esquinas redondeadas,
+   secciones como tarjetas con el brillo rojo de la esquina, campos y
+   tablas con el mismo lenguaje que el resto. Va al final para mandar sobre
+   las reglas viejas de arriba.
+   ========================================================================== */
+.admin-page .admin-main {
+  max-width: 1400px;
+  padding: 28px 24px 64px;
+}
+
+.admin-page .page-title {
+  margin-bottom: 18px;
+}
+
+/* El botón de cuenta: en el sitio se esconde en celular (vive en el menú
+   ☰), pero aquí es la única forma de iniciar sesión. */
+.admin-page .site-header .auth-slot {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .admin-page .admin-main {
+    padding: 20px 16px 48px;
+  }
+
+  .admin-page .lu-back span {
+    display: none;
+  }
+}
+
+/* Pestañas de sección */
+.admin-page .admin-tabs {
+  gap: 8px;
+  margin: 0 0 4px;
+}
+
+.admin-page .admin-tabs a {
+  border-radius: var(--radius-btn);
+  padding: 10px 16px;
+  background: var(--surface);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-page .admin-tabs a:hover {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+.admin-page .admin-tabs a.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 10px 22px -12px var(--accent-glow);
+}
+
+/* Secciones como tarjetas */
+.admin-page .admin-section {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background:
+    radial-gradient(280px 170px at 0% 0%, var(--card-glow), transparent 70%),
+    var(--surface);
+}
+
+.admin-page .admin-section > h2 {
+  display: block;
+  margin: 0 0 6px;
+  padding: 0;
+  border: none;
+  font-size: var(--text-2xl);
+}
+
+.admin-page .admin-section > .subtitle {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.admin-page .admin-section h3 {
+  margin: 26px 0 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  resize: none;
+}
+
+/* Campos */
+.admin-page .admin-form label,
+.admin-page .game-select-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.admin-page .admin-form input,
+.admin-page .admin-form select,
+.admin-page .admin-form textarea,
+.admin-page .game-select-label select,
+.admin-page .rows-table input,
+.admin-page .rows-table select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-page .admin-form input,
+.admin-page .admin-form select,
+.admin-page .admin-form textarea,
+.admin-page .game-select-label select {
+  padding: 9px 11px;
+  font-size: 0.9rem;
+}
+
+.admin-page .admin-form input:focus,
+.admin-page .admin-form select:focus,
+.admin-page .admin-form textarea:focus,
+.admin-page .game-select-label select:focus,
+.admin-page .rows-table input:focus,
+.admin-page .rows-table select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.admin-page .game-select-label select {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
+/* Botones: el principal en rojo, los secundarios en la superficie */
+.admin-page .admin-form button,
+.admin-page .generate-btn {
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 11px 20px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 10px 22px -12px var(--accent-glow);
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.admin-page .generate-btn {
+  margin-top: 18px;
+}
+
+.admin-page .admin-form button:hover,
+.admin-page .generate-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.admin-page .add-row-btn,
+.admin-page .copy-btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  background: var(--surface-alt);
+  color: var(--text);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.admin-page .add-row-btn:hover,
+.admin-page .copy-btn:hover {
+  filter: none;
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.admin-page .remove-row-btn {
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.admin-page .remove-row-btn:hover {
+  border-color: var(--loss);
+  background: color-mix(in srgb, var(--loss) 12%, transparent);
+}
+
+/* Tablas de líneas (bateo, pitcheo...) con el borde rojo de arriba de las
+   tablas del sitio. */
+.admin-page .rows-table-wrap {
+  border-radius: 12px;
+  border-top: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.admin-page .rows-table th {
+  background: var(--surface-alt);
+}
+
+.admin-page .rows-table tbody tr:hover td {
+  background: var(--zebra);
+}
+
+/* Código generado */
+.admin-page .code-output pre {
+  border-radius: 12px;
+  background: var(--bg);
+  border-left: 3px solid var(--accent);
+}
+
+/* Listas (pagos, temporadas, anuncios, RSVP) */
+.admin-page .dues-admin-row,
+.admin-page .seasons-admin-row,
+.admin-page .announcement-admin-row {
+  border-radius: 12px;
+  background: var(--surface-alt);
+}
+
+.admin-page .dues-admin-row.paid {
+  border-color: color-mix(in srgb, var(--win) 55%, var(--border));
+  background: color-mix(in srgb, var(--win) 10%, var(--surface));
+}
+
+.admin-page .dues-admin-row:not(.paid) {
+  border-color: color-mix(in srgb, var(--loss) 45%, var(--border));
+}
+
+.admin-page .rsvp-admin-chip {
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-weight: 700;
+}
+
+.admin-page .rsvp-admin-col h4 {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text);
+}
