@@ -6510,8 +6510,8 @@ a.home-sponsor-card:hover {
 }
 
 /* ---- Día de juego (ver gameDay en js/views/home.js) ----
-   Franja roja con escamas pegada arriba del hero: "HOY JUGAMOS · vs Rival ·
-   hora". La tarjeta del próximo juego también se pinta de rojo. */
+   Franja roja sólida (sin escamas ni degradado, a petición expresa) pegada
+   arriba del hero: "HOY JUGAMOS · vs Rival · hora". La tarjeta del próximo juego también se pinta de rojo. */
 .home-gameday {
   position: absolute;
   z-index: 2;
@@ -6523,23 +6523,13 @@ a.home-sponsor-card:hover {
   justify-content: center;
   gap: 14px;
   padding: 10px 16px;
-  background: linear-gradient(90deg, var(--accent-dark), var(--accent) 50%, var(--accent-dark));
+  background: var(--accent);
   color: #fff;
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   isolation: isolate;
   overflow: hidden;
-}
-
-.home-gameday::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: rgba(255, 255, 255, 0.1);
-  -webkit-mask: var(--skin-texture) center / 420px repeat;
-  mask: var(--skin-texture) center / 420px repeat;
 }
 
 .home-gameday b {
