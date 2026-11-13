@@ -1,6 +1,7 @@
 // Temas: Eclipse (azul marino, [data-theme="eclipse"]) — el DEFAULT, a
 // petición expresa — y Luna (negro, sin atributo), que solo se usa si alguien
-// la eligió y quedó guardada en localStorage. Íconos: rayo (Eclipse) y fuego
+// la eligió y quedó guardada en localStorage. Íconos: sol (Sol), eclipse —círculo
+// mitad luz, mitad sombra— (Eclipse) y luna
 // (Luna). El botón vive en index.html (junto al ícono de Instagram) —
 // admin.html y lineup/index.html no lo tienen, pero si el tema guardado es
 // otro que Luna lo respetan igual (cada uno trae su propio script inline en
@@ -23,7 +24,7 @@ const STORAGE_KEY = "caimanes-theme";
 // Sol ("light") regresó a petición expresa: el ciclo es sol → eclipse → luna.
 const THEMES = ["light", "eclipse", "dark"];
 const THEME_LABEL = { light: "Sol", eclipse: "Eclipse", dark: "Luna" };
-const THEME_ICON = { light: "fa-sun", eclipse: "fa-bolt", dark: "fa-fire" };
+const THEME_ICON = { light: "fa-sun", eclipse: "fa-circle-half-stroke", dark: "fa-moon" };
 
 function currentTheme() {
   const attr = document.documentElement.dataset.theme;
