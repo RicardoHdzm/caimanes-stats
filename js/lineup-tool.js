@@ -7,7 +7,7 @@
 // - candados: un jugador fijado conserva turno y posición al regenerar;
 // - compartir como imagen (flyer) o como texto para WhatsApp;
 // - la vista de campo con cada quien en su posición.
-import { ROSTER, SCHEDULE } from "./data.js";
+import { ROSTER, SCHEDULE, INJURED } from "./data.js";
 import {
   DEFENSE_POSITIONS,
   EDITABLE_POSITIONS,
@@ -33,16 +33,28 @@ const coverageEl = document.getElementById("lu-coverage");
 const generateBtn = document.getElementById("generate-btn");
 const generateLabel = document.getElementById("generate-label");
 
+// Lo que depende de internet (sesión y posiciones del perfil) se espera
+// con TOPE: en el campo casi nunca hay buena señal y, sin tope, una
+// petición colgada dejaba la página sin lista ni alineación (y el botón
+// de generar sin responder). Pasado el tope se sigue con lo de data.js.
+const NET_TIMEOUT_MS = 3500;
+function withTimeout(promise, fallback) {
+  return Promise.race([
+    Promise.resolve(promise).catch(() => fallback),
+    new Promise((resolve) => setTimeout(() => resolve(fallback), NET_TIMEOUT_MS)),
+  ]);
+}
+
 // Esta página no es parte del router del sitio (ver index.html/js/main.js),
 // así que nadie más llama initAuth() aquí — hace falta antes de leer
 // player_positions, si no getClient() sigue en null.
-await initAuth();
+await withTimeout(initAuth(), null);
 
 // Posiciones personalizadas (ver "Editar mis posiciones" en el perfil) se
 // mezclan ANTES de armar la lista de asistentes. `position` = las MÁS
 // JUGADAS (ver displayPositions en js/stats.js); la registrada queda en
 // `registeredPosition`.
-const positionOverrides = await getAllPositionOverrides();
+const positionOverrides = (await withTimeout(getAllPositionOverrides(), null)) ?? new Map();
 const roster = ROSTER.map((p) => {
   const registered = positionOverrides.get(p.id) ?? p.position ?? "";
   return { ...p, registeredPosition: registered, position: displayPositions(p.id, registered) };
@@ -108,22 +120,39 @@ function positionSelectHtml(player) {
 
 const cards = new Map(); // playerId -> { card, checkbox, select }
 
+// Lesionados (INJURED en js/data.js, los de la medalla "Fragile"): marca
+// en su tarjeta, en la tabla y en la banca para no alinearlos sin querer.
+const INJURED_TAG = '<span class="lu-injured"><i class="fa-solid fa-user-injured" aria-hidden="true"></i> Lesionado</span>';
+const injuredIcon = (id) =>
+  INJURED.includes(id) ? ' <i class="fa-solid fa-user-injured lu-injured-icon" title="Lesionado" aria-label="Lesionado"></i>' : "";
+
 for (const player of roster) {
-  // <label>: tocar cualquier parte de la tarjeta marca/desmarca (el checkbox
-  // queda oculto); el selector de posición no cuenta como "tocar la tarjeta".
-  const card = document.createElement("label");
-  card.className = "lu-card";
+  // Tocar cualquier parte de la tarjeta marca/desmarca (el checkbox queda
+  // oculto). El selector de posición va FUERA del <label>: dentro, en
+  // iPhone tocarlo también desmarcaba al jugador.
+  const injured = INJURED.includes(player.id);
+  const card = document.createElement("div");
+  card.className = `lu-card${injured ? " is-injured" : ""}`;
   card.innerHTML = `
-    <input type="checkbox" class="lu-card-check-input" />
-    <span class="lu-card-photo">${renderAvatar(player, 46)}</span>
-    <span class="lu-card-info">
-      <b class="lu-card-num">#${player.number ?? "-"}</b>
-      <span class="lu-card-name">${escapeHtml(player.name)}</span>
-    </span>
-    <span class="lu-card-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+    <label class="lu-card-hit">
+      <input type="checkbox" class="lu-card-check-input" />
+      <span class="lu-card-photo">${renderAvatar(player, 46)}</span>
+      <span class="lu-card-info">
+        <b class="lu-card-num">#${player.number ?? "-"}</b>
+        <span class="lu-card-name">${escapeHtml(player.name)}</span>
+        ${injured ? INJURED_TAG : ""}
+      </span>
+      <span class="lu-card-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+    </label>
     ${positionSelectHtml(player)}`;
   const checkbox = card.querySelector("input");
   const select = card.querySelector("select");
+  // El selector apagado (jugador sin marcar) no recibe toques: ese toque
+  // también marca al jugador.
+  card.addEventListener("click", (e) => {
+    if (e.target.closest(".lu-card-hit") || (e.target.closest("select") && !select.disabled)) return;
+    checkbox.click();
+  });
   const defaultPos = registeredFieldPositions(player)[0] ?? "";
   select.value = selection.get(player.id) ?? defaultPos;
 
@@ -153,8 +182,8 @@ function syncCard(id) {
 
 function onSelectionChange() {
   updateBar();
-  renderCoverage();
   save();
+  renderCoverage();
 }
 
 function updateBar() {
@@ -235,7 +264,7 @@ function renderCoverage() {
 }
 
 function listJoin(items) {
-  return items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} y ${items.at(-1)}`;
+  return items.length <= 1 ? items.join("") : `${items.slice(0, -1).join(", ")} y ${items[items.length - 1]}`;
 }
 
 // ---- Generar (respetando candados) ----
@@ -289,7 +318,12 @@ function generate() {
   save();
   updateBar();
   renderResult();
-  resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Scroll calculado a mano (scrollIntoView suave fallaba en algunos
+  // celulares) y ya con la alineación pintada.
+  requestAnimationFrame(() => {
+    const top = resultEl.getBoundingClientRect().top + window.scrollY - 76;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  });
 }
 
 generateBtn.addEventListener("click", generate);
@@ -414,7 +448,27 @@ function fieldHtml(rows) {
     ${extra ? `<div class="lu-extras">${extra}</div>` : ""}`;
 }
 
+// Repinta la alineación. Mientras se vuelve a pintar se conserva el alto:
+// al vaciar el contenedor la página se encogía y, en celular, el scroll
+// brincaba a la lista de jugadores (parecía que la alineación se había
+// borrado). Si algo falla al pintar, se avisa en lugar de dejar el hueco.
 function renderResult() {
+  const h = resultEl.offsetHeight;
+  if (h) resultEl.style.minHeight = `${h}px`;
+  try {
+    drawResult();
+  } catch (err) {
+    console.error(err);
+    result = null;
+    save();
+    updateBar();
+    resultEl.innerHTML = '<p class="lu-error"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> No se pudo mostrar la alineación. Vuelve a generarla.</p>';
+  } finally {
+    resultEl.style.minHeight = "";
+  }
+}
+
+function drawResult() {
   resultEl.innerHTML = "";
   if (!result?.rows.length) return;
 
@@ -463,7 +517,7 @@ function renderResult() {
       render: (_v, row) => (row.pitcherOnly ? "" : '<span class="drag-handle" title="Arrastra para cambiar el orden"><i class="fa-solid fa-grip-vertical"></i></span>'),
     },
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
-    { key: "name", label: "Jugador", sticky: true },
+    { key: "name", label: "Jugador", sticky: true, render: (v, row) => `${escapeHtml(v)}${injuredIcon(row.playerId)}` },
     {
       key: "lock",
       label: "Fijar",
@@ -586,7 +640,7 @@ function renderResult() {
           <span class="lu-bench-item">
             ${p ? renderAvatar(p, 34) : ""}
             <span class="lu-bench-info">
-              <b>${escapeHtml(s.name)}</b>
+              <b>${escapeHtml(s.name)}${injuredIcon(s.playerId)}</b>
               <small>${pos ? `${pos} · ` : ""}OPS ${s.OPS} · ${s.seasonGP} JJ</small>
             </span>
             <select class="lu-sub" data-player="${s.playerId}" aria-label="Meter a ${escapeHtml(s.name)} a la alineación">${subOptions}</select>
@@ -621,8 +675,11 @@ function renderResult() {
 }
 
 // ---- Arranque: recuperar lo guardado ----
-load();
-for (const id of cards.keys()) syncCard(id);
-updateBar();
-renderCoverage();
-renderResult();
+// Cada paso por separado: si uno falla, los demás igual se pintan.
+for (const step of [load, () => cards.forEach((_c, id) => syncCard(id)), updateBar, renderCoverage, renderResult]) {
+  try {
+    step();
+  } catch (err) {
+    console.error(err);
+  }
+}
