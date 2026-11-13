@@ -10361,3 +10361,25 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   --shadow-card: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
   color: var(--text);
 }
+
+/* ---- Cambio de tema suave (ver switchSmoothly en js/theme.js) ----
+   Fundido de toda la página (View Transitions) y, en navegadores sin eso,
+   los colores se deslizan mientras está puesta .theme-fading. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+}
+
+html.theme-fading,
+html.theme-fading *,
+html.theme-fading *::before,
+html.theme-fading *::after {
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease,
+    border-color 0.4s ease,
+    fill 0.4s ease,
+    stroke 0.4s ease,
+    box-shadow 0.4s ease !important;
+}

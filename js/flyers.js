@@ -45,9 +45,10 @@ function rgba(hex, alpha) {
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
-// Colores del flyer: se ELIGEN en la vista previa (Clásico / Moderno, ver
-// openFlyer), ya no dependen del tema activo del sitio (a petición
-// expresa). Mismos valores que los temas Eclipse y Luna de css/styles.css.
+// Colores del flyer: se ELIGEN en la vista previa (Clásico / Moderno /
+// Claro, ver openFlyer). Mismos valores que los temas Eclipse, Luna y Sol de
+// css/styles.css. Con el sitio en Sol la vista previa arranca en Claro (a
+// petición expresa: el tema claro también aplica a las imágenes).
 export const FLYER_COLORS = [
   {
     id: "clasico",
@@ -65,19 +66,36 @@ export const FLYER_COLORS = [
     bg: "#0d0d0d",
     text: "#f2f3f4",
     muted: "#8d96a0",
-    accent: "#e2202f",
-    accentDark: "#9c1526",
-    accentText: "#ff5a6e",
+    accent: "#bf0f35",
+    accentDark: "#7d0924",
+    accentText: "#e8375c",
+  },
+  {
+    id: "claro",
+    label: "Claro",
+    bg: "#eef1f6",
+    text: "#0f1729",
+    muted: "#586276",
+    accent: "#bf0f35",
+    accentDark: "#7d0924",
+    accentText: "#a30c2d",
+    light: true,
   },
 ];
 
 function flyerPalette(colorId) {
   const c = FLYER_COLORS.find((x) => x.id === colorId) ?? FLYER_COLORS[0];
+  const light = !!c.light;
   return {
     ...c,
-    light: false,
-    // Velo sutil para cajas/rayas (blanco: los dos fondos son oscuros).
-    tint: (a) => `rgba(255, 255, 255, ${a})`,
+    light,
+    // Velo sutil para cajas/rayas: blanco sobre los fondos oscuros, azul
+    // marino sobre el claro.
+    tint: (a) => (light ? `rgba(15, 23, 41, ${a})` : `rgba(255, 255, 255, ${a})`),
+    // Sombras (más suaves en claro) y el dorado para TEXTO (el claro de
+    // siempre no se lee sobre blanco).
+    shade: (a) => `rgba(${light ? "15, 23, 41" : "0, 0, 0"}, ${light ? a * 0.35 : a})`,
+    gold: light ? "#b07a12" : GOLD,
   };
 }
 
@@ -237,20 +255,20 @@ function drawBackground(ctx, CH) {
   ctx.fillStyle = P.bg;
   ctx.fillRect(0, 0, W, CH);
   ctx.save();
-  ctx.globalAlpha = 0.7;
+  ctx.globalAlpha = P.light ? 0.12 : 0.7;
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(crocSkinLayer(), (W - WALL_W) / 2, (CH - WALL_H) / 2, WALL_W, WALL_H);
   ctx.restore();
 
   const glow = ctx.createRadialGradient(W / 2, CH * 0.45, 60, W / 2, CH * 0.45, 820);
-  glow.addColorStop(0, rgba(P.accent, 0.3));
+  glow.addColorStop(0, rgba(P.accent, P.light ? 0.1 : 0.3));
   glow.addColorStop(1, rgba(P.accent, 0));
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, CH);
 
   const vignette = ctx.createRadialGradient(W / 2, CH / 2, 300, W / 2, CH / 2, CH * 0.8);
-  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
-  vignette.addColorStop(1, "rgba(0, 0, 0, 0.65)");
+  vignette.addColorStop(0, P.shade(0));
+  vignette.addColorStop(1, P.shade(0.65));
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, W, CH);
 
@@ -266,7 +284,7 @@ function drawBackground(ctx, CH) {
 function drawLogo(ctx, logo, cx, y, size) {
   if (!logo) return;
   ctx.save();
-  ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+  ctx.shadowColor = P.shade(0.55);
   ctx.shadowBlur = 30;
   ctx.drawImage(logo, cx - size / 2, y, size, size);
   ctx.restore();
@@ -285,7 +303,7 @@ function drawFooter(ctx, sponsors, CH) {
   const GAP = 48;
   let items = sponsors.map((s) => {
     const h = Math.min(BASE / s.ratio ** 0.6, BASE);
-    return { c: s.dark, w: h * s.ratio, h };
+    return { c: P.light ? s.light : s.dark, w: h * s.ratio, h };
   });
   const total = items.reduce((sum, i) => sum + i.w, 0) + GAP * (items.length - 1);
   const scale = Math.min(1, (W - 140) / total);
@@ -337,9 +355,9 @@ function bigTitle(ctx, str, y, size) {
   ctx.font = font(s, { italic: true });
   ctx.textAlign = "center";
   ctx.save();
-  ctx.shadowColor = rgba(P.accent, 0.55);
+  ctx.shadowColor = rgba(P.accent, P.light ? 0.25 : 0.55);
   ctx.shadowBlur = 45;
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = P.light ? P.text : "#fff";
   ctx.fillText(str, W / 2, y);
   ctx.restore();
 }
@@ -358,7 +376,7 @@ function redBand(ctx, y, h) {
   bctx.fillRect(0, 0, W, h);
   applySkin(bctx, 0.9);
   ctx.save();
-  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowColor = P.shade(0.5);
   ctx.shadowBlur = 40;
   ctx.drawImage(band, 0, y);
   ctx.restore();
@@ -390,7 +408,7 @@ function jerseyText(ctx, str, x, y, { size, maxWidth = W - 120, color = "#fff", 
   }
   ctx.save();
   if (shadow) {
-    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+    ctx.shadowColor = P.shade(0.45);
     ctx.shadowBlur = 20;
     ctx.shadowOffsetX = 8;
     ctx.shadowOffsetY = 10;
@@ -437,7 +455,7 @@ function gameHeader(game, playoffRound) {
     title: playoffRound ? `PLAYOFFS${season}` : no ? `JUEGO ${no}${season}` : `RESULTADO${season}`,
     sub: `${formatDate(game.date)}${game.time ? ` · ${formatTime(game.time)}` : ""}`,
     league: playoffRound ? playoffRound.toUpperCase() : seasonLeague(game.season),
-    leagueColor: playoffRound ? GOLD : P.accentText,
+    leagueColor: playoffRound ? P.gold : P.accentText,
   };
 }
 
@@ -644,7 +662,7 @@ export async function resultFlyer(game, playoffRound = null, format = "post", co
     drawSkewedPhoto(ctx, mvpPhoto, mvp?.name, 110, 782, 260, 280, 32, GOLD);
     const tx = 440;
     const maxW = W - tx - 70;
-    text(ctx, "★ MVP DEL JUEGO", tx, 834, { size: 40, color: GOLD, align: "left", maxWidth: maxW });
+    text(ctx, "★ MVP DEL JUEGO", tx, 834, { size: 40, color: P.gold, align: "left", maxWidth: maxW });
     twoToneName(ctx, mvp?.name ?? mvpId, tx, 920, 1002, 92, maxW);
     const line = mvpLine(game, mvpId);
     if (line) text(ctx, line, tx, 1054, { size: 32, color: P.muted, weight: 600, align: "left", maxWidth: maxW });
@@ -951,10 +969,10 @@ export async function powerRankingFlyer(data, format = "post", color) {
     }
 
     // Lugar (Teko) y, a su lado, el movimiento.
-    jerseyText(ctx, String(r.rank), left + 46, mid + 17, { size: 40, color: r.rank === 1 ? GOLD : "#fff", shadow: false, maxWidth: 70 });
+    jerseyText(ctx, String(r.rank), left + 46, mid + 17, { size: 40, color: r.rank === 1 ? P.gold : P.text, shadow: false, maxWidth: 70 });
     const move =
       r.move == null
-        ? { t: "NUEVO", c: GOLD }
+        ? { t: "NUEVO", c: P.gold }
         : r.move > 0
           ? { t: `▲${r.move}`, c: "#3fb56f" }
           : r.move < 0
@@ -970,7 +988,7 @@ export async function powerRankingFlyer(data, format = "post", color) {
     if (r.line) text(ctx, r.line.toUpperCase(), tx, mid + 23, { size: 17, weight: 600, color: P.muted, align: "left", maxWidth: maxW });
 
     // Puntos.
-    jerseyText(ctx, String(r.score), right - 24, mid + 16, { size: 42, align: "right", shadow: false, maxWidth: 100 });
+    jerseyText(ctx, String(r.score), right - 24, mid + 16, { size: 42, color: P.text, align: "right", shadow: false, maxWidth: 100 });
   });
 
   drawFooter(ctx, sponsors, CH);
@@ -1300,12 +1318,16 @@ export async function openFlyer(make, filename, shareText = "") {
   let currentFile = null;
   let renderToken = 0;
   let format = "post";
-  let color = FLYER_COLORS[0].id;
+  // Con el sitio en Sol arranca en Claro; la elección se guarda aparte
+  // (una para Sol y otra para los temas oscuros).
+  const siteLight = document.documentElement.dataset.theme === "light";
+  const colorKey = siteLight ? `${FLYER_COLOR_KEY}-light` : FLYER_COLOR_KEY;
+  let color = siteLight ? "claro" : FLYER_COLORS[0].id;
   try {
-    const saved = localStorage.getItem(FLYER_COLOR_KEY);
+    const saved = localStorage.getItem(colorKey);
     if (FLYER_COLORS.some((c) => c.id === saved)) color = saved;
   } catch {
-    // Sin almacenamiento: Clásico.
+    // Sin almacenamiento: el de default.
   }
 
   // Compartir con la imagen adjunta (menú nativo del celular: WhatsApp,
@@ -1351,7 +1373,7 @@ export async function openFlyer(make, filename, shareText = "") {
     if (btn.dataset.color) {
       color = btn.dataset.color;
       try {
-        localStorage.setItem(FLYER_COLOR_KEY, color);
+        localStorage.setItem(colorKey, color);
       } catch {
         // Solo es una comodidad.
       }

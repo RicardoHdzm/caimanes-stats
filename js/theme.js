@@ -46,9 +46,33 @@ function applyTheme(theme) {
   document.getElementById("more-tile-theme")?.setAttribute("aria-label", `Tema: ${THEME_LABEL[theme]} — toca para cambiar`);
 }
 
+// Cambio de tema con transición suave (a petición expresa): un fundido de
+// toda la página donde el navegador lo permite (View Transitions) y, si no,
+// que los colores se deslicen unos 0.4s (clase .theme-fading en
+// css/styles.css). Sin animación si el sistema pide reducir movimiento.
+function switchSmoothly(swap) {
+  const root = document.documentElement;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    swap();
+    return;
+  }
+  if (document.startViewTransition) {
+    try {
+      document.startViewTransition(swap);
+      return;
+    } catch {
+      // Cae al plan B de abajo.
+    }
+  }
+  root.classList.add("theme-fading");
+  swap();
+  clearTimeout(switchSmoothly.timer);
+  switchSmoothly.timer = setTimeout(() => root.classList.remove("theme-fading"), 450);
+}
+
 function advanceTheme() {
   const next = THEMES[(THEMES.indexOf(currentTheme()) + 1) % THEMES.length];
-  applyTheme(next);
+  switchSmoothly(() => applyTheme(next));
   try {
     localStorage.setItem(STORAGE_KEY, next);
   } catch {
