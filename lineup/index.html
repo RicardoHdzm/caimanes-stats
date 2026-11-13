@@ -4,12 +4,13 @@
 <meta charset="UTF-8" />
 <!-- Mismo tema que el sitio principal, sin parpadeo — ver index.html. -->
 <script>
-  // Eclipse (azul) es el default; Luna (negro) solo si se eligió y guardó.
+  // Eclipse (azul) es el default; Sol (claro) o Luna (negro) solo si se eligieron y guardaron.
   var theme = "eclipse";
   try {
-    if (localStorage.getItem("caimanes-theme") === "dark") theme = "dark";
+    var saved = localStorage.getItem("caimanes-theme");
+    if (saved === "dark" || saved === "light") theme = saved;
   } catch (e) {}
-  if (theme === "eclipse") document.documentElement.dataset.theme = theme;
+  if (theme !== "dark") document.documentElement.dataset.theme = theme;
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />

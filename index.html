@@ -6,12 +6,13 @@
        la página no "parpadee" oscuro-y-luego-claro en cada carga. El resto
        de la lógica (botón, guardar el cambio) vive en js/theme.js. -->
   <script>
-    // Eclipse (azul) es el default; Luna (negro) solo si se eligió y guardó.
+    // Eclipse (azul) es el default; Sol (claro) o Luna (negro) solo si se eligieron y guardaron.
     var theme = "eclipse";
     try {
-      if (localStorage.getItem("caimanes-theme") === "dark") theme = "dark";
+      var saved = localStorage.getItem("caimanes-theme");
+      if (saved === "dark" || saved === "light") theme = saved;
     } catch (e) {}
-    if (theme === "eclipse") document.documentElement.dataset.theme = theme;
+    if (theme !== "dark") document.documentElement.dataset.theme = theme;
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
@@ -138,9 +139,10 @@
            vacío si Supabase no está configurado. -->
       <div id="auth-slot" class="auth-slot"></div>
       <!-- Solo escritorio (en celular vive en el menú ☰): el interruptor de
-           tema eclipse/luna (ver js/theme.js). -->
+           tema sol/eclipse/luna (ver js/theme.js). -->
       <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
         <span class="theme-switch-thumb"></span>
+        <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
         <i class="fa-solid fa-bolt theme-switch-icon theme-switch-icon--eclipse"></i>
         <i class="fa-solid fa-fire theme-switch-icon theme-switch-icon--moon"></i>
       </button>

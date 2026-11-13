@@ -20,11 +20,8 @@
 // círculo deslizante (no hay espacio para ese widget dentro de un tile
 // cuadrado). Ambos controles, si están presentes, avanzan el mismo ciclo.
 const STORAGE_KEY = "caimanes-theme";
-// "light" (Sol) quitado por ahora, a petición expresa — sus colores siguen
-// en css/styles.css ([data-theme="light"]); para regresarlo, vuelve a
-// ponerlo al principio de THEMES, en el script inline de cada .html y su
-// ícono en #theme-toggle de index.html. Quien lo tenía guardado cae a Eclipse.
-const THEMES = ["eclipse", "dark"];
+// Sol ("light") regresó a petición expresa: el ciclo es sol → eclipse → luna.
+const THEMES = ["light", "eclipse", "dark"];
 const THEME_LABEL = { light: "Sol", eclipse: "Eclipse", dark: "Luna" };
 const THEME_ICON = { light: "fa-sun", eclipse: "fa-bolt", dark: "fa-fire" };
 
