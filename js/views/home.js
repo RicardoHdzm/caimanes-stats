@@ -317,7 +317,11 @@ export function renderHome(container) {
   // Flyer para redes (ver js/flyers.js).
   if (next) {
     const shareBtn = shareButton(() =>
-      openFlyer((format, color) => nextGameFlyer(next, format, color), `proximo-juego-${next.date}`, `Próximo juego: Caimanes de Villas vs ${next.opponent}`)
+      openFlyer(
+        (format, color) => nextGameFlyer(next, format, color),
+        `${gameDay ? "hoy" : "proximo-juego"}-${next.date}`,
+        `${gameDay ? "Hoy jugamos" : "Próximo juego"}: Caimanes de Villas vs ${next.opponent}`
+      )
     );
     // Solo la palabra, sin el ícono del botón normal.
     shareBtn.textContent = "Compartir";

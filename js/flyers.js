@@ -470,7 +470,10 @@ export async function nextGameFlyer(game, format = "post", color) {
     league: seasonLeague(),
   });
 
-  bigTitle(ctx, "PRÓXIMO JUEGO", 395, 180);
+  // El mismo día del juego dice "HOY" (a petición expresa).
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  bigTitle(ctx, game.date === today ? "HOY" : "PRÓXIMO JUEGO", 395, 180);
 
   // Franja con los dos equipos y "VS" al centro.
   redBand(ctx, 443, 270);
