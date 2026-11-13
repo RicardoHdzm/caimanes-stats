@@ -65,6 +65,8 @@
   --accent-text: #ff5a6e;
   --accent-dark: #9c1526;
   --accent-glow: rgba(226, 32, 47, 0.35);
+  /* Brillo rojo de la esquina de las tarjetas (más tenue en Sol). */
+  --card-glow: color-mix(in srgb, var(--accent) 18%, transparent);
 
   --win: #3fb56f;
   --loss: #e2202f;
@@ -150,22 +152,32 @@
    quedan igual que en Luna, es la misma identidad visual. El tercer tema,
    Eclipse (ver más abajo), es la excepción: ese sí trae su propio rojo. */
 :root[data-theme="light"] {
-  --bg: #f4f5f7;
+  /* Neutros con un toque del azul marino del equipo (antes grises puros:
+     se sentía como el oscuro "en negativo"). */
+  --bg: #eef1f6;
   --surface: #ffffff;
-  --surface-alt: #eef0f3;
+  --surface-alt: #f3f5f9;
   --surface-raised: #ffffff;
-  --border: #dbdfe4;
-  --text: #1a1e23;
-  --muted: #5b6470;
+  --border: #d5dbe5;
+  --text: #0f1729;
+  --muted: #586276;
+
+  /* Mismo rojo que Eclipse (el default): más profundo, se ve mejor en blanco. */
+  --accent: #bf0f35;
+  --accent-dark: #7d0924;
+  --loss: #bf0f35;
+  --win: #1e9150;
+  --scheduled: #c97f00;
+  --card-glow: color-mix(in srgb, var(--accent) 6%, transparent);
 
   /* --accent-text (el rojo para TEXTO chico) está afinado para leerse sobre
      fondo oscuro — sobre blanco un rojo tan claro pierde contraste, así que
      aquí usa el tono más oscuro que ya existía para hovers. */
-  --accent-text: #b3172a;
-  --accent-glow: rgba(226, 32, 47, 0.25);
+  --accent-text: #a30c2d;
+  --accent-glow: rgba(191, 15, 53, 0.16);
 
-  --zebra: rgba(0, 0, 0, 0.025);
-  --skin-line: rgba(15, 23, 42, 0.035);
+  --zebra: rgba(15, 23, 41, 0.03);
+  --skin-line: rgba(15, 23, 41, 0.03);
 
   --bg-glow: #ffffff;
 
@@ -177,7 +189,7 @@
 
   /* Mismo rojo-al-10% que .standings-us/.row-you, pero ya mezclado sobre
      --surface en este tema (blanco) en vez del de fondo oscuro. */
-  --row-you-solid: #fbe4e6;
+  --row-you-solid: #f8e3e8;
 }
 
 /* ---- Tema Eclipse ----
@@ -8504,7 +8516,7 @@ a.home-sponsor-card:hover {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(280px 170px at 0% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%),
+    radial-gradient(280px 170px at 0% 0%, var(--card-glow), transparent 70%),
     linear-gradient(160deg, var(--hero-shade) 0%, transparent 65%),
     var(--surface);
 }
@@ -8574,7 +8586,7 @@ a.home-sponsor-card:hover {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(280px 170px at 0% 0%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%),
+    radial-gradient(280px 170px at 0% 0%, var(--card-glow), transparent 70%),
     linear-gradient(160deg, var(--hero-shade) 0%, transparent 65%),
     var(--surface);
 }
@@ -8621,7 +8633,7 @@ a.home-sponsor-card:hover {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(280px 170px at 0% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+    radial-gradient(280px 170px at 0% 0%, var(--card-glow), transparent 70%),
     var(--surface);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
@@ -8634,7 +8646,7 @@ a.home-sponsor-card:hover {
 
 .score-card {
   background:
-    radial-gradient(260px 160px at 0% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(260px 160px at 0% 0%, var(--card-glow), transparent 70%),
     var(--surface);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
@@ -9608,7 +9620,7 @@ a.home-sponsor-card:hover .home-sponsor-logo {
    efecto al pasar el mouse; el número de vlog en Teko. ---- */
 .playlist-card {
   background:
-    radial-gradient(240px 140px at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(240px 140px at 0% 0%, var(--card-glow), transparent 70%),
     var(--surface-alt);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
@@ -9641,7 +9653,7 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   border-top: 3px solid var(--accent);
   border-radius: var(--radius-md);
   background:
-    radial-gradient(280px 170px at 0% 100%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    radial-gradient(280px 170px at 0% 100%, var(--card-glow), transparent 70%),
     var(--surface);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
@@ -9762,7 +9774,7 @@ a.home-sponsor-card:hover .home-sponsor-logo {
 .lu-card.is-on {
   border-color: var(--accent);
   background:
-    radial-gradient(120% 140% at 0 0, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+    radial-gradient(120% 140% at 0 0, var(--card-glow), transparent 60%),
     var(--surface);
   box-shadow: 0 14px 30px -18px var(--accent-glow);
 }
@@ -10320,13 +10332,28 @@ a.home-sponsor-card:hover .home-sponsor-logo {
    Tema Sol (claro) — ajustes de los estilos nuevos, que se hicieron pensando
    en fondo oscuro. Al final para mandar sobre ellos.
    ========================================================================== */
-:root[data-theme="light"] .home-hero-name {
-  background: linear-gradient(180deg, #1a1e23 30%, #48505c);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-/* El logo del header es blanco (whitelogo@2x.png): en claro, en negro. */
-:root[data-theme="light"] .site-brand-logo {
-  filter: brightness(0);
+/* El "marco" del sitio (cintillo de juegos, header, hero de la portada y
+   footer) se queda en el azul marino de Eclipse: solo el contenido va en
+   claro. Con todo en blanco el sitio se veía "en negativo" (a petición
+   expresa). Los tokens se redefinen en cada pieza y todo lo de adentro los
+   hereda. */
+:root[data-theme="light"] .match-ticker,
+:root[data-theme="light"] .site-header,
+:root[data-theme="light"] .home-hero,
+:root[data-theme="light"] .footer {
+  --bg: #0a0e18;
+  --surface: #101622;
+  --surface-alt: #141b28;
+  --surface-raised: #1a2230;
+  --border: #222c40;
+  --text: #f2f3f4;
+  --muted: #a3a5a4;
+  --accent-text: #e8375c;
+  --accent-glow: rgba(191, 15, 53, 0.35);
+  --card-glow: color-mix(in srgb, var(--accent) 18%, transparent);
+  --win: #3fb56f;
+  --scheduled: #f5a623;
+  --zebra: rgba(255, 255, 255, 0.03);
+  --shadow-card: 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+  color: var(--text);
 }
