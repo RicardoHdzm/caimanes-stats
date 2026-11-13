@@ -355,7 +355,8 @@ function bigTitle(ctx, str, y, size) {
   ctx.font = font(s, { italic: true });
   ctx.textAlign = "center";
   ctx.save();
-  ctx.shadowColor = rgba(P.accent, P.light ? 0.25 : 0.55);
+  // En Claro el resplandor es blanco (a petición expresa); rojo en los oscuros.
+  ctx.shadowColor = P.light ? "rgba(255, 255, 255, 0.95)" : rgba(P.accent, 0.55);
   ctx.shadowBlur = 45;
   ctx.fillStyle = P.light ? P.text : "#fff";
   ctx.fillText(str, W / 2, y);
