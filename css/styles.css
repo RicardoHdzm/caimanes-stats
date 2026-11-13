@@ -61,10 +61,12 @@
      da 3.57:1, suficiente para elementos gráficos (mínimo 3) pero NO para
      texto (mínimo 4.5). Para texto chico en rojo va --accent-text, que da
      5.53:1 y se ve prácticamente igual. */
-  --accent: #e2202f;
-  --accent-text: #ff5a6e;
-  --accent-dark: #9c1526;
-  --accent-glow: rgba(226, 32, 47, 0.35);
+  /* El rojo de Eclipse es el color principal en los tres temas (a petición
+     expresa; antes Luna y Sol usaban #e2202f). */
+  --accent: #bf0f35;
+  --accent-text: #e8375c;
+  --accent-dark: #7d0924;
+  --accent-glow: rgba(191, 15, 53, 0.35);
   /* Brillo rojo de la esquina de las tarjetas (más tenue en Sol). */
   --card-glow: color-mix(in srgb, var(--accent) 18%, transparent);
 
@@ -1700,7 +1702,7 @@ main h3::before {
   padding: 6px 16px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--accent);
-  background: rgba(226, 32, 47, 0.12);
+  background: rgba(191, 15, 53, 0.12);
   color: var(--accent-text);
   font-size: var(--text-sm);
   font-weight: 700;
@@ -1936,9 +1938,9 @@ main h3::before {
 
 .achievement-medal--dues-unpaid .achievement-medal-icon {
   border: 2px solid var(--loss);
-  background: rgba(226, 32, 47, 0.15);
+  background: rgba(191, 15, 53, 0.15);
   color: var(--loss);
-  box-shadow: 0 0 12px rgba(226, 32, 47, 0.35);
+  box-shadow: 0 0 12px rgba(191, 15, 53, 0.35);
 }
 
 /* Explica cada logro al pasar el mouse (o al enfocarlo con teclado, ver
@@ -2089,7 +2091,7 @@ main h3::before {
 
 .card-icon::before,
 .leader-card h3 i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  background: linear-gradient(135deg, #e8375c, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2353,7 +2355,7 @@ main h3::before {
 }
 
 .leader-card--hero h3 i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  background: linear-gradient(135deg, #e8375c, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2681,7 +2683,7 @@ main h3::before {
 /* Nuestra fila en la tabla de posiciones: hay 18 equipos y sin esto hay que
    ir leyendo nombre por nombre para encontrarnos. */
 .stats-table tbody tr.standings-us td {
-  background-color: rgba(226, 32, 47, 0.1);
+  background-color: rgba(191, 15, 53, 0.1);
   font-weight: 700;
   color: var(--text);
 }
@@ -2700,7 +2702,7 @@ main h3::before {
    juntas en una misma tabla (esa es de equipos, esta de jugadores), así
    que no hay ambigüedad de cuál "tú" es cuál. */
 .stats-table tbody tr.row-you td {
-  background-color: rgba(226, 32, 47, 0.1);
+  background-color: rgba(191, 15, 53, 0.1);
   font-weight: 700;
   color: var(--text);
 }
@@ -2718,7 +2720,7 @@ main h3::before {
    que ahí no alcanza para distinguirse — se agrega un aro completo más un
    tinte de fondo, mismo rojo que .row-you de arriba. */
 .card.card-you {
-  background: linear-gradient(160deg, rgba(226, 32, 47, 0.14), var(--surface));
+  background: linear-gradient(160deg, rgba(191, 15, 53, 0.14), var(--surface));
   box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
 }
 
@@ -2770,7 +2772,7 @@ main h3::before {
 }
 
 .badge-loss {
-  background: rgba(226, 32, 47, 0.15);
+  background: rgba(191, 15, 53, 0.15);
   color: var(--loss);
 }
 
@@ -2896,7 +2898,7 @@ main h3::before {
 }
 
 .avatar-initials {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  background: linear-gradient(135deg, #e8375c, var(--accent-dark));
   color: #fff;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -3707,7 +3709,7 @@ body.modal-open {
 }
 
 .rsvp-no.active {
-  background: rgba(226, 32, 47, 0.12);
+  background: rgba(191, 15, 53, 0.12);
   border-color: var(--loss);
   color: var(--loss);
 }
@@ -4067,7 +4069,7 @@ button.mvp-vote-card:active {
 }
 
 .record-label i::before {
-  background: linear-gradient(135deg, #ff5a6e, var(--accent-dark));
+  background: linear-gradient(135deg, #e8375c, var(--accent-dark));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
