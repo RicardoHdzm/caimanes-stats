@@ -127,51 +127,67 @@
   <section class="admin-section" id="admin-section-juego" hidden>
     <h2>Agregar / editar juego</h2>
     <p class="subtitle">Llena los datos del juego y las líneas de bateo/pitcheo/fildeo, luego copia el código en <code>GAMES</code> dentro de <code>js/data.js</code>. Para editar uno que ya existe, selecciónalo abajo: se rellena el formulario y el código generado reemplaza ese bloque completo.</p>
-    <label class="game-select-label">Editar juego existente
-      <select id="game-select">
-        <option value="">— Nuevo juego —</option>
-      </select>
-    </label>
-    <label class="playoff-toggle-label">
-      <input type="checkbox" id="is-playoff-toggle" name="isPlayoff" /> ¿Es un juego de playoffs?
-    </label>
-    <form id="game-form" class="admin-form">
-      <label>ID (único)<input type="text" name="id" required /></label>
-      <label id="season-field">Temporada<input type="number" name="season" min="1" required /></label>
-      <div id="playoff-fields" hidden>
-        <label>Ronda (ej. "Cuartos de final")<input type="text" name="roundName" /></label>
-        <label class="playoff-final-label"><input type="checkbox" name="isFinal" /> ¿Es la final del campeonato?</label>
-      </div>
-      <label>Fecha<input type="date" name="date" required /></label>
-      <label>Hora (opcional)<input type="time" name="time" /></label>
-      <label>Rival<input type="text" name="opponent" required /></label>
-      <label>¿En qué parte de la entrada bateamos?
-        <select name="weCloseBatting">
-          <option value="unknown">No sé todavía</option>
-          <option value="true">Baja — cerramos bateando</option>
-          <option value="false">Alta — abrimos, cierra el rival</option>
+    <!-- Arriba: qué juego se edita y si es de playoffs. Abajo, el formulario
+         en dos bloques (datos del juego / marcador), cada uno en su
+         cuadrícula con etiquetas cortas para que los campos queden
+         alineados. Estilos: .admin-game-* al final de css/admin.css. -->
+    <div class="admin-game-top">
+      <label class="game-select-label">Editar juego existente
+        <select id="game-select">
+          <option value="">— Nuevo juego —</option>
         </select>
       </label>
-      <label>¿Ya tienes el marcador?
-        <select name="scoreKnown" id="score-known">
-          <option value="yes">Sí</option>
-          <option value="no">No todavía</option>
-        </select>
+      <label class="playoff-toggle-label">
+        <input type="checkbox" id="is-playoff-toggle" name="isPlayoff" /> ¿Es un juego de playoffs?
       </label>
-      <div id="score-fields">
-        <label>Carreras nosotras<input type="number" name="scoreUs" /></label>
-        <label>Carreras rival<input type="number" name="scoreThem" /></label>
-      </div>
-      <div id="result-field" hidden>
-        <label>Resultado
-          <select name="result">
-            <option value="W">Victoria</option>
-            <option value="L">Derrota</option>
-            <option value="T">Empate</option>
-          </select>
-        </label>
-      </div>
-      <label>Link del replay (opcional)<input type="url" name="replayUrl" placeholder="https://..." /></label>
+    </div>
+    <form id="game-form" class="admin-form admin-game-form">
+      <fieldset class="admin-fieldset">
+        <legend>Datos del juego</legend>
+        <div class="admin-grid">
+          <label>ID (único)<input type="text" name="id" required /></label>
+          <label id="season-field">Temporada<input type="number" name="season" min="1" required /></label>
+          <div id="playoff-fields" hidden>
+            <label>Ronda<input type="text" name="roundName" placeholder="Cuartos de final" /></label>
+            <label class="playoff-final-label"><input type="checkbox" name="isFinal" /> ¿Es la final?</label>
+          </div>
+          <label>Fecha<input type="date" name="date" required /></label>
+          <label>Hora (opcional)<input type="time" name="time" /></label>
+          <label class="admin-span-2">Rival<input type="text" name="opponent" required /></label>
+        </div>
+      </fieldset>
+      <fieldset class="admin-fieldset">
+        <legend>Marcador</legend>
+        <div class="admin-grid">
+          <label>Bateamos en la
+            <select name="weCloseBatting">
+              <option value="unknown">No sé todavía</option>
+              <option value="true">Baja (cerramos)</option>
+              <option value="false">Alta (abrimos)</option>
+            </select>
+          </label>
+          <label>¿Ya hay marcador?
+            <select name="scoreKnown" id="score-known">
+              <option value="yes">Sí</option>
+              <option value="no">No todavía</option>
+            </select>
+          </label>
+          <div id="score-fields">
+            <label>Carreras nosotros<input type="number" name="scoreUs" min="0" /></label>
+            <label>Carreras rival<input type="number" name="scoreThem" min="0" /></label>
+          </div>
+          <div id="result-field" hidden>
+            <label>Resultado
+              <select name="result">
+                <option value="W">Victoria</option>
+                <option value="L">Derrota</option>
+                <option value="T">Empate</option>
+              </select>
+            </label>
+          </div>
+          <label class="admin-span-2">Link del replay (opcional)<input type="url" name="replayUrl" placeholder="https://..." /></label>
+        </div>
+      </fieldset>
     </form>
 
     <h3>Bateo / line-up</h3>
