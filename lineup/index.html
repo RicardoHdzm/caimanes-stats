@@ -15,46 +15,52 @@
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
 <title>Generador de alineación — Caimanes de Villas</title>
 <link rel="icon" type="image/png" href="../assets/logo.png" />
+<!-- Ícono al agregarla a la pantalla de inicio: el logo blanco
+     (assets/logos/whitelogo@2x.png) centrado sobre fondo oscuro, en cuadrado
+     (iOS pinta de negro lo transparente y los íconos deben ser cuadrados). -->
+<link rel="apple-touch-icon" href="../assets/lineup-icon-180.png" />
+<!-- Ruta absoluta: abierta como caimanes.team/lineup (sin "/" final) una
+     relativa caería en el manifest del sitio principal. -->
+<link rel="manifest" href="/lineup/manifest.webmanifest" />
+<meta name="theme-color" content="#0a0e18" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <link rel="stylesheet" href="../css/styles.css" />
 <link rel="stylesheet" href="../css/admin.css" />
 </head>
-<body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <img src="../assets/logo.png" alt="Caimanes de Villas" class="brand-logo" />
-  </div>
+<body class="lu-page">
+<!-- Mismo header delgado del sitio (logo blanco a la izquierda). Estilos de
+     toda la página: "Generador de alineación (lineup/)" en css/styles.css. -->
+<header class="site-header">
+  <a href="../" class="site-brand" aria-label="Caimanes de Villas — volver al sitio">
+    <img src="../assets/logos/whitelogo@2x.png" alt="" class="site-brand-logo" />
+  </a>
+  <a href="../" class="lu-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Volver al sitio</a>
 </header>
 
-<main id="lineup-app" class="admin-main">
-  <a href="../" class="back-link"><i class="fa-solid fa-arrow-left"></i> Volver al sitio</a>
+<main id="lineup-app" class="lu-main">
+  <h2 class="page-title">Generador de <span class="page-title-accent">alineación</span> <i class="page-title-slashes" aria-hidden="true">///</i></h2>
 
-  <section class="admin-section">
-    <h2>Generador de alineación</h2>
+  <div class="lu-toolbar">
+    <button type="button" id="select-all-btn" class="lu-chip-btn"><i class="fa-solid fa-check-double" aria-hidden="true"></i> Todos</button>
+    <button type="button" id="select-none-btn" class="lu-chip-btn"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Ninguno</button>
+  </div>
 
-    <div class="attendee-controls">
-      <button type="button" id="select-all-btn"><i class="fa-solid fa-check-double"></i> Todos</button>
-      <button type="button" id="select-none-btn"><i class="fa-solid fa-xmark"></i> Ninguno</button>
-      <span class="attendee-count" id="attendee-count"></span>
-    </div>
+  <section class="lu-coverage" id="lu-coverage" hidden></section>
 
-    <div class="attendee-grid" id="attendee-list"></div>
+  <div class="lu-grid" id="attendee-list"></div>
 
-    <button type="button" id="generate-btn" class="generate-btn">
-      <i class="fa-solid fa-baseball-bat-ball"></i> Generar alineación
-    </button>
-  </section>
-
-  <section class="admin-section" id="lineup-result">
-  </section>
+  <section class="lu-result" id="lineup-result"></section>
 </main>
 
-<footer class="footer">
-  <div class="season-row">
-    <span class="season">Herramienta local — no guarda nada, solo sugiere</span>
+<!-- Barra fija abajo: cuántos van y el botón, siempre a la mano. -->
+<div class="lu-bar" id="lu-bar">
+  <div class="lu-bar-inner">
+    <span class="lu-bar-count" id="attendee-count"></span>
+    <button type="button" id="generate-btn" class="lu-generate">
+      <i class="fa-solid fa-baseball-bat-ball" aria-hidden="true"></i> <span id="generate-label">Generar alineación</span>
+    </button>
   </div>
-  La alineación se recalcula cada vez que le das clic al botón; no se guarda en ningún lado.
-</footer>
+</div>
 
 <script type="module" src="../js/lineup-tool.js"></script>
 </body>

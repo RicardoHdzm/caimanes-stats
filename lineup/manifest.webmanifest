@@ -1,0 +1,14 @@
+{
+  "name": "Alineación — Caimanes de Villas",
+  "short_name": "Alineación",
+  "description": "Generador de alineación de Caimanes de Villas.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0e18",
+  "theme_color": "#0a0e18",
+  "icons": [
+    { "src": "../assets/lineup-icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "../assets/lineup-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

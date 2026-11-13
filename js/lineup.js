@@ -12,14 +12,14 @@ import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 export const DEFENSE_POSITIONS = ["P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
 // Lo que se puede elegir en el selector de posición del orden al bat en
 // lineup/ — todo menos P (el pitcher se elige en la lista de asistentes).
-const EDITABLE_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "JD", "JC"];
+export const EDITABLE_POSITIONS = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "JD", "JC"];
 
 export function positionsOf(value) {
   if (!value) return [];
   return value.split("/").map((v) => v.trim()).filter(Boolean);
 }
 
-function emptyStats(playerId) {
+export function emptyStats(playerId) {
   return { playerId, name: playerName(playerId), G: 0, AVG: ".000", OBP: ".000", SLG: ".000", OPS: ".000", HR: 0, RBI: 0, SB: 0, seasonGP: 0, regular: false, pitchOuts: 0, WHIP: 0 };
 }
 
@@ -29,7 +29,7 @@ function emptyStats(playerId) {
 // `regular` en renderLineupResult) — y ya entre iguales, mejor OPS. A
 // petición expresa: alguien que casi no viene no le gana el lugar a uno
 // constante solo por un par de buenos juegos.
-function byRegularThenOps(a, b) {
+export function byRegularThenOps(a, b) {
   if (a.regular !== b.regular) return a.regular ? -1 : 1;
   return Number(b.OPS) - Number(a.OPS);
 }
@@ -309,7 +309,7 @@ function lineupStatsGames() {
   return [];
 }
 
-function lineupStatsById(roster) {
+export function lineupStatsById(roster) {
   const statGames = lineupStatsGames();
   const seasonStatsById = new Map(battingTotals(statGames).map((r) => [r.playerId, r]));
   const pitchingById = new Map(pitchingTotals(statGames).map((r) => [r.playerId, r]));
@@ -628,7 +628,7 @@ export function renderLineupResult(container, roster, gamePositionById = null, {
 // pitcher ("P", no batea) se queda fija al final. `rows` es el MISMO
 // arreglo que lee el flyer de compartir: se reacomoda en su lugar y se
 // renumeran los turnos, así el flyer sale con el orden nuevo.
-function enableRowDrag(tableContainer, rows, redraw) {
+export function enableRowDrag(tableContainer, rows, redraw) {
   tableContainer.addEventListener("pointerdown", (e) => {
     const handle = e.target.closest(".drag-handle");
     if (!handle) return;
