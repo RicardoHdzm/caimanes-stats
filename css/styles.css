@@ -10253,3 +10253,18 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   color: var(--muted);
   font-size: 0.75rem;
 }
+
+/* Meter a alguien de la banca (ver benchEl en js/lineup-tool.js). */
+.lu-sub {
+  margin-left: auto;
+  flex-shrink: 0;
+  max-width: 118px;
+  padding: 5px 6px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+  color: var(--accent-text);
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}

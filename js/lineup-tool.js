@@ -23,7 +23,7 @@ import {
 import { initAuth } from "./auth.js";
 import { displayPositions } from "./stats.js";
 import { getAllPositionOverrides } from "./db.js";
-import { escapeHtml, renderAvatar, renderPositionBadge, renderSortableTable, formatGameTime } from "./ui.js";
+import { escapeHtml, renderAvatar, renderSortableTable, formatGameTime } from "./ui.js";
 import { lineupFlyer, openFlyer, shareButton } from "./flyers.js";
 
 const listEl = document.getElementById("attendee-list");
@@ -245,6 +245,8 @@ function listJoin(items) {
 // ninguna) — así el motor no le puede ganar el lugar al fijado. Después del
 // orden calculado, los fijados vuelven a su turno y el resto llena los huecos.
 const TAKEN = "__taken";
+// Valor de "A la banca" en el selector de posición de la tabla.
+const TO_BENCH = "__bench";
 
 function generate() {
   const attendees = roster.filter((p) => selection.has(p.id));
@@ -476,13 +478,12 @@ function renderResult() {
       label: "Pos",
       full: "Posición",
       // La posición se puede CAMBIAR desde aquí (si otro la tenía, se
-      // intercambian). El pitcher se queda fijo: se elige en la lista.
+      // intercambian) o mandar al jugador a la banca. El pitcher no cambia
+      // de posición (se elige en la lista), pero sí puede irse a la banca.
       render: (v, row) =>
-        v !== "P"
-          ? `<select class="pos-select" data-player="${row.playerId}" aria-label="Posición de ${escapeHtml(row.name)}">${EDITABLE_POSITIONS.map(
-              (p) => `<option value="${p}"${p === v ? " selected" : ""}>${p}</option>`
-            ).join("")}</select>`
-          : renderPositionBadge(v),
+        `<select class="pos-select" data-player="${row.playerId}" aria-label="Posición de ${escapeHtml(row.name)}">${(v === "P" ? ["P"] : EDITABLE_POSITIONS)
+          .map((p) => `<option value="${p}"${p === v ? " selected" : ""}>${p}</option>`)
+          .join("")}<option value="${TO_BENCH}">A la banca</option></select>`,
     },
     { key: "AVG", label: "AVG", full: "Promedio", numeric: true },
     { key: "OBP", label: "OBP", full: "Porcentaje de embasado", numeric: true },
@@ -528,6 +529,15 @@ function renderResult() {
     if (!select) return;
     const row = rows.find((r) => r.playerId === select.dataset.player);
     if (!row) return;
+    // A la banca: sale del orden al bat (y pierde su candado); su posición
+    // queda vacía para meter a alguien desde la banca.
+    if (select.value === TO_BENCH) {
+      result.rows = rows.filter((r) => r !== row).map((r) => ({ playerId: r.playerId, position: r.position, pitcherOnly: r.pitcherOnly }));
+      result.locked.delete(row.playerId);
+      save();
+      renderResult();
+      return;
+    }
     const other = rows.find((r) => r !== row && r.position === select.value);
     if (other) other.position = row.position;
     row.position = select.value;
@@ -554,6 +564,18 @@ function renderResult() {
     const benchHead = document.createElement("h3");
     benchHead.textContent = "Banca";
     resultEl.appendChild(benchHead);
+    // Cada quien en la banca puede entrar: en lugar de alguien alineado
+    // (toma su turno y su posición; el otro pasa a la banca) o en una
+    // posición que haya quedado vacía.
+    const taken = new Set(rows.map((r) => r.position));
+    const emptyPositions = [...DEFENSE_POSITIONS, "JD", "JC"].filter((pos) => !taken.has(pos));
+    const subOptions = `
+      <option value="" selected disabled>Entrar…</option>
+      <optgroup label="En lugar de">${rows
+        .map((r) => `<option value="row:${r.playerId}">${escapeHtml(shortName(r.name))} (${r.position})</option>`)
+        .join("")}</optgroup>
+      ${emptyPositions.length ? `<optgroup label="Posición vacía">${emptyPositions.map((pos) => `<option value="pos:${pos}">${pos}</option>`).join("")}</optgroup>` : ""}`;
+
     const benchEl = document.createElement("div");
     benchEl.className = "lu-bench";
     benchEl.innerHTML = bench
@@ -567,9 +589,33 @@ function renderResult() {
               <b>${escapeHtml(s.name)}</b>
               <small>${pos ? `${pos} · ` : ""}OPS ${s.OPS} · ${s.seasonGP} JJ</small>
             </span>
+            <select class="lu-sub" data-player="${s.playerId}" aria-label="Meter a ${escapeHtml(s.name)} a la alineación">${subOptions}</select>
           </span>`;
       })
       .join("");
+    benchEl.addEventListener("change", (e) => {
+      const select = e.target.closest(".lu-sub");
+      if (!select?.value) return;
+      const inId = select.dataset.player;
+      const [kind, value] = select.value.split(":");
+      const next = rows.map((r) => ({ playerId: r.playerId, position: r.position, pitcherOnly: r.pitcherOnly }));
+      if (kind === "row") {
+        const target = next.find((r) => r.playerId === value);
+        if (!target) return;
+        target.playerId = inId;
+        result.locked.delete(value);
+      } else if (value === "P" && next.some((r) => r.position === "JD")) {
+        // Con JD el pitcher no batea: va al final, fuera del orden.
+        next.push({ playerId: inId, position: "P", pitcherOnly: true });
+      } else {
+        // Al final del orden al bat (antes del pitcher que no batea).
+        const at = next.findIndex((r) => r.pitcherOnly);
+        next.splice(at < 0 ? next.length : at, 0, { playerId: inId, position: value, pitcherOnly: false });
+      }
+      result.rows = next;
+      save();
+      renderResult();
+    });
     resultEl.appendChild(benchEl);
   }
 }
