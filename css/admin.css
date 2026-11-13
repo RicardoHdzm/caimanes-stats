@@ -956,7 +956,7 @@
   letter-spacing: 0;
 }
 
-.admin-page .admin-grid input,
+.admin-page .admin-grid input:not([type="checkbox"]),
 .admin-page .admin-grid select {
   width: 100%;
   min-height: 40px;
