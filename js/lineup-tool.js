@@ -7,7 +7,7 @@
 // - candados: un jugador fijado conserva turno y posición al regenerar;
 // - compartir como imagen (flyer) o como texto para WhatsApp;
 // - la vista de campo con cada quien en su posición.
-import { ROSTER, SCHEDULE, INJURED } from "./data.js";
+import { ROSTER, SCHEDULE } from "./data.js";
 import {
   DEFENSE_POSITIONS,
   EDITABLE_POSITIONS,
@@ -120,19 +120,12 @@ function positionSelectHtml(player) {
 
 const cards = new Map(); // playerId -> { card, checkbox, select }
 
-// Lesionados (INJURED en js/data.js, los de la medalla "Fragile"): marca
-// en su tarjeta, en la tabla y en la banca para no alinearlos sin querer.
-const INJURED_TAG = '<span class="lu-injured"><i class="fa-solid fa-user-injured" aria-hidden="true"></i> Lesionado</span>';
-const injuredIcon = (id) =>
-  INJURED.includes(id) ? ' <i class="fa-solid fa-user-injured lu-injured-icon" title="Lesionado" aria-label="Lesionado"></i>' : "";
-
 for (const player of roster) {
   // Tocar cualquier parte de la tarjeta marca/desmarca (el checkbox queda
   // oculto). El selector de posición va FUERA del <label>: dentro, en
   // iPhone tocarlo también desmarcaba al jugador.
-  const injured = INJURED.includes(player.id);
   const card = document.createElement("div");
-  card.className = `lu-card${injured ? " is-injured" : ""}`;
+  card.className = "lu-card";
   card.innerHTML = `
     <label class="lu-card-hit">
       <input type="checkbox" class="lu-card-check-input" />
@@ -140,7 +133,6 @@ for (const player of roster) {
       <span class="lu-card-info">
         <b class="lu-card-num">#${player.number ?? "-"}</b>
         <span class="lu-card-name">${escapeHtml(player.name)}</span>
-        ${injured ? INJURED_TAG : ""}
       </span>
       <span class="lu-card-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
     </label>
@@ -517,7 +509,7 @@ function drawResult() {
       render: (_v, row) => (row.pitcherOnly ? "" : '<span class="drag-handle" title="Arrastra para cambiar el orden"><i class="fa-solid fa-grip-vertical"></i></span>'),
     },
     { key: "slot", label: "#", full: "Turno al bat", numeric: true, sticky: true, render: (_v, row) => row.slotDisplay },
-    { key: "name", label: "Jugador", sticky: true, render: (v, row) => `${escapeHtml(v)}${injuredIcon(row.playerId)}` },
+    { key: "name", label: "Jugador", sticky: true, render: (v) => escapeHtml(v) },
     {
       key: "lock",
       label: "Fijar",
@@ -640,7 +632,7 @@ function drawResult() {
           <span class="lu-bench-item">
             ${p ? renderAvatar(p, 34) : ""}
             <span class="lu-bench-info">
-              <b>${escapeHtml(s.name)}${injuredIcon(s.playerId)}</b>
+              <b>${escapeHtml(s.name)}</b>
               <small>${pos ? `${pos} · ` : ""}OPS ${s.OPS} · ${s.seasonGP} JJ</small>
             </span>
             <select class="lu-sub" data-player="${s.playerId}" aria-label="Meter a ${escapeHtml(s.name)} a la alineación">${subOptions}</select>

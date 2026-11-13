@@ -10295,34 +10295,6 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   cursor: pointer;
 }
 
-/* Lesionados (INJURED en js/data.js): etiqueta ámbar en su tarjeta e
-   ícono junto a su nombre en la tabla y la banca. */
-.lu-injured {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  width: fit-content;
-  margin-top: 4px;
-  padding: 2px 7px;
-  border: 1px solid color-mix(in srgb, var(--scheduled) 55%, transparent);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--scheduled) 14%, transparent);
-  color: var(--scheduled);
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.lu-card.is-injured:not(.is-on) .lu-card-photo .avatar {
-  filter: grayscale(0.6);
-}
-
-.lu-injured-icon {
-  margin-left: 4px;
-  color: var(--scheduled);
-}
-
 .lu-error {
   padding: 14px 16px;
   border: 1px solid color-mix(in srgb, var(--loss) 50%, var(--border));
