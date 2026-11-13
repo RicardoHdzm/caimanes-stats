@@ -10325,3 +10325,8 @@ a.home-sponsor-card:hover .home-sponsor-logo {
   -webkit-background-clip: text;
   background-clip: text;
 }
+
+/* El logo del header es blanco (whitelogo@2x.png): en claro, en negro. */
+:root[data-theme="light"] .site-brand-logo {
+  filter: brightness(0);
+}
