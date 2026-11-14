@@ -132,7 +132,7 @@ export const DUES_PAID = {
     p13: false, // Luis Pompa
     p14: true, // Ricardo Santoyo
     p15: true, // Ricardo Hernández
-    p16: false, // Ruben Perez
+    p16: true, // Ruben Perez
     p18: false, // Javier Urquiza
     p21: false, // Alberto Solis
     p22: false, // Luis
@@ -920,7 +920,7 @@ export const GAMES = [
       { playerId: "p26", IP: 1, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
     ],
     fielding: [
-      { playerId: "p18", PO: 4, A: 0, E: 0 },
+      { playerId: "p18", PO: 5, A: 0, E: 0 },
       { playerId: "p5", PO: 2, A: 1, E: 2 },
       { playerId: "p26", PO: 3, A: 0, E: 0 },
       { playerId: "p12", PO: 2, A: 0, E: 0 },
@@ -954,6 +954,7 @@ export const GAMES = [
       { inning: 5, type: "campo", playerOut: "p4", playerIn: "p24", position: "RF" },
       { inning: 5, type: "campo", playerOut: "p6", playerIn: "p8", position: "C" },
       { inning: 5, type: "bateo", playerOut: "p5", playerIn: "p10", position: "LF" },
+      { inning: 5, type: "bateo", playerOut: "p25", playerIn: "p22", position: "JC" },
     ],
     replayUrl: "https://www.facebook.com/100044345960156/videos/1829674711577814",
   },
