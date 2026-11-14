@@ -887,6 +887,76 @@ export const GAMES = [
     replayUrl: "https://www.facebook.com/100044345960156/videos/1132555746302149/",
     vlogUrl: "https://www.youtube.com/watch?v=j8CNVxhXgMA",
   },
+  {
+    id: "g15",
+    season: 9,
+    date: "2026-11-13",
+    time: "19:00",
+    opponent: "Santara",
+    weCloseBatting: true,
+    // Venía como 21-15 del admin; las carreras anotadas/impulsadas (15) y las
+    // permitidas por el pitcheo (21) dicen 15-21 — confirmado: derrota.
+    scoreUs: 15,
+    scoreThem: 21,
+    batting: [
+      { playerId: "p18", order: 1, position: "LF", AB: 5, H: 5, "2B": 0, "3B": 1, HR: 0, HRC: 0, RBI: 1, R: 3, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p5", order: 2, position: "2B", AB: 3, H: 1, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 0 },
+      { playerId: "p26", order: 3, position: "CF", AB: 4, H: 3, "2B": 1, "3B": 1, HR: 0, HRC: 0, RBI: 1, R: 3, BB: 1, SO: 0, SB: 1 },
+      { playerId: "p12", order: 4, position: "1B", AB: 4, H: 1, "2B": 0, "3B": 0, HR: 1, HRC: 0, RBI: 2, R: 2, BB: 1, SO: 1, SB: 1 },
+      { playerId: "p1", order: 5, position: "SS", AB: 4, H: 4, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 5, R: 2, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p15", order: 6, position: "3B", AB: 4, H: 2, "2B": 1, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 0, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p4", order: 7, position: "RF", AB: 3, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p3", order: 8, position: "JD", AB: 4, H: 2, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 2 },
+      { playerId: "p6", order: 9, position: "C", AB: 2, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 1, SB: 0 },
+      { playerId: "p25", order: 10, position: "JC", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p10", order: 2, position: "LF", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 1, R: 1, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p24", order: 7, position: "RF", AB: 1, H: 0, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 1, SB: 0 },
+      { playerId: "p8", order: 9, position: "C", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
+      { playerId: "p22", order: 10, position: "JC", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
+    ],
+    pitching: [
+      { playerId: "p14", IP: 4, H: 14, R: 10, ER: 0, BB: 3, SO: 0, HR: 3, decision: "" },
+      { playerId: "p18", IP: 2, H: 12, R: 11, ER: 0, BB: 2, SO: 0, HR: 1, decision: "" },
+      { playerId: "p26", IP: 1, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
+    ],
+    fielding: [
+      { playerId: "p18", PO: 4, A: 0, E: 0 },
+      { playerId: "p5", PO: 2, A: 1, E: 2 },
+      { playerId: "p26", PO: 3, A: 0, E: 0 },
+      { playerId: "p12", PO: 2, A: 0, E: 0 },
+      { playerId: "p1", PO: 4, A: 3, E: 0 },
+      { playerId: "p15", PO: 1, A: 0, E: 0 },
+      { playerId: "p4", PO: 1, A: 0, E: 0 },
+      { playerId: "p3", PO: 0, A: 0, E: 0 },
+      { playerId: "p6", PO: 0, A: 0, E: 0 },
+      { playerId: "p10", PO: 0, A: 0, E: 1 },
+      { playerId: "p24", PO: 1, A: 0, E: 1 },
+      { playerId: "p8", PO: 0, A: 0, E: 0 },
+      { playerId: "p14", PO: 0, A: 0, E: 1 },
+    ],
+    outs: [
+      { playerId: "p18", GO: 0, FO: 0, LO: 0, BO: 1, RO: 0, SAC: 0 },
+      { playerId: "p5", GO: 1, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p26", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p12", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p1", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p15", GO: 2, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p4", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p3", GO: 0, FO: 2, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p6", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p25", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p10", GO: 0, FO: 1, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p24", GO: 0, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p8", GO: 1, FO: 0, LO: 0, BO: 0, RO: 0, SAC: 0 },
+      { playerId: "p22", GO: 1, FO: 0, LO: 0, BO: 0, RO: 1, SAC: 0 },
+    ],
+    substitutions: [
+      { inning: 5, type: "campo", playerOut: "p4", playerIn: "p24", position: "RF" },
+      { inning: 5, type: "campo", playerOut: "p6", playerIn: "p8", position: "C" },
+      { inning: 5, type: "bateo", playerOut: "p5", playerIn: "p10", position: "LF" },
+    ],
+    replayUrl: "https://www.facebook.com/100044345960156/videos/1829674711577814",
+  },
 ];
 
 // Juegos de PLAYOFFS — solo temporadas que llegaron a esta fase tienen
@@ -1054,7 +1124,7 @@ export const SCHEDULE = [
   // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
   // { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" }, // ya se jugó: es g13 en GAMES
   // { id: "s3", date: "2026-11-07", time: "17:00", opponent: "Gallos" }, // ya se jugó: es g14 en GAMES
-  { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Santara" },
+  // { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Santara" }, // ya se jugó: es g15 en GAMES
 ];
 
 // Tabla de posiciones de la liga. Se copia tal cual la publica la liga: NO se
