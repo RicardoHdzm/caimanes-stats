@@ -10355,3 +10355,23 @@ html.theme-fading *::after {
     stroke 0.4s ease,
     box-shadow 0.4s ease !important;
 }
+
+/* Sin juego programado: el mismo cuadro del hero con el último juego (ver
+   `last` en js/views/home.js). Raya y marcador del color del resultado. */
+.home-next--W {
+  border-left-color: var(--win);
+}
+
+.home-next--W .home-next-label {
+  color: var(--win);
+}
+
+.home-next-score small {
+  margin: 0 0.12em;
+  color: var(--muted);
+  font-size: 0.7em;
+}
+
+.home-next--W .home-next-score {
+  color: var(--win);
+}

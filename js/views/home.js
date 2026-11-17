@@ -17,7 +17,9 @@ import {
 } from "../stats.js";
 import { escapeHtml, renderAvatar, ordinalTemporada, formatGameTime, POSITION_NAMES } from "../ui.js";
 import { suggestedStartersWithPos } from "../lineup.js";
-import { nextGameFlyer, openFlyer, shareButton } from "../flyers.js";
+import { nextGameFlyer, resultFlyer, openFlyer, shareButton } from "../flyers.js";
+
+const LAST_LABEL = { W: "Victoria", L: "Derrota", T: "Empate" };
 import { powerRankingTopHtml } from "./powerranking.js";
 import { upcomingCardHtml, resultCardHtml } from "../scorecards.js";
 
@@ -47,7 +49,9 @@ function localToday() {
 
 function nextGame() {
   const today = localToday();
-  return [...SCHEDULE].filter((g) => g.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] ?? SCHEDULE[0] ?? null;
+  // Solo juegos de hoy en adelante: uno ya pasado (aunque siga en SCHEDULE)
+  // no es "próximo" — ahí el hero muestra el último juego.
+  return [...SCHEDULE].filter((g) => g.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
 }
 
 function gameStart(g) {
@@ -249,6 +253,12 @@ export function renderHome(container) {
   // Franja de números: los 4 hablan de lo mismo — TODOS los juegos
   // capturados, regular + playoffs (antes el primero era "9 Temporadas", la historia completa,
   // y parecía que carreras/hits/robadas eran de las 9; a petición expresa).
+  // Sin juego programado, el cuadro del hero muestra el último juego (a
+  // petición expresa): marcador, resultado y link a su página.
+  const last = next
+    ? null
+    : allGames.filter((g) => g.date && g.scoreUs != null && g.scoreThem != null).sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+  const lastResult = last ? gameResult(last) : null;
   const gamesLogged = allGames.filter((g) => g.scoreUs != null).length;
   const runs = allGames.reduce((sum, g) => sum + (g.scoreUs ?? 0), 0);
   const teamBatting = battingTotals(allGames);
@@ -283,7 +293,7 @@ export function renderHome(container) {
         <p class="home-hero-league">${escapeHtml(leagueLine)}</p>
         <div class="home-hero-ctas">
           <a href="#/roster" class="home-btn home-btn--solid">Conoce al equipo</a>
-          <button type="button" class="home-btn home-btn--ghost" data-scroll="#home-games">Próximos juegos</button>
+          <button type="button" class="home-btn home-btn--ghost" data-scroll="#home-games">${next ? "Próximos juegos" : "Últimos juegos"}</button>
         </div>
       </div>
       ${
@@ -296,7 +306,16 @@ export function renderHome(container) {
           <span class="home-next-when">${escapeHtml(fmtDate(next.date, { weekday: "long", day: "numeric", month: "long" }))}${next.time ? ` · ${formatGameTime(next.time)}` : ""}</span>
           <span class="home-next-countdown" id="home-countdown">${countdownText(next)}</span>
         </div>`
-          : ""
+          : last
+            ? `
+        <div class="home-next home-next--last home-next--${lastResult ?? "unknown"}">
+          <a class="home-next-link" href="#/juegos/${last.id}" aria-label="Ver juego"></a>
+          <span class="home-next-label">Último juego${lastResult ? ` · ${LAST_LABEL[lastResult]}` : ""}</span>
+          <span class="home-next-match">Caimanes <em>vs</em> ${escapeHtml(last.opponent ?? "Rival")}</span>
+          <span class="home-next-when">${escapeHtml(fmtDate(last.date, { weekday: "long", day: "numeric", month: "long" }))}</span>
+          <span class="home-next-countdown home-next-score">${last.scoreUs}<small>–</small>${last.scoreThem}</span>
+        </div>`
+            : ""
       }
     </section>
 
@@ -324,6 +343,20 @@ export function renderHome(container) {
       )
     );
     // Solo la palabra, sin el ícono del botón normal.
+    shareBtn.textContent = "Compartir";
+    shareBtn.classList.add("home-next-share");
+    root.querySelector(".home-next").appendChild(shareBtn);
+  } else if (last) {
+    const round = last.playoff
+      ? PLAYOFFS.find((e) => e.season === last.season)?.rounds.find((r) => r.games?.some((x) => x.id === last.id))?.name ?? "Playoffs"
+      : null;
+    const shareBtn = shareButton(() =>
+      openFlyer(
+        (format, color) => resultFlyer(last, round, format, color),
+        `resultado-${last.date}`,
+        `Resultado: Caimanes de Villas ${last.scoreUs}-${last.scoreThem} ${last.opponent}`
+      )
+    );
     shareBtn.textContent = "Compartir";
     shareBtn.classList.add("home-next-share");
     root.querySelector(".home-next").appendChild(shareBtn);

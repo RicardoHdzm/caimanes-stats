@@ -915,8 +915,8 @@ export const GAMES = [
       { playerId: "p22", order: 10, position: "JC", AB: 2, H: 1, "2B": 0, "3B": 0, HR: 0, HRC: 0, RBI: 0, R: 0, BB: 0, SO: 0, SB: 1 },
     ],
     pitching: [
-      { playerId: "p14", IP: 4, H: 14, R: 10, ER: 0, BB: 3, SO: 0, HR: 3, decision: "" },
-      { playerId: "p18", IP: 2, H: 12, R: 11, ER: 0, BB: 2, SO: 0, HR: 1, decision: "" },
+      { playerId: "p14", IP: 4, H: 14, R: 11, ER: 0, BB: 3, SO: 0, HR: 3, decision: "L" },
+      { playerId: "p18", IP: 2, H: 12, R: 10, ER: 0, BB: 2, SO: 0, HR: 1, decision: "" },
       { playerId: "p26", IP: 1, H: 0, R: 0, ER: 0, BB: 0, SO: 0, HR: 0, decision: "" },
     ],
     fielding: [
