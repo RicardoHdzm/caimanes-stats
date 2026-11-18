@@ -1,6 +1,7 @@
 // Vistas de CAIMANES FC (fc.html). Reusan las clases de la portada y de las
 // tablas del softbol para que los dos sitios se vean como uno solo.
-import { FC_TEAM, FC_PLAYERS, FC_POSITIONS, FC_STANDINGS, FC_MATCHES } from "./data.js";
+import { FC_TEAM, FC_PLAYERS, FC_POSITIONS, FC_STANDINGS, FC_MATCHES, FC_SPONSORS } from "./data.js";
+import { fitSponsorLogo } from "../sponsors.js";
 import {
   playedMatches,
   upcomingMatches,
@@ -186,6 +187,33 @@ export function renderFcHome(container) {
     <a class="home-btn home-btn--ghost home-center" href="#/plantilla">Ver plantilla completa →</a>` : emptyState("fa-users", "La plantilla todavía no está capturada.")}
   `;
   root.appendChild(squad);
+
+  // ---- Patrocinadores (mismas tarjetas que la portada del softbol) ----
+  if (FC_SPONSORS.length) {
+    const sponsors = document.createElement("section");
+    sponsors.className = "home-section";
+    sponsors.innerHTML = `
+      ${sectionHead("Nuestros", "patrocinadores", "SPONSORS")}
+      <div class="home-sponsors">
+        ${FC_SPONSORS.map((s) => {
+          const logo = `<img class="home-sponsor-logo" src="${s.logo}" alt="${escapeHtml(s.name)}" loading="lazy">`;
+          return s.url
+            ? `<a class="home-sponsor-card" href="${s.url}" target="_blank" rel="noopener noreferrer">${logo}</a>`
+            : `<div class="home-sponsor-card">${logo}</div>`;
+        }).join("")}
+        <a class="home-sponsor-card home-sponsor-cta" href="https://ig.me/m/caimanes.sb" target="_blank" rel="noopener noreferrer">
+          <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+          <b>¿Quieres apoyar al equipo?</b>
+          <span>Escríbenos</span>
+        </a>
+      </div>
+    `;
+    root.appendChild(sponsors);
+    for (const img of sponsors.querySelectorAll("img")) {
+      if (img.complete && img.naturalWidth) fitSponsorLogo(img);
+      else img.addEventListener("load", () => fitSponsorLogo(img), { once: true });
+    }
+  }
 
   container.appendChild(root);
 

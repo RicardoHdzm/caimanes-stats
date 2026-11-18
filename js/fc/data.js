@@ -64,6 +64,12 @@ export const FC_MATCHES = [
   // },
 ];
 
+// Patrocinadores (mismo formato que SPONSORS en js/data.js). `url` es
+// opcional: sin él, la tarjeta se ve pero no es clicable.
+export const FC_SPONSORS = [
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
+];
+
 // Tabla de la liga como la publica la liga. `us: true` marca nuestro renglón.
 export const FC_STANDINGS = {
   updated: null, // "2026-11-20"

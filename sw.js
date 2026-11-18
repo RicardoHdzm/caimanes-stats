@@ -8,7 +8,7 @@
 //
 // Al cambiar cualquier archivo del proyecto sube CACHE_VERSION: eso tira la
 // caché vieja completa y evita mezclas de versiones.
-const CACHE_VERSION = "v650";
+const CACHE_VERSION = "v651";
 const CACHE_NAME = `caimanes-${CACHE_VERSION}`;
 
 // Lo mínimo para que la app arranque estando offline desde cero.
@@ -32,6 +32,7 @@ const APP_SHELL = [
   "./js/scorecards.js",
   "./js/views/home.js",
   "./js/views/sports.js",
+  "./js/sponsors.js",
   "./fc.html",
   "./js/fc/main.js",
   "./js/fc/data.js",
