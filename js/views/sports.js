@@ -1,6 +1,7 @@
 // Portada del sitio (#/): pantalla dividida para elegir deporte — Softbol
 // (Caimanes de Villas, este mismo sitio en #/softbol), Fútbol (Caimanes FC,
-// fc.html) y Pádel (Caimanes Padel Squad, todavía "Próximamente": no es link).
+// fc.html) y Pádel (Caimanes Padel Squad, todavía "Próximamente": no es link;
+// su video ligero assets/hero-padel.mp4 queda listo para cuando tenga página).
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
 // .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
