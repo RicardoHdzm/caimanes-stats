@@ -10757,6 +10757,8 @@ a.sport-panel:focus-visible .sport-panel-cta {
   color: var(--text);
   font-size: var(--text-sm);
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
   transition: border-color 0.15s, color 0.15s;
@@ -10812,6 +10814,14 @@ a.sport-panel:focus-visible .sport-panel-cta {
    softbol a 34px (es más angosto y tiene más huecos, por eso va más alto). */
 .fc-site .site-brand .fc-brand-white {
   height: 50px;
+}
+
+/* Reverso de las tarjetas de la Plantilla: el escudo de FC tenue de fondo en
+   vez del logo del sóftbol (un poco más grande: el PNG trae margen). */
+.fc-site .roster-card-back::before {
+  width: 220px;
+  height: 220px;
+  background-image: url("../assets/logo-futbol.png?v=3");
 }
 
 .fc-site .footer-logo .fc-crest-head {

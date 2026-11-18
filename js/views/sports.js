@@ -21,7 +21,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           <img src="assets/logo.png" alt="" class="sport-panel-logo" />
-          <span class="sport-panel-sport">Softbol</span>
+          <span class="sport-panel-sport">Sóftbol</span>
           <span class="sport-panel-team">Caimanes de Villas</span>
           <span class="sport-panel-cta">Entrar</span>
         </span>

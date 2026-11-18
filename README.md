@@ -55,7 +55,7 @@ el cuerpo técnico, no la decisión final.
   negro — en los temas oscuros se invierte a blanco solo, sin necesitar dos
   versiones del archivo. `url` es opcional (sin él el logo no es clicable).
 
-Las entradas pitcheadas (`IP`) usan la notación estándar de béisbol/softbol:
+Las entradas pitcheadas (`IP`) usan la notación estándar de béisbol/sóftbol:
 `.1` = 1 out, `.2` = 2 outs (ej. `4.2` = 4 entradas completas + 2 outs).
 
 Todos los promedios (AVG, OBP, SLG, ERA, WHIP, FPCT, etc.) se calculan solos

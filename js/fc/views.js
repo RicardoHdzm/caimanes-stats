@@ -17,7 +17,7 @@ import {
   localToday,
 } from "./stats.js";
 import { fcLogoHtml, sectionHead, matchCardHtml, emptyState, fmtDate, RESULT_LABEL, rivalInitials } from "./ui.js";
-import { escapeHtml, heading, renderSortableTable, renderGlossary, renderAvatar, formatGameTime } from "../ui.js";
+import { escapeHtml, heading, renderSortableTable, renderGlossary, renderAvatar, formatGameTime, ordinalTemporada } from "../ui.js";
 
 const POSITION_ORDER = ["POR", "DEF", "MED", "DEL"];
 
@@ -503,40 +503,212 @@ export function renderFcPlantilla(container) {
   draw();
 }
 
+// ---- Perfil de jugador: el mismo diseño que el del sóftbol (js/views/jugador.js) ----
+// Hero con el número gigante de fondo, foto grande, nombre en dos tonos
+// (apellido en rojo), posición, barra de partidos jugados y los 4 números
+// clave; abajo el último partido y dos pestañas: Temporada (fichas) y
+// Partido por partido (tabla). Mismas clases (.profile-hero…, .stat-sheet…).
+const FC_PROFILE_AVATAR_SIZE = 190;
+// Mismos colores de insignia que las posiciones del sóftbol.
+const FC_POSITION_BADGE = { POR: "pos-badge-p", DEF: "pos-badge-c", MED: "pos-badge-if", DEL: "pos-badge-of" };
+
 export function renderFcJugador(container, id) {
   const p = findPlayer(id);
   if (!p) {
     renderFcNotFound(container);
     return;
   }
+
+  const back = document.createElement("a");
+  back.href = "#/plantilla";
+  back.className = "back-link";
+  back.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Volver a la plantilla`;
+  container.appendChild(back);
+
   const s = playerStats().find((r) => r.playerId === p.id);
-  const tile = (value, label) => `<span class="fc-tile"><b>${value}</b><small>${label}</small></span>`;
+  const played = playedMatches();
   const log = matchesOfPlayer(p.id);
-  container.innerHTML = `
-    <a class="fc-back" href="#/plantilla"><i class="fa-solid fa-arrow-left"></i> Plantilla</a>
-    <section class="fc-player-hero">
-      <span class="fc-player-photo">${avatar(p, 160)}</span>
-      <div>
-        ${p.number ? `<span class="fc-player-num">#${p.number}</span>` : ""}
-        <h2 class="page-title">${escapeHtml(p.name)}</h2>
-        <p class="subtitle">${escapeHtml(FC_POSITIONS[p.position] ?? p.position ?? "")}</p>
-      </div>
-    </section>
-    <div class="fc-tiles">
-      ${tile(s.PJ, "Partidos")}
-      ${tile(s.G, "Goles")}
-      ${tile(s.A, "Asistencias")}
-      ${p.position === "POR" ? tile(s.CS, "En cero") : tile(s.MVP, "MVP")}
-      ${tile(s.TA, "Amarillas")}
-      ${tile(s.TR, "Rojas")}
+  const pct = played.length ? Math.min(100, Math.round((s.PJ / played.length) * 100)) : 0;
+  const nameWords = p.name.split(" ");
+  const lastName = nameWords.length > 1 ? nameWords.pop() : "";
+  const seasons = p.seasons ?? 1;
+  const isKeeper = p.position === "POR";
+
+  const hero = document.createElement("div");
+  hero.className = "profile-hero";
+  hero.innerHTML = `
+    ${p.number ? `<div class="profile-hero-ghost" aria-hidden="true"><span>${p.number}</span></div>` : ""}
+    <div id="profile-debut-badge">
+      <div class="debut-badge"><i class="fa-solid fa-calendar-check"></i> ${ordinalTemporada(seasons)} temporada en el equipo</div>
     </div>
-    <h3>Partidos</h3>
-    ${
-      log.length
-        ? `<div class="home-match-grid">${log.map(matchCardHtml).join("")}</div>`
-        : emptyState("fa-futbol", "Todavía no tiene partidos registrados.")
-    }
+    <div class="profile-hero-top">
+      <div class="profile-avatar-col">
+        <div class="profile-avatar-wrap">
+          <span>${avatar(p, FC_PROFILE_AVATAR_SIZE)}</span>
+        </div>
+      </div>
+      <div class="profile-hero-info">
+        <div class="profile-hero-kicker">
+          ${p.number ? `<span class="profile-hero-number">${p.number}</span>` : ""}
+        </div>
+        <div class="profile-hero-name">${escapeHtml(nameWords.join(" "))}${lastName ? ` <span>${escapeHtml(lastName)}</span>` : ""}</div>
+        <div class="profile-hero-name-positions">${
+          p.position
+            ? `<span class="pos-badge ${FC_POSITION_BADGE[p.position] ?? ""}">${escapeHtml(FC_POSITIONS[p.position] ?? p.position)}</span>`
+            : ""
+        }</div>
+        <div class="profile-attendance">
+          <div class="profile-attendance-label">
+            <span>${s.PJ}/${played.length} partidos jugados</span>
+          </div>
+          <div class="profile-attendance-bar"><div class="profile-attendance-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="profile-keystats">
+      ${[
+        [s.PJ, "Partidos"],
+        [s.G, "Goles"],
+        [s.A, "Asistencias"],
+        isKeeper ? [s.CS, "En cero"] : [s.MVP, "MVP"],
+      ]
+        .map(([v, l]) => `<div class="profile-keystat"><b>${v}</b><span>${l}</span></div>`)
+        .join("")}
+    </div>
   `;
+  container.appendChild(hero);
+
+  // ---- Último partido en que jugó ----
+  const last = log[0];
+  if (last) {
+    const goals = (last.goals ?? []).filter((g) => g.player === p.id).length;
+    const assists = (last.goals ?? []).filter((g) => g.assist === p.id).length;
+    const cards = (last.cards ?? []).filter((c) => c.player === p.id);
+    const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+    const line = [
+      goals ? plural(goals, "gol", "goles") : "",
+      assists ? plural(assists, "asistencia", "asistencias") : "",
+      last.mvp === p.id ? "Jugador del partido" : "",
+      cards.some((c) => c.type === "red") ? "Roja" : cards.length ? "Amarilla" : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const r = matchResult(last);
+    const lastEl = document.createElement("a");
+    lastEl.className = "profile-last-game";
+    lastEl.href = `#/partidos/${encodeURIComponent(last.id)}`;
+    lastEl.innerHTML = `
+      <span class="profile-last-label">Último partido</span>
+      <span class="profile-last-match">vs ${escapeHtml(last.opponent ?? "")} · <b class="profile-last-result profile-last-result--${r}">${RESULT_LABEL[r]} ${last.goalsFor}-${last.goalsAgainst}</b> · ${escapeHtml(fmtDate(last.date))}</span>
+      ${line ? `<span class="profile-last-line">${escapeHtml(line)}</span>` : ""}
+      <span class="profile-last-cta">Ver partido <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>`;
+    container.appendChild(lastEl);
+  }
+
+  // ---- Pestañas: Temporada | Partido por partido ----
+  const PANES = [
+    { id: "temporada", label: "Temporada" },
+    { id: "partidos", label: "Partido por partido" },
+  ];
+  const tabsBar = document.createElement("div");
+  tabsBar.className = "profile-tabs";
+  tabsBar.setAttribute("role", "tablist");
+  tabsBar.innerHTML = PANES.map(
+    (t, i) => `<button type="button" class="profile-tab${i === 0 ? " active" : ""}" role="tab" data-pane="${t.id}" aria-selected="${i === 0}">${t.label}</button>`
+  ).join("");
+  container.appendChild(tabsBar);
+  const panes = Object.fromEntries(
+    PANES.map((t, i) => {
+      const el = document.createElement("div");
+      el.className = "profile-pane";
+      el.dataset.pane = t.id;
+      el.setAttribute("role", "tabpanel");
+      el.hidden = i !== 0;
+      container.appendChild(el);
+      return [t.id, el];
+    })
+  );
+  tabsBar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".profile-tab");
+    if (!btn) return;
+    for (const b of tabsBar.querySelectorAll(".profile-tab")) {
+      const on = b === btn;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", String(on));
+    }
+    for (const [pid, el] of Object.entries(panes)) el.hidden = pid !== btn.dataset.pane;
+  });
+
+  const empty = (pane) => {
+    const el = document.createElement("p");
+    el.className = "subtitle";
+    el.textContent = "Todavía no pisa la cancha esta temporada.";
+    pane.appendChild(el);
+  };
+
+  if (!log.length) {
+    empty(panes.temporada);
+    empty(panes.partidos);
+    return;
+  }
+
+  // Temporada: fichas de números.
+  const cell = (v, l) => `<div class="sheet-cell"><span class="sheet-value">${v}</span><span class="sheet-label">${l}</span></div>`;
+  const h3 = document.createElement("h3");
+  h3.textContent = "Temporada";
+  panes.temporada.appendChild(h3);
+  const sheet = document.createElement("div");
+  sheet.className = "stat-sheet";
+  sheet.innerHTML = [
+    cell(s.PJ, "Partidos"),
+    cell(s.G, "Goles"),
+    cell(s.A, "Asistencias"),
+    cell(s.G + s.A, "Goles + asist."),
+    cell(s.MVP, "Jugador del partido"),
+    isKeeper ? cell(s.CS, "Porterías en cero") : "",
+    cell(s.TA, "Amarillas"),
+    cell(s.TR, "Rojas"),
+  ].join("");
+  panes.temporada.appendChild(sheet);
+
+  // Partido por partido: tabla (clic en un renglón abre el partido).
+  const RES = { W: "G", L: "P", T: "E" };
+  const rows = log.map((m) => {
+    const myCards = (m.cards ?? []).filter((c) => c.player === p.id);
+    return {
+      id: m.id,
+      date: m.date,
+      opponent: m.opponent ?? "",
+      result: `${RES[matchResult(m)]} ${m.goalsFor}-${m.goalsAgainst}`,
+      G: (m.goals ?? []).filter((g) => g.player === p.id).length,
+      A: (m.goals ?? []).filter((g) => g.assist === p.id).length,
+      TA: myCards.filter((c) => c.type !== "red").length,
+      TR: myCards.filter((c) => c.type === "red").length,
+      MVP: m.mvp === p.id ? 1 : 0,
+    };
+  });
+  const columns = [
+    { key: "date", label: "Fecha", sticky: true },
+    { key: "opponent", label: "Rival" },
+    { key: "result", label: "Res", full: "Resultado (G = ganado, P = perdido, E = empate)" },
+    { key: "G", label: "G", full: "Goles", numeric: true },
+    { key: "A", label: "A", full: "Asistencias", numeric: true },
+    { key: "TA", label: "TA", full: "Tarjetas amarillas", numeric: true },
+    { key: "TR", label: "TR", full: "Tarjetas rojas", numeric: true },
+    { key: "MVP", label: "MVP", full: "Jugador del partido", numeric: true },
+  ];
+  const h3g = document.createElement("h3");
+  h3g.textContent = "Partido por partido";
+  panes.partidos.appendChild(h3g);
+  const tableEl = document.createElement("div");
+  panes.partidos.appendChild(tableEl);
+  renderSortableTable(tableEl, {
+    columns,
+    rows,
+    defaultSort: "date",
+    onRowClick: (row) => (location.hash = `#/partidos/${encodeURIComponent(row.id)}`),
+  });
+  renderGlossary(panes.partidos, columns);
 }
 
 // ============================== ESTADÍSTICAS ==============================

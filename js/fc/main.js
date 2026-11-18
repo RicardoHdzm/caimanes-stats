@@ -72,7 +72,7 @@ moreSheet.innerHTML = `
     <div class="more-sheet-grid">
       <a href="./#/softbol" data-sport-switch="softbol">
         <span class="more-app-icon"><i class="fa-solid fa-baseball-bat-ball"></i></span>
-        <span>Softbol</span>
+        <span>Sóftbol</span>
       </a>
       <a href="./#/">
         <span class="more-app-icon"><i class="fa-solid fa-shuffle"></i></span>
@@ -99,7 +99,7 @@ document.getElementById("footer-nav").innerHTML = `
     </div>
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="./#/softbol" data-sport-switch="softbol">Softbol · Caimanes de Villas</a>
+      <a href="./#/softbol" data-sport-switch="softbol">Sóftbol · Caimanes de Villas</a>
       <a href="./#/">Cambiar deporte</a>
     </div>`;
 document.getElementById("footer-year").textContent = new Date().getFullYear();
