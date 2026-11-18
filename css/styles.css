@@ -10561,8 +10561,17 @@ body.is-sport-picker main {
   text-align: center;
 }
 
+/* Los dos logos con el mismo peso visual: el escudo de fútbol tiene ~21%
+   más "tinta" que el de softbol a igual tamaño (y es alto y angosto contra
+   ancho y bajo), así que va al 94% de ancho. Su caja se completa con margen
+   para que "SOFTBOL" y "FÚTBOL" queden a la misma altura. */
+.sport-picker {
+  --logo-softbol: clamp(160px, 22vw, 270px);
+  --logo-futbol: calc(var(--logo-softbol) * 0.94);
+}
+
 .sport-panel-logo {
-  width: clamp(160px, 22vw, 270px);
+  width: var(--logo-softbol);
   height: auto;
   margin-bottom: 8px;
   filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
@@ -10570,8 +10579,9 @@ body.is-sport-picker main {
 }
 
 .sport-panel-logo--fc {
-  width: clamp(190px, 23vw, 280px);
-  margin-block: -4px 4px;
+  width: var(--logo-futbol);
+  margin-top: calc((var(--logo-softbol) - var(--logo-futbol)) / 2);
+  margin-bottom: calc((var(--logo-softbol) - var(--logo-futbol)) / 2 + 8px);
 }
 
 .sport-panel-sport {
@@ -10584,10 +10594,6 @@ body.is-sport-picker main {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   color: #e8375c;
-}
-
-.sport-panel--futbol .sport-panel-sport {
-  color: #5fd38a;
 }
 
 .sport-panel-team {
@@ -10617,12 +10623,6 @@ body.is-sport-picker main {
 .sport-panel:focus-visible .sport-panel-cta {
   border-color: var(--accent);
   background: var(--accent);
-}
-
-.sport-panel--futbol:hover .sport-panel-cta,
-.sport-panel--futbol:focus-visible .sport-panel-cta {
-  border-color: #23874a;
-  background: #23874a;
 }
 
 .sport-panel:focus-visible {
@@ -10673,12 +10673,8 @@ body.is-sport-picker main {
     padding: 28px 16px;
   }
 
-  .sport-panel-logo {
-    width: clamp(120px, 36vw, 170px);
-  }
-
-  .sport-panel-logo--fc {
-    width: clamp(132px, 38vw, 178px);
+  .sport-picker {
+    --logo-softbol: clamp(120px, 36vw, 170px);
   }
 
   .sport-panel-cta {
