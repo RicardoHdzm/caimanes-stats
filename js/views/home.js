@@ -224,12 +224,13 @@ export function renderHome(container) {
       </div>`
           : ""
       }
-      <!-- Fondo: assets/hero.mp4 = copia ligera de assets/video-hero.mp4 (720p,
-           24 fps, sin audio, ~4.5 MB en vez de 139 MB — con el velo encima no
-           se nota la diferencia). El poster es su primer cuadro: se ve al
-           instante mientras carga el video. "?v=4": el video cambió y así
-           nadie se queda con el viejo en caché. Velo: .home-hero-bg. -->
-      <video class="home-hero-video" src="assets/hero.mp4?v=4" poster="assets/hero-poster.jpg?v=4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+      <!-- Fondo: assets/hero-softbol.mp4 = copia ligera de assets/soft-hero.mp4
+           (720p, 24 fps, sin audio, ~1.5 MB en vez de 34 MB — con el velo
+           encima no se nota la diferencia). El poster es su primer cuadro: se
+           ve al instante mientras carga el video. Si se cambia el video con el
+           mismo nombre, agregar "?v=2" para que nadie se quede con el viejo en
+           caché. Velo: .home-hero-bg. -->
+      <video class="home-hero-video" src="assets/hero-softbol.mp4" poster="assets/hero-softbol-poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="home-hero-bg" aria-hidden="true"></div>
       <div class="home-hero-content">
         <img src="assets/logo.png" alt="" class="home-hero-logo" />

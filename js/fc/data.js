@@ -11,12 +11,11 @@ export const FC_TEAM = {
   // Nombre de la liga y del torneo actual, ej. "Liga Valle Alto" / "Apertura 2026".
   league: "",
   season: "",
-  // Escudo del equipo: copia recortada (sin el margen transparente) de
-  // assets/logo-futbol.png. Con null se usaría el escudo provisional en CSS
-  // (ver fcLogoHtml en js/fc/ui.js). "?v=2": el escudo cambió con el mismo
-  // nombre de archivo; subir el número cada vez que se reemplace, si no los
-  // navegadores siguen mostrando el viejo que tienen guardado.
-  logo: "assets/logos/caimanes-fc.png?v=2",
+  // Escudo del equipo, el archivo tal cual. Si se reemplaza por otro con el
+  // mismo nombre, subir el "?v=" — si no, los navegadores siguen mostrando
+  // el viejo que tienen guardado. Con null se usaría el escudo provisional
+  // en CSS (ver fcLogoHtml en js/fc/ui.js).
+  logo: "assets/logo-futbol.png?v=3",
   // Escudo todo en blanco para el header (como la cabeza blanca del caimán en
   // el header del softbol): copia recortada de assets/logos/fc-blanco.png.
   logoWhite: "assets/logos/caimanes-fc-white.png",

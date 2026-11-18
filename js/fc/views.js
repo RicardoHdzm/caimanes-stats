@@ -63,6 +63,9 @@ export function renderFcHome(container) {
   root.innerHTML = `
     <section class="home-hero home-hero--fc">
       <div class="fc-pitch" aria-hidden="true"></div>
+      <!-- assets/hero-futbol.mp4 = copia ligera de assets/soccer-hero.mp4 (720p,
+           24 fps, sin audio, ~4.9 MB en vez de 99 MB), igual que el del softbol. -->
+      <video class="home-hero-video" src="assets/hero-futbol.mp4" poster="assets/hero-futbol-poster.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
       <div class="home-hero-bg" aria-hidden="true"></div>
       <div class="home-hero-content">
         ${fcLogoHtml(220, "home-hero-logo fc-hero-logo")}

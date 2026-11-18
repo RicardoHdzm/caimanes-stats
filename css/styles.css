@@ -10382,10 +10382,9 @@ html.theme-fading *::after {
    de arriba.
    ========================================================================== */
 
-/* ---- Cancha de fútbol (fondo del hero de FC y del panel del selector):
-   franjas de pasto + las líneas de la cancha en un SVG que llena el área. */
-.fc-pitch,
-.sport-panel--futbol .sport-panel-bg {
+/* ---- Cancha de fútbol dibujada (franjas de pasto + líneas en un SVG):
+   respaldo del hero de FC si no hay video. ---- */
+.fc-pitch {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='none' stroke='white' stroke-opacity='.28' stroke-width='4'%3E%3Crect x='60' y='60' width='1080' height='680'/%3E%3Cline x1='600' y1='60' x2='600' y2='740'/%3E%3Ccircle cx='600' cy='400' r='110'/%3E%3Crect x='60' y='240' width='150' height='320'/%3E%3Crect x='990' y='240' width='150' height='320'/%3E%3Crect x='60' y='330' width='55' height='140'/%3E%3Crect x='1085' y='330' width='55' height='140'/%3E%3C/g%3E%3Ccircle cx='600' cy='400' r='7' fill='white' fill-opacity='.35'/%3E%3C/svg%3E") center / cover no-repeat,
     repeating-linear-gradient(90deg, #17552b 0 8%, #1c6332 8% 16%);
@@ -10440,38 +10439,13 @@ html.theme-fading *::after {
   color: #fff;
 }
 
-/* Escudo real (assets/logos/caimanes-fc.png): su borde es azul marino casi
-   igual al fondo del sitio, así que lleva un contorno blanco fino (como el
-   logo del softbol) para que la silueta del caimán no se pierda. */
+/* Escudo real (FC_TEAM.logo = assets/logo-futbol.png), tal cual — sin
+   contorno ni recorte. El PNG es cuadrado con margen a los lados, por eso
+   los anchos de abajo (hero, selector) son más grandes que el escudo. */
 .fc-logo-img {
-  --logo-stroke: 2px;
   width: var(--crest-w, 120px);
   height: auto;
   object-fit: contain;
-  filter:
-    drop-shadow(var(--logo-stroke) 0 0 #fff)
-    drop-shadow(calc(var(--logo-stroke) * -1) 0 0 #fff)
-    drop-shadow(0 var(--logo-stroke) 0 #fff)
-    drop-shadow(0 calc(var(--logo-stroke) * -1) 0 #fff);
-}
-
-.site-brand .fc-logo-img,
-.score-row-logo.fc-logo-img,
-.footer-logo .fc-logo-img {
-  --logo-stroke: 1px;
-}
-
-/* Escudo grande: contorno más grueso + la sombra que llevan los logos del
-   hero y del selector (su `filter` propio se pisaría con el del contorno). */
-.home-hero--fc .fc-logo-img,
-.sport-panel-logo.fc-logo-img {
-  --logo-stroke: 3px;
-  filter:
-    drop-shadow(var(--logo-stroke) 0 0 #fff)
-    drop-shadow(calc(var(--logo-stroke) * -1) 0 0 #fff)
-    drop-shadow(0 var(--logo-stroke) 0 #fff)
-    drop-shadow(0 calc(var(--logo-stroke) * -1) 0 #fff)
-    drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
 }
 
 /* ---- Selector de deporte: pantalla completa, dividida en dos ---- */
@@ -10519,8 +10493,13 @@ body.is-sport-picker main {
   z-index: 1;
 }
 
+/* Los primeros cuadros de los videos de los heroes (assets/hero-*.mp4). */
 .sport-panel--softbol .sport-panel-bg {
-  background: url("../assets/hero-poster.jpg?v=4") center / cover no-repeat;
+  background: url("../assets/hero-softbol-poster.jpg") center / cover no-repeat;
+}
+
+.sport-panel--futbol .sport-panel-bg {
+  background: url("../assets/hero-futbol-poster.jpg") center / cover no-repeat;
 }
 
 .sport-panel--softbol::before {
@@ -10567,7 +10546,8 @@ body.is-sport-picker main {
 }
 
 .sport-panel-logo--fc {
-  width: clamp(150px, 18vw, 220px);
+  width: clamp(190px, 23vw, 280px);
+  margin-block: -4px 4px;
 }
 
 .sport-panel-sport {
@@ -10674,7 +10654,7 @@ body.is-sport-picker main {
   }
 
   .sport-panel-logo--fc {
-    width: clamp(104px, 30vw, 140px);
+    width: clamp(132px, 38vw, 178px);
   }
 
   .sport-panel-cta {
@@ -10783,7 +10763,7 @@ body.is-sport-picker main {
 }
 
 .home-hero--fc .fc-hero-logo {
-  width: clamp(150px, 20vw, 220px);
+  width: clamp(190px, 25vw, 280px);
 }
 
 .score-row-logo--fc {
