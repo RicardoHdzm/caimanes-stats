@@ -15,6 +15,9 @@ export const FC_TEAM = {
   // assets/logo-futbol.png. Con null se usaría el escudo provisional en CSS
   // (ver fcLogoHtml en js/fc/ui.js).
   logo: "assets/logos/caimanes-fc.png",
+  // Escudo todo en blanco para el header (como la cabeza blanca del caimán en
+  // el header del softbol): copia recortada de assets/logos/fc-blanco.png.
+  logoWhite: "assets/logos/caimanes-fc-white.png",
   instagram: "https://www.instagram.com/caimanes.sb/",
 };
 

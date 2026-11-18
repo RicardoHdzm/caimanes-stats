@@ -48,7 +48,8 @@ function currentRoute() {
 }
 
 // ---- Header, menú ☰ y footer ----
-document.getElementById("fc-brand").innerHTML = `${fcLogoHtml(40, "fc-brand-logo")}<span class="fc-brand-name">Caimanes <b>FC</b></span>`;
+const brandLogo = FC_TEAM.logoWhite ? `<img src="${FC_TEAM.logoWhite}" alt="" class="site-brand-logo fc-brand-white" />` : fcLogoHtml(40, "fc-brand-logo");
+document.getElementById("fc-brand").innerHTML = `${brandLogo}<span class="fc-brand-name">Caimanes <b>FC</b></span>`;
 tabs.innerHTML = NAV.map((t) => `<a href="${t.route}" data-route="${t.tab}">${t.label}</a>`).join("");
 
 const tile = (t) => `

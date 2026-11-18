@@ -10754,6 +10754,12 @@ body.is-sport-picker main {
   filter: none;
 }
 
+/* Escudo blanco del header (FC_TEAM.logoWhite): un poco más alto que la
+   cabeza del caimán del softbol porque es más angosto. */
+.fc-site .site-brand .fc-brand-white {
+  height: 40px;
+}
+
 .fc-site .footer-logo .fc-crest-head {
   width: 72%;
   height: auto;
