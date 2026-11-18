@@ -67,7 +67,7 @@ export function renderFcHome(container) {
       <div class="home-hero-content">
         ${fcLogoHtml(220, "home-hero-logo fc-hero-logo")}
         <h1 class="home-hero-name">Caimanes</h1>
-        <p class="home-hero-tag">Fútbol Club</p>
+        <p class="home-hero-tag">Football Club</p>
         <p class="home-hero-league">${escapeHtml(leagueLine)}</p>
         <div class="home-hero-ctas">
           <a href="#/plantilla" class="home-btn home-btn--solid">Conoce al equipo</a>
@@ -106,7 +106,7 @@ export function renderFcHome(container) {
 
     <div class="home-marquee" aria-hidden="true">
       <div class="home-marquee-track">
-        ${Array.from({ length: 8 }, () => `<span>Caimanes FC</span><span class="home-marquee-accent">#CaimaGol</span><span>Fútbol 7</span><span class="home-marquee-accent">#Caimanation</span>`).join("")}
+        ${Array.from({ length: 8 }, () => `<span>Caimanes FC</span><span class="home-marquee-accent">#CaimaGol</span><span>Fútbol</span><span class="home-marquee-accent">#Caimanation</span>`).join("")}
       </div>
     </div>
   `;

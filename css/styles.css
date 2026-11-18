@@ -10378,7 +10378,7 @@ html.theme-fading *::after {
 
 /* ==========================================================================
    Dos deportes: selector de la portada (#/, js/views/sports.js) y el sitio de
-   CAIMANES FC — fútbol 7 (fc.html, js/fc/). Al final para mandar sobre lo
+   CAIMANES FC — fútbol (fc.html, js/fc/). Al final para mandar sobre lo
    de arriba.
    ========================================================================== */
 
@@ -10754,10 +10754,11 @@ body.is-sport-picker main {
   filter: none;
 }
 
-/* Escudo blanco del header (FC_TEAM.logoWhite): un poco más alto que la
-   cabeza del caimán del softbol porque es más angosto. */
+/* Escudo blanco del header (FC_TEAM.logoWhite), solo, sin el nombre. 50px
+   de alto = la misma cantidad de "tinta" que la cabeza del caimán del
+   softbol a 34px (es más angosto y tiene más huecos, por eso va más alto). */
 .fc-site .site-brand .fc-brand-white {
-  height: 40px;
+  height: 50px;
 }
 
 .fc-site .footer-logo .fc-crest-head {

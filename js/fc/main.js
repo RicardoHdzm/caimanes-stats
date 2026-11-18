@@ -1,4 +1,4 @@
-// CAIMANES FC (fútbol 7) — sitio aparte del softbol (fc.html), con el mismo
+// CAIMANES FC (fútbol) — sitio aparte del softbol (fc.html), con el mismo
 // header, menú ☰, temas y estilos. Se llega desde el selector de deporte de
 // la portada (index.html#/, ver js/views/sports.js).
 import { FC_TEAM } from "./data.js";
@@ -49,7 +49,8 @@ function currentRoute() {
 
 // ---- Header, menú ☰ y footer ----
 const brandLogo = FC_TEAM.logoWhite ? `<img src="${FC_TEAM.logoWhite}" alt="" class="site-brand-logo fc-brand-white" />` : fcLogoHtml(40, "fc-brand-logo");
-document.getElementById("fc-brand").innerHTML = `${brandLogo}<span class="fc-brand-name">Caimanes <b>FC</b></span>`;
+// Solo el escudo, sin el nombre al lado (igual que el header del softbol).
+document.getElementById("fc-brand").innerHTML = brandLogo;
 tabs.innerHTML = NAV.map((t) => `<a href="${t.route}" data-route="${t.tab}">${t.label}</a>`).join("");
 
 const tile = (t) => `
@@ -140,8 +141,12 @@ function buildTicker() {
       `<a class="ticker-item" href="#/partidos/${encodeURIComponent(m.id)}"><b>Caimanes FC <i class="ticker-score ticker-score--${r}">${m.goalsFor}–${m.goalsAgainst}</i> ${escapeHtml(m.opponent ?? "")}</b> · ${RESULT_LABEL[r]}</a>`
     );
   }
+  // Sin partidos todavía (la temporada no empieza): la misma cinta, nomás
+  // con "Próximamente" corriendo.
   if (!items.length) {
-    el.hidden = true;
+    const soon = `<span class="ticker-item ticker-item--next"><b>Próximamente</b></span>`;
+    const run = soon.repeat(8);
+    el.innerHTML = `<span class="ticker-label">● Partidos</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
     return;
   }
   const run = items.join("").repeat(2);

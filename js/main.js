@@ -29,7 +29,7 @@ import { initSplash } from "./splash.js";
 import { initRecovery } from "./recovery.js";
 
 const routes = {
-  // #/ es el selector de deporte (softbol / fútbol 7, ver js/views/sports.js)
+  // #/ es el selector de deporte (softbol / fútbol, ver js/views/sports.js)
   // y la portada del softbol estilo lyon.gg (js/views/home.js) vive en
   // #/softbol — la de todos, con o sin sesión.
   home: renderSportPicker,
@@ -126,7 +126,7 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
 ).join("") + `
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="fc.html">Fútbol 7 · Caimanes FC</a>
+      <a href="fc.html">Fútbol · Caimanes FC</a>
       <a href="#/">Cambiar deporte</a>
     </div>`;
 

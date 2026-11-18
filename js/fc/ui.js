@@ -61,7 +61,7 @@ const usLogo = () =>
 const rivalLogo = (opponent) => `<i class="score-row-logo score-row-logo--rival">${escapeHtml(rivalInitials(opponent))}</i>`;
 
 function matchTag(m) {
-  return [m.matchday ? `Jornada ${m.matchday}` : "", m.venue ?? ""].filter(Boolean).map(escapeHtml).join(" · ") || "Fútbol 7";
+  return [m.matchday ? `Jornada ${m.matchday}` : "", m.venue ?? ""].filter(Boolean).map(escapeHtml).join(" · ") || "Fútbol";
 }
 
 // Tarjeta de un partido (jugado o próximo).

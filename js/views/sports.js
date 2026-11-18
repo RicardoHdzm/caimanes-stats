@@ -1,5 +1,5 @@
 // Portada del sitio (#/): pantalla dividida para elegir deporte — Softbol
-// (Caimanes de Villas, este mismo sitio en #/softbol) o Fútbol 7 (Caimanes FC,
+// (Caimanes de Villas, este mismo sitio en #/softbol) o Fútbol (Caimanes FC,
 // fc.html). Sin header, barra de juegos ni footer: js/main.js le pone a
 // <body> la clase .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
@@ -20,7 +20,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           ${fcLogoHtml(220, "sport-panel-logo sport-panel-logo--fc")}
-          <span class="sport-panel-sport"><i class="fa-solid fa-futbol" aria-hidden="true"></i> Fútbol 7</span>
+          <span class="sport-panel-sport"><i class="fa-solid fa-futbol" aria-hidden="true"></i> Fútbol</span>
           <span class="sport-panel-team">Caimanes FC</span>
           <span class="sport-panel-cta">Entrar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
         </span>
