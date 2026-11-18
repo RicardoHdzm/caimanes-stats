@@ -10546,9 +10546,7 @@ body.is-sport-picker main {
 }
 
 .sport-panel--futbol::before {
-  background:
-    radial-gradient(700px 480px at 50% 40%, rgba(63, 181, 111, 0.18), transparent 70%),
-    linear-gradient(180deg, rgba(10, 14, 24, 0.72), rgba(10, 14, 24, 0.88));
+  background: linear-gradient(180deg, rgba(10, 14, 24, 0.72), rgba(10, 14, 24, 0.88));
 }
 
 /* Raya que separa un panel del siguiente. */

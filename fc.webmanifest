@@ -1,0 +1,34 @@
+{
+  "id": "./fc.html",
+  "name": "Caimanes FC",
+  "short_name": "Caimanes FC",
+  "description": "Caimanes FC, equipo de fútbol de Culiacán: partidos, resultados, tabla, plantilla y estadísticas.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "./fc.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0e18",
+  "theme_color": "#0a0e18",
+  "icons": [
+    {
+      "src": "assets/fc-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/fc-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/fc-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
