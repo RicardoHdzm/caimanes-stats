@@ -19,7 +19,7 @@ export const FC_TEAM = {
   // Escudo todo en blanco para el header (como la cabeza blanca del caimán en
   // el header del softbol): copia recortada de assets/logos/fc-blanco.png.
   // "?v=2": subir el número si se reemplaza el archivo con el mismo nombre.
-  logoWhite: "assets/logos/caimanes-fc-white.png?v=2",
+  logoWhite: "assets/logos/caimanes-fc-white.png?v=3",
   instagram: "https://www.instagram.com/caimanes.sb/",
 };
 
