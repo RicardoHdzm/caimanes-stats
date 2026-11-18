@@ -366,26 +366,141 @@ export function renderFcTabla(container) {
 }
 
 // ============================== PLANTILLA ==============================
+// ---- Plantilla: el mismo diseño que el Roster del softbol (js/views/roster.js) ----
+// Tarjeta tipo barajita: al frente la foto con posición, número y nombre; al
+// tocarla se voltea y atrás trae 6 números de la temporada y "Ver perfil".
+// Mismas clases (.roster-card…, .pos-filter-chip…) para verse idéntica.
+const FC_POSITION_GROUPS = [
+  { id: "ALL", label: "Todos" },
+  { id: "POR", label: "Porteros" },
+  { id: "DEF", label: "Defensas" },
+  { id: "MED", label: "Medios" },
+  { id: "DEL", label: "Delanteros" },
+];
+
+const SEASON_ORDINALS = ["Primera", "Segunda", "Tercera", "Cuarta", "Quinta", "Sexta", "Séptima", "Octava", "Novena", "Décima"];
+
+// Temporadas del jugador con el equipo (`seasons` en js/fc/data.js; sin
+// dato, es la primera — el equipo es de 2026).
+function fcSeasonLabel(p) {
+  const n = p.seasons ?? 1;
+  return `${SEASON_ORDINALS[n - 1] ?? `${n}ª`} Temporada`;
+}
+
+function fcRosterCard(p, s) {
+  const stat = (value, label) => `<span class="roster-card-stat"><b>${value}</b><span>${label}</span></span>`;
+  const tile = (value, label) => `<span class="roster-back-tile"><b>${value}</b><span>${label}</span></span>`;
+  const tiles = [
+    tile(s.PJ, "Partidos"),
+    tile(s.G, "Goles"),
+    tile(s.A, "Asistencias"),
+    p.position === "POR" ? tile(s.CS, "En cero") : tile(s.MVP, "MVP"),
+    tile(s.TA, "Amarillas"),
+    tile(s.TR, "Rojas"),
+  ];
+  return `
+    <div class="roster-card" data-player="${escapeHtml(p.id)}">
+      <div class="roster-card-inner">
+        <div class="roster-card-face roster-card-front" role="button" tabindex="0" aria-label="Ver los números de ${escapeHtml(p.name)}">
+          <span class="roster-card-photo">
+            <span class="roster-card-img">${avatar(p, 280)}</span>
+            <span class="roster-card-positions">${p.position ? `<span>${escapeHtml(p.position)}</span>` : ""}</span>
+            ${p.number ? `<span class="roster-card-number">${p.number}</span>` : ""}
+            <span class="roster-card-who">
+              <span class="roster-card-name">${escapeHtml(p.name)}</span>
+              <span class="roster-card-seasons">${fcSeasonLabel(p)}</span>
+            </span>
+            <span class="roster-card-flip-hint" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
+          </span>
+          <span class="roster-card-stats">
+            ${stat(s.PJ, "Partidos")}
+            ${stat(s.G, "Goles")}
+          </span>
+        </div>
+        <div class="roster-card-face roster-card-back" aria-hidden="true">
+          <div class="roster-back-head">
+            ${p.number ? `<span class="roster-back-number">${p.number}</span>` : ""}
+            <span class="roster-back-who">
+              <span class="roster-back-name">${escapeHtml(p.name)}</span>
+              <span class="roster-back-season">${escapeHtml(FC_TEAM.season || fcSeasonLabel(p))}</span>
+            </span>
+          </div>
+          <div class="roster-back-grid">${tiles.join("")}</div>
+          <a class="roster-back-link" href="#/jugador/${encodeURIComponent(p.id)}" tabindex="-1">Ver perfil <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>`;
+}
+
 export function renderFcPlantilla(container) {
   heading(container, "Plantilla");
   if (!FC_PLAYERS.length) {
     container.insertAdjacentHTML("beforeend", emptyState("fa-users", "La plantilla todavía no está capturada."));
     return;
   }
-  const groups = POSITION_ORDER.map((pos) => ({ pos, players: sortedSquad().filter((p) => p.position === pos) }));
-  const other = sortedSquad().filter((p) => !POSITION_ORDER.includes(p.position));
-  if (other.length) groups.push({ pos: null, players: other });
-  if (other.length === FC_PLAYERS.length) {
-    container.insertAdjacentHTML("beforeend", `<div class="home-roster fc-roster">${other.map(playerCardHtml).join("")}</div>`);
-    return;
+
+  const statsById = new Map(playerStats().map((r) => [r.playerId, r]));
+  // Por número; los que todavía no tienen van al final (por nombre).
+  const rows = [...FC_PLAYERS].sort((a, b) => (a.number || Infinity) - (b.number || Infinity) || a.name.localeCompare(b.name));
+
+  const filterRow = document.createElement("div");
+  filterRow.className = "pos-filter-row";
+  filterRow.innerHTML = FC_POSITION_GROUPS.map(
+    (g) => `<button type="button" class="pos-filter-chip${g.id === "ALL" ? " active" : ""}" data-group="${g.id}">${g.label}</button>`
+  ).join("");
+  const countEl = document.createElement("span");
+  countEl.className = "roster-count";
+  filterRow.appendChild(countEl);
+  container.appendChild(filterRow);
+
+  const gridEl = document.createElement("div");
+  gridEl.className = "roster-grid";
+  container.appendChild(gridEl);
+
+  let activeGroup = "ALL";
+  function draw() {
+    const filtered = activeGroup === "ALL" ? rows : rows.filter((p) => p.position === activeGroup);
+    countEl.textContent =
+      activeGroup === "ALL" ? `${rows.length} jugador${rows.length === 1 ? "" : "es"}` : `${filtered.length} de ${rows.length} jugadores`;
+    gridEl.innerHTML = filtered.length
+      ? filtered.map((p) => fcRosterCard(p, statsById.get(p.id))).join("")
+      : `<p class="home-empty">Nadie en esta posición todavía.</p>`;
   }
-  container.insertAdjacentHTML(
-    "beforeend",
-    groups
-      .filter((g) => g.players.length)
-      .map((g) => `<h3>${g.pos ? `${FC_POSITIONS[g.pos]}s` : "Posición por definir"}</h3><div class="home-roster fc-roster">${g.players.map(playerCardHtml).join("")}</div>`)
-      .join("")
-  );
+
+  // Voltear: tocar la tarjeta (o Enter/espacio) la gira; "Ver perfil" de
+  // atrás sí navega. Solo una volteada a la vez.
+  function setFlipped(card, flipped) {
+    card.classList.toggle("is-flipped", flipped);
+    card.querySelector(".roster-card-back").setAttribute("aria-hidden", String(!flipped));
+    card.querySelector(".roster-back-link").tabIndex = flipped ? 0 : -1;
+  }
+  function flip(card) {
+    const flipped = !card.classList.contains("is-flipped");
+    for (const other of gridEl.querySelectorAll(".roster-card.is-flipped")) if (other !== card) setFlipped(other, false);
+    setFlipped(card, flipped);
+  }
+  gridEl.addEventListener("click", (e) => {
+    if (e.target.closest(".roster-back-link")) return;
+    const card = e.target.closest(".roster-card");
+    if (card) flip(card);
+  });
+  gridEl.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const front = e.target.closest(".roster-card-front");
+    if (!front) return;
+    e.preventDefault();
+    flip(front.closest(".roster-card"));
+  });
+
+  filterRow.addEventListener("click", (e) => {
+    const btn = e.target.closest(".pos-filter-chip");
+    if (!btn) return;
+    for (const chip of filterRow.querySelectorAll(".pos-filter-chip")) chip.classList.toggle("active", chip === btn);
+    activeGroup = btn.dataset.group;
+    draw();
+  });
+
+  draw();
 }
 
 export function renderFcJugador(container, id) {
