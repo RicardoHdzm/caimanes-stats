@@ -7,7 +7,7 @@ import { fcLogoHtml } from "../fc/ui.js";
 export function renderSportPicker(container) {
   container.innerHTML = `
     <section class="sport-picker" aria-label="Elige deporte">
-      <a class="sport-panel sport-panel--softbol" href="#/softbol">
+      <a class="sport-panel sport-panel--softbol" href="#/softbol" data-sport-switch="softbol">
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           <img src="assets/logo.png" alt="" class="sport-panel-logo" />
@@ -16,7 +16,7 @@ export function renderSportPicker(container) {
           <span class="sport-panel-cta">Entrar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
         </span>
       </a>
-      <a class="sport-panel sport-panel--futbol" href="fc.html">
+      <a class="sport-panel sport-panel--futbol" href="fc.html" data-sport-switch="futbol">
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           ${fcLogoHtml(220, "sport-panel-logo sport-panel-logo--fc")}

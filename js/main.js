@@ -25,6 +25,7 @@ import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 import { ordinalTemporada, escapeHtml, formatGameTime } from "./ui.js";
 import { allStatGames, gameResult } from "./stats.js";
 import { initTheme } from "./theme.js";
+import { initSportSwitch } from "./sport-switch.js";
 import { initSplash } from "./splash.js";
 import { initRecovery } from "./recovery.js";
 
@@ -126,7 +127,7 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
 ).join("") + `
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="fc.html">Fútbol · Caimanes FC</a>
+      <a href="fc.html" data-sport-switch="futbol">Fútbol · Caimanes FC</a>
       <a href="#/">Cambiar deporte</a>
     </div>`;
 
@@ -283,7 +284,7 @@ function buildBottomTabs() {
     ).join("")}
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
-      <a href="fc.html">
+      <a href="fc.html" data-sport-switch="futbol">
         <span class="more-app-icon"><i class="fa-solid fa-futbol"></i></span>
         <span>Caimanes FC</span>
       </a>
@@ -516,11 +517,14 @@ function render() {
   booted = true;
   // Ya pintó: se quita el "cascarón" de carga (ver el script del <head>).
   delete document.documentElement.dataset.boot;
+  // Aviso para la pantalla de "Cargando" al cambiar de deporte.
+  window.dispatchEvent(new Event("caimanes:rendered"));
 }
 
 buildBottomTabs();
 buildTicker();
 initTheme();
+initSportSwitch();
 initRecovery();
 mountAuthControl(document.getElementById("auth-slot"));
 

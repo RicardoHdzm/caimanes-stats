@@ -16,6 +16,7 @@ import {
 } from "./views.js";
 import { escapeHtml, formatGameTime } from "../ui.js";
 import { initTheme } from "../theme.js";
+import { initSportSwitch } from "../sport-switch.js";
 
 const NAV = [
   { tab: "home", route: "#/", label: "Inicio", icon: "fa-house" },
@@ -69,7 +70,7 @@ moreSheet.innerHTML = `
     <div class="more-sheet-grid">${NAV.map(tile).join("")}</div>
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
-      <a href="./#/softbol">
+      <a href="./#/softbol" data-sport-switch="softbol">
         <span class="more-app-icon"><i class="fa-solid fa-baseball-bat-ball"></i></span>
         <span>Softbol</span>
       </a>
@@ -98,7 +99,7 @@ document.getElementById("footer-nav").innerHTML = `
     </div>
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="./#/softbol">Softbol · Caimanes de Villas</a>
+      <a href="./#/softbol" data-sport-switch="softbol">Softbol · Caimanes de Villas</a>
       <a href="./#/">Cambiar deporte</a>
     </div>`;
 document.getElementById("footer-year").textContent = new Date().getFullYear();
@@ -142,10 +143,14 @@ function buildTicker() {
     );
   }
   // Sin partidos todavía (la temporada no empieza): la misma cinta, nomás
-  // con "Próximamente" corriendo.
+  // con "Próximamente" corriendo, una vez en rojo (--next) y otra en blanco.
+  // Pares completos (8 = 4 pares) para que cada mitad de la cinta sea igual
+  // y la vuelta no rompa la alternancia.
   if (!items.length) {
-    const soon = `<span class="ticker-item ticker-item--next"><b>Próximamente</b></span>`;
-    const run = soon.repeat(8);
+    const pair =
+      `<span class="ticker-item ticker-item--next"><b>Próximamente</b></span>` +
+      `<span class="ticker-item"><b>Próximamente</b></span>`;
+    const run = pair.repeat(4);
     el.innerHTML = `<span class="ticker-label">● Partidos</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
     return;
   }
@@ -172,10 +177,13 @@ function render() {
   booted = true;
   // Ya pintó: se quita el "cascarón" de carga (ver el script del <head>).
   delete document.documentElement.dataset.boot;
+  // Aviso para la pantalla de "Cargando" al cambiar de deporte.
+  window.dispatchEvent(new Event("caimanes:rendered"));
 }
 
 buildTicker();
 initTheme();
+initSportSwitch();
 render();
 window.addEventListener("hashchange", () => {
   render();

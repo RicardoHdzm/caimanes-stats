@@ -19,6 +19,13 @@
     var h = location.hash;
     if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "picker";
     else if (h === "#/softbol") document.documentElement.dataset.boot = "hero";
+    // Llegando de cambiar de deporte (ver js/sport-switch.js): la pantalla de
+    // "Cargando" se pone antes de pintar nada, para que no haya corte.
+    try {
+      var sw = sessionStorage.getItem("caimanes-switch");
+      if (sw) sessionStorage.removeItem("caimanes-switch");
+      if (sw === "softbol" || sw === "futbol") document.documentElement.dataset.switch = sw;
+    } catch (e) {}
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
@@ -63,6 +70,15 @@
   <link rel="preload" as="image" href="assets/hero-futbol-poster.jpg" />
 </head>
 <body>
+  <!-- Pantalla de "Cargando" al cambiar de deporte (js/sport-switch.js). Va
+       primero en el <body> para pintarse antes que todo lo demás; solo se ve
+       con html[data-switch] (softbol o futbol: decide cuál logo). -->
+  <div class="sport-loader" aria-hidden="true">
+    <img src="assets/logo.png" alt="" class="sport-loader-logo sport-loader-logo--softbol" />
+    <img src="assets/logo-futbol.png?v=3" alt="" class="sport-loader-logo sport-loader-logo--futbol" />
+    <span class="sport-loader-bar"><i></i></span>
+    <span class="sport-loader-text">Cargando</span>
+  </div>
   <!-- Ya no hay pantalla de bienvenida ("Entrar"), a petición expresa: el
        sitio abre directo en la portada. js/splash.js sigue ahí y, al no
        encontrar #splash-gate, arranca la app de inmediato. Si algún día se
@@ -148,7 +164,7 @@
            vacío si Supabase no está configurado. -->
       <div id="auth-slot" class="auth-slot"></div>
       <!-- Al otro deporte: Caimanes FC (fútbol) vive en fc.html. -->
-      <a href="fc.html" class="sport-switch" aria-label="Ir a Caimanes FC (fútbol)">
+      <a href="fc.html" class="sport-switch" data-sport-switch="futbol" aria-label="Ir a Caimanes FC (fútbol)">
         <i class="fa-solid fa-futbol" aria-hidden="true"></i><span>Fútbol</span>
       </a>
       <!-- Solo escritorio (en celular vive en el menú ☰): el interruptor de

@@ -14,6 +14,13 @@
     // (ver html[data-boot] en css/styles.css).
     var h = location.hash;
     if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "hero";
+    // Llegando de cambiar de deporte (ver js/sport-switch.js): la pantalla de
+    // "Cargando" se pone antes de pintar nada, para que no haya corte.
+    try {
+      var sw = sessionStorage.getItem("caimanes-switch");
+      if (sw) sessionStorage.removeItem("caimanes-switch");
+      if (sw === "softbol" || sw === "futbol") document.documentElement.dataset.switch = sw;
+    } catch (e) {}
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
@@ -42,6 +49,15 @@
   <link rel="preload" as="image" href="assets/hero-futbol-poster.jpg" />
 </head>
 <body class="fc-site">
+  <!-- Pantalla de "Cargando" al cambiar de deporte (js/sport-switch.js). Va
+       primero en el <body> para pintarse antes que todo lo demás; solo se ve
+       con html[data-switch] (softbol o futbol: decide cuál logo). -->
+  <div class="sport-loader" aria-hidden="true">
+    <img src="assets/logo.png" alt="" class="sport-loader-logo sport-loader-logo--softbol" />
+    <img src="assets/logo-futbol.png?v=3" alt="" class="sport-loader-logo sport-loader-logo--futbol" />
+    <span class="sport-loader-bar"><i></i></span>
+    <span class="sport-loader-text">Cargando</span>
+  </div>
   <!-- Mismo armado que index.html (barra Match Center, header delgado con la
        nav en fila y menú ☰); lo llena js/fc/main.js con los datos de
        js/fc/data.js. -->
@@ -50,7 +66,7 @@
     <a href="#/" class="site-brand" id="fc-brand" aria-label="Caimanes FC — ir al inicio"></a>
     <nav class="tabs site-nav" id="tabs" aria-label="Secciones"></nav>
     <div class="site-header-actions">
-      <a href="./#/softbol" class="sport-switch" aria-label="Ir a Caimanes de Villas (softbol)">
+      <a href="./#/softbol" class="sport-switch" data-sport-switch="softbol" aria-label="Ir a Caimanes de Villas (softbol)">
         <i class="fa-solid fa-baseball-bat-ball" aria-hidden="true"></i><span>Softbol</span>
       </a>
       <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
