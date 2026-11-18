@@ -420,6 +420,7 @@ moreSheet.addEventListener("click", (e) => e.stopPropagation());
 document.addEventListener("click", () => toggleMoreSheet(false));
 
 const MORE_TAB_IDS = new Set(MORE_TABS.map((t) => t.tab));
+let booted = false;
 
 function render() {
   const myId = getCurrentPlayerId();
@@ -504,9 +505,17 @@ function render() {
   route.render(app);
   // Entrada suave de la página nueva (ver .page-enter en styles.css): se
   // quita y se vuelve a poner la clase para que la animación corra cada vez.
+  // La primera pintada (al abrir la página o al cambiar de deporte) va sin
+  // animación: el fundido desde transparente dejaba ver el fondo de la
+  // página (claro en el tema Sol) antes que el hero.
   app.classList.remove("page-enter");
-  void app.offsetWidth;
-  app.classList.add("page-enter");
+  if (booted) {
+    void app.offsetWidth;
+    app.classList.add("page-enter");
+  }
+  booted = true;
+  // Ya pintó: se quita el "cascarón" de carga (ver el script del <head>).
+  delete document.documentElement.dataset.boot;
 }
 
 buildBottomTabs();

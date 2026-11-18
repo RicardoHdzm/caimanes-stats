@@ -10448,6 +10448,32 @@ html.theme-fading *::after {
   object-fit: contain;
 }
 
+/* ---- Sin destello claro al abrir una portada con hero ----
+   El hero tiene su propio fondo oscuro (var(--bg) en su alcance: azul marino
+   también en el tema Sol), visible mientras llega el primer cuadro del video.
+   Y antes de que el JS pinte, html[data-boot] (lo pone el script del <head>
+   de index.html/fc.html, lo quita el primer render) reserva el espacio ya
+   oscuro; en el selector, además, esconde header/cintillo/footer. */
+.home-hero {
+  background: var(--bg);
+}
+
+html[data-boot] #app:empty {
+  min-height: 100vh;
+  background: #0a0e18;
+}
+
+html[data-boot="picker"] .match-ticker,
+html[data-boot="picker"] .site-header,
+html[data-boot="picker"] .footer {
+  display: none;
+}
+
+html[data-boot="picker"] main {
+  max-width: none;
+  padding: 0;
+}
+
 /* ---- Selector de deporte: pantalla completa, dividida en dos ---- */
 body.is-sport-picker .match-ticker,
 body.is-sport-picker .site-header,
@@ -10503,9 +10529,7 @@ body.is-sport-picker main {
 }
 
 .sport-panel--softbol::before {
-  background:
-    radial-gradient(700px 480px at 50% 40%, rgba(191, 15, 53, 0.32), transparent 70%),
-    linear-gradient(180deg, rgba(10, 14, 24, 0.82), rgba(10, 14, 24, 0.9));
+  background: linear-gradient(180deg, rgba(10, 14, 24, 0.82), rgba(10, 14, 24, 0.9));
 }
 
 .sport-panel--futbol::before {

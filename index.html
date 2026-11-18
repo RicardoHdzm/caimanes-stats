@@ -13,6 +13,12 @@
       if (saved === "dark" || saved === "light") theme = saved;
     } catch (e) {}
     if (theme !== "dark") document.documentElement.dataset.theme = theme;
+    // Mientras js/main.js pinta la primera vista (ver html[data-boot] en
+    // css/styles.css): en el selector de deporte (#/) y en la portada con
+    // hero (#/softbol) se reserva el espacio ya oscuro, sin el destello claro.
+    var h = location.hash;
+    if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "picker";
+    else if (h === "#/softbol") document.documentElement.dataset.boot = "hero";
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Sin esto, iOS/Android detectan texto como "SS/LF/CF" o nombres+número
@@ -52,6 +58,9 @@
   <meta name="apple-mobile-web-app-title" content="Caimanes" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="css/styles.css" />
+  <!-- Fondos del selector y del hero: que ya estén listos al pintarse. -->
+  <link rel="preload" as="image" href="assets/hero-softbol-poster.jpg" />
+  <link rel="preload" as="image" href="assets/hero-futbol-poster.jpg" />
 </head>
 <body>
   <!-- Ya no hay pantalla de bienvenida ("Entrar"), a petición expresa: el

@@ -10,6 +10,10 @@
       if (saved === "dark" || saved === "light") theme = saved;
     } catch (e) {}
     if (theme !== "dark") document.documentElement.dataset.theme = theme;
+    // Mientras js/fc/main.js pinta la portada: el área del hero ya oscura
+    // (ver html[data-boot] en css/styles.css).
+    var h = location.hash;
+    if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "hero";
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
@@ -35,6 +39,7 @@
   <meta name="apple-mobile-web-app-title" content="Caimanes" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preload" as="image" href="assets/hero-futbol-poster.jpg" />
 </head>
 <body class="fc-site">
   <!-- Mismo armado que index.html (barra Match Center, header delgado con la

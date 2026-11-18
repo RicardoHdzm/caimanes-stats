@@ -153,6 +153,7 @@ function buildTicker() {
   el.innerHTML = `<span class="ticker-label">● Partidos</span><div class="ticker-viewport"><div class="ticker-track">${run}${run}</div></div>`;
 }
 
+let booted = false;
 function render() {
   const route = currentRoute();
   toggleMoreSheet(false);
@@ -160,9 +161,17 @@ function render() {
   for (const link of moreSheet.querySelectorAll("a[data-tab]")) link.classList.toggle("active", link.dataset.tab === route.tab);
   app.innerHTML = "";
   route.render(app);
+  // La primera pintada (al abrir la página o al cambiar de deporte) va sin
+  // animación: el fundido desde transparente dejaba ver el fondo de la
+  // página (claro en el tema Sol) antes que el hero.
   app.classList.remove("page-enter");
-  void app.offsetWidth;
-  app.classList.add("page-enter");
+  if (booted) {
+    void app.offsetWidth;
+    app.classList.add("page-enter");
+  }
+  booted = true;
+  // Ya pintó: se quita el "cascarón" de carga (ver el script del <head>).
+  delete document.documentElement.dataset.boot;
 }
 
 buildTicker();
