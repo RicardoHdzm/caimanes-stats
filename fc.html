@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Mismo script que index.html: aplica el tema guardado antes del CSS. -->
+  <script>
+    var theme = "eclipse";
+    try {
+      var saved = localStorage.getItem("caimanes-theme");
+      if (saved === "dark" || saved === "light") theme = saved;
+    } catch (e) {}
+    if (theme !== "dark") document.documentElement.dataset.theme = theme;
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+  <title>Caimanes FC — Fútbol 7 en Culiacán</title>
+  <meta name="description" content="Caimanes FC, equipo de fútbol 7 de Culiacán: partidos, resultados, tabla, plantilla y estadísticas." />
+  <meta name="theme-color" content="#0a0e18" />
+  <link rel="canonical" href="https://caimanes.team/fc.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Caimanes" />
+  <meta property="og:locale" content="es_MX" />
+  <meta property="og:title" content="Caimanes FC — Fútbol 7 en Culiacán" />
+  <meta property="og:description" content="Caimanes FC, equipo de fútbol 7 de Culiacán: partidos, resultados, tabla, plantilla y estadísticas." />
+  <meta property="og:url" content="https://caimanes.team/fc.html" />
+  <meta property="og:image" content="https://caimanes.team/assets/thumbnail.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Caimanes" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="fc-site">
+  <!-- Mismo armado que index.html (barra Match Center, header delgado con la
+       nav en fila y menú ☰); lo llena js/fc/main.js con los datos de
+       js/fc/data.js. -->
+  <div class="match-ticker" id="match-ticker" aria-label="Match Center"></div>
+  <header class="site-header">
+    <a href="#/" class="site-brand" id="fc-brand" aria-label="Caimanes FC — ir al inicio"></a>
+    <nav class="tabs site-nav" id="tabs" aria-label="Secciones"></nav>
+    <div class="site-header-actions">
+      <a href="./#/" class="sport-switch" aria-label="Cambiar de deporte">
+        <i class="fa-solid fa-baseball-bat-ball" aria-hidden="true"></i><span>Softbol</span>
+      </a>
+      <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
+        <span class="theme-switch-thumb"></span>
+        <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
+        <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
+        <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
+      </button>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a href="#/" class="footer-logo" aria-label="Caimanes FC — ir al inicio">
+            <span id="footer-logo"></span>
+            <span class="footer-wordmark">Caimanes <span>FC</span></span>
+          </a>
+          <p class="footer-about">Equipo de fútbol 7. Partidos, tabla y estadísticas de cada torneo.</p>
+          <span class="season" id="season-label"></span>
+        </div>
+        <nav class="footer-nav" id="footer-nav" aria-label="Secciones del sitio"></nav>
+      </div>
+      <div class="footer-bottom">
+        <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" class="footer-social" aria-label="Instagram del equipo">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <p class="footer-legal">Caimanes FC © <span id="footer-year"></span> · Diseñado por JRHM.STUDIO</p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="more-sheet" class="more-sheet" hidden></div>
+
+  <script type="module" src="js/fc/main.js"></script>
+</body>
+</html>

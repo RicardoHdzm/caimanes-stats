@@ -19,7 +19,7 @@
        como teléfono/dirección y los subrayan como link tocable — no son
        links reales, solo texto de stats. -->
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
-  <title>Caimanes de Villas — Softbol en Culiacán</title>
+  <title>Caimanes — Softbol y Fútbol 7 en Culiacán</title>
 
   <!-- Preview al compartir el link (WhatsApp, Facebook, X). La imagen y la URL
        tienen que ser absolutas: los scrapers no resuelven rutas relativas. -->
@@ -88,11 +88,11 @@
        ☰ de pantalla completa (#more-sheet). -->
   <div class="match-ticker" id="match-ticker" aria-label="Match Center"></div>
   <header class="site-header">
-    <a href="#/" class="site-brand" aria-label="Caimanes de Villas — ir al inicio">
+    <a href="#/softbol" class="site-brand" aria-label="Caimanes de Villas — ir al inicio">
       <img src="assets/logos/whitelogo@2x.png" alt="" class="site-brand-logo" />
     </a>
     <nav class="tabs site-nav" id="tabs" aria-label="Secciones">
-      <a href="#/" data-route="home">Inicio</a>
+      <a href="#/softbol" data-route="softbol">Inicio</a>
       <a href="#/inicio" data-route="inicio">Feed</a>
       <a href="#" data-route="mi-perfil" id="nav-mi-perfil" hidden>Mi Perfil</a>
       <!-- Agrupadas por tema en menús desplegables (a petición expresa):
@@ -138,6 +138,10 @@
       <!-- Vacío a propósito: js/auth.js lo llena (botón de cuenta) y lo deja
            vacío si Supabase no está configurado. -->
       <div id="auth-slot" class="auth-slot"></div>
+      <!-- Al otro deporte: Caimanes FC (fútbol 7) vive en fc.html. -->
+      <a href="fc.html" class="sport-switch" aria-label="Ir a Caimanes FC (fútbol 7)">
+        <i class="fa-solid fa-futbol" aria-hidden="true"></i><span>Fútbol 7</span>
+      </a>
       <!-- Solo escritorio (en celular vive en el menú ☰): el interruptor de
            tema sol/eclipse/luna (ver js/theme.js). -->
       <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
@@ -160,7 +164,7 @@
     <div class="footer-inner">
       <div class="footer-main">
         <div class="footer-brand">
-          <a href="#/" class="footer-logo" aria-label="Caimanes de Villas — ir al inicio">
+          <a href="#/softbol" class="footer-logo" aria-label="Caimanes de Villas — ir al inicio">
             <img src="assets/logo.png" alt="" />
             <span class="footer-wordmark">Caimanes <span>de Villas</span></span>
           </a>

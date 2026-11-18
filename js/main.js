@@ -1,5 +1,6 @@
 import { TEAM, SCHEDULE } from "./data.js";
 import { renderHome } from "./views/home.js";
+import { renderSportPicker } from "./views/sports.js";
 import { renderFeed } from "./views/feed.js";
 import { renderResumen } from "./views/resumen.js";
 import { renderRoster } from "./views/roster.js";
@@ -28,9 +29,11 @@ import { initSplash } from "./splash.js";
 import { initRecovery } from "./recovery.js";
 
 const routes = {
-  // Portada estilo lyon.gg (ver js/views/home.js) — la de todos, con o sin
-  // sesión: #/ o cualquier ruta desconocida cae aquí.
-  home: renderHome,
+  // #/ es el selector de deporte (softbol / fútbol 7, ver js/views/sports.js)
+  // y la portada del softbol estilo lyon.gg (js/views/home.js) vive en
+  // #/softbol — la de todos, con o sin sesión.
+  home: renderSportPicker,
+  softbol: renderHome,
   inicio: renderFeed,
   resumen: renderResumen,
   roster: renderRoster,
@@ -81,7 +84,7 @@ const MORE_TABS = [
 // .nav-group en index.html), a petición expresa.
 const ALL_TABS = new Map([...BOTTOM_TABS, ...MORE_TABS].map((t) => [t.tab, t]));
 const APPS_TOP = [
-  { tab: "home", route: "#/", label: "Inicio", icon: "fa-house" },
+  { tab: "softbol", route: "#/softbol", label: "Inicio", icon: "fa-house" },
   ALL_TABS.get("inicio"),
   { tab: "mi-perfil", route: "#", label: "Mi Perfil", icon: "fa-id-card" },
 ];
@@ -120,7 +123,12 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
       <h3 class="footer-col-title">${g.label}</h3>
       ${g.tabs.map((t) => `<a href="${t.route}">${t.label}</a>`).join("")}
     </div>`
-).join("");
+).join("") + `
+    <div class="footer-col">
+      <h3 class="footer-col-title">Otros deportes</h3>
+      <a href="fc.html">Fútbol 7 · Caimanes FC</a>
+      <a href="#/">Cambiar deporte</a>
+    </div>`;
 
 function renderNotFound(container) {
   container.innerHTML = `
@@ -128,7 +136,7 @@ function renderNotFound(container) {
       <img src="assets/logo.png" alt="" class="not-found-logo" />
       <h2 class="page-title">Se lo comió el caimán</h2>
       <p>Esta página no existe (o ya no). Mejor regresa al dugout.</p>
-      <a href="#/" class="home-btn home-btn--solid">Volver al inicio</a>
+      <a href="#/softbol" class="home-btn home-btn--solid">Volver al inicio</a>
     </div>`;
 }
 
@@ -197,7 +205,7 @@ function currentRoute() {
   // por "caimanes:auth-changed" ya muestra el Feed real cuando la sesión
   // resuelve.
   if (tab === "inicio" && !getSession()) {
-    return { tab: "home", render: routes.home };
+    return { tab: "softbol", render: routes.softbol };
   }
 
   return { tab, render: routes[tab] };
@@ -275,6 +283,14 @@ function buildBottomTabs() {
     ).join("")}
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
+      <a href="fc.html">
+        <span class="more-app-icon"><i class="fa-solid fa-futbol"></i></span>
+        <span>Caimanes FC</span>
+      </a>
+      <a href="#/">
+        <span class="more-app-icon"><i class="fa-solid fa-shuffle"></i></span>
+        <span>Cambiar deporte</span>
+      </a>
       <a href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" id="more-tile-instagram" aria-label="Instagram del equipo">
         <span class="more-app-icon"><i class="fa-brands fa-instagram"></i></span>
         <span>Instagram</span>
@@ -479,6 +495,10 @@ function render() {
   for (const link of moreSheet.querySelectorAll("a")) {
     link.classList.toggle("active", link.dataset.tab === route.tab);
   }
+
+  // El selector de deporte (#/) es pantalla completa: sin barra de juegos,
+  // header ni footer (ver .is-sport-picker en css/styles.css).
+  document.body.classList.toggle("is-sport-picker", route.tab === "home");
 
   app.innerHTML = "";
   route.render(app);
