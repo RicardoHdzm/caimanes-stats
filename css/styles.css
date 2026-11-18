@@ -10520,20 +10520,21 @@ body.is-sport-picker main {
   z-index: 1;
 }
 
-/* Los primeros cuadros de los videos de los heroes (assets/hero-*.mp4). */
+/* Fotos propias del selector (assets/*-home.jpg, tal cual). El punto de
+   enfoque (background-position) cuida lo importante cuando el panel recorta
+   la foto — sobre todo en celular, donde cada panel es ancho y bajito:
+   guante y bate al centro, el balón abajo a la derecha, las raquetas un poco
+   abajo del centro. */
 .sport-panel--softbol .sport-panel-bg {
-  background: url("../assets/hero-softbol-poster.jpg") center / cover no-repeat;
+  background: url("../assets/softbol-home.jpg") 45% 55% / cover no-repeat;
 }
 
 .sport-panel--futbol .sport-panel-bg {
-  background: url("../assets/hero-futbol-poster.jpg") center / cover no-repeat;
+  background: url("../assets/soccer-home.jpg") 60% 72% / cover no-repeat;
 }
 
-/* Pádel: cuadro de los 7 s de assets/hero-padel.mp4 (copia ligera de
-   assets/padel-hero.mp4) — el primero era una mano dentro de la mochila,
-   casi negro; este ya se lee como pádel (raqueta y pelotas). */
 .sport-panel--padel .sport-panel-bg {
-  background: url("../assets/hero-padel-poster.jpg") center / cover no-repeat;
+  background: url("../assets/padel-home.jpg") 50% 62% / cover no-repeat;
 }
 
 .sport-panel--softbol::before {
