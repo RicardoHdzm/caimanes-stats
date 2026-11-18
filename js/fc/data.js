@@ -34,14 +34,17 @@ export const FC_POSITIONS = {
 // Plantilla. `id` único y sin espacios (sale en la URL del perfil).
 // `photo` es opcional; sin foto se muestran las iniciales. `number` y
 // `position` (POR/DEF/MED/DEL) se llenan cuando estén definidos.
-// Los que también juegan softbol usan la misma foto de assets/players/.
+// Los que también juegan sóftbol usan la misma foto de assets/players/ y
+// llevan `softbolId` (su id en js/data.js; les da la medalla "Two-Way").
+// Opcionales: `captain: true` (medalla "Captain") y `seasons` (cuántas
+// temporadas lleva en el equipo).
 export const FC_PLAYERS = [
-  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: "assets/players/p4.jpg" },
-  { id: "fernando-olivas", name: "Fernando Olivas", number: null, position: null, photo: "assets/players/p25.jpg" },
-  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: "assets/players/p3.jpg" },
-  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: "assets/players/p6.jpg" },
-  { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: "assets/players/p13.jpg" },
-  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: "assets/players/p16.jpg" },
+  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: "assets/players/p4.jpg", softbolId: "p4" },
+  { id: "fernando-olivas", name: "Fernando Olivas", number: null, position: null, photo: "assets/players/p25.jpg", softbolId: "p25" },
+  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: "assets/players/p3.jpg", softbolId: "p3" },
+  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: "assets/players/p6.jpg", softbolId: "p6" },
+  { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: "assets/players/p13.jpg", softbolId: "p13" },
+  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: "assets/players/p16.jpg", softbolId: "p16" },
   // { id: "juan-perez", name: "Juan Pérez", number: 10, position: "DEL", photo: null },
 ];
 

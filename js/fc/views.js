@@ -2,6 +2,7 @@
 // tablas del softbol para que los dos sitios se vean como uno solo.
 import { FC_TEAM, FC_PLAYERS, FC_POSITIONS, FC_STANDINGS, FC_MATCHES, FC_SPONSORS } from "./data.js";
 import { fitSponsorLogo } from "../sponsors.js";
+import { FC_MEDALS, FC_TOTAL_MEDALS, fcMedalsFor, hasMedal, medalHtml } from "./medals.js";
 import {
   playedMatches,
   upcomingMatches,
@@ -605,10 +606,27 @@ export function renderFcJugador(container, id) {
     container.appendChild(lastEl);
   }
 
-  // ---- Pestañas: Temporada | Partido por partido ----
+  // ---- Medallas al frente (las primeras 8), como en el sóftbol; el
+  // medallero completo vive en la pestaña "Medallas" ----
+  const medals = fcMedalsFor(p);
+  const medalStrip = document.createElement("div");
+  medalStrip.className = "profile-medal-strip";
+  medalStrip.hidden = medals.length === 0;
+  if (medals.length) {
+    const shown = medals.slice(0, 8);
+    const more = medals.length - shown.length;
+    medalStrip.innerHTML = `
+      <span class="profile-medal-strip-title">Medallas <b>${medals.length}</b></span>
+      <div class="profile-medal-strip-row">${shown.map(medalHtml).join("")}${more > 0 ? `<span class="profile-medal-more">+${more}</span>` : ""}</div>
+      <button type="button" class="profile-medal-all">Ver todas <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>`;
+  }
+  container.appendChild(medalStrip);
+
+  // ---- Pestañas: Temporada | Partido por partido | Medallas ----
   const PANES = [
     { id: "temporada", label: "Temporada" },
     { id: "partidos", label: "Partido por partido" },
+    { id: "medallas", label: "Medallas" },
   ];
   const tabsBar = document.createElement("div");
   tabsBar.className = "profile-tabs";
@@ -628,16 +646,40 @@ export function renderFcJugador(container, id) {
       return [t.id, el];
     })
   );
-  tabsBar.addEventListener("click", (e) => {
-    const btn = e.target.closest(".profile-tab");
-    if (!btn) return;
+  function showPane(id) {
     for (const b of tabsBar.querySelectorAll(".profile-tab")) {
-      const on = b === btn;
+      const on = b.dataset.pane === id;
       b.classList.toggle("active", on);
       b.setAttribute("aria-selected", String(on));
     }
-    for (const [pid, el] of Object.entries(panes)) el.hidden = pid !== btn.dataset.pane;
+    for (const [pid, el] of Object.entries(panes)) el.hidden = pid !== id;
+  }
+  tabsBar.addEventListener("click", (e) => {
+    const btn = e.target.closest(".profile-tab");
+    if (btn) showPane(btn.dataset.pane);
   });
+  medalStrip.querySelector(".profile-medal-all")?.addEventListener("click", () => {
+    showPane("medallas");
+    tabsBar.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // Medallero: misma tarjeta que el del sóftbol (.medallero-card), con su
+  // botón a la guía de medallas de fútbol (#/medallas/<id>).
+  const guideBtn = `<a href="#/medallas/${encodeURIComponent(p.id)}" class="medallero-guide-btn">Guía de medallas</a>`;
+  if (medals.length) {
+    const card = document.createElement("div");
+    card.className = "leader-card player-standalone-card medallero-card";
+    card.innerHTML = `
+      <h3><i class="fa-solid fa-medal"></i><span>Medallero <span class="medallero-count">${medals.length}/${FC_TOTAL_MEDALS}</span></span></h3>
+      <div class="achievements-grid">${medals.map(medalHtml).join("")}</div>
+      ${guideBtn}`;
+    panes.medallas.appendChild(card);
+  } else {
+    const none = document.createElement("p");
+    none.className = "subtitle";
+    none.innerHTML = `Todavía no gana medallas. <a href="#/medallas/${encodeURIComponent(p.id)}">Ver la guía de medallas</a>`;
+    panes.medallas.appendChild(none);
+  }
 
   const empty = (pane) => {
     const el = document.createElement("p");
@@ -709,6 +751,56 @@ export function renderFcJugador(container, id) {
     onRowClick: (row) => (location.hash = `#/partidos/${encodeURIComponent(row.id)}`),
   });
   renderGlossary(panes.partidos, columns);
+}
+
+// ============================== GUÍA DE MEDALLAS ==============================
+// Igual que la del sóftbol (js/views/medallas.js): todas las medallas que
+// existen, cómo se gana cada una y si el jugador de origen ya la tiene. Aquí
+// no hay sesión, así que "¿La tiene?" es sobre el perfil desde el que se
+// llegó (#/medallas/<id>); sin id, la columna no sale.
+export function renderFcMedallas(container, fromId) {
+  const from = fromId ? findPlayer(fromId) : null;
+  const back = document.createElement("a");
+  back.href = from ? `#/jugador/${encodeURIComponent(from.id)}` : "#/plantilla";
+  back.className = "back-link back-link--spaced";
+  back.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Volver ${from ? "al perfil" : "a la plantilla"}`;
+  container.appendChild(back);
+
+  heading(container, "Guía de medallas");
+  const chips = from ? fcMedalsFor(from) : [];
+  const status = (m) =>
+    hasMedal(chips, m)
+      ? `<span class="stat-green"><i class="fa-solid fa-check"></i> Sí</span>`
+      : `<span class="medalla-status-pending">No</span>`;
+  const wrap = document.createElement("div");
+  wrap.className = "table-wrap section-gap";
+  wrap.innerHTML = `
+    <table class="stats-table not-sortable medallas-table">
+      <thead>
+        <tr>
+          <th>Medalla</th>
+          <th>Nombre</th>
+          <th>Cómo se obtiene</th>
+          ${from ? `<th>¿${escapeHtml(from.name.split(" ")[0])} la tiene?</th>` : ""}
+        </tr>
+      </thead>
+      <tbody>
+        ${FC_MEDALS.map(
+          (m) => `
+        <tr>
+          <td>
+            <div class="achievement-medal achievement-medal--${m.kind}">
+              <div class="achievement-medal-icon"><i class="${m.icon}"></i></div>
+            </div>
+          </td>
+          <td>${escapeHtml(m.name)}</td>
+          <td>${escapeHtml(m.how)}</td>
+          ${from ? `<td>${status(m)}</td>` : ""}
+        </tr>`
+        ).join("")}
+      </tbody>
+    </table>`;
+  container.appendChild(wrap);
 }
 
 // ============================== ESTADÍSTICAS ==============================

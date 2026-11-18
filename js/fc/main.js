@@ -13,6 +13,7 @@ import {
   renderFcJugador,
   renderFcEstadisticas,
   renderFcNotFound,
+  renderFcMedallas,
 } from "./views.js";
 import { escapeHtml, formatGameTime } from "../ui.js";
 import { initTheme } from "../theme.js";
@@ -44,6 +45,8 @@ function currentRoute() {
   if (!first) return { tab: "home", render: routes.home };
   if (first === "partidos" && second) return { tab: "partidos", render: (c) => renderFcPartido(c, second) };
   if (first === "jugador" && second) return { tab: "plantilla", render: (c) => renderFcJugador(c, second) };
+  // Guía de medallas; el id (opcional) es el perfil desde el que se llegó.
+  if (first === "medallas") return { tab: "plantilla", render: (c) => renderFcMedallas(c, second) };
   if (routes[first]) return { tab: first, render: routes[first] };
   return { tab: null, render: renderFcNotFound };
 }
