@@ -21,7 +21,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           <img src="assets/logo.png" alt="" class="sport-panel-logo" />
-          <span class="sport-panel-sport"><i class="fa-solid fa-baseball-bat-ball" aria-hidden="true"></i> Softbol</span>
+          <span class="sport-panel-sport">Softbol</span>
           <span class="sport-panel-team">Caimanes de Villas</span>
           <span class="sport-panel-cta">Entrar</span>
         </span>
@@ -30,7 +30,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           ${fcLogoHtml(220, "sport-panel-logo sport-panel-logo--fc")}
-          <span class="sport-panel-sport"><i class="fa-solid fa-futbol" aria-hidden="true"></i> Fútbol</span>
+          <span class="sport-panel-sport">Fútbol</span>
           <span class="sport-panel-team">Caimanes FC</span>
           <span class="sport-panel-cta">Entrar</span>
         </span>
@@ -39,7 +39,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-bg" aria-hidden="true"></span>
         <span class="sport-panel-content">
           ${padelLogo}
-          <span class="sport-panel-sport"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i> Pádel</span>
+          <span class="sport-panel-sport">Pádel</span>
           <span class="sport-panel-team">Caimanes Padel Squad</span>
           <span class="sport-panel-cta sport-panel-cta--soon">Próximamente</span>
         </span>
