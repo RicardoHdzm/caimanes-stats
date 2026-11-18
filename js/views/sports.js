@@ -1,10 +1,19 @@
 // Portada del sitio (#/): pantalla dividida para elegir deporte — Softbol
-// (Caimanes de Villas, este mismo sitio en #/softbol) o Fútbol (Caimanes FC,
-// fc.html). Sin header, barra de juegos ni footer: js/main.js le pone a
-// <body> la clase .is-sport-picker mientras esta pantalla está abierta.
+// (Caimanes de Villas, este mismo sitio en #/softbol), Fútbol (Caimanes FC,
+// fc.html) y Pádel (Caimanes Padel Squad, todavía "Próximamente": no es link).
+// Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
+// .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
 
+// Logo de Caimanes Padel Squad, el archivo tal cual. Si se reemplaza con el
+// mismo nombre, agregar/subir un "?v=" para que no se quede el viejo en
+// caché. Con null se usaría la cabeza blanca del caimán como provisional.
+const PADEL_LOGO = "assets/logos/padel.png";
+
 export function renderSportPicker(container) {
+  const padelLogo = PADEL_LOGO
+    ? `<img src="${PADEL_LOGO}" alt="" class="sport-panel-logo sport-panel-logo--padel" />`
+    : `<img src="assets/logos/whitelogo@2x.png" alt="" class="sport-panel-logo sport-panel-logo--padel sport-panel-logo--placeholder" />`;
   container.innerHTML = `
     <section class="sport-picker" aria-label="Elige deporte">
       <a class="sport-panel sport-panel--softbol" href="#/softbol" data-sport-switch="softbol">
@@ -25,5 +34,14 @@ export function renderSportPicker(container) {
           <span class="sport-panel-cta">Entrar <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
         </span>
       </a>
+      <div class="sport-panel sport-panel--padel sport-panel--soon">
+        <span class="sport-panel-bg" aria-hidden="true"></span>
+        <span class="sport-panel-content">
+          ${padelLogo}
+          <span class="sport-panel-sport"><i class="fa-solid fa-table-tennis-paddle-ball" aria-hidden="true"></i> Pádel</span>
+          <span class="sport-panel-team">Caimanes Padel Squad</span>
+          <span class="sport-panel-cta sport-panel-cta--soon">Próximamente</span>
+        </span>
+      </div>
     </section>`;
 }
