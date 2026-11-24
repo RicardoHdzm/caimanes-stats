@@ -11518,7 +11518,7 @@ button.playlist-card-play {
 /* ---- iPhone en modo app (agregado a la pantalla de inicio) ----
    Mismo arreglo que la app de Yaz: iOS desenfoca la zona de la barra de
    estado (hora/batería) y un poco más abajo, así que una franja sólida del
-   rojo del equipo cubre esa zona + 8 px, y el sitio arranca después de
+   color del cintillo cubre esa zona + 8 px, y el sitio arranca después de
    ella (antes el cintillo quedaba ahí y se veía borroso). Solo en modo app:
    en el navegador no cambia nada. viewport-fit=cover en el <meta viewport>
    hace que env(safe-area-inset-top) tenga valor. */
@@ -11539,8 +11539,13 @@ button.playlist-card-play {
     right: 0;
     z-index: 1001;
     height: var(--app-top);
-    background: var(--accent);
+    /* Mismo azul marino del cintillo (en Sol el cintillo se queda oscuro). */
+    background: color-mix(in srgb, var(--bg) 80%, #000);
     pointer-events: none;
+  }
+
+  :root[data-theme="light"] body::after {
+    background: color-mix(in srgb, #0a0e18 80%, #000);
   }
 
   .site-header {
