@@ -11516,42 +11516,48 @@ button.playlist-card-play {
 }
 
 /* ---- iPhone en modo app (agregado a la pantalla de inicio) ----
-   Con la barra de estado "black-translucent" el sitio se dibuja debajo de
-   la hora/batería, y iOS desenfoca lo que queda ahí: el cintillo se veía
-   borroso. Todo arranca debajo de esa zona (viewport-fit=cover en el
-   <meta viewport> hace que env(safe-area-inset-top) tenga valor; en el
-   navegador normal vale 0 y nada cambia), y la zona se pinta sólida del
-   color del cintillo, también al hacer scroll. */
-body {
-  padding-top: env(safe-area-inset-top, 0px);
-}
+   Mismo arreglo que la app de Yaz: iOS desenfoca la zona de la barra de
+   estado (hora/batería) y un poco más abajo, así que una franja sólida del
+   rojo del equipo cubre esa zona + 8 px, y el sitio arranca después de
+   ella (antes el cintillo quedaba ahí y se veía borroso). Solo en modo app:
+   en el navegador no cambia nada. viewport-fit=cover en el <meta viewport>
+   hace que env(safe-area-inset-top) tenga valor. */
+@media (display-mode: standalone) {
+  :root {
+    --app-top: calc(env(safe-area-inset-top, 0px) + 8px);
+  }
 
-body::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1001;
-  height: env(safe-area-inset-top, 0px);
-  background: color-mix(in srgb, var(--bg) 80%, #000);
-  pointer-events: none;
-}
+  body {
+    padding-top: var(--app-top);
+  }
 
-:root[data-theme="light"] body::after {
-  background: #0a0e18;
-}
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    height: var(--app-top);
+    background: var(--accent);
+    pointer-events: none;
+  }
 
-.site-header {
-  top: env(safe-area-inset-top, 0px);
-}
+  .site-header {
+    top: var(--app-top);
+  }
 
-.more-sheet:not([hidden]) {
-  padding-top: env(safe-area-inset-top, 0px);
-}
+  .more-sheet:not([hidden]) {
+    padding-top: var(--app-top);
+  }
 
-.flyer-modal {
-  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  .flyer-modal {
+    padding-top: calc(20px + var(--app-top));
+  }
+
+  .mini-player {
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* Botón "Actualizar" del modo app (js/app-refresh.js): gira mientras borra
