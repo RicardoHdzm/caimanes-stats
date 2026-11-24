@@ -21,7 +21,7 @@ function rowMarkup(player, paid) {
   return `
     <div class="dues-admin-row${paid === "saldo" ? " partial" : paid ? " paid" : ""}">
       <span>#${player.number ?? "-"} ${player.name}</span>
-      <span class="dues-admin-status">${paid === "saldo" ? "Saldo pendiente" : paid ? "Pagado" : "Pendiente"}</span>
+      <span class="dues-admin-status">${paid === "saldo" ? "Abonando" : paid ? "Pagado" : "Pendiente"}</span>
     </div>
   `;
 }

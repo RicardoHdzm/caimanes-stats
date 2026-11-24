@@ -119,7 +119,7 @@ export const DUES_PAID = {
   // Todos pendientes al arrancar la temporada — al pagar, borra su línea
   // (o cámbiala a `true`).
   9: {
-    p1: false, // Axel Medina
+    p1: "saldo", // Axel Medina
     p3: false, // Omar Ramirez
     p4: true, // Carlos Borboa
     p5: false, // Christopher Felix
