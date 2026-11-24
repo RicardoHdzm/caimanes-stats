@@ -6071,16 +6071,30 @@ body.menu-open {
   inset: 0;
   z-index: 60;
   background: var(--bg);
-  padding: 0 clamp(16px, 4vw, 48px) calc(24px + env(safe-area-inset-bottom, 0px));
+  /* Arriba: debajo de la hora/batería del iPhone en modo app (en el
+     navegador env() vale 0). */
+  padding: env(safe-area-inset-top, 0px) clamp(16px, 4vw, 48px) calc(24px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
+  /* iPhone: el dedo desplaza el menú, no la página de atrás. */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Las escamas del menú van "absolute", no "fixed": una capa fija dentro de
+   un panel que se desplaza hacía que en iPhone el menú no hiciera scroll. */
+.more-sheet::before {
+  position: absolute;
+  height: 100vh;
+  bottom: auto;
 }
 
 .more-sheet .more-sheet-header {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   height: 64px;
-  margin: 0 0 8px;
+  margin: 8px 0 16px;
   border-bottom: 1px solid var(--border);
 }
 
