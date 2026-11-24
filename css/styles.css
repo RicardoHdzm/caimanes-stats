@@ -11554,10 +11554,6 @@ button.playlist-card-play {
   .flyer-modal {
     padding-top: calc(20px + var(--app-top));
   }
-
-  .mini-player {
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  }
 }
 
 /* Botón "Actualizar" del modo app (js/app-refresh.js): gira mientras borra
