@@ -8,15 +8,29 @@
 import { ROSTER } from "../data.js";
 import { heading, renderAvatar, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
+import { playTrack, currentTrackId } from "../miniplayer.js";
 
-// El link real de Spotify/YouTube/etc. si hay uno válido; sin link, el
-// botón se ve pero no hace nada (no hay a dónde mandarlo).
-function playButtonHtml(walkup) {
-  const parsed = safeWalkupUrl(walkup.url);
-  return parsed
-    ? `<a class="playlist-card-play" href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener noreferrer" aria-label="Reproducir"><i class="fa-solid fa-circle-play"></i></a>`
-    : `<span class="playlist-card-play playlist-card-play--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
+// Con link válido, el play abre el minireproductor (ver js/miniplayer.js;
+// YouTube, Spotify, Apple Music y SoundCloud suenan aquí mismo, lo demás se
+// abre afuera). Sin link, el botón se ve pero no hace nada.
+function playButtonHtml(player, walkup) {
+  if (!safeWalkupUrl(walkup.url)) {
+    return `<span class="playlist-card-play playlist-card-play--disabled" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>`;
+  }
+  const playing = currentTrackId() === player.id;
+  return `<button type="button" class="playlist-card-play${playing ? " is-playing" : ""}" data-play="${player.id}" aria-label="${playing ? "Sonando" : "Reproducir"}: ${escapeHtml(walkup.title)}">
+      <i class="fa-solid fa-circle-play"></i><span class="playlist-card-eq" aria-hidden="true"><i></i><i></i><i></i></span>
+    </button>`;
 }
+
+// Lo que necesita el minireproductor de cada fila.
+const toTrack = (r) => ({
+  id: r.player.id,
+  url: r.walkup.url,
+  title: r.walkup.title,
+  artist: r.walkup.artist,
+  who: `#${r.player.number || "-"} ${r.player.name}`,
+});
 
 // Buscador: cada palabra escrita debe ser el inicio de una palabra del nombre
 // o del número, sin importar acentos ni mayúsculas ("munoz", "lu fe", "21").
@@ -39,7 +53,7 @@ function playlistCard(player, walkup) {
         <p class="playlist-card-title">${escapeHtml(walkup.title)}</p>
         ${artist}
       </div>
-      ${playButtonHtml(walkup)}
+      ${playButtonHtml(player, walkup)}
     </div>
   `;
 }
@@ -78,13 +92,14 @@ export function renderPlaylist(container) {
   // con la mitad diciendo "sin canción todavía" sería puro ruido en una
   // playlist.
   let rows = [];
+  let shown = [];
 
   function drawCards() {
     if (rows.length === 0) {
       listEl.innerHTML = '<p class="subtitle">Nadie ha subido su canción de entrada todavía. ¿Quién abre el bat?</p>';
       return;
     }
-    const shown = rows.filter((r) => matchesPlayer(r.player, input.value));
+    shown = rows.filter((r) => matchesPlayer(r.player, input.value));
     listEl.innerHTML = shown.length
       ? shown.map((r) => playlistCard(r.player, r.walkup)).join("")
       : '<p class="subtitle">Ese caimán no está en el roster.</p>';
@@ -98,13 +113,36 @@ export function renderPlaylist(container) {
     drawCards();
   }
 
+  // Play: la cola es lo que se ve en ese momento (respeta el buscador).
+  function play(id) {
+    const row = shown.find((r) => r.player.id === id);
+    if (row) playTrack(toTrack(row), shown.filter((r) => safeWalkupUrl(r.walkup.url)).map(toTrack));
+  }
+
+  listEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-play]");
+    if (btn) play(btn.dataset.play);
+  });
+
+  // Marca cuál está sonando sin repintar todo (el reproductor avisa al
+  // cambiar de canción, cerrar o avanzar con ⏮ ⏭). Si ya no estás en la
+  // Playlist, se suelta solo.
+  const onPlayer = (e) => {
+    if (!listEl.isConnected) {
+      window.removeEventListener("caimanes:miniplayer", onPlayer);
+      return;
+    }
+    listEl.querySelectorAll("[data-play]").forEach((btn) => btn.classList.toggle("is-playing", btn.dataset.play === e.detail.id));
+  };
+  window.addEventListener("caimanes:miniplayer", onPlayer);
+
   input.addEventListener("input", drawCards);
   // Enter pone la canción del primer resultado, para no tener que ir por el
   // botón en pleno juego.
   input.addEventListener("keydown", (e) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
-    listEl.querySelector("a.playlist-card-play")?.click();
+    listEl.querySelector("button.playlist-card-play")?.click();
   });
 
   draw(new Map());

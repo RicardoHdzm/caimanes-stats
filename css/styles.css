@@ -11311,3 +11311,206 @@ html[data-switch="futbol"] .sport-loader-logo--futbol {
     width: 100%;
   }
 }
+
+/* ---- Minireproductor (js/miniplayer.js) ----
+   Flota abajo: a lo ancho en celular, en la esquina en escritorio. Sigue
+   sonando al cambiar de sección. Debajo del menú ☰ (z-index 200). */
+.mini-player {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 150;
+  max-width: 440px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 16px;
+  background:
+    radial-gradient(240px 120px at 0% 0%, var(--card-glow), transparent 70%),
+    var(--surface);
+  box-shadow: 0 22px 48px -18px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  animation: mini-player-in 0.25s ease-out;
+}
+
+.mini-player[hidden] {
+  display: none;
+}
+
+@keyframes mini-player-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (min-width: 900px) {
+  .mini-player {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: 380px;
+  }
+}
+
+.mini-player-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 6px 8px 12px;
+}
+
+.mini-player-info {
+  flex: 1;
+  min-width: 0;
+  margin-left: 8px;
+}
+
+.mini-player-title,
+.mini-player-sub {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-player-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.mini-player-sub {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.mini-player-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.mini-player-btn:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.mini-player-frame iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+.mini-player-frame iframe.is-video {
+  aspect-ratio: 16 / 9;
+}
+
+/* Chico: solo se esconde el video, la música sigue. */
+.mini-player.is-small .mini-player-frame {
+  height: 0;
+  overflow: hidden;
+}
+
+/* Barritas de "sonando" (en el reproductor y en el play de la Playlist). */
+.mini-player-eq,
+.playlist-card-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.mini-player-eq i,
+.playlist-card-eq i {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent-text);
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+
+.mini-player-eq i:nth-child(2),
+.playlist-card-eq i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.mini-player-eq i:nth-child(3),
+.playlist-card-eq i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes eq-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.mini-player-eq i,
+.playlist-card-eq i {
+  transform-origin: bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-player-eq i,
+  .playlist-card-eq i {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+}
+
+/* El play de la Playlist ahora es botón (abre el minireproductor). */
+button.playlist-card-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.playlist-card-play .playlist-card-eq {
+  display: none;
+  height: 18px;
+}
+
+.playlist-card-play .playlist-card-eq i {
+  width: 4px;
+}
+
+.playlist-card-play.is-playing .fa-circle-play {
+  display: none;
+}
+
+.playlist-card-play.is-playing .playlist-card-eq {
+  display: inline-flex;
+}
+
+.playlist-card:has(.is-playing) {
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
+/* Que el reproductor no tape lo último de la página en celular. */
+@media (max-width: 899px) {
+  body.mini-player-open .footer {
+    padding-bottom: 300px;
+  }
+}
