@@ -8,7 +8,7 @@
 import { ROSTER } from "../data.js";
 import { heading, renderAvatar, escapeHtml, safeWalkupUrl, hasRealWalkup } from "../ui.js";
 import { getAllWalkupOverrides, getAvatarUrl } from "../db.js";
-import { playTrack, currentTrackId } from "../miniplayer.js";
+import { playTrack, currentTrackId, loadSpotifyApi } from "../miniplayer.js";
 
 // Con link válido, el play abre el minireproductor (ver js/miniplayer.js;
 // YouTube, Spotify, Apple Music y SoundCloud suenan aquí mismo, lo demás se
@@ -74,6 +74,8 @@ async function hydrateAvatars(root) {
 
 export function renderPlaylist(container) {
   heading(container, "Playlist del equipo");
+  // Se precarga el reproductor de Spotify para que el play suene al instante.
+  loadSpotifyApi().catch(() => {});
 
   const search = document.createElement("label");
   search.className = "playlist-search";

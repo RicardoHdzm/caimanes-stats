@@ -11514,3 +11514,42 @@ button.playlist-card-play {
     padding-bottom: 300px;
   }
 }
+
+/* ---- iPhone en modo app (agregado a la pantalla de inicio) ----
+   Con la barra de estado "black-translucent" el sitio se dibuja debajo de
+   la hora/batería, y iOS desenfoca lo que queda ahí: el cintillo se veía
+   borroso. Todo arranca debajo de esa zona (viewport-fit=cover en el
+   <meta viewport> hace que env(safe-area-inset-top) tenga valor; en el
+   navegador normal vale 0 y nada cambia), y la zona se pinta sólida del
+   color del cintillo, también al hacer scroll. */
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  height: env(safe-area-inset-top, 0px);
+  background: color-mix(in srgb, var(--bg) 80%, #000);
+  pointer-events: none;
+}
+
+:root[data-theme="light"] body::after {
+  background: #0a0e18;
+}
+
+.site-header {
+  top: env(safe-area-inset-top, 0px);
+}
+
+.more-sheet:not([hidden]) {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.flyer-modal {
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+}

@@ -43,7 +43,12 @@ export function embedFor(url) {
   if (host === "open.spotify.com") {
     const m = u.pathname.match(/^\/(?:intl-[a-z-]+\/)?(track|album|playlist|episode)\/([A-Za-z0-9]+)/);
     if (!m) return null;
-    return { src: `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator`, height: 152, service: "Spotify" };
+    return {
+      src: `https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator`,
+      uri: `spotify:${m[1]}:${m[2]}`,
+      height: 152,
+      service: "Spotify",
+    };
   }
 
   // Apple Music: el mismo link en embed.music.apple.com
@@ -94,6 +99,69 @@ function ensureRoot() {
   return root;
 }
 
+const iframeHtml = (embed, track) => `
+  <iframe src="${escapeHtml(embed.src)}" title="Reproductor: ${escapeHtml(track.title)}"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    ${embed.video ? 'class="is-video"' : `style="height:${embed.height}px"`}></iframe>`;
+
+// Spotify: con su iFrame API oficial (en vez del <iframe> pelón) se le
+// puede dar play desde aquí, así suena con un solo toque. Sin ella (no
+// cargó, bloqueada) cae al <iframe> normal y hay que darle play adentro.
+// Sin sesión de Spotify suena la muestra de 30 s — justo lo que dura ir a
+// batear (a propósito).
+let spotifyApi = null;
+let spotifyController = null;
+
+export function loadSpotifyApi() {
+  if (!spotifyApi) {
+    spotifyApi = new Promise((resolve, reject) => {
+      window.onSpotifyIframeApiReady = resolve;
+      const s = document.createElement("script");
+      s.src = "https://open.spotify.com/embed/iframe-api/v1";
+      s.async = true;
+      s.onerror = () => {
+        spotifyApi = null;
+        reject(new Error("Spotify iFrame API"));
+      };
+      document.head.appendChild(s);
+    });
+  }
+  return spotifyApi;
+}
+
+function destroySpotify() {
+  try {
+    spotifyController?.destroy();
+  } catch {
+    // ya no estaba en la página
+  }
+  spotifyController = null;
+}
+
+function mountSpotify(frame, embed, track) {
+  const slot = document.createElement("div");
+  frame.appendChild(slot);
+  const fallback = () => {
+    if (current === track && frame.isConnected) frame.innerHTML = iframeHtml(embed, track);
+  };
+  const timer = setTimeout(fallback, 6000);
+  loadSpotifyApi()
+    .then((api) => {
+      // Ya cambiaron de canción (o cerraron) mientras cargaba.
+      if (current !== track || !slot.isConnected) return clearTimeout(timer);
+      api.createController(slot, { uri: embed.uri, width: "100%", height: embed.height }, (controller) => {
+        clearTimeout(timer);
+        if (current !== track) return controller.destroy();
+        spotifyController = controller;
+        controller.addListener("ready", () => controller.play());
+      });
+    })
+    .catch(() => {
+      clearTimeout(timer);
+      fallback();
+    });
+}
+
 const iconBtn = (action, icon, label) =>
   `<button type="button" class="mini-player-btn" data-mp="${action}" aria-label="${label}" title="${label}"><i class="fa-solid ${icon}"></i></button>`;
 
@@ -102,6 +170,7 @@ const iconBtn = (action, icon, label) =>
 function render(reload = true) {
   const el = ensureRoot();
   if (!current) {
+    destroySpotify();
     el.hidden = true;
     el.innerHTML = "";
     document.body.classList.remove("mini-player-open");
@@ -122,13 +191,12 @@ function render(reload = true) {
       ${iconBtn("close", "fa-xmark", "Cerrar reproductor")}
     </div>`;
 
-  if (reload || !el.querySelector("iframe")) {
-    el.innerHTML = `${bar}
-      <div class="mini-player-frame">
-        <iframe src="${escapeHtml(embed.src)}" title="Reproductor: ${escapeHtml(current.title)}"
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          ${embed.video ? 'class="is-video"' : `style="height:${embed.height}px"`}></iframe>
-      </div>`;
+  if (reload || !el.querySelector(".mini-player-frame")) {
+    destroySpotify();
+    el.innerHTML = `${bar}<div class="mini-player-frame"></div>`;
+    const frame = el.querySelector(".mini-player-frame");
+    if (embed.uri) mountSpotify(frame, embed, current);
+    else frame.innerHTML = iframeHtml(embed, current);
   } else {
     el.querySelector(".mini-player-bar").outerHTML = bar;
   }
