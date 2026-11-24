@@ -111,7 +111,7 @@ export const ROSTER = PLAYERS.filter((p) => p.seasons?.includes(CURRENT_SEASON))
 // default TODOS cuentan como pagados; para marcar a alguien como
 // pendiente, agrega su id en la temporada que corresponda con `false`
 // (ej. "p7": false — no hace falta listar a los que sí pagaron, ya es el
-// default). Al abrir una temporada nueva, agrega una entrada vacía con el
+// default). Si ya abonó pero le queda saldo, usa "saldo" (sale en amarillo). Al abrir una temporada nueva, agrega una entrada vacía con el
 // número nuevo (ver el checklist junto a CURRENT_SEASON) — la anterior se
 // queda tal cual, como historial.
 export const DUES_PAID = {
@@ -123,10 +123,10 @@ export const DUES_PAID = {
     p3: false, // Omar Ramirez
     p4: true, // Carlos Borboa
     p5: false, // Christopher Felix
-    p6: true, // Edwyn Pompa
+    p6: "saldo", // Edwyn Pompa
     p7: false, // Francois Cardenas
     p8: true, // Jorge Zazueta
-    p10: true, // Enrique Muñoz
+    p10: "saldo", // Enrique Muñoz
     p11: true, // Luis Lugo Bastidas
     p12: true, // Luis Fernando Lugo
     p13: false, // Luis Pompa
@@ -137,7 +137,7 @@ export const DUES_PAID = {
     p21: false, // Alberto Solis
     p22: false, // Luis
     p23: false, // Emanuel Corrales
-    p24: false, // Alex Escalante
+    p24: true, // Alex Escalante
     p25: false, // Fernando Olivas
     p26: true, // Marco Olivas
   },

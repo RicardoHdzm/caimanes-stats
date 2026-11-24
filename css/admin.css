@@ -334,6 +334,10 @@
   color: var(--loss);
 }
 
+.dues-admin-row.partial .dues-admin-status {
+  color: var(--partial);
+}
+
 /* ---- Temporadas por jugador (admin.html, solo cuenta del coach) ---- */
 
 .seasons-admin-list {
@@ -856,6 +860,11 @@
 
 .admin-page .dues-admin-row:not(.paid) {
   border-color: color-mix(in srgb, var(--loss) 45%, var(--border));
+}
+
+.admin-page .dues-admin-row.partial {
+  border-color: color-mix(in srgb, var(--partial) 55%, var(--border));
+  background: color-mix(in srgb, var(--partial) 10%, var(--surface));
 }
 
 .admin-page .rsvp-admin-chip {

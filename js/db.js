@@ -67,6 +67,7 @@ async function runMutation(mutationFn) {
 // temporada ACTUAL a propósito — el estado de pago de una temporada
 // cerrada no se muestra en ningún lado hoy (ni Roster ni el perfil tienen
 // selector de temporada), se queda solo como historial en data.js.
+// Valores: true (pagó), false (pendiente) o "saldo" (abonó, le falta).
 export async function getDuesMap() {
   const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
   return new Map(PLAYERS.map((p) => [p.id, seasonDues[p.id] ?? true]));

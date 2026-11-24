@@ -95,6 +95,7 @@ const CATALOG = [
   { kind: "social", icon: "fa-solid fa-cake-candles", name: "HBD", how: "Registró su cumpleaños (día y mes) en el perfil.", match: (l) => l === "HBD", async: true },
   // ---- Estado de inscripción ----
   { kind: "dues-paid", icon: "fa-solid fa-sack-dollar", name: "Rich kid", how: "Ya pagó la inscripción de la temporada.", match: (l) => l === "Rich kid", async: true },
+  { kind: "dues-partial", icon: "fa-solid fa-hand-holding-dollar", name: "A plazos", how: "Ya abonó, pero tiene saldo pendiente de la inscripción.", match: (l) => l === "A plazos", async: true },
   { kind: "dues-unpaid", icon: "fa-solid fa-trash-can", name: "Moroso", how: "Todavía no paga la inscripción de la temporada.", match: (l) => l === "Moroso", async: true },
 ];
 
@@ -118,6 +119,7 @@ async function getAsyncLabels(player) {
   // Inscripción — pública, igual que en el Roster y el perfil.
   const paid = await getDuesForPlayer(player.id);
   if (paid === true) labels.push("Rich kid");
+  if (paid === "saldo") labels.push("A plazos");
   if (paid === false) labels.push("Moroso");
 
   const announcements = await getAnnouncements(1000);

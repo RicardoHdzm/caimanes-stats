@@ -74,6 +74,8 @@
   --loss: #e2202f;
   --tie: #8d96a0;
   --scheduled: #f5a623;
+  /* Inscripción con saldo pendiente. */
+  --partial: #fde047;
 
   --pos-pitcher: #4a9eff;
   --pos-catcher: #a855f7;
@@ -170,6 +172,7 @@
   --loss: #bf0f35;
   --win: #1e9150;
   --scheduled: #c97f00;
+  --partial: #a16207;
   --card-glow: color-mix(in srgb, var(--accent) 6%, transparent);
 
   /* --accent-text (el rojo para TEXTO chico) está afinado para leerse sobre
@@ -1936,6 +1939,13 @@ main h3::before {
   box-shadow: 0 0 12px rgba(63, 181, 111, 0.35);
 }
 
+.achievement-medal--dues-partial .achievement-medal-icon {
+  border: 2px solid var(--partial);
+  background: color-mix(in srgb, var(--partial) 15%, transparent);
+  color: var(--partial);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--partial) 35%, transparent);
+}
+
 .achievement-medal--dues-unpaid .achievement-medal-icon {
   border: 2px solid var(--loss);
   background: rgba(191, 15, 53, 0.15);
@@ -2737,6 +2747,11 @@ main h3::before {
 
 .stat-green {
   color: var(--win);
+  font-weight: 400;
+}
+
+.stat-yellow {
+  color: var(--partial);
   font-weight: 400;
 }
 

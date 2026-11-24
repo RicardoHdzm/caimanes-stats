@@ -126,6 +126,7 @@ function renderDebut(seasons) {
 //                             más abajo, en cuanto getAvatarUrl()/
 //                             getWalkupOverride() contestan.
 //   dues-paid     (verde)  — ya pagó la inscripción de la temporada
+//   dues-partial  (amarillo) — abonó, pero le queda saldo pendiente
 //   dues-unpaid   (rojo)   — todavía no la paga — ambos junto al badge
 //                             "Estado de inscripción" más abajo, solo con
 //                             sesión iniciada (mismo criterio que ese badge).
@@ -151,6 +152,7 @@ const KIND_ORDER = [
   "participation",
   "social",
   "dues-paid",
+  "dues-partial",
   "dues-unpaid",
 ];
 
@@ -1164,7 +1166,14 @@ export function renderJugadorDetalle(container, playerId) {
       // vuelve a haber una fuente que sí pueda fallar.
       if (paid === null) return;
       addAchievementMedal(
-        paid
+        paid === "saldo"
+          ? {
+              icon: "fa-solid fa-hand-holding-dollar",
+              label: "A plazos",
+              kind: "dues-partial",
+              desc: "Ya abonó, pero tiene saldo pendiente de la inscripción.",
+            }
+          : paid
           ? {
               icon: "fa-solid fa-sack-dollar",
               label: "Rich kid",

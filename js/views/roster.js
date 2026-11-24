@@ -73,7 +73,7 @@ function rosterCard(player, duesMap, stats) {
             <span class="roster-card-flip-hint" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span>
           </span>
           <span class="roster-card-stats">
-            ${stat(paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
+            ${stat(paid === "saldo" ? '<i class="stat-yellow">Saldo</i>' : paid ? '<i class="stat-green">Pagada</i>' : "Pendiente", "Inscripción")}
             ${stat(games, "Apariciones")}
           </span>
         </div>
