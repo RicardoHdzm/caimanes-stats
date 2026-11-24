@@ -29,7 +29,7 @@ const toTrack = (r) => ({
   url: r.walkup.url,
   title: r.walkup.title,
   artist: r.walkup.artist,
-  who: `#${r.player.number || "-"} ${r.player.name}`,
+  who: `${r.player.number ? `#${r.player.number} ` : ""}${r.player.name}`,
 });
 
 // Buscador: cada palabra escrita debe ser el inicio de una palabra del nombre
