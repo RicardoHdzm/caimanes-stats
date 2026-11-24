@@ -123,10 +123,10 @@ export const DUES_PAID = {
     p3: false, // Omar Ramirez
     p4: true, // Carlos Borboa
     p5: false, // Christopher Felix
-    p6: false, // Edwyn Pompa
+    p6: true, // Edwyn Pompa
     p7: false, // Francois Cardenas
-    p8: false, // Jorge Zazueta
-    p10: false, // Enrique Muñoz
+    p8: true, // Jorge Zazueta
+    p10: true, // Enrique Muñoz
     p11: true, // Luis Lugo Bastidas
     p12: true, // Luis Fernando Lugo
     p13: false, // Luis Pompa
@@ -139,7 +139,7 @@ export const DUES_PAID = {
     p23: false, // Emanuel Corrales
     p24: false, // Alex Escalante
     p25: false, // Fernando Olivas
-    p26: false, // Marco Olivas
+    p26: true, // Marco Olivas
   },
 };
 
