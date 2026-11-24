@@ -11553,3 +11553,19 @@ body::after {
 .flyer-modal {
   padding-top: calc(20px + env(safe-area-inset-top, 0px));
 }
+
+/* Botón "Actualizar" del modo app (js/app-refresh.js): gira mientras borra
+   la copia guardada y recarga. */
+.app-refresh[hidden] {
+  display: none;
+}
+
+.app-refresh.is-loading i {
+  animation: app-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes app-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

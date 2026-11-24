@@ -1,3 +1,4 @@
+import { initAppRefresh } from "./app-refresh.js";
 import { TEAM, SCHEDULE } from "./data.js";
 import { renderHome } from "./views/home.js";
 import { renderSportPicker } from "./views/sports.js";
@@ -627,6 +628,8 @@ initSplash(startApp);
 // Service worker: deja abrir la página sin señal (en el campo casi nunca hay
 // datos). Si falla el registro la app sigue funcionando normal, solo pierde
 // el modo offline — por eso el catch silencioso.
+initAppRefresh();
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js").catch(() => {});

@@ -1,6 +1,7 @@
 // CAIMANES FC (fútbol) — sitio aparte del softbol (fc.html), con el mismo
 // header, menú ☰, temas y estilos. Se llega desde el selector de deporte de
 // la portada (index.html#/, ver js/views/sports.js).
+import { initAppRefresh } from "../app-refresh.js";
 import { FC_TEAM } from "./data.js";
 import { playedMatches, upcomingMatches, matchResult } from "./stats.js";
 import { fmtDate, RESULT_LABEL, fcLogoHtml } from "./ui.js";
@@ -192,6 +193,8 @@ window.addEventListener("hashchange", () => {
   render();
   window.scrollTo(0, 0);
 });
+
+initAppRefresh();
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
