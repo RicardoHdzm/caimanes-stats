@@ -10724,6 +10724,57 @@ body.is-sport-picker main {
     -webkit-text-stroke-color 0.25s ease;
 }
 
+/* Nombre del deporte y del equipo, uno encima del otro en la misma caja
+   (con recorte): al pasar el mouse el deporte sube y sale, y el equipo
+   entra desde abajo — como rodillo. El equipo va en dos renglones para
+   caber en el alto del nombre, el segundo en rojo. Solo con mouse. */
+.sp-row-name {
+  display: grid;
+  overflow: hidden;
+  /* margen para los acentos (Ó, Ú, Á) que se saldrían del recorte */
+  padding-top: 0.1em;
+  margin-top: -0.1em;
+}
+
+.sp-name-sport,
+.sp-name-team {
+  grid-area: 1 / 1;
+  transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.sp-name-team {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.46em;
+  line-height: 1;
+  white-space: nowrap;
+  color: #fff;
+  -webkit-text-stroke: 0;
+  transform: translateY(110%);
+}
+
+.sp-name-team span + span {
+  color: var(--sp-red);
+}
+
+@media (hover: hover) and (min-width: 761px) {
+  .sp-row:hover .sp-name-sport,
+  .sp-row:focus-visible .sp-name-sport {
+    transform: translateY(-110%);
+  }
+
+  .sp-row:hover .sp-name-team,
+  .sp-row:focus-visible .sp-name-team {
+    transform: none;
+  }
+
+  /* El equipo ya sale en grande: a la derecha solo queda el botón. */
+  .sp-row-team {
+    display: none;
+  }
+}
+
 /* Datos del activo: equipo y botón, salen a la derecha de su nombre.
    Su lugar siempre está apartado (solo se desvanecen), así la lista nunca
    se mueve — antes se abrían debajo y empujaban a los de abajo. */

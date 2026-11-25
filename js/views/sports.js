@@ -1,6 +1,7 @@
 // Portada del sitio (#/): "lista tipográfica" para elegir deporte — los
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
-// cambia el fondo a su foto y a la derecha sale su logo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
+// cambia el fondo a su foto y a la derecha sale su logo. Con el mouse
+// encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
 // (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y Gaming
 // (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro.
@@ -17,6 +18,8 @@ const ORG_NAME = "Caimanes.Team";
 const SOCIALS = [{ label: "Instagram", icon: "fa-instagram", url: "https://www.instagram.com/caimanes.sb/" }];
 
 // Los cuatro deportes, en orden. `href: null` = todavía "Próximamente".
+// `teamLines`: el nombre del equipo partido en dos renglones — es lo que
+// aparece en lugar del deporte al pasar el mouse (el segundo, en rojo).
 // Las fotos de fondo van en css/styles.css (.sp-media--<key>). Si se reemplaza un logo con el mismo
 // nombre de archivo, agregar/subir un "?v=" para que no se quede el viejo.
 const SPORTS = [
@@ -24,6 +27,7 @@ const SPORTS = [
     key: "softbol",
     name: "Sóftbol",
     team: "Caimanes de Villas",
+    teamLines: ["Caimanes", "de Villas"],
     href: "#/softbol",
     logo: `<img src="assets/logo.png" alt="" class="sp-logo" />`,
   },
@@ -31,6 +35,7 @@ const SPORTS = [
     key: "futbol",
     name: "Fútbol",
     team: "Caimanes FC",
+    teamLines: ["Caimanes", "FC"],
     href: "fc.html",
     logo: fcLogoHtml(220, "sp-logo sp-logo--fc"),
   },
@@ -38,6 +43,7 @@ const SPORTS = [
     key: "padel",
     name: "Pádel",
     team: "Caimanes Padel Squad",
+    teamLines: ["Caimanes", "Padel Squad"],
     href: null,
     logo: `<img src="assets/logos/padel.png" alt="" class="sp-logo sp-logo--padel" />`,
   },
@@ -45,6 +51,7 @@ const SPORTS = [
     key: "esports",
     name: "Gaming",
     team: "Caiman X",
+    teamLines: ["Caiman", "X"],
     href: null,
     logo: `<img src="assets/logos/caimanx.png" alt="" class="sp-logo sp-logo--esports" />`,
   },
@@ -56,7 +63,10 @@ function rowHtml(s, i) {
   const num = String(i + 1).padStart(2, "0");
   const inner = `
       <span class="sp-row-num">${num}</span>
-      <span class="sp-row-name">${s.name}</span>
+      <span class="sp-row-name">
+        <span class="sp-name-sport">${s.name}</span>
+        <span class="sp-name-team"><span>${s.teamLines[0]}</span><span>${s.teamLines[1]}</span></span>
+      </span>
       <span class="sp-row-info">
         <span class="sp-row-logo">${s.logo}</span>
         <span class="sp-row-team">${s.team}</span>
