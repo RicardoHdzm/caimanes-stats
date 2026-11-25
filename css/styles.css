@@ -10702,12 +10702,56 @@ body.is-sport-picker main {
 
 .sp-row-num {
   align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   margin-top: 1.1em;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: rgba(255, 255, 255, 0.4);
   transition: color 0.3s;
+}
+
+/* Barrita de la rotación: solo se ve en el activo y se llena en
+   --sp-rotate (js/views/sports.js); al terminar, pasa al siguiente. Con el
+   mouse en la lista se congela (.is-paused). */
+.sp-row-bar {
+  position: relative;
+  width: 1.9em;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.sp-row-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--sp-red);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.sp-row.is-active .sp-row-bar {
+  opacity: 1;
+}
+
+.sp-row.is-active .sp-row-bar::after {
+  animation: sp-progress var(--sp-rotate, 5s) linear both;
+}
+
+.sport-picker.is-paused .sp-row-bar::after {
+  animation-play-state: paused;
+}
+
+@keyframes sp-progress {
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .sp-row-name {
@@ -10718,7 +10762,7 @@ body.is-sport-picker main {
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: transparent;
-  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.45);
+  -webkit-text-stroke: 1.6px rgba(255, 255, 255, 0.65);
   transition:
     color 0.25s ease,
     -webkit-text-stroke-color 0.25s ease;
@@ -10956,7 +11000,7 @@ a.sp-row:hover .sp-row-cta i {
 
   .sp-row-name {
     font-size: clamp(2.8rem, 14vw, 4.2rem);
-    -webkit-text-stroke-width: 1.2px;
+    -webkit-text-stroke-width: 1.4px;
   }
 
   /* Aquí los datos se ven siempre: cada renglón se toca directo. */
@@ -10971,17 +11015,6 @@ a.sp-row:hover .sp-row-cta i {
     opacity: 1;
     visibility: visible;
     transform: none;
-  }
-
-  .sp-row-logo {
-    display: block;
-    flex: none;
-  }
-
-  .sp-row-logo .sp-logo {
-    display: block;
-    width: auto;
-    height: 26px;
   }
 
   .sp-row-team {
@@ -11004,6 +11037,11 @@ a.sp-row:hover .sp-row-cta i {
   .sp-row-info {
     animation: none;
     transition: none;
+  }
+
+  /* Sin animación no hay rotación: la barrita no tiene caso. */
+  .sp-row-bar {
+    display: none;
   }
 }
 

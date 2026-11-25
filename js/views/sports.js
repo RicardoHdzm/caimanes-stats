@@ -4,7 +4,8 @@
 // encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
 // (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y Gaming
 // (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
-// rotando solo entre los cuatro.
+// rotando solo entre los cuatro; la barrita roja junto al número del activo
+// se va llenando y, al llenarse, pasa al siguiente.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
 // .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
@@ -34,7 +35,7 @@ const SPORTS = [
   {
     key: "futbol",
     name: "Fútbol",
-    team: "Caimanes FC",
+    team: "Caimanes Football Club",
     teamLines: ["Caimanes", "Football Club"],
     href: "fc.html",
     logo: fcLogoHtml(220, "sp-logo sp-logo--fc"),
@@ -50,7 +51,7 @@ const SPORTS = [
   {
     key: "esports",
     name: "Gaming",
-    team: "Caiman X",
+    team: "Caiman X Gaming",
     teamLines: ["Caiman X", "Gaming"],
     href: null,
     logo: `<img src="assets/logos/caimanx.png" alt="" class="sp-logo sp-logo--esports" />`,
@@ -62,7 +63,7 @@ const ROTATE_MS = 5000;
 function rowHtml(s, i) {
   const num = String(i + 1).padStart(2, "0");
   const inner = `
-      <span class="sp-row-num">${num}</span>
+      <span class="sp-row-num">${num}<span class="sp-row-bar"></span></span>
       <span class="sp-row-name">
         <span class="sp-name-sport">${s.name}</span>
         <span class="sp-name-team"><span>${s.teamLines[0]}</span><span>${s.teamLines[1]}</span></span>
@@ -108,10 +109,8 @@ export function renderSportPicker(container) {
 }
 
 function wire(root) {
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const keys = SPORTS.map((s) => s.key);
   let current = null;
-  let paused = false;
 
   function setActive(key) {
     if (key === current) return;
@@ -121,6 +120,16 @@ function wire(root) {
 
   setActive(keys[0]);
 
+  // Rotación: la lleva la animación de la barrita del activo (css/styles.css,
+  // sp-progress, dura ROTATE_MS). Al terminar, pasa al siguiente. Con el mouse
+  // o el foco en la lista se pausa (.is-paused) y la barrita se congela. Con
+  // "reducir movimiento" no hay animación, así que tampoco rota.
+  root.style.setProperty("--sp-rotate", `${ROTATE_MS}ms`);
+  root.addEventListener("animationend", (e) => {
+    if (e.animationName !== "sp-progress") return;
+    setActive(keys[(keys.indexOf(current) + 1) % keys.length]);
+  });
+
   const list = root.querySelector(".sp-list");
   for (const row of list.querySelectorAll(".sp-row")) {
     row.addEventListener("pointerenter", (e) => {
@@ -128,24 +137,11 @@ function wire(root) {
     });
     row.addEventListener("focus", () => setActive(row.dataset.key));
   }
+  const pause = (on) => root.classList.toggle("is-paused", on);
   list.addEventListener("pointerenter", (e) => {
-    if (e.pointerType === "mouse") paused = true;
+    if (e.pointerType === "mouse") pause(true);
   });
-  list.addEventListener("pointerleave", () => {
-    paused = false;
-  });
-  list.addEventListener("focusin", () => (paused = true));
-  list.addEventListener("focusout", () => (paused = false));
-
-  // Mientras nadie señala, rota solo entre los cuatro.
-  if (reduce) return;
-  const timer = setInterval(() => {
-    // Se salió de la portada: se apaga.
-    if (!document.body.contains(root)) {
-      clearInterval(timer);
-      return;
-    }
-    if (paused || document.hidden) return;
-    setActive(keys[(keys.indexOf(current) + 1) % keys.length]);
-  }, ROTATE_MS);
+  list.addEventListener("pointerleave", () => pause(false));
+  list.addEventListener("focusin", () => pause(true));
+  list.addEventListener("focusout", () => pause(false));
 }
