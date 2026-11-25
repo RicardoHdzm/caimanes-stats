@@ -59,6 +59,11 @@ export const FLYER_COLORS = [
     accent: "#bf0f35",
     accentDark: "#7d0924",
     accentText: "#e8375c",
+    // El resplandor rojo y la viñeta negra lo volvían guinda/morado: aquí
+    // el resplandor es tenue y la viñeta azul marino, para que se lea el
+    // azul del sitio (y el rojo quede en franjas y textos).
+    glow: 0.05,
+    vignette: "3, 6, 14",
   },
   {
     id: "moderno",
@@ -261,14 +266,14 @@ function drawBackground(ctx, CH) {
   ctx.restore();
 
   const glow = ctx.createRadialGradient(W / 2, CH * 0.45, 60, W / 2, CH * 0.45, 820);
-  glow.addColorStop(0, rgba(P.accent, P.light ? 0.1 : 0.3));
+  glow.addColorStop(0, rgba(P.accent, P.glow ?? (P.light ? 0.1 : 0.3)));
   glow.addColorStop(1, rgba(P.accent, 0));
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, CH);
 
   const vignette = ctx.createRadialGradient(W / 2, CH / 2, 300, W / 2, CH / 2, CH * 0.8);
-  vignette.addColorStop(0, P.shade(0));
-  vignette.addColorStop(1, P.shade(0.65));
+  vignette.addColorStop(0, P.vignette ? `rgba(${P.vignette}, 0)` : P.shade(0));
+  vignette.addColorStop(1, P.vignette ? `rgba(${P.vignette}, 0.65)` : P.shade(0.65));
   ctx.fillStyle = vignette;
   ctx.fillRect(0, 0, W, CH);
 
