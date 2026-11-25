@@ -10633,9 +10633,19 @@ body.is-sport-picker main {
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   color: #fff;
-  font-size: 1.05rem;
+  /* En pixeles exactos (no rem): el ícono cae en pixel entero dentro del
+     círculo y no se ve corrido por medio pixel. */
+  font-size: 16px;
   text-decoration: none;
   transition: background 0.25s, border-color 0.25s;
+}
+
+.sp-social i {
+  display: block;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
 }
 
 .sp-social:hover,
@@ -10981,7 +10991,6 @@ a.sp-row:hover .sp-row-cta i {
   .sp-social {
     width: 34px;
     height: 34px;
-    font-size: 0.95rem;
   }
 
   .sp-list {
