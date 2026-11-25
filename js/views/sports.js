@@ -9,7 +9,7 @@
 import { fcLogoHtml } from "../fc/ui.js";
 
 // Nombre de la organización, arriba a la izquierda.
-const ORG_NAME = "Caimanes";
+const ORG_NAME = "Caimanes.Team";
 
 // Redes de la organización, arriba a la derecha. Para agregar otra, copiar
 // una línea: el icono es el nombre de Font Awesome (fa-facebook, fa-tiktok,
