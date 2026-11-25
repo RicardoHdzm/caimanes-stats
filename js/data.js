@@ -154,7 +154,7 @@ export const DUES_PAID = {
     p22: false, // Luis
     p23: false, // Emanuel Corrales
     p24: true, // Alex Escalante
-    p25: false, // Fernando Olivas
+    p25: true, // Fernando Olivas
     p26: 500, // Marco Olivas
   },
 };
