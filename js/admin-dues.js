@@ -6,6 +6,7 @@
 import { ROSTER, DUES_FEE, GAME_COST, TEAM } from "./data.js";
 import { initAuth, mountAuthControl, isCoach } from "./auth.js";
 import { getDuesDetail } from "./db.js";
+import { currentSeasonGames } from "./stats.js";
 import { SUPABASE_CONFIGURED } from "./supabase-config.js";
 
 const gate = document.getElementById("admin-gate");
@@ -29,19 +30,22 @@ function rowMarkup(player, { status: paid, amount }) {
   `;
 }
 
-// Recaudado, para cuántos juegos alcanza (GAME_COST c/u) y cuánto sobra.
+// Recaudado, juegos ya pagados (los jugados de la temporada, GAME_COST
+// c/u, salen solos de GAMES) y lo que queda en caja.
 function summaryMarkup(detail) {
   const amounts = [...detail.values()].map((d) => d.amount);
   const total = amounts.reduce((sum, a) => sum + (a ?? 0), 0);
   const unknown = amounts.filter((a) => a === null).length;
-  const games = Math.floor(total / GAME_COST);
-  const left = total - games * GAME_COST;
+  const played = currentSeasonGames().length;
+  const spent = played * GAME_COST;
+  const left = total - spent;
+  const more = Math.floor(Math.max(left, 0) / GAME_COST);
   const stat = (label, value, note = "") =>
     `<div class="dues-admin-stat"><span>${label}</span><strong>${value}</strong>${note ? `<small>${note}</small>` : ""}</div>`;
   return [
     stat("Recaudado", money(total), unknown ? `sin contar ${unknown} abono${unknown === 1 ? "" : "s"} sin cantidad` : `de ${money(ROSTER.length * DUES_FEE)}`),
-    stat("Juegos pagados", `${games} de ${TEAM.gamesInSeason}`, `${money(GAME_COST)} por juego`),
-    stat("Sobrante", money(left), left > 0 ? `faltan ${money(GAME_COST - left)} para otro juego` : ""),
+    stat("Juegos pagados", `${played} de ${TEAM.gamesInSeason}`, `${money(spent)} (${money(GAME_COST)} por juego)`),
+    stat("Restante", left < 0 ? `−${money(-left)}` : money(left), `Recaudado − juegos jugados · alcanza para ${more} juego${more === 1 ? "" : "s"} más`),
   ].join("");
 }
 
