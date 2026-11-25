@@ -10503,8 +10503,8 @@ html[data-boot="picker"] main {
   padding: 0;
 }
 
-/* ---- Selector de deporte: pantalla completa, dividida en tres (softbol,
-   fútbol y pádel — este último "Próximamente", sin link) ---- */
+/* ---- Selector de deporte: pantalla completa, dividida en cuatro (softbol,
+   fútbol, pádel y eSports — estos dos "Próximamente", sin link) ---- */
 body.is-sport-picker .match-ticker,
 body.is-sport-picker .site-header,
 body.is-sport-picker .footer {
@@ -10566,12 +10566,27 @@ body.is-sport-picker main {
   background: url("../assets/padel-home.jpg") 50% 62% / cover no-repeat;
 }
 
+/* eSports todavía no tiene foto: fondo de cuadrícula tipo pantalla con un
+   resplandor rojo. Cuando haya foto, va como las de arriba
+   (assets/esports-home.jpg). */
+.sport-panel--esports .sport-panel-bg {
+  background:
+    radial-gradient(70% 55% at 50% 45%, rgba(191, 15, 53, 0.35), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    #0d1220;
+}
+
 .sport-panel--softbol::before {
   background: linear-gradient(180deg, rgba(10, 14, 24, 0.82), rgba(10, 14, 24, 0.9));
 }
 
 .sport-panel--padel::before {
   background: linear-gradient(180deg, rgba(10, 14, 24, 0.74), rgba(10, 14, 24, 0.88));
+}
+
+.sport-panel--esports::before {
+  background: linear-gradient(180deg, rgba(10, 14, 24, 0.2), rgba(10, 14, 24, 0.6));
 }
 
 .sport-panel--futbol::before {
@@ -10632,6 +10647,16 @@ body.is-sport-picker main {
   width: calc(var(--logo-softbol) * 1.05);
   margin-top: calc(var(--logo-softbol) * 0.015);
   margin-bottom: calc(var(--logo-softbol) * 0.015 + 8px);
+}
+
+/* Logo de eSports (assets/logos/caimanx.png, 3341×1156, letrero ancho):
+   130% del ancho de softbol para el mismo peso visual; su alto es 0.45 del
+   de softbol, así que la caja se completa para alinear "ESPORTS". */
+.sport-panel-logo--esports {
+  width: calc(var(--logo-softbol) * 1.3);
+  max-width: 100%;
+  margin-top: calc(var(--logo-softbol) * 0.275);
+  margin-bottom: calc(var(--logo-softbol) * 0.275 + 8px);
 }
 
 /* Logo provisional de pádel (cabeza blanca del caimán, más ancha que alta):
@@ -10722,23 +10747,32 @@ a.sport-panel:focus-visible .sport-panel-cta {
   }
 }
 
-/* En celular, uno arriba del otro. */
+/* En celular, cuadrícula de 2×2. */
 @media (max-width: 760px) {
   .sport-picker {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 1fr;
   }
 
   .sport-panel {
-    min-height: calc(100vh / 3);
-    min-height: calc(100dvh / 3);
+    min-height: calc(100vh / 2);
+    min-height: calc(100dvh / 2);
   }
 
+  /* Raya vertical solo entre las dos columnas... */
   .sport-panel:not(:last-child)::after {
-    top: auto;
-    left: 0;
-    width: auto;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
+    display: none;
+  }
+
+  .sport-panel:nth-child(odd)::after {
+    display: block;
+  }
+
+  /* ...y una horizontal entre las dos filas. */
+  .sport-panel:nth-child(-n + 2) {
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent) 1;
   }
 
   .sport-panel-content {

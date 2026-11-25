@@ -1,7 +1,8 @@
 // Portada del sitio (#/): pantalla dividida para elegir deporte — Softbol
 // (Caimanes de Villas, este mismo sitio en #/softbol), Fútbol (Caimanes FC,
-// fc.html) y Pádel (Caimanes Padel Squad, todavía "Próximamente": no es link;
-// su video ligero assets/hero-padel.mp4 queda listo para cuando tenga página).
+// fc.html), Pádel (Caimanes Padel Squad) y eSports (CaimanX) — estos dos
+// todavía "Próximamente": no son link. El video ligero de pádel
+// (assets/hero-padel.mp4) queda listo para cuando tenga página.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
 // .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
@@ -41,6 +42,15 @@ export function renderSportPicker(container) {
           ${padelLogo}
           <span class="sport-panel-sport">Pádel</span>
           <span class="sport-panel-team">Caimanes Padel Squad</span>
+          <span class="sport-panel-cta sport-panel-cta--soon">Próximamente</span>
+        </span>
+      </div>
+      <div class="sport-panel sport-panel--esports sport-panel--soon">
+        <span class="sport-panel-bg" aria-hidden="true"></span>
+        <span class="sport-panel-content">
+          <img src="assets/logos/caimanx.png" alt="" class="sport-panel-logo sport-panel-logo--esports" />
+          <span class="sport-panel-sport">eSports</span>
+          <span class="sport-panel-team">CaimanX</span>
           <span class="sport-panel-cta sport-panel-cta--soon">Próximamente</span>
         </span>
       </div>
