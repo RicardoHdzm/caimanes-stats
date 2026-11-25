@@ -10503,8 +10503,10 @@ html[data-boot="picker"] main {
   padding: 0;
 }
 
-/* ---- Selector de deporte: pantalla completa, dividida en cuatro (softbol,
-   fútbol, pádel y eSports — estos dos "Próximamente", sin link) ---- */
+/* ---- Selector de deporte (#/, js/views/sports.js): "lista tipográfica".
+   Los cuatro nombres en grande a la izquierda; el activo va sólido y los
+   demás solo en contorno. Detrás, la foto (o video) del activo; a la
+   derecha, su logo. Colores fijos: esta pantalla siempre es oscura. ---- */
 body.is-sport-picker .match-ticker,
 body.is-sport-picker .site-header,
 body.is-sport-picker .footer {
@@ -10517,292 +10519,426 @@ body.is-sport-picker main {
 }
 
 .sport-picker {
-  display: flex;
+  --sp-red: #e8375c;
+  --sp-bg: #0a0e18;
+  --sp-gutter: clamp(20px, 5vw, 80px);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #0a0e18;
-}
-
-.sport-panel {
-  position: relative;
-  flex: 1 1 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+  background: var(--sp-bg);
   color: #fff;
-  text-decoration: none;
-  transition: flex-grow 0.5s ease;
 }
 
-.sport-panel-bg {
+/* ---- Fondo: una capa por deporte, se cruzan al cambiar ---- */
+.sp-media,
+.sp-media-item,
+.sp-video {
   position: absolute;
   inset: 0;
-  transition: transform 0.9s ease;
 }
 
-/* Velo encima de cada fondo para que el logo y el nombre se lean. */
-.sport-panel::before {
+.sp-media-item {
+  opacity: 0;
+  transform: scale(1.08);
+  transition:
+    opacity 0.9s ease,
+    transform 6s ease-out;
+}
+
+.sp-media-item.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Velo: oscuro a la izquierda (donde va la lista), más abierto a la
+   derecha para que se vea la foto. */
+.sp-media::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(10, 14, 24, 0.95) 0%, rgba(10, 14, 24, 0.8) 40%, rgba(10, 14, 24, 0.45) 100%),
+    linear-gradient(0deg, rgba(10, 14, 24, 0.7), transparent 40%);
 }
 
-/* Fotos propias del selector (assets/*-home.jpg, tal cual). El punto de
-   enfoque (background-position) cuida lo importante cuando el panel recorta
-   la foto — sobre todo en celular, donde cada panel es ancho y bajito:
-   guante y bate al centro, el balón abajo a la derecha, las raquetas un poco
-   abajo del centro. */
-.sport-panel--softbol .sport-panel-bg {
+/* Fotos del selector (assets/*-home.jpg, tal cual). */
+.sp-media--softbol {
   background: url("../assets/softbol-home.jpg") 45% 55% / cover no-repeat;
 }
 
-.sport-panel--futbol .sport-panel-bg {
+.sp-media--futbol {
   background: url("../assets/soccer-home.jpg") 60% 72% / cover no-repeat;
 }
 
-.sport-panel--padel .sport-panel-bg {
+.sp-media--padel {
   background: url("../assets/padel-home.jpg") 50% 62% / cover no-repeat;
 }
 
-/* eSports todavía no tiene foto: fondo de cuadrícula tipo pantalla con un
-   resplandor rojo. Cuando haya foto, va como las de arriba
-   (assets/esports-home.jpg). */
-.sport-panel--esports .sport-panel-bg {
+/* eSports todavía no tiene foto: cuadrícula tipo pantalla con resplandor
+   rojo. Cuando haya, va como las de arriba (assets/esports-home.jpg). */
+.sp-media--esports {
   background:
-    radial-gradient(70% 55% at 50% 45%, rgba(191, 15, 53, 0.35), transparent 70%),
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px) 0 0 / 32px 32px,
+    radial-gradient(50% 60% at 72% 50%, rgba(191, 15, 53, 0.45), transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
     #0d1220;
 }
 
-.sport-panel--softbol::before {
-  background: linear-gradient(180deg, rgba(10, 14, 24, 0.82), rgba(10, 14, 24, 0.9));
+/* Video al señalar con el mouse (js/views/sports.js). */
+.sp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
 }
 
-.sport-panel--padel::before {
-  background: linear-gradient(180deg, rgba(10, 14, 24, 0.74), rgba(10, 14, 24, 0.88));
+.sp-video.is-on {
+  opacity: 1;
 }
 
-.sport-panel--esports::before {
-  background: linear-gradient(180deg, rgba(10, 14, 24, 0.2), rgba(10, 14, 24, 0.6));
-}
-
-.sport-panel--futbol::before {
-  background: linear-gradient(180deg, rgba(10, 14, 24, 0.72), rgba(10, 14, 24, 0.88));
-}
-
-/* Raya que separa un panel del siguiente. */
-.sport-panel:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(180deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent);
-}
-
-.sport-panel-content {
+/* ---- Barra de arriba: organización y redes ---- */
+.sp-top {
   position: relative;
   z-index: 2;
+  grid-column: 1 / -1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 48px 20px;
-  text-align: center;
+  justify-content: space-between;
+  padding: clamp(18px, 3vh, 32px) var(--sp-gutter);
 }
 
-/* Los dos logos con el mismo peso visual: el escudo de fútbol tiene ~21%
-   más "tinta" que el de softbol a igual tamaño (y es alto y angosto contra
-   ancho y bajo), así que va al 94% de ancho. Su caja se completa con margen
-   para que "SOFTBOL" y "FÚTBOL" queden a la misma altura. */
-.sport-picker {
-  --logo-softbol: clamp(130px, 15vw, 230px);
-  --logo-futbol: calc(var(--logo-softbol) * 0.94);
+.sp-org {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
 }
 
-.sport-panel-logo {
-  width: var(--logo-softbol);
+.sp-org-logo {
+  width: 40px;
   height: auto;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.55));
-  transition: transform 0.5s ease;
 }
 
-.sport-panel-logo--fc {
-  width: var(--logo-futbol);
-  margin-top: calc((var(--logo-softbol) - var(--logo-futbol)) / 2);
-  margin-bottom: calc((var(--logo-softbol) - var(--logo-futbol)) / 2 + 8px);
+.sp-socials {
+  display: flex;
+  gap: 8px;
 }
 
-/* Logo de pádel (assets/logos/padel.png, 748×691): la "CP" en rayo es
-   diagonal y con mucho hueco — por pura "tinta" iría al 131%, pero así se ve
-   más grande que los otros; al 105% se ven parejos. Alto = 0.97 del ancho de
-   softbol, se completa la caja para alinear "PÁDEL". */
-.sport-panel-logo--padel:not(.sport-panel-logo--placeholder) {
-  width: calc(var(--logo-softbol) * 1.05);
-  margin-top: calc(var(--logo-softbol) * 0.015);
-  margin-bottom: calc(var(--logo-softbol) * 0.015 + 8px);
-}
-
-/* Logo de eSports (assets/logos/caimanx.png, 3341×1156, letrero ancho):
-   130% del ancho de softbol para el mismo peso visual; su alto es 0.45 del
-   de softbol, así que la caja se completa para alinear "ESPORTS". */
-.sport-panel-logo--esports {
-  width: calc(var(--logo-softbol) * 1.3);
-  max-width: 100%;
-  margin-top: calc(var(--logo-softbol) * 0.275);
-  margin-bottom: calc(var(--logo-softbol) * 0.275 + 8px);
-}
-
-/* Logo provisional de pádel (cabeza blanca del caimán, más ancha que alta):
-   120% de ancho para el mismo peso visual, y su caja se completa a la altura
-   de los otros dos (su alto es 0.81 del ancho de softbol). */
-.sport-panel-logo--placeholder {
-  width: calc(var(--logo-softbol) * 1.2);
-  margin-top: calc(var(--logo-softbol) * 0.096);
-  margin-bottom: calc(var(--logo-softbol) * 0.096 + 8px);
-}
-
-.sport-panel-sport {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  /* compensa el letter-spacing de la última letra para que quede centrado */
-  padding-left: 0.35em;
-  font-family: var(--font-display);
-  font-size: clamp(0.95rem, 1.6vw, 1.2rem);
-  font-weight: 600;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: #e8375c;
-}
-
-.sport-panel-team {
-  font-family: var(--font-display);
-  font-size: clamp(1.9rem, 3.4vw, 3.4rem);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.sport-panel-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 16px;
-  padding: 12px 28px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.sp-social {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.05rem;
+  text-decoration: none;
   transition: background 0.25s, border-color 0.25s;
 }
 
-a.sport-panel:hover .sport-panel-cta,
-a.sport-panel:focus-visible .sport-panel-cta {
+.sp-social:hover,
+.sp-social:focus-visible {
   border-color: var(--accent);
   background: var(--accent);
 }
 
-/* "Próximamente": parece etiqueta, no botón. */
-.sport-panel--soon {
+/* ---- La lista ---- */
+.sp-list {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 clamp(24px, 6vh, 64px) var(--sp-gutter);
+}
+
+.sp-row {
+  display: grid;
+  grid-template-columns: 3em auto;
+  align-items: start;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  animation: sp-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.sp-row:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.sp-row:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.sp-row:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+@keyframes sp-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+.sp-row--soon {
   cursor: default;
 }
 
-.sport-panel-cta--soon {
-  border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.3);
+.sp-row:focus-visible {
+  outline: none;
+}
+
+.sp-row:focus-visible .sp-row-name {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+}
+
+.sp-row-num {
+  margin-top: 1.1em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s;
+}
+
+.sp-row-name {
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, min(12vh, 9vw), 8.5rem);
+  font-weight: 700;
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.45);
+  transition:
+    color 0.35s ease,
+    -webkit-text-stroke-color 0.35s ease;
+}
+
+/* Datos del activo: equipo y botón, se abren debajo de su nombre. */
+.sp-row-info {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.45s ease,
+    opacity 0.3s ease,
+    margin 0.45s ease;
+}
+
+/* En computadora el logo va grande a la derecha (.sp-stage). */
+.sp-row-logo {
+  display: none;
+}
+
+.sp-row-team {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.75);
 }
 
-.sport-panel:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: -6px;
+.sp-row-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* En escritorio, el lado que señalas crece un poco. */
-@media (hover: hover) and (min-width: 761px) {
-  /* Solo los que llevan a algún lado (pádel todavía no). */
-  .sport-picker:has(a.sport-panel:hover) .sport-panel {
-    flex-grow: 0.85;
-  }
-
-  .sport-picker a.sport-panel:hover {
-    flex-grow: 1.25;
-  }
-
-  a.sport-panel:hover .sport-panel-bg {
-    transform: scale(1.05);
-  }
-
-  a.sport-panel:hover .sport-panel-logo {
-    transform: scale(1.04);
-  }
+.sp-row-cta i {
+  transition: transform 0.25s ease;
 }
 
-/* En celular, cuadrícula de 2×2. */
+a.sp-row:hover .sp-row-cta i {
+  transform: translateX(4px);
+}
+
+.sp-row-cta--soon {
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sp-row.is-active .sp-row-num {
+  color: var(--sp-red);
+}
+
+.sp-row.is-active .sp-row-name {
+  color: #fff;
+  -webkit-text-stroke-color: #fff;
+}
+
+.sp-row.is-active .sp-row-info {
+  max-height: 60px;
+  opacity: 1;
+  margin: 8px 0 14px;
+}
+
+/* ---- Logo grande del activo, a la derecha ---- */
+.sp-stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  padding: 0 var(--sp-gutter) clamp(24px, 6vh, 64px) 0;
+}
+
+.sp-stage-item {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(16px) scale(0.94);
+  transition:
+    opacity 0.5s ease,
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sp-stage-item.is-active {
+  opacity: 1;
+  transform: none;
+}
+
+/* Mismo peso visual entre logos (el de fútbol tiene más "tinta", el de
+   pádel menos, el de eSports es un letrero ancho). */
+.sp-stage .sp-logo {
+  display: block;
+  width: clamp(200px, 24vw, 380px);
+  height: auto;
+  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
+}
+
+.sp-stage .sp-logo--fc {
+  width: clamp(188px, 22.5vw, 357px);
+}
+
+.sp-stage .sp-logo--padel {
+  width: clamp(210px, 25vw, 400px);
+}
+
+.sp-stage .sp-logo--esports {
+  width: clamp(260px, 32vw, 500px);
+}
+
+/* ---- Celular: lista a todo lo ancho, sin logo grande ---- */
 @media (max-width: 760px) {
   .sport-picker {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .sport-panel {
-    min-height: calc(100vh / 2);
-    min-height: calc(100dvh / 2);
-  }
-
-  /* Raya vertical solo entre las dos columnas... */
-  .sport-panel:not(:last-child)::after {
+  .sp-stage {
     display: none;
   }
 
-  .sport-panel:nth-child(odd)::after {
+  .sp-media::after {
+    background: linear-gradient(180deg, rgba(10, 14, 24, 0.9), rgba(10, 14, 24, 0.8) 50%, rgba(10, 14, 24, 0.94));
+  }
+
+  .sp-top {
+    padding: 16px 20px;
+  }
+
+  .sp-org {
+    font-size: 1rem;
+  }
+
+  .sp-org-logo {
+    width: 34px;
+  }
+
+  .sp-social {
+    width: 34px;
+    height: 34px;
+    font-size: 0.95rem;
+  }
+
+  .sp-list {
+    align-self: stretch;
+    justify-content: center;
+    padding: 0 20px 24px;
+  }
+
+  .sp-row {
+    grid-template-columns: 2.2em minmax(0, 1fr);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .sp-row:last-child {
+    border-bottom: none;
+  }
+
+  .sp-row-num {
+    margin-top: 0.9em;
+    font-size: 0.72rem;
+  }
+
+  .sp-row-name {
+    font-size: clamp(2.8rem, 14vw, 4.2rem);
+    -webkit-text-stroke-width: 1.2px;
+  }
+
+  /* Aquí los datos se ven siempre: cada renglón se toca directo. */
+  .sp-row-info,
+  .sp-row.is-active .sp-row-info {
+    max-height: none;
+    opacity: 1;
+    margin: 6px 0 0;
+    gap: 10px;
+  }
+
+  .sp-row-logo {
     display: block;
+    flex: none;
   }
 
-  /* ...y una horizontal entre las dos filas. */
-  .sport-panel:nth-child(-n + 2) {
-    border-bottom: 2px solid;
-    border-image: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent) 70%, transparent) 1;
+  .sp-row-logo .sp-logo {
+    display: block;
+    width: auto;
+    height: 26px;
   }
 
-  .sport-panel-content {
-    gap: 4px;
-    padding: 16px 8px;
+  .sp-row-team {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
   }
 
-  .sport-picker {
-    --logo-softbol: clamp(84px, 24vw, 120px);
-  }
-
-  .sport-panel-logo {
-    margin-bottom: 4px;
-  }
-
-  .sport-panel-team {
-    font-size: clamp(1.7rem, 7.5vw, 2.4rem);
-  }
-
-  .sport-panel-cta {
-    margin-top: 6px;
-    padding: 8px 14px;
-    font-size: 0.78rem;
+  .sp-row-cta {
+    padding: 5px 12px;
+    font-size: 0.68rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sport-panel,
-  .sport-panel-bg,
-  .sport-panel-logo {
+  .sp-row,
+  .sp-media-item,
+  .sp-stage-item,
+  .sp-row-info {
+    animation: none;
     transition: none;
   }
 }
