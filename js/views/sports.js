@@ -1,7 +1,7 @@
 // Portada del sitio (#/): "lista tipográfica" para elegir deporte — los
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
 // cambia el fondo a su foto y a la derecha sale su logo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
-// (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y eSports
+// (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y Gaming
 // (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
@@ -43,7 +43,7 @@ const SPORTS = [
   },
   {
     key: "esports",
-    name: "eSports",
+    name: "Gaming",
     team: "Caiman X",
     href: null,
     logo: `<img src="assets/logos/caimanx.png" alt="" class="sp-logo sp-logo--esports" />`,
@@ -83,7 +83,6 @@ export function renderSportPicker(container) {
       </div>
       <header class="sp-top">
         <span class="sp-org">
-          <img src="assets/logos/whitelogo@2x.png" alt="" class="sp-org-logo" />
           <span>${ORG_NAME}</span>
         </span>
         <span class="sp-socials">${socials}</span>

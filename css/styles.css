@@ -10592,14 +10592,9 @@ body.is-sport-picker main {
   background: url("../assets/padel-home.jpg") 50% 62% / cover no-repeat;
 }
 
-/* eSports todavía no tiene foto: cuadrícula tipo pantalla con resplandor
-   rojo. Cuando haya, va como las de arriba (assets/esports-home.jpg). */
+/* Gaming (clase "esports" por dentro): assets/gaming.jpeg, tal cual. */
 .sp-media--esports {
-  background:
-    radial-gradient(50% 60% at 72% 50%, rgba(191, 15, 53, 0.45), transparent 70%),
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
-    #0d1220;
+  background: url("../assets/gaming.jpeg") 55% 50% / cover no-repeat;
 }
 
 /* ---- Barra de arriba: organización y redes ---- */
@@ -10624,10 +10619,6 @@ body.is-sport-picker main {
   text-transform: uppercase;
 }
 
-.sp-org-logo {
-  width: 40px;
-  height: auto;
-}
 
 .sp-socials {
   display: flex;
@@ -10883,9 +10874,6 @@ a.sp-row:hover .sp-row-cta i {
     font-size: 1rem;
   }
 
-  .sp-org-logo {
-    width: 34px;
-  }
 
   .sp-social {
     width: 34px;
