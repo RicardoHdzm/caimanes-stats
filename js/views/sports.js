@@ -72,11 +72,6 @@ function rowHtml(s, i) {
       <span class="sp-row-info">
         <span class="sp-row-logo">${s.logo}</span>
         <span class="sp-row-team">${s.team}</span>
-        ${
-          s.href
-            ? `<span class="sp-row-cta">Entrar <i class="fa-solid fa-arrow-right"></i></span>`
-            : `<span class="sp-row-cta sp-row-cta--soon">Próximamente</span>`
-        }
       </span>`;
   return s.href
     ? `<a class="sp-row" href="${s.href}" data-key="${s.key}" data-sport-switch="${s.key}">${inner}</a>`
