@@ -338,6 +338,57 @@
   color: var(--partial);
 }
 
+/* Estado arriba, cantidad abajo, alineados a la derecha. */
+.dues-admin-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.dues-admin-amount {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Totales: recaudado, juegos pagados y sobrante. */
+.dues-admin-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dues-admin-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-alt);
+}
+
+.dues-admin-stat span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dues-admin-stat strong {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.dues-admin-stat small {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 /* ---- Temporadas por jugador (admin.html, solo cuenta del coach) ---- */
 
 .seasons-admin-list {

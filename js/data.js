@@ -111,27 +111,37 @@ export const ROSTER = PLAYERS.filter((p) => p.seasons?.includes(CURRENT_SEASON))
 // default TODOS cuentan como pagados; para marcar a alguien como
 // pendiente, agrega su id en la temporada que corresponda con `false`
 // (ej. "p7": false — no hace falta listar a los que sí pagaron, ya es el
-// default). Si ya abonó pero le queda saldo, usa "saldo" (sale en amarillo). Al abrir una temporada nueva, agrega una entrada vacía con el
+// default). Si ya abonó pero le queda saldo, pon la cantidad que lleva
+// (ej. p26: 500 — sale en amarillo; si llega a DUES_FEE cuenta como
+// pagado). "saldo" sin cantidad también sirve, pero no suma al total del
+// Admin. Al abrir una temporada nueva, agrega una entrada vacía con el
 // número nuevo (ver el checklist junto a CURRENT_SEASON) — la anterior se
 // queda tal cual, como historial.
+//
+// DUES_FEE: inscripción completa por jugador (lo que cuenta un `true`).
+// GAME_COST: lo que cuesta cada juego — Admin → Estado de pago dice para
+// cuántos juegos alcanza lo recaudado y cuánto sobra.
+export const DUES_FEE = 550;
+export const GAME_COST = 650;
+
 export const DUES_PAID = {
   8: {},
   // Todos pendientes al arrancar la temporada — al pagar, borra su línea
   // (o cámbiala a `true`).
   9: {
-    p1: "saldo", // Axel Medina
+    p1: true, // Axel Medina
     p3: false, // Omar Ramirez
     p4: true, // Carlos Borboa
     p5: false, // Christopher Felix
-    p6: "saldo", // Edwyn Pompa
+    p6: 524, // Edwyn Pompa
     p7: false, // Francois Cardenas
     p8: true, // Jorge Zazueta
-    p10: "saldo", // Enrique Muñoz
+    p10: 524, // Enrique Muñoz
     p11: true, // Luis Lugo Bastidas
     p12: true, // Luis Fernando Lugo
     p13: false, // Luis Pompa
     p14: true, // Ricardo Santoyo
-    p15: true, // Ricardo Hernández
+    p15: false, // Ricardo Hernández
     p16: true, // Ruben Perez
     p18: false, // Javier Urquiza
     p21: false, // Alberto Solis
@@ -139,7 +149,7 @@ export const DUES_PAID = {
     p23: false, // Emanuel Corrales
     p24: true, // Alex Escalante
     p25: false, // Fernando Olivas
-    p26: true, // Marco Olivas
+    p26: 500, // Marco Olivas
   },
 };
 

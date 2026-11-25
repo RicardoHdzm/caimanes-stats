@@ -64,7 +64,8 @@
 
     <section class="admin-section" id="admin-section-pagos">
       <h2>Estado de pago</h2>
-      <p class="subtitle">Ya no se edita desde aquí — vive directo en <code>DUES_PAID</code>, en js/data.js. Para marcar a alguien como pendiente, agrega su id ahí con <code>false</code> y sube el cambio. Esto solo muestra el estado actual.</p>
+      <p class="subtitle">Se edita en <code>DUES_PAID</code>, en js/data.js: <code>true</code> pagado, <code>false</code> pendiente, o la cantidad que lleva (ej. <code>500</code>).</p>
+      <div class="dues-admin-summary" id="dues-admin-summary"></div>
       <div class="dues-admin-list" id="dues-admin-list"></div>
     </section>
 

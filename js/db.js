@@ -8,7 +8,7 @@
 // pagos); por ahora solo expone el cliente para que las próximas fases lo
 // reusen sin volver a importarlo cada una por su cuenta.
 import { getClient, getCurrentPlayerId } from "./auth.js";
-import { PLAYERS, DUES_PAID, CURRENT_SEASON } from "./data.js";
+import { PLAYERS, DUES_PAID, DUES_FEE, CURRENT_SEASON } from "./data.js";
 
 export { getClient };
 
@@ -68,14 +68,35 @@ async function runMutation(mutationFn) {
 // cerrada no se muestra en ningún lado hoy (ni Roster ni el perfil tienen
 // selector de temporada), se queda solo como historial en data.js.
 // Valores: true (pagó), false (pendiente) o "saldo" (abonó, le falta).
+// En data.js también puede venir una cantidad (ej. 500): aquí se traduce
+// a uno de esos tres para que nadie más tenga que saber de montos.
+function duesStatus(v) {
+  if (typeof v !== "number") return v ?? true;
+  return v >= DUES_FEE ? true : v > 0 ? "saldo" : false;
+}
+
+// Cuánto lleva pagado: true = DUES_FEE, false = 0, número = ese número,
+// "saldo" sin cantidad = null (no se sabe).
+function duesAmount(v) {
+  if (typeof v === "number") return v;
+  if (v === "saldo") return null;
+  return (v ?? true) ? DUES_FEE : 0;
+}
+
 export async function getDuesMap() {
   const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
-  return new Map(PLAYERS.map((p) => [p.id, seasonDues[p.id] ?? true]));
+  return new Map(PLAYERS.map((p) => [p.id, duesStatus(seasonDues[p.id])]));
 }
 
 export async function getDuesForPlayer(playerId) {
   const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
-  return seasonDues[playerId] ?? true;
+  return duesStatus(seasonDues[playerId]);
+}
+
+// Solo para Admin → Estado de pago: id -> { status, amount }.
+export function getDuesDetail(playerIds) {
+  const seasonDues = DUES_PAID[CURRENT_SEASON] ?? {};
+  return new Map(playerIds.map((id) => [id, { status: duesStatus(seasonDues[id]), amount: duesAmount(seasonDues[id]) }]));
 }
 
 // ---- RSVP a un juego programado (game_rsvps) ----
