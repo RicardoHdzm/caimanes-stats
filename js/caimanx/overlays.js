@@ -11,11 +11,10 @@ const W = 1920;
 const H = 1080;
 const FONT = '"Saira", "Arial Narrow", sans-serif';
 const RED = "#d31545";
-const RED_DARK = "#8a0d2c";
 const PANEL = "rgba(10, 14, 24, 0.9)";
-const LOGO_SRC = "assets/logos/caimanx.png?v=2";
-// Parte con tinta del logo (el PNG cuadrado trae margen): x 6–94 %, y 11–89 %.
-const LOGO_CROP = { x: 0.06, y: 0.113, w: 0.88, h: 0.774 };
+const LOGO_SRC = "assets/logos/caimanx.png?v=3";
+// Parte del PNG que se usa (el escudo actual no trae margen: todo).
+const LOGO_CROP = { x: 0, y: 0, w: 1, h: 1 };
 
 // ---- recursos ----
 
@@ -125,32 +124,20 @@ function frame(ctx, x, y, w, h, { thick = 6, corner = 34 } = {}) {
   }
 }
 
-// Placa con el logo a la izquierda (sobre rojo), el nombre y "CAIMAN X GAMING".
+// Placa con el logo a la izquierda (en su recuadro oscuro, con raya roja),
+// el nombre y "CAIMAN X GAMING".
 function namePlate(ctx, logo, x, y, w, h, tag) {
   panel(ctx, x, y, w, h);
   ctx.save();
   roundRect(ctx, x, y, w, h, 10);
   ctx.clip();
-  const grad = ctx.createLinearGradient(x, 0, x + h * 1.3, 0);
-  grad.addColorStop(0, RED);
-  grad.addColorStop(1, RED_DARK);
-  ctx.fillStyle = grad;
-  slant(ctx, x - 20, y, h * 1.3 + 20, h, 0);
-  ctx.fill();
+  // El escudo es rojo y blanco: va sobre oscuro para que se lea completo.
+  ctx.fillStyle = "#06080f";
+  ctx.fillRect(x, y, h * 1.3, h);
+  ctx.fillStyle = RED;
+  ctx.fillRect(x + h * 1.3 - 4, y, 4, h);
   ctx.restore();
-  // Logo en blanco sobre el rojo: se pinta en una capa aparte y se tiñe.
-  if (logo) {
-    const lh = h * 0.62;
-    const layer = document.createElement("canvas");
-    layer.width = Math.ceil(lh * 1.2);
-    layer.height = Math.ceil(lh);
-    const lctx = layer.getContext("2d");
-    drawLogo(lctx, logo, layer.width / 2, layer.height / 2, lh);
-    lctx.globalCompositeOperation = "source-in";
-    lctx.fillStyle = "#fff";
-    lctx.fillRect(0, 0, layer.width, layer.height);
-    ctx.drawImage(layer, x + (h * 1.3 - layer.width) / 2, y + (h - layer.height) / 2);
-  }
+  drawLogo(ctx, logo, x + (h * 1.3) / 2, y + h / 2 + 1, h * 0.7);
   const tx = x + h * 1.3 + 18;
   const maxW = w - h * 1.3 - 34;
   if (h >= 70) {

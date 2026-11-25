@@ -78,7 +78,7 @@ function renderHome(container) {
         <img class="home-hero-video" src="assets/gaming.jpeg" alt="" aria-hidden="true" />
         <div class="home-hero-bg" aria-hidden="true"></div>
         <div class="home-hero-content">
-          <img src="assets/logos/caimanx.png?v=2" alt="" class="home-hero-logo cx-hero-logo" />
+          <img src="assets/logos/caimanx.png?v=3" alt="" class="home-hero-logo cx-hero-logo" />
           <h1 class="home-hero-name">Caiman X</h1>
           <p class="home-hero-tag">Gaming</p>
           <p class="home-hero-league">Caimanes.Team · Culiacán</p>
@@ -144,7 +144,7 @@ function renderOverlaysPage(container, focus) {
 function renderNotFound(container) {
   container.innerHTML = `
     <div class="not-found">
-      <img src="assets/logos/caimanx.png?v=2" alt="" class="not-found-logo cx-notfound-logo" />
+      <img src="assets/logos/caimanx.png?v=3" alt="" class="not-found-logo cx-notfound-logo" />
       <h2 class="page-title">Game over</h2>
       <p>Esta página no existe (o ya no).</p>
       <a href="#/" class="home-btn home-btn--solid">Volver al inicio</a>
