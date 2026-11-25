@@ -4,8 +4,8 @@
 // encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
 // (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y Gaming
 // (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
-// rotando solo entre los cuatro; la barrita roja junto al número del activo
-// se va llenando y, al llenarse, pasa al siguiente.
+// rotando solo entre los cuatro; la línea roja debajo del nombre activo se
+// va llenando y, al llenarse, pasa al siguiente.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
 // .is-sport-picker mientras esta pantalla está abierta.
 import { fcLogoHtml } from "../fc/ui.js";
@@ -63,7 +63,8 @@ const ROTATE_MS = 5000;
 function rowHtml(s, i) {
   const num = String(i + 1).padStart(2, "0");
   const inner = `
-      <span class="sp-row-num">${num}<span class="sp-row-bar"></span></span>
+      <span class="sp-row-num">${num}</span>
+      <span class="sp-row-bar" aria-hidden="true"></span>
       <span class="sp-row-name">
         <span class="sp-name-sport">${s.name}</span>
         <span class="sp-name-team"><span>${s.teamLines[0]}</span><span>${s.teamLines[1]}</span></span>

@@ -10655,6 +10655,7 @@ body.is-sport-picker main {
 }
 
 .sp-row {
+  position: relative;
   display: grid;
   grid-template-columns: 3em auto auto;
   justify-content: start;
@@ -10702,10 +10703,6 @@ body.is-sport-picker main {
 
 .sp-row-num {
   align-self: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
   margin-top: 1.1em;
   font-size: 0.8rem;
   font-weight: 700;
@@ -10714,17 +10711,27 @@ body.is-sport-picker main {
   transition: color 0.3s;
 }
 
-/* Barrita de la rotación: solo se ve en el activo y se llena en
-   --sp-rotate (js/views/sports.js); al terminar, pasa al siguiente. Con el
-   mouse en la lista se congela (.is-paused). */
+/* Línea de la rotación: debajo del nombre del activo, del ancho del
+   nombre (larga a propósito: en una barrita corta el avance se veía a
+   brincos de pixel en pixel). Se llena en --sp-rotate
+   (js/views/sports.js); al terminar, pasa al siguiente. Con el mouse en la
+   lista se congela (.is-paused). Va "absolute" sobre la columna del nombre
+   de la cuadrícula del renglón, así no mueve nada. */
 .sp-row-bar {
-  position: relative;
-  width: 1.9em;
+  position: absolute;
+  /* inicio y fin explícitos: en "absolute", un fin "auto" se iría hasta la
+     orilla del renglón */
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  left: 0;
+  right: 0;
+  bottom: -6px;
   height: 2px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none;
 }
 
 .sp-row-bar::after {
@@ -10734,6 +10741,7 @@ body.is-sport-picker main {
   background: var(--sp-red);
   transform: scaleX(0);
   transform-origin: left;
+  will-change: transform;
 }
 
 .sp-row.is-active .sp-row-bar {
@@ -10991,6 +10999,14 @@ a.sp-row:hover .sp-row-cta i {
 
   .sp-row:last-child {
     border-bottom: none;
+  }
+
+  /* Aquí la línea va sobre el divisor de abajo del renglón. */
+  .sp-row-bar {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    bottom: -1px;
+    background: transparent;
   }
 
   .sp-row-num {
