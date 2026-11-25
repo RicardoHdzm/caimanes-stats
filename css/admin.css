@@ -389,6 +389,11 @@
   color: var(--muted);
 }
 
+.dues-admin-share {
+  display: flex;
+  margin-top: 10px;
+}
+
 /* ---- Temporadas por jugador (admin.html, solo cuenta del coach) ---- */
 
 .seasons-admin-list {

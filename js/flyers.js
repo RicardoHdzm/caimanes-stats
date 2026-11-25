@@ -999,6 +999,87 @@ export async function powerRankingFlyer(data, format = "post", color) {
   return canvas;
 }
 
+// ---- Estado de pago (Admin, ver js/admin-dues.js) ----
+
+const DUES_COLORS = { paid: "#3fb56f" };
+const duesMoney = (n) => (n < 0 ? `−$${(-n).toLocaleString("es-MX")}` : `$${n.toLocaleString("es-MX")}`);
+
+// `data`: { dateLabel, total, leagueFee, played, gamesInSeason, left, rows: [{ name,
+// status (true | false | "saldo"), amount (número o null) }] } — los
+// totales arriba y, abajo, cada jugador en dos columnas (de arriba hacia
+// abajo) con su cantidad, del color de su estado.
+export async function duesFlyer(data, format = "post", color) {
+  const { canvas, ctx, story, CH, logo, sponsors } = await newFlyer(format, color);
+  drawHeader(ctx, logo, story, { title: seasonTitle(), sub: data.dateLabel, league: seasonLeague() });
+
+  bigTitle(ctx, "ESTADO DE PAGO", 318, 124);
+
+  statTiles(
+    ctx,
+    "",
+    [
+      { value: duesMoney(data.total), label: "RECAUDADO" },
+      { value: duesMoney(data.leagueFee), label: "INSCRIPCIÓN LIGA" },
+      { value: `${data.played} DE ${data.gamesInSeason}`, label: "JUEGOS PAGADOS" },
+      { value: duesMoney(data.left), label: "RESTANTE" },
+    ],
+    352,
+    4
+  );
+
+  const statusColor = (r) => (r.status === "saldo" ? P.gold : r.status ? DUES_COLORS.paid : P.accentText);
+  const left = 90;
+  const gap = 22;
+  const cols = 2;
+  const tw = (W - left * 2 - gap) / cols;
+  const perCol = Math.ceil(data.rows.length / cols);
+  const top = 494;
+  const bottom = 1062;
+  const rowGap = 6;
+  const rowH = Math.min(52, (bottom - top - rowGap * (perCol - 1)) / perCol);
+  data.rows.forEach((r, i) => {
+    const x = left + Math.floor(i / perCol) * (tw + gap);
+    const y = top + (i % perCol) * (rowH + rowGap);
+    const mid = y + rowH / 2;
+    const c = statusColor(r);
+    roundRect(ctx, x, y, tw, rowH, 10);
+    ctx.fillStyle = P.tint(0.07);
+    ctx.fill();
+    ctx.save();
+    roundRect(ctx, x, y, tw, rowH, 10);
+    ctx.clip();
+    ctx.fillStyle = c;
+    ctx.fillRect(x, y, 6, rowH);
+    ctx.restore();
+    const value = r.amount === null ? "ABONANDO" : duesMoney(r.amount);
+    text(ctx, value, x + tw - 18, mid + 10, { size: 28, italic: true, color: c, align: "right", maxWidth: 130 });
+    text(ctx, (r.name ?? "").toUpperCase(), x + 24, mid + 10, { size: 28, weight: 600, align: "left", maxWidth: tw - 24 - 150 });
+  });
+
+  // Leyenda de colores, centrada debajo de la lista.
+  const legend = [
+    { c: DUES_COLORS.paid, t: "PAGADO" },
+    { c: P.gold, t: "ABONANDO" },
+    { c: P.accentText, t: "PENDIENTE" },
+  ];
+  ctx.font = font(24, { weight: 600 });
+  const itemW = legend.map((l) => 24 + ctx.measureText(l.t).width);
+  const legendGap = 36;
+  let lx = (W - (itemW.reduce((a, b) => a + b, 0) + legendGap * (legend.length - 1))) / 2;
+  const ly = 1108;
+  legend.forEach((l, i) => {
+    ctx.fillStyle = l.c;
+    ctx.beginPath();
+    ctx.arc(lx + 7, ly - 8, 7, 0, Math.PI * 2);
+    ctx.fill();
+    text(ctx, l.t, lx + 24, ly, { size: 24, weight: 600, color: P.muted, align: "left", maxWidth: 400 });
+    lx += itemW[i] + legendGap;
+  });
+
+  drawFooter(ctx, sponsors, CH);
+  return canvas;
+}
+
 // ---- Wallpaper de jersey (pestaña Fanzone, ver js/views/fanzone.js) ----
 //
 // Diseño de Ricardo: fondo con trama de piel de caimán, apellido (sin acentos) y
