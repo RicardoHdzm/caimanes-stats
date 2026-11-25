@@ -126,6 +126,10 @@ export const DUES_FEE = 548;
 export const GAME_COST = 650;
 export const LEAGUE_FEE = 5000;
 
+// Cuenta para depositar la inscripción — sale en la imagen de Estado de pago
+// (Admin) y en el texto que se manda junto con ella al compartir.
+export const PAYMENT_ACCOUNT = { bank: "BBVA", name: "JOSE RICARDO HERNANDEZ MEZA", clabe: "012730015765340691" };
+
 export const DUES_PAID = {
   8: {},
   // Todos pendientes al arrancar la temporada — al pagar, borra su línea

@@ -1011,7 +1011,7 @@ export async function powerRankingFlyer(data, format = "post", color) {
 const DUES_COLORS = { paid: "#3fb56f" };
 const duesMoney = (n) => (n < 0 ? `−$${(-n).toLocaleString("es-MX")}` : `$${n.toLocaleString("es-MX")}`);
 
-// `data`: { dateLabel, total, leagueFee, duesFee, gameCost, played, gamesInSeason, left, rows: [{ name,
+// `data`: { dateLabel, total, leagueFee, duesFee, gameCost, played, gamesInSeason, left, account ({ bank, name, clabe }), rows: [{ name,
 // status (true | false | "saldo"), amount (número o null) }] } — los
 // totales arriba y, abajo, cada jugador en dos columnas (de arriba hacia
 // abajo) con su cantidad, del color de su estado.
@@ -1019,7 +1019,7 @@ export async function duesFlyer(data, format = "post", color) {
   const { canvas, ctx, story, CH, logo, sponsors } = await newFlyer(format, color);
   drawHeader(ctx, logo, story, { title: seasonTitle(), sub: data.dateLabel, league: seasonLeague() });
 
-  bigTitle(ctx, "ESTADO DE PAGO", 318, 124);
+  bigTitle(ctx, "ESTADO DE PAGO", 296, 108);
 
   statTiles(
     ctx,
@@ -1030,13 +1030,13 @@ export async function duesFlyer(data, format = "post", color) {
       { value: `${data.played} DE ${data.gamesInSeason}`, label: "JUEGOS PAGADOS" },
       { value: duesMoney(data.left), label: "RESTANTE" },
     ],
-    352,
+    322,
     4
   );
 
   // Las dos cuotas, para que se entiendan las cuentas.
-  text(ctx, `INSCRIPCIÓN POR JUGADOR: ${duesMoney(data.duesFee)}  ·  COSTO POR JUEGO: ${duesMoney(data.gameCost)}`, W / 2, 506, {
-    size: 30,
+  text(ctx, `INSCRIPCIÓN POR JUGADOR: ${duesMoney(data.duesFee)}  ·  COSTO POR JUEGO: ${duesMoney(data.gameCost)}`, W / 2, 468, {
+    size: 28,
     color: P.accentText,
   });
 
@@ -1046,9 +1046,9 @@ export async function duesFlyer(data, format = "post", color) {
   const cols = 2;
   const tw = (W - left * 2 - gap) / cols;
   const perCol = Math.ceil(data.rows.length / cols);
-  const top = 532;
-  const bottom = 1066;
-  const rowGap = 6;
+  const top = 490;
+  const bottom = 942;
+  const rowGap = 5;
   const rowH = Math.min(52, (bottom - top - rowGap * (perCol - 1)) / perCol);
   data.rows.forEach((r, i) => {
     const x = left + Math.floor(i / perCol) * (tw + gap);
@@ -1065,8 +1065,8 @@ export async function duesFlyer(data, format = "post", color) {
     ctx.fillRect(x, y, 6, rowH);
     ctx.restore();
     const value = r.amount === null ? "ABONANDO" : duesMoney(r.amount);
-    text(ctx, value, x + tw - 18, mid + 10, { size: 28, italic: true, color: c, align: "right", maxWidth: 130 });
-    text(ctx, (r.name ?? "").toUpperCase(), x + 24, mid + 10, { size: 28, weight: 600, align: "left", maxWidth: tw - 24 - 150 });
+    text(ctx, value, x + tw - 18, mid + 9, { size: 26, italic: true, color: c, align: "right", maxWidth: 130 });
+    text(ctx, (r.name ?? "").toUpperCase(), x + 24, mid + 9, { size: 26, weight: 600, align: "left", maxWidth: tw - 24 - 150 });
   });
 
   // Leyenda de colores, centrada debajo de la lista.
@@ -1075,19 +1075,36 @@ export async function duesFlyer(data, format = "post", color) {
     { c: P.gold, t: "ABONANDO" },
     { c: P.accentText, t: "PENDIENTE" },
   ];
-  ctx.font = font(24, { weight: 600 });
+  ctx.font = font(22, { weight: 600 });
   const itemW = legend.map((l) => 24 + ctx.measureText(l.t).width);
   const legendGap = 36;
   let lx = (W - (itemW.reduce((a, b) => a + b, 0) + legendGap * (legend.length - 1))) / 2;
-  const ly = 1108;
+  const ly = 976;
   legend.forEach((l, i) => {
     ctx.fillStyle = l.c;
     ctx.beginPath();
     ctx.arc(lx + 7, ly - 8, 7, 0, Math.PI * 2);
     ctx.fill();
-    text(ctx, l.t, lx + 24, ly, { size: 24, weight: 600, color: P.muted, align: "left", maxWidth: 400 });
+    text(ctx, l.t, lx + 24, ly, { size: 22, weight: 600, color: P.muted, align: "left", maxWidth: 400 });
     lx += itemW[i] + legendGap;
   });
+
+  // Cuenta para depositar.
+  if (data.account) {
+    const a = data.account;
+    const bx = 90;
+    const by = 996;
+    const bw = W - 180;
+    const bh = 106;
+    roundRect(ctx, bx, by, bw, bh, 16);
+    ctx.fillStyle = P.tint(0.07);
+    ctx.fill();
+    ctx.strokeStyle = rgba(P.accent, 0.8);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    text(ctx, `DEPÓSITOS: ${a.bank} · ${a.name}`, W / 2, by + 40, { size: 28, weight: 600, maxWidth: bw - 40 });
+    text(ctx, `CLABE ${a.clabe}`, W / 2, by + 88, { size: 40, italic: true, color: P.accentText, maxWidth: bw - 40 });
+  }
 
   drawFooter(ctx, sponsors, CH);
   return canvas;

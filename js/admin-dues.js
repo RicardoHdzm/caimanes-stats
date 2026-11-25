@@ -3,7 +3,7 @@
 // candado de UI, no de seguridad real: admin.js nunca escribe en Supabase
 // (solo genera texto para pegar a mano en data.js) — y el estado de pago
 // (ver abajo) tampoco escribe nada, ya no depende de Supabase en absoluto.
-import { ROSTER, DUES_FEE, GAME_COST, LEAGUE_FEE, TEAM, CURRENT_SEASON } from "./data.js";
+import { ROSTER, DUES_FEE, GAME_COST, LEAGUE_FEE, PAYMENT_ACCOUNT, TEAM, CURRENT_SEASON } from "./data.js";
 import { initAuth, mountAuthControl, isCoach } from "./auth.js";
 import { getDuesDetail } from "./db.js";
 import { currentSeasonGames } from "./stats.js";
@@ -89,11 +89,13 @@ function openDuesFlyer() {
     (a, b) => STATUS_ORDER(a.status) - STATUS_ORDER(b.status) || a.name.localeCompare(b.name, "es")
   );
   const today = new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long" }).toUpperCase();
-  const data = { dateLabel: `CORTE AL ${today}`, total, leagueFee: LEAGUE_FEE, duesFee: DUES_FEE, gameCost: GAME_COST, played, gamesInSeason: TEAM.gamesInSeason, left, rows };
+  const data = { dateLabel: `CORTE AL ${today}`, total, leagueFee: LEAGUE_FEE, duesFee: DUES_FEE, gameCost: GAME_COST, played, gamesInSeason: TEAM.gamesInSeason, left, rows, account: PAYMENT_ACCOUNT };
+  // La cuenta también va en el texto, para que la puedan copiar.
+  const a = PAYMENT_ACCOUNT;
   openFlyer(
     (format, color) => duesFlyer(data, format, color),
     "estado-de-pago",
-    `Estado de pago · ${ordinalTemporada(CURRENT_SEASON)} Temporada`
+    `Estado de pago · ${ordinalTemporada(CURRENT_SEASON)} Temporada\n\n${a.bank}\nNombre: ${a.name}\nCuenta CLABE: ${a.clabe}`
   );
 }
 
