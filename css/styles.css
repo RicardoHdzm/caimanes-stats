@@ -10593,11 +10593,8 @@ body.is-sport-picker main {
 }
 
 /* Gaming (clase "esports" por dentro): assets/gaming.jpeg, tal cual. */
-/* La captura del juego es muy colorida: más oscura y apagada, para que
-   el rojo del logo de Caiman X resalte. */
 .sp-media--esports {
   background: url("../assets/gaming.jpeg") 55% 50% / cover no-repeat;
-  filter: saturate(0.4) brightness(0.6);
 }
 
 /* ---- Barra de arriba: organización y redes ---- */
@@ -10933,8 +10930,6 @@ body.is-sport-picker main {
    para que pesen igual. */
 .sp-stage .sp-logo--esports {
   width: clamp(180px, 21.5vw, 340px);
-  /* Sin contorno como los otros: una sombra más marcada lo despega del fondo. */
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.75)) drop-shadow(0 24px 48px rgba(0, 0, 0, 0.9));
 }
 
 /* Pantallas medianas: más espacio para la lista que para el logo. */
