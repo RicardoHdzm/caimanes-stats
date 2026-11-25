@@ -1,326 +1,41 @@
-/* Sitio de Caiman X (caimanx.html). Siempre oscuro; mismos colores y letra
-   (Saira) que la portada de Caimanes.Team. */
-@font-face {
-  font-family: "Saira";
-  font-style: normal;
-  font-weight: 500 800;
-  font-display: swap;
-  src: url("../assets/fonts/saira-latin.woff2") format("woff2");
+/* Caiman X (caimanx.html): lo propio del sitio de gaming. Todo lo demás
+   (header, menú ☰, hero, secciones, footer, temas) sale de css/styles.css,
+   igual que el sóftbol y Caimanes FC; aquí solo se usan sus variables
+   (--bg, --surface, --border, --text, --muted, --accent...), así que
+   funciona en Sol, Eclipse y Luna. */
+
+/* ---- Logo de Caiman X (cuadrado, con margen en el PNG) ---- */
+.cx-site .site-brand .cx-brand-logo {
+  height: 46px;
 }
 
-:root {
-  --cx-bg: #0a0e18;
-  --cx-surface: #121828;
-  --cx-border: rgba(255, 255, 255, 0.12);
-  --cx-text: #f2f3f4;
-  --cx-muted: #8d96a0;
-  --cx-red: #d31545;
-  --cx-red-text: #e8375c;
-  --cx-gutter: clamp(16px, 5vw, 80px);
-  color-scheme: dark;
+.cx-footer-logo {
+  object-fit: contain;
 }
 
-* {
-  box-sizing: border-box;
+.home-hero--cx .cx-hero-logo {
+  width: clamp(180px, 24vw, 270px);
 }
 
-body {
-  margin: 0;
-  background: var(--cx-bg);
-  color: var(--cx-text);
-  font-family: "Saira", "Arial Narrow", system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+/* Hero: la imagen de gaming con un velo un poco más ligero que el del
+   video del sóftbol, como en Caimanes FC. */
+.home-hero--cx .home-hero-bg {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg) 78%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 72%, transparent) 50%,
+    var(--bg) 100%
+  );
 }
 
-a {
-  color: inherit;
-}
-
-/* ---- Barra de arriba ---- */
-.cx-top {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: clamp(16px, 3vh, 32px) var(--cx-gutter);
-}
-
-.cx-org {
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
-.cx-social {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  font-size: 16px;
-  text-decoration: none;
-  transition: background 0.25s, border-color 0.25s;
-}
-
-.cx-social i {
-  display: block;
-  width: 1em;
-  height: 1em;
-  line-height: 1;
-  text-align: center;
-}
-
-.cx-social:hover,
-.cx-social:focus-visible {
-  border-color: var(--cx-red);
-  background: var(--cx-red);
-}
-
-/* ---- Portada ---- */
-.cx-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  min-height: 62vh;
-  padding: 110px var(--cx-gutter) 56px;
-  text-align: center;
-  background:
-    linear-gradient(180deg, rgba(10, 14, 24, 0.82), rgba(10, 14, 24, 0.7) 50%, var(--cx-bg)),
-    url("../assets/gaming.jpeg") 55% 50% / cover no-repeat;
-}
-
-.cx-hero-logo {
-  width: clamp(160px, 22vw, 280px);
+.cx-notfound-logo {
+  width: 140px;
   height: auto;
-  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
 }
 
-.cx-hero-title {
-  margin: 0;
-  font-size: clamp(2.4rem, 7vw, 4.6rem);
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.cx-hero-title span,
-.cx-section-title span {
-  color: var(--cx-red-text);
-}
-
-/* ---- Secciones ---- */
-.cx-main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--cx-gutter) 64px;
-}
-
-.cx-section-title {
-  margin: 0 0 20px;
-  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.cx-fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.cx-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.cx-field span {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--cx-muted);
-}
-
-.cx-field input {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1px solid var(--cx-border);
-  border-radius: 10px;
-  background: var(--cx-surface);
-  color: var(--cx-text);
-  font: 600 1rem "Saira", system-ui, sans-serif;
-}
-
-.cx-field input:focus {
-  outline: none;
-  border-color: var(--cx-red);
-}
-
-/* ---- Tarjetas de overlay ---- */
-.cx-overlays {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
-  gap: 16px;
-}
-
-.cx-overlay {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--cx-border);
-  border-radius: 14px;
-  background: var(--cx-surface);
-}
-
-/* Vista previa: cuadros grises = partes transparentes del PNG. */
-.cx-overlay-preview {
-  aspect-ratio: 16 / 9;
-  background:
-    repeating-conic-gradient(#1b2133 0% 25%, #151a29 0% 50%) 0 0 / 24px 24px;
-}
-
-.cx-overlay-preview canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.cx-overlay-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
-}
-
-.cx-overlay-name {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.cx-overlay-desc {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--cx-muted);
-}
-
-.cx-download {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
-  border-radius: 999px;
-  background: var(--cx-red);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: filter 0.2s;
-}
-
-.cx-download:hover,
-.cx-download:focus-visible {
-  filter: brightness(1.15);
-}
-
-/* ---- Cómo usarlo ---- */
-.cx-howto {
-  margin-top: 24px;
-  padding: 18px 20px;
-  border: 1px solid var(--cx-border);
-  border-radius: 14px;
-  background: var(--cx-surface);
-}
-
-.cx-howto h3 {
-  margin: 0 0 10px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.cx-howto ol {
-  margin: 0;
-  padding-left: 1.3em;
-  line-height: 1.6;
-  color: #cfd3d8;
-}
-
-.cx-footer {
-  padding: 24px var(--cx-gutter) 40px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--cx-muted);
-}
-
-/* ---- Navegación de la portada ---- */
-.cx-nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.cx-nav a {
-  padding: 7px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.25s, border-color 0.25s;
-}
-
-.cx-nav a:hover,
-.cx-nav a:focus-visible {
-  border-color: var(--cx-red);
-  background: var(--cx-red);
-}
-
-.cx-socials {
+.cx-footer-socials {
   display: flex;
   gap: 8px;
-}
-
-.cx-section {
-  margin-bottom: 56px;
-  scroll-margin-top: 24px;
-}
-
-.cx-subtitle {
-  margin: 28px 0 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--cx-muted);
-}
-
-.cx-empty {
-  margin: 0;
-  padding: 18px 20px;
-  border: 1px dashed var(--cx-border);
-  border-radius: 14px;
-  color: var(--cx-muted);
 }
 
 /* ---- Jugadores ---- */
@@ -334,9 +49,9 @@ a {
   position: relative;
   overflow: hidden;
   padding: 18px;
-  border: 1px solid var(--cx-border);
-  border-radius: 14px;
-  background: var(--cx-surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
 .cx-player::before {
@@ -344,23 +59,24 @@ a {
   position: absolute;
   inset: 0 0 auto;
   height: 4px;
-  background: var(--cx-red);
+  background: var(--accent);
 }
 
 .cx-player-tag {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
   font-style: italic;
-  line-height: 1.1;
+  line-height: 1.05;
   text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 
 .cx-player-name {
   margin: 2px 0 0;
-  font-size: 0.9rem;
-  color: var(--cx-muted);
+  font-size: var(--text-md);
+  color: var(--muted);
 }
 
 .cx-chips {
@@ -372,10 +88,10 @@ a {
 
 .cx-chip {
   padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(211, 21, 69, 0.16);
-  color: var(--cx-red-text);
-  font-size: 0.75rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-text);
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -384,7 +100,8 @@ a {
   align-items: center;
   gap: 6px;
   margin-top: 12px;
-  font-size: 0.85rem;
+  color: var(--text);
+  font-size: var(--text-md);
   font-weight: 700;
   text-decoration: none;
 }
@@ -403,34 +120,36 @@ a {
   gap: 18px;
   min-height: 130px;
   padding: 18px;
-  border: 1px solid var(--cx-border);
-  border-radius: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
   background:
-    linear-gradient(135deg, rgba(211, 21, 69, 0.18), transparent 60%),
-    var(--cx-surface);
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+    var(--surface);
+  color: var(--text);
   text-decoration: none;
   transition: border-color 0.25s, transform 0.25s;
 }
 
 .cx-game:hover,
 .cx-game:focus-visible {
-  border-color: var(--cx-red);
+  border-color: var(--accent);
   transform: translateY(-2px);
 }
 
 .cx-game-name {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .cx-game-link {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--cx-red-text);
+  color: var(--accent-text);
 }
 
 /* ---- Torneos ---- */
@@ -446,45 +165,44 @@ a {
   align-items: center;
   gap: 14px;
   padding: 14px 18px;
-  border: 1px solid var(--cx-border);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: var(--cx-surface);
+  background: var(--surface);
 }
 
 .cx-tournament-date {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--cx-muted);
+  color: var(--muted);
   text-transform: uppercase;
 }
 
 .cx-tournament-name {
   display: flex;
   flex-direction: column;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
 .cx-tournament-name small {
-  font-size: 0.75rem;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--cx-muted);
+  color: var(--muted);
   text-transform: none;
 }
 
 .cx-tournament-result {
   font-weight: 800;
-  color: var(--cx-red-text);
+  color: var(--accent-text);
   text-align: right;
 }
 
 .cx-tournament-result.is-pending {
-  color: var(--cx-muted);
+  color: var(--muted);
   font-weight: 600;
-}
-
-.cx-overlay {
-  scroll-margin-top: 24px;
 }
 
 @media (max-width: 560px) {
@@ -495,4 +213,147 @@ a {
   .cx-tournament-date {
     grid-column: 1 / -1;
   }
+}
+
+/* ---- Overlays (#/overlays) ---- */
+.cx-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cx-field span {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cx-field input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 1rem var(--font-body);
+}
+
+.cx-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.cx-subtitle {
+  margin: 28px 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cx-overlays {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+}
+
+.cx-overlay {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  scroll-margin-top: 90px;
+}
+
+/* Vista previa: cuadros = partes transparentes del PNG. Siempre oscura (el
+   overlay se diseñó para ir encima de un juego). */
+.cx-overlay-preview {
+  aspect-ratio: 16 / 9;
+  background: repeating-conic-gradient(#1b2133 0% 25%, #151a29 0% 50%) 0 0 / 24px 24px;
+}
+
+.cx-overlay-preview canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cx-overlay-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.cx-overlay-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.cx-overlay-desc {
+  margin: 2px 0 0;
+  font-size: var(--text-md);
+  color: var(--muted);
+}
+
+.cx-download {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: filter 0.2s;
+}
+
+.cx-download:hover,
+.cx-download:focus-visible {
+  filter: brightness(1.15);
+}
+
+.cx-howto {
+  margin-top: 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.cx-howto h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cx-howto ol {
+  margin: 0;
+  padding-left: 1.3em;
+  line-height: 1.6;
 }

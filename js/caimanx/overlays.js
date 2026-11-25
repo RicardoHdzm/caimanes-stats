@@ -1,4 +1,4 @@
-// Overlays de stream para OBS (caimanx.html). Cada uno se dibuja en un
+// Overlays de stream para OBS (caimanx.html#/overlays). Cada uno se dibuja en un
 // <canvas> de 1920×1080 con fondo transparente y se descarga como PNG: en OBS
 // va como fuente de Imagen encima del juego y la cámara. Los huecos
 // (cámara, juego) quedan transparentes; los recuadros vacíos (marcador,
@@ -368,25 +368,16 @@ const SCREENS = [
   { id: "fin", name: "Fin del stream", words: ["FIN DEL", "STREAM"] },
 ].map((s) => ({ ...s, draw: (ctx, { logo, tag, custom }) => screen(ctx, logo, tag, custom, s.words) }));
 
-// ---- página ----
+// ---- página (#/overlays, la pinta js/caimanx/main.js) ----
 
-const tagInput = document.getElementById("cx-tag");
-const rivalInput = document.getElementById("cx-rival");
-const groups = [
-  { el: document.getElementById("cx-overlays"), items: OVERLAYS, prefix: "caimanx-overlay-" },
-  { el: document.getElementById("cx-screens"), items: SCREENS, prefix: "caimanx-" },
-];
+export const OVERLAY_COUNT = OVERLAYS.length + SCREENS.length;
 
-function values() {
-  return {
-    tag: (tagInput.value.trim() || "CAIMAN X").toUpperCase(),
-    rival: rivalInput.value.trim().toUpperCase(),
-    custom: tagInput.value.trim() !== "",
-  };
-}
+// Lo escrito se recuerda mientras la página esté abierta (al ir a otra
+// sección y volver).
+const typed = { tag: "", rival: "" };
 
-for (const { el, items, prefix } of groups) {
-  el.innerHTML = items
+function cardsHtml(items, prefix) {
+  return items
     .map(
       (o) => `
     <article class="cx-overlay" id="overlay-${o.id}" data-id="${o.id}">
@@ -401,35 +392,77 @@ for (const { el, items, prefix } of groups) {
     </article>`
     )
     .join("");
-
-  // La descarga se arma al hacer clic, con lo que haya en el lienzo.
-  el.addEventListener("click", (e) => {
-    const link = e.target.closest(".cx-download");
-    if (!link) return;
-    const canvas = link.closest(".cx-overlay").querySelector("canvas");
-    link.href = canvas.toDataURL("image/png");
-  });
 }
 
-async function render() {
-  const { logo } = await loadAssets();
-  const v = values();
-  for (const { el, items } of groups) {
-    for (const o of items) {
-      const canvas = el.querySelector(`[data-id="${o.id}"] canvas`);
+export function renderOverlays(container) {
+  const root = document.createElement("div");
+  root.className = "cx-overlays-page";
+  root.innerHTML = `
+    <div class="cx-fields">
+      <label class="cx-field">
+        <span>Tu nombre o tag</span>
+        <input type="text" data-field="tag" maxlength="20" placeholder="CAIMAN X" autocomplete="off" />
+      </label>
+      <label class="cx-field">
+        <span>Rival (peleas)</span>
+        <input type="text" data-field="rival" maxlength="20" placeholder="Opcional" autocomplete="off" />
+      </label>
+    </div>
+
+    <h3 class="cx-subtitle">Durante el juego</h3>
+    <div class="cx-overlays">${cardsHtml(OVERLAYS, "caimanx-overlay-")}</div>
+
+    <h3 class="cx-subtitle">Pantallas</h3>
+    <div class="cx-overlays">${cardsHtml(SCREENS, "caimanx-")}</div>
+
+    <div class="cx-howto">
+      <h3>Cómo ponerlo en OBS</h3>
+      <ol>
+        <li>Descarga el PNG (1920×1080). Los de juego traen fondo transparente.</li>
+        <li>En OBS, en <b>Fuentes</b>, toca <b>+</b> → <b>Imagen</b> y elige el archivo.</li>
+        <li>Déjalo hasta arriba de la lista de fuentes, encima de la captura del juego y de la cámara.</li>
+        <li>Acomoda tu cámara dentro del marco rojo. En Pokémon, mete la captura del juego en el recuadro grande.</li>
+        <li>Para marcador, récord o tu equipo, agrega fuentes de <b>Texto</b> o <b>Imagen</b> encima de los recuadros vacíos.</li>
+        <li>Las pantallas (empezando, regreso, fin) van cada una en su propia escena.</li>
+      </ol>
+    </div>`;
+  container.appendChild(root);
+
+  const inputs = root.querySelectorAll("input[data-field]");
+  for (const input of inputs) input.value = typed[input.dataset.field];
+
+  async function draw() {
+    const { logo } = await loadAssets();
+    if (!root.isConnected) return;
+    const v = {
+      tag: (typed.tag.trim() || "CAIMAN X").toUpperCase(),
+      rival: typed.rival.trim().toUpperCase(),
+      custom: typed.tag.trim() !== "",
+    };
+    for (const o of [...OVERLAYS, ...SCREENS]) {
+      const canvas = root.querySelector(`[data-id="${o.id}"] canvas`);
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, W, H);
       o.draw(ctx, { logo, ...v });
     }
   }
-}
 
-let timer = 0;
-for (const input of [tagInput, rivalInput]) {
-  input.addEventListener("input", () => {
-    clearTimeout(timer);
-    timer = setTimeout(render, 150);
+  let timer = 0;
+  for (const input of inputs) {
+    input.addEventListener("input", () => {
+      typed[input.dataset.field] = input.value;
+      clearTimeout(timer);
+      timer = setTimeout(draw, 150);
+    });
+  }
+
+  // La descarga se arma al hacer clic, con lo que haya en el lienzo.
+  root.addEventListener("click", (e) => {
+    const link = e.target.closest(".cx-download");
+    if (!link) return;
+    const canvas = link.closest(".cx-overlay").querySelector("canvas");
+    link.href = canvas.toDataURL("image/png");
   });
-}
 
-render();
+  draw();
+}

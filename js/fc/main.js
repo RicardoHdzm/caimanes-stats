@@ -78,6 +78,10 @@ moreSheet.innerHTML = `
         <span class="more-app-icon"><i class="fa-solid fa-baseball-bat-ball"></i></span>
         <span>Sóftbol</span>
       </a>
+      <a href="caimanx.html">
+        <span class="more-app-icon"><i class="fa-solid fa-gamepad"></i></span>
+        <span>Caiman X</span>
+      </a>
       <a href="./#/">
         <span class="more-app-icon"><i class="fa-solid fa-shuffle"></i></span>
         <span>Cambiar deporte</span>
@@ -104,6 +108,7 @@ document.getElementById("footer-nav").innerHTML = `
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
       <a href="./#/softbol" data-sport-switch="softbol">Sóftbol · Caimanes de Villas</a>
+      <a href="caimanx.html">Gaming · Caiman X</a>
       <a href="./#/">Cambiar deporte</a>
     </div>`;
 document.getElementById("footer-year").textContent = new Date().getFullYear();

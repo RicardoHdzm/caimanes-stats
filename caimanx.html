@@ -2,7 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <!-- Mismo script que index.html y fc.html: aplica el tema guardado antes
+       del CSS. -->
+  <script>
+    var theme = "eclipse";
+    try {
+      var saved = localStorage.getItem("caimanes-theme");
+      if (saved === "dark" || saved === "light") theme = saved;
+    } catch (e) {}
+    if (theme !== "dark") document.documentElement.dataset.theme = theme;
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
   <title>Caiman X Gaming — Caimanes.Team</title>
   <meta name="description" content="Caiman X Gaming, el equipo de gaming de Caimanes.Team en Culiacán: jugadores, juegos, torneos y overlays para stream en OBS." />
   <meta name="theme-color" content="#0a0e18" />
@@ -16,83 +27,59 @@
   <meta property="og:image" content="https://caimanes.team/assets/thumbnail.png" />
   <link rel="icon" type="image/png" href="assets/icon-192.png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/caimanx.css" />
 </head>
-<body>
-  <!-- Sitio de Caiman X (gaming). Página aparte, siempre oscura, con su
-       propio CSS (css/caimanx.css) y JS (js/caimanx/: data.js con los
-       datos a mano, main.js las secciones, overlays.js los overlays). -->
-  <header class="cx-top">
-    <a href="./" class="cx-org">Caimanes.Team</a>
-    <span class="cx-socials" id="cx-socials"></span>
+<body class="cx-site">
+  <!-- Caiman X (gaming): mismo armado que index.html y fc.html (barra de
+       arriba, header delgado con las secciones en fila y menú ☰, footer);
+       lo llena js/caimanx/main.js con los datos de js/caimanx/data.js. -->
+  <div class="match-ticker" id="match-ticker" aria-label="Torneos"></div>
+  <header class="site-header">
+    <a href="#/" class="site-brand" aria-label="Caiman X — ir al inicio">
+      <img src="assets/logos/caimanx.png?v=2" alt="" class="site-brand-logo cx-brand-logo" />
+    </a>
+    <nav class="tabs site-nav" id="tabs" aria-label="Secciones"></nav>
+    <div class="site-header-actions">
+      <button type="button" id="theme-toggle" class="theme-switch" aria-label="Tema: Eclipse — clic para cambiar">
+        <span class="theme-switch-thumb"></span>
+        <i class="fa-solid fa-sun theme-switch-icon theme-switch-icon--sun"></i>
+        <i class="fa-solid fa-circle-half-stroke theme-switch-icon theme-switch-icon--eclipse"></i>
+        <i class="fa-solid fa-moon theme-switch-icon theme-switch-icon--moon"></i>
+      </button>
+      <!-- Solo en modo app (ver js/app-refresh.js). -->
+      <button type="button" class="menu-toggle app-refresh" id="app-refresh" aria-label="Actualizar" title="Actualizar" hidden>
+        <i class="fa-solid fa-rotate-right"></i>
+      </button>
+      <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
   </header>
 
-  <section class="cx-hero">
-    <img src="assets/logos/caimanx.png?v=2" alt="Caiman X" class="cx-hero-logo" />
-    <h1 class="cx-hero-title">Caiman X <span>Gaming</span></h1>
-    <nav class="cx-nav" aria-label="Secciones">
-      <a href="#jugadores">Jugadores</a>
-      <a href="#juegos">Juegos</a>
-      <a href="#torneos">Torneos</a>
-      <a href="#overlays">Overlays</a>
-    </nav>
-  </section>
+  <main id="app"></main>
 
-  <main class="cx-main">
-    <section class="cx-section" id="jugadores" aria-labelledby="jugadores-title">
-      <h2 class="cx-section-title" id="jugadores-title">El <span>equipo</span></h2>
-      <div id="cx-players"></div>
-    </section>
-
-    <section class="cx-section" id="juegos" aria-labelledby="juegos-title">
-      <h2 class="cx-section-title" id="juegos-title">Los <span>juegos</span></h2>
-      <div id="cx-games"></div>
-    </section>
-
-    <section class="cx-section" id="torneos" aria-labelledby="torneos-title">
-      <h2 class="cx-section-title" id="torneos-title">Los <span>torneos</span></h2>
-      <div id="cx-tournaments"></div>
-    </section>
-
-    <section class="cx-section" id="overlays" aria-labelledby="overlays-title">
-      <h2 class="cx-section-title" id="overlays-title">Overlays para <span>OBS</span></h2>
-
-      <div class="cx-fields">
-        <label class="cx-field">
-          <span>Tu nombre o tag</span>
-          <input type="text" id="cx-tag" maxlength="20" placeholder="CAIMAN X" autocomplete="off" />
-        </label>
-        <label class="cx-field">
-          <span>Rival (peleas)</span>
-          <input type="text" id="cx-rival" maxlength="20" placeholder="Opcional" autocomplete="off" />
-        </label>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <a href="#/" class="footer-logo" aria-label="Caiman X — ir al inicio">
+            <img src="assets/logos/caimanx.png?v=2" alt="" class="cx-footer-logo" />
+            <span class="footer-wordmark">Caiman X <span>Gaming</span></span>
+          </a>
+          <p class="footer-about">El equipo de gaming de Caimanes.Team. Jugadores, torneos y overlays para stream.</p>
+        </div>
+        <nav class="footer-nav" id="footer-nav" aria-label="Secciones del sitio"></nav>
       </div>
-
-      <h3 class="cx-subtitle">Durante el juego</h3>
-      <div class="cx-overlays" id="cx-overlays"></div>
-
-      <h3 class="cx-subtitle">Pantallas</h3>
-      <div class="cx-overlays" id="cx-screens"></div>
-
-      <div class="cx-howto">
-        <h3>Cómo ponerlo en OBS</h3>
-        <ol>
-          <li>Descarga el PNG (1920×1080). Los de juego traen fondo transparente.</li>
-          <li>En OBS, en <b>Fuentes</b>, toca <b>+</b> → <b>Imagen</b> y elige el archivo.</li>
-          <li>Déjalo hasta arriba de la lista de fuentes, encima de la captura del juego y de la cámara.</li>
-          <li>Acomoda tu cámara dentro del marco rojo. En Pokémon, mete la captura del juego en el recuadro grande.</li>
-          <li>Para marcador, récord o tu equipo, agrega fuentes de <b>Texto</b> o <b>Imagen</b> encima de los recuadros vacíos.</li>
-          <li>Las pantallas (empezando, regreso, fin) van cada una en su propia escena.</li>
-        </ol>
+      <div class="footer-bottom">
+        <span class="cx-footer-socials" id="footer-socials"></span>
+        <p class="footer-legal">Caiman X © <span id="footer-year"></span> · Diseñado por JRHM.STUDIO</p>
       </div>
-    </section>
-  </main>
-
-  <footer class="cx-footer">
-    <a href="./">Caimanes.Team</a> · Culiacán
+    </div>
   </footer>
 
+  <div id="more-sheet" class="more-sheet" hidden></div>
+
   <script type="module" src="js/caimanx/main.js"></script>
-  <script type="module" src="js/caimanx/overlays.js"></script>
 </body>
 </html>
