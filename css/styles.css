@@ -39,6 +39,17 @@
   src: url("../assets/fonts/teko-600.woff2") format("woff2");
 }
 
+/* Saira (Google Fonts, licencia OFL), guardada aquí como las demás. Es la
+   fuente de la portada (#/, .sport-picker). Fuente variable: un solo archivo
+   cubre del peso 500 al 800. Solo el subconjunto latino, ~33 KB. */
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("../assets/fonts/saira-latin.woff2") format("woff2");
+}
+
 :root {
   /* Ancho máximo del cuerpo del sitio (main y el contenido del footer). */
   --content-max: 1280px;
@@ -10522,6 +10533,9 @@ body.is-sport-picker main {
   --sp-red: #e8375c;
   --sp-bg: #0a0e18;
   --sp-gutter: clamp(20px, 5vw, 80px);
+  /* Toda la portada va en Saira (ver @font-face arriba). */
+  --font-display: "Saira", "Arial Narrow", system-ui, sans-serif;
+  font-family: var(--font-display);
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
@@ -10654,6 +10668,8 @@ body.is-sport-picker main {
   grid-template-columns: 3em auto auto;
   justify-content: start;
   align-items: center;
+  /* aire entre un deporte y otro */
+  padding: clamp(4px, 1.1vh, 12px) 0;
   color: #fff;
   text-decoration: none;
   cursor: pointer;
@@ -10705,9 +10721,10 @@ body.is-sport-picker main {
 
 .sp-row-name {
   font-family: var(--font-display);
-  font-size: clamp(3rem, min(12vh, 7.2vw), 8.5rem);
-  font-weight: 700;
-  line-height: 0.92;
+  font-size: clamp(2.6rem, min(9.5vh, 5.6vw), 6.8rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
   color: transparent;
   -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.45);
