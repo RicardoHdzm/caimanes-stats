@@ -1,6 +1,6 @@
 // Portada del sitio (#/): pantalla dividida para elegir deporte — Softbol
 // (Caimanes de Villas, este mismo sitio en #/softbol), Fútbol (Caimanes FC,
-// fc.html), Pádel (Caimanes Padel Squad) y eSports (CaimanX) — estos dos
+// fc.html), Pádel (Caimanes Padel Squad) y eSports (Caiman X) — estos dos
 // todavía "Próximamente": no son link. El video ligero de pádel
 // (assets/hero-padel.mp4) queda listo para cuando tenga página.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
@@ -50,7 +50,7 @@ export function renderSportPicker(container) {
         <span class="sport-panel-content">
           <img src="assets/logos/caimanx.png" alt="" class="sport-panel-logo sport-panel-logo--esports" />
           <span class="sport-panel-sport">eSports</span>
-          <span class="sport-panel-team">CaimanX</span>
+          <span class="sport-panel-team">Caiman X</span>
           <span class="sport-panel-cta sport-panel-cta--soon">Próximamente</span>
         </span>
       </div>

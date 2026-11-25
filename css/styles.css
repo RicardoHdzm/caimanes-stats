@@ -10777,7 +10777,7 @@ a.sport-panel:focus-visible .sport-panel-cta {
 
   .sport-panel-content {
     gap: 4px;
-    padding: 18px 16px;
+    padding: 16px 8px;
   }
 
   .sport-picker {
@@ -10794,8 +10794,8 @@ a.sport-panel:focus-visible .sport-panel-cta {
 
   .sport-panel-cta {
     margin-top: 6px;
-    padding: 8px 20px;
-    font-size: 0.85rem;
+    padding: 8px 14px;
+    font-size: 0.78rem;
   }
 }
 
