@@ -2,8 +2,8 @@
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
 // cambia el fondo a su foto y a la derecha sale su logo. Con el mouse
 // encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
-// (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y Gaming
-// (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
+// (Caimanes FC, fc.html) y Gaming (Caiman X, caimanx.html) son link; Pádel
+// (Caimanes Padel Squad) todavía no. Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro; la línea roja debajo del nombre activo se
 // va llenando y, al llenarse, pasa al siguiente.
 // Sin header, barra de juegos ni footer: js/main.js le pone a <body> la clase
@@ -53,7 +53,7 @@ const SPORTS = [
     name: "Gaming",
     team: "Caiman X Gaming",
     teamLines: ["Caiman X", "Gaming"],
-    href: null,
+    href: "caimanx.html",
     logo: `<img src="assets/logos/caimanx.png?v=2" alt="" class="sp-logo sp-logo--esports" />`,
   },
 ];
