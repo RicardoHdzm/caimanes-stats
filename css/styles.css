@@ -10585,7 +10585,7 @@ body.is-sport-picker main {
 }
 
 .sp-media--futbol {
-  background: url("../assets/soccer-home.jpg") 60% 72% / cover no-repeat;
+  background: url("../assets/soccer-home.jpg?v=2") 72% 50% / cover no-repeat;
 }
 
 .sp-media--padel {
