@@ -10505,7 +10505,7 @@ html[data-boot="picker"] main {
 
 /* ---- Selector de deporte (#/, js/views/sports.js): "lista tipográfica".
    Los cuatro nombres en grande a la izquierda; el activo va sólido y los
-   demás solo en contorno. Detrás, la foto (o video) del activo; a la
+   demás solo en contorno. Detrás, la foto del activo; a la
    derecha, su logo. Colores fijos: esta pantalla siempre es oscura. ---- */
 body.is-sport-picker .match-ticker,
 body.is-sport-picker .site-header,
@@ -10535,8 +10535,7 @@ body.is-sport-picker main {
 
 /* ---- Fondo: una capa por deporte, se cruzan al cambiar ---- */
 .sp-media,
-.sp-media-item,
-.sp-video {
+.sp-media-item {
   position: absolute;
   inset: 0;
 }
@@ -10587,19 +10586,6 @@ body.is-sport-picker main {
     linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
     linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 36px,
     #0d1220;
-}
-
-/* Video al señalar con el mouse (js/views/sports.js). */
-.sp-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.sp-video.is-on {
-  opacity: 1;
 }
 
 /* ---- Barra de arriba: organización y redes ---- */

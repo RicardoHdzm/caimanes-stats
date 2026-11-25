@@ -1,7 +1,6 @@
 // Portada del sitio (#/): "lista tipográfica" para elegir deporte — los
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
-// cambia el fondo a su foto (y a su video, en computadora con mouse) y a la
-// derecha sale su logo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
+// cambia el fondo a su foto y a la derecha sale su logo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
 // (Caimanes FC, fc.html) son link; Pádel (Caimanes Padel Squad) y eSports
 // (Caiman X) todavía "Próximamente". Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro.
@@ -18,9 +17,7 @@ const ORG_NAME = "Caimanes";
 const SOCIALS = [{ label: "Instagram", icon: "fa-instagram", url: "https://www.instagram.com/caimanes.sb/" }];
 
 // Los cuatro deportes, en orden. `href: null` = todavía "Próximamente".
-// `video`: se reproduce de fondo al señalarlo con el mouse (solo
-// computadora; se descarga hasta ese momento). Las fotos de fondo van en
-// css/styles.css (.sp-media--<key>). Si se reemplaza un logo con el mismo
+// Las fotos de fondo van en css/styles.css (.sp-media--<key>). Si se reemplaza un logo con el mismo
 // nombre de archivo, agregar/subir un "?v=" para que no se quede el viejo.
 const SPORTS = [
   {
@@ -29,7 +26,6 @@ const SPORTS = [
     team: "Caimanes de Villas",
     href: "#/softbol",
     logo: `<img src="assets/logo.png" alt="" class="sp-logo" />`,
-    video: "assets/hero-softbol.mp4",
   },
   {
     key: "futbol",
@@ -37,7 +33,6 @@ const SPORTS = [
     team: "Caimanes FC",
     href: "fc.html",
     logo: fcLogoHtml(220, "sp-logo sp-logo--fc"),
-    video: "assets/hero-futbol.mp4",
   },
   {
     key: "padel",
@@ -45,7 +40,6 @@ const SPORTS = [
     team: "Caimanes Padel Squad",
     href: null,
     logo: `<img src="assets/logos/padel.png" alt="" class="sp-logo sp-logo--padel" />`,
-    video: "assets/hero-padel.mp4",
   },
   {
     key: "esports",
@@ -53,7 +47,6 @@ const SPORTS = [
     team: "Caiman X",
     href: null,
     logo: `<img src="assets/logos/caimanx.png" alt="" class="sp-logo sp-logo--esports" />`,
-    video: null,
   },
 ];
 
@@ -107,47 +100,14 @@ export function renderSportPicker(container) {
 
 function wire(root) {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const canHover = matchMedia("(hover: hover) and (min-width: 761px)").matches;
   const keys = SPORTS.map((s) => s.key);
-  const videos = {};
   let current = null;
   let paused = false;
 
-  function playVideo(key) {
-    for (const [k, v] of Object.entries(videos)) {
-      if (k !== key) {
-        v.classList.remove("is-on");
-        v.pause();
-      }
-    }
-    const src = SPORTS.find((s) => s.key === key)?.video;
-    if (!src || !canHover || reduce) return;
-    let v = videos[key];
-    if (!v) {
-      v = document.createElement("video");
-      v.className = "sp-video";
-      v.muted = true;
-      v.loop = true;
-      v.playsInline = true;
-      v.src = src;
-      v.addEventListener("playing", () => {
-        if (current === key) v.classList.add("is-on");
-      });
-      root.querySelector(`.sp-media-item[data-key="${key}"]`).append(v);
-      videos[key] = v;
-    } else {
-      v.classList.add("is-on");
-    }
-    v.play().catch(() => {});
-  }
-
-  // fromUser: lo señaló alguien (no la rotación automática) — solo entonces
-  // se descarga/reproduce el video, para no bajar los tres solos.
-  function setActive(key, fromUser = false) {
-    if (key === current && !fromUser) return;
+  function setActive(key) {
+    if (key === current) return;
     current = key;
     for (const el of root.querySelectorAll("[data-key]")) el.classList.toggle("is-active", el.dataset.key === key);
-    playVideo(fromUser ? key : null);
   }
 
   setActive(keys[0]);
@@ -155,9 +115,9 @@ function wire(root) {
   const list = root.querySelector(".sp-list");
   for (const row of list.querySelectorAll(".sp-row")) {
     row.addEventListener("pointerenter", (e) => {
-      if (e.pointerType === "mouse") setActive(row.dataset.key, true);
+      if (e.pointerType === "mouse") setActive(row.dataset.key);
     });
-    row.addEventListener("focus", () => setActive(row.dataset.key, canHover));
+    row.addEventListener("focus", () => setActive(row.dataset.key));
   }
   list.addEventListener("pointerenter", (e) => {
     if (e.pointerType === "mouse") paused = true;
@@ -168,12 +128,12 @@ function wire(root) {
   list.addEventListener("focusin", () => (paused = true));
   list.addEventListener("focusout", () => (paused = false));
 
+  // Mientras nadie señala, rota solo entre los cuatro.
   if (reduce) return;
   const timer = setInterval(() => {
     // Se salió de la portada: se apaga.
     if (!document.body.contains(root)) {
       clearInterval(timer);
-      for (const v of Object.values(videos)) v.pause();
       return;
     }
     if (paused || document.hidden) return;
