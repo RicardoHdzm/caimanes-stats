@@ -4,7 +4,8 @@
 // (cámara, juego) quedan transparentes; los recuadros vacíos (marcador,
 // récord, equipo) son para encimarles texto o imágenes en OBS.
 //
-// Para agregar otro juego: una entrada más en OVERLAYS con su `draw`.
+// Para agregar otro tipo: una entrada más en OVERLAYS (o SCREENS) con su
+// `draw`.
 
 const W = 1920;
 const H = 1080;
@@ -196,7 +197,17 @@ function fullBackground(ctx) {
   ctx.restore();
 }
 
-// ---- los overlays ----
+// ---- los overlays (durante el juego) ----
+//
+// Por TIPO de juego, no por juego: lo que cambia entre uno y otro es dónde
+// pone cada juego su marcador, minimapa y controles. `id` es el que usa
+// GAMES en js/caimanx/data.js para llevar a su tarjeta.
+
+// Cámara + placa con el nombre justo debajo.
+function camWithPlate(ctx, logo, tag, x, y, w, h) {
+  frame(ctx, x, y, w, h);
+  namePlate(ctx, logo, x - 6, y + h + 16, w + 12, 60, tag);
+}
 
 const OVERLAYS = [
   {
@@ -216,36 +227,9 @@ const OVERLAYS = [
     },
   },
   {
-    id: "pokemon",
-    name: "Pokémon",
-    desc: "Juego en el recuadro grande, cámara y tu equipo a la derecha, récord abajo.",
-    draw(ctx, { logo, tag }) {
-      fullBackground(ctx);
-      // Juego (16:9) y cámara.
-      frame(ctx, 36, 36, 1404, 790);
-      frame(ctx, 1476, 36, 408, 230, { corner: 26 });
-      // Equipo: 6 lugares.
-      text(ctx, "EQUIPO", 1476, 312, { size: 30, italic: true, spacing: 2 });
-      ctx.fillStyle = RED;
-      ctx.fillRect(1476, 334, 60, 4);
-      const sw = (408 - 16) / 2;
-      const sh = 152;
-      for (let i = 0; i < 6; i++) {
-        slot(ctx, 1476 + (i % 2) * (sw + 16), 356 + Math.floor(i / 2) * (sh + 12), sw, sh, String(i + 1));
-      }
-      // Abajo: nombre y récord.
-      namePlate(ctx, logo, 36, 862, 1404, 182, tag);
-      panel(ctx, 1476, 862, 408, 182);
-      text(ctx, "RÉCORD", 1680, 900, { size: 24, weight: 700, color: "#e8375c", align: "center", spacing: 4 });
-      slot(ctx, 1500, 926, 160, 96, "V");
-      slot(ctx, 1700, 926, 160, 96, "D");
-      text(ctx, "–", 1680, 975, { size: 48, align: "center", color: "rgba(255, 255, 255, 0.5)" });
-    },
-  },
-  {
-    id: "smash",
-    name: "Smash Bros",
-    desc: "Marcador arriba al centro (nombres y puntos) y cámara arriba a la izquierda.",
+    id: "peleas",
+    name: "Peleas (1 vs 1)",
+    desc: "Smash Bros y juegos de peleas: marcador arriba al centro y cámara arriba a la izquierda.",
     draw(ctx, { logo, tag, rival }) {
       frame(ctx, 30, 30, 352, 198, { corner: 24 });
       const y = 18;
@@ -286,62 +270,159 @@ const OVERLAYS = [
     },
   },
   {
-    id: "lol",
-    name: "League of Legends",
-    desc: "Cámara a la izquierda, lejos del chat, el minimapa y los controles.",
+    id: "deportes",
+    name: "Deportes",
+    desc: "EA FC (FIFA), NBA 2K y similares: el juego trae su marcador arriba a la izquierda, la cámara va a la derecha.",
     draw(ctx, { logo, tag }) {
-      frame(ctx, 30, 210, 400, 225);
-      namePlate(ctx, logo, 24, 452, 412, 60, tag);
+      camWithPlate(ctx, logo, tag, 1490, 30, 400, 225);
+    },
+  },
+  {
+    id: "shooters",
+    name: "Shooters",
+    desc: "Fortnite, Warzone, Valorant y similares: cámara a media altura a la izquierda, lejos del minimapa y las armas.",
+    draw(ctx, { logo, tag }) {
+      camWithPlate(ctx, logo, tag, 30, 380, 384, 216);
+    },
+  },
+  {
+    id: "moba",
+    name: "MOBA",
+    desc: "League of Legends: cámara a la izquierda, lejos del chat, el minimapa y los controles.",
+    draw(ctx, { logo, tag }) {
+      camWithPlate(ctx, logo, tag, 30, 210, 400, 225);
+    },
+  },
+  {
+    id: "pokemon",
+    name: "Pokémon",
+    desc: "Juego en el recuadro grande, cámara y tu equipo a la derecha, récord abajo.",
+    draw(ctx, { logo, tag }) {
+      fullBackground(ctx);
+      // Juego (16:9) y cámara.
+      frame(ctx, 36, 36, 1404, 790);
+      frame(ctx, 1476, 36, 408, 230, { corner: 26 });
+      // Equipo: 6 lugares.
+      text(ctx, "EQUIPO", 1476, 312, { size: 30, italic: true, spacing: 2 });
+      ctx.fillStyle = RED;
+      ctx.fillRect(1476, 334, 60, 4);
+      const sw = (408 - 16) / 2;
+      const sh = 152;
+      for (let i = 0; i < 6; i++) {
+        slot(ctx, 1476 + (i % 2) * (sw + 16), 356 + Math.floor(i / 2) * (sh + 12), sw, sh, String(i + 1));
+      }
+      // Abajo: nombre y récord.
+      namePlate(ctx, logo, 36, 862, 1404, 182, tag);
+      panel(ctx, 1476, 862, 408, 182);
+      text(ctx, "RÉCORD", 1680, 900, { size: 24, weight: 700, color: "#e8375c", align: "center", spacing: 4 });
+      slot(ctx, 1500, 926, 160, 96, "V");
+      slot(ctx, 1700, 926, 160, 96, "D");
+      text(ctx, "–", 1680, 975, { size: 48, align: "center", color: "rgba(255, 255, 255, 0.5)" });
     },
   },
 ];
+
+// ---- pantallas (escenas sin juego) ----
+//
+// Imagen completa: logo al centro, título en dos tonos, tu nombre abajo.
+
+function screen(ctx, logo, tag, custom, [white, red]) {
+  fullBackground(ctx);
+  const glow = ctx.createRadialGradient(W / 2, 380, 40, W / 2, 380, 620);
+  glow.addColorStop(0, "rgba(211, 21, 69, 0.22)");
+  glow.addColorStop(1, "rgba(211, 21, 69, 0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+  ctx.shadowBlur = 40;
+  drawLogo(ctx, logo, W / 2, 330, 300);
+  ctx.restore();
+
+  // Título: primera parte en blanco, segunda en rojo, centrado como un todo.
+  const size = 150;
+  ctx.font = font(size, 800, true);
+  const gap = 34;
+  const w1 = ctx.measureText(white).width;
+  const w2 = ctx.measureText(red).width;
+  const x0 = (W - (w1 + gap + w2)) / 2;
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 30;
+  text(ctx, white, x0, 640, { size, italic: true });
+  text(ctx, red, x0 + w1 + gap, 640, { size, italic: true, color: "#e8375c" });
+  ctx.restore();
+  ctx.fillStyle = RED;
+  ctx.fillRect(W / 2 - 70, 730, 140, 6);
+
+  // Sin nombre escrito, solo "CAIMAN X GAMING" (si no, se repetiría).
+  if (custom) text(ctx, tag, W / 2, 800, { size: 56, italic: true, align: "center", maxWidth: 1200 });
+  text(ctx, "CAIMAN X GAMING", W / 2, custom ? 858 : 800, { size: 26, weight: 700, color: "#e8375c", align: "center", spacing: 8 });
+  text(ctx, "CAIMANES.TEAM", W / 2, 1030, { size: 22, weight: 700, color: "rgba(255, 255, 255, 0.45)", align: "center", spacing: 8 });
+}
+
+const SCREENS = [
+  { id: "empezando", name: "Empezando pronto", words: ["EMPEZANDO", "PRONTO"] },
+  { id: "regreso", name: "Ahorita regreso", words: ["AHORITA", "REGRESO"] },
+  { id: "fin", name: "Fin del stream", words: ["FIN DEL", "STREAM"] },
+].map((s) => ({ ...s, draw: (ctx, { logo, tag, custom }) => screen(ctx, logo, tag, custom, s.words) }));
 
 // ---- página ----
 
 const tagInput = document.getElementById("cx-tag");
 const rivalInput = document.getElementById("cx-rival");
-const listEl = document.getElementById("cx-overlays");
+const groups = [
+  { el: document.getElementById("cx-overlays"), items: OVERLAYS, prefix: "caimanx-overlay-" },
+  { el: document.getElementById("cx-screens"), items: SCREENS, prefix: "caimanx-" },
+];
 
 function values() {
   return {
     tag: (tagInput.value.trim() || "CAIMAN X").toUpperCase(),
     rival: rivalInput.value.trim().toUpperCase(),
+    custom: tagInput.value.trim() !== "",
   };
 }
 
-listEl.innerHTML = OVERLAYS.map(
-  (o) => `
-    <article class="cx-overlay" data-id="${o.id}">
-      <div class="cx-overlay-preview"><canvas width="${W}" height="${H}" aria-label="Vista previa del overlay ${o.name}"></canvas></div>
+for (const { el, items, prefix } of groups) {
+  el.innerHTML = items
+    .map(
+      (o) => `
+    <article class="cx-overlay" id="overlay-${o.id}" data-id="${o.id}">
+      <div class="cx-overlay-preview"><canvas width="${W}" height="${H}" aria-label="Vista previa: ${o.name}"></canvas></div>
       <div class="cx-overlay-body">
         <div>
           <h3 class="cx-overlay-name">${o.name}</h3>
-          <p class="cx-overlay-desc">${o.desc}</p>
+          ${o.desc ? `<p class="cx-overlay-desc">${o.desc}</p>` : ""}
         </div>
-        <a class="cx-download" href="#" download="caimanx-overlay-${o.id}.png"><i class="fa-solid fa-download"></i> PNG</a>
+        <a class="cx-download" href="#" download="${prefix}${o.id}.png"><i class="fa-solid fa-download"></i> PNG</a>
       </div>
     </article>`
-).join("");
+    )
+    .join("");
+
+  // La descarga se arma al hacer clic, con lo que haya en el lienzo.
+  el.addEventListener("click", (e) => {
+    const link = e.target.closest(".cx-download");
+    if (!link) return;
+    const canvas = link.closest(".cx-overlay").querySelector("canvas");
+    link.href = canvas.toDataURL("image/png");
+  });
+}
 
 async function render() {
   const { logo } = await loadAssets();
   const v = values();
-  for (const o of OVERLAYS) {
-    const card = listEl.querySelector(`[data-id="${o.id}"]`);
-    const canvas = card.querySelector("canvas");
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, W, H);
-    o.draw(ctx, { logo, ...v });
+  for (const { el, items } of groups) {
+    for (const o of items) {
+      const canvas = el.querySelector(`[data-id="${o.id}"] canvas`);
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, W, H);
+      o.draw(ctx, { logo, ...v });
+    }
   }
 }
-
-// La descarga se arma al hacer clic, con lo que haya en el lienzo.
-listEl.addEventListener("click", (e) => {
-  const link = e.target.closest(".cx-download");
-  if (!link) return;
-  const canvas = link.closest(".cx-overlay").querySelector("canvas");
-  link.href = canvas.toDataURL("image/png");
-});
 
 let timer = 0;
 for (const input of [tagInput, rivalInput]) {

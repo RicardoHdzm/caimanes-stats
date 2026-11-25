@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Caiman X Gaming — Caimanes.Team</title>
-  <meta name="description" content="Caiman X Gaming, el equipo de gaming de Caimanes.Team en Culiacán. Overlays para stream en OBS: general, Pokémon, Smash Bros y League of Legends." />
+  <meta name="description" content="Caiman X Gaming, el equipo de gaming de Caimanes.Team en Culiacán: jugadores, juegos, torneos y overlays para stream en OBS." />
   <meta name="theme-color" content="#0a0e18" />
   <link rel="canonical" href="https://caimanes.team/caimanx.html" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Caimanes.Team" />
   <meta property="og:locale" content="es_MX" />
   <meta property="og:title" content="Caiman X Gaming — Caimanes.Team" />
-  <meta property="og:description" content="Overlays para stream en OBS: general, Pokémon, Smash Bros y League of Legends." />
+  <meta property="og:description" content="Jugadores, juegos, torneos y overlays para stream en OBS." />
   <meta property="og:url" content="https://caimanes.team/caimanx.html" />
   <meta property="og:image" content="https://caimanes.team/assets/thumbnail.png" />
   <link rel="icon" type="image/png" href="assets/icon-192.png" />
@@ -20,18 +20,40 @@
 </head>
 <body>
   <!-- Sitio de Caiman X (gaming). Página aparte, siempre oscura, con su
-       propio CSS (css/caimanx.css) y JS (js/caimanx/overlays.js). -->
+       propio CSS (css/caimanx.css) y JS (js/caimanx/: data.js con los
+       datos a mano, main.js las secciones, overlays.js los overlays). -->
   <header class="cx-top">
     <a href="./" class="cx-org">Caimanes.Team</a>
-    <a class="cx-social" href="https://www.instagram.com/caimanes.sb/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <span class="cx-socials" id="cx-socials"></span>
   </header>
 
   <section class="cx-hero">
     <img src="assets/logos/caimanx.png?v=2" alt="Caiman X" class="cx-hero-logo" />
     <h1 class="cx-hero-title">Caiman X <span>Gaming</span></h1>
+    <nav class="cx-nav" aria-label="Secciones">
+      <a href="#jugadores">Jugadores</a>
+      <a href="#juegos">Juegos</a>
+      <a href="#torneos">Torneos</a>
+      <a href="#overlays">Overlays</a>
+    </nav>
   </section>
 
   <main class="cx-main">
+    <section class="cx-section" id="jugadores" aria-labelledby="jugadores-title">
+      <h2 class="cx-section-title" id="jugadores-title">El <span>equipo</span></h2>
+      <div id="cx-players"></div>
+    </section>
+
+    <section class="cx-section" id="juegos" aria-labelledby="juegos-title">
+      <h2 class="cx-section-title" id="juegos-title">Los <span>juegos</span></h2>
+      <div id="cx-games"></div>
+    </section>
+
+    <section class="cx-section" id="torneos" aria-labelledby="torneos-title">
+      <h2 class="cx-section-title" id="torneos-title">Los <span>torneos</span></h2>
+      <div id="cx-tournaments"></div>
+    </section>
+
     <section class="cx-section" id="overlays" aria-labelledby="overlays-title">
       <h2 class="cx-section-title" id="overlays-title">Overlays para <span>OBS</span></h2>
 
@@ -41,21 +63,26 @@
           <input type="text" id="cx-tag" maxlength="20" placeholder="CAIMAN X" autocomplete="off" />
         </label>
         <label class="cx-field">
-          <span>Rival (Smash Bros)</span>
+          <span>Rival (peleas)</span>
           <input type="text" id="cx-rival" maxlength="20" placeholder="Opcional" autocomplete="off" />
         </label>
       </div>
 
+      <h3 class="cx-subtitle">Durante el juego</h3>
       <div class="cx-overlays" id="cx-overlays"></div>
+
+      <h3 class="cx-subtitle">Pantallas</h3>
+      <div class="cx-overlays" id="cx-screens"></div>
 
       <div class="cx-howto">
         <h3>Cómo ponerlo en OBS</h3>
         <ol>
-          <li>Descarga el overlay del juego (PNG de 1920×1080 con fondo transparente).</li>
+          <li>Descarga el PNG (1920×1080). Los de juego traen fondo transparente.</li>
           <li>En OBS, en <b>Fuentes</b>, toca <b>+</b> → <b>Imagen</b> y elige el archivo.</li>
           <li>Déjalo hasta arriba de la lista de fuentes, encima de la captura del juego y de la cámara.</li>
           <li>Acomoda tu cámara dentro del marco rojo. En Pokémon, mete la captura del juego en el recuadro grande.</li>
           <li>Para marcador, récord o tu equipo, agrega fuentes de <b>Texto</b> o <b>Imagen</b> encima de los recuadros vacíos.</li>
+          <li>Las pantallas (empezando, regreso, fin) van cada una en su propia escena.</li>
         </ol>
       </div>
     </section>
@@ -65,6 +92,7 @@
     <a href="./">Caimanes.Team</a> · Culiacán
   </footer>
 
+  <script type="module" src="js/caimanx/main.js"></script>
   <script type="module" src="js/caimanx/overlays.js"></script>
 </body>
 </html>

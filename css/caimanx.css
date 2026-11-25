@@ -268,3 +268,231 @@ a {
   font-size: 0.85rem;
   color: var(--cx-muted);
 }
+
+/* ---- Navegación de la portada ---- */
+.cx-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cx-nav a {
+  padding: 7px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.cx-nav a:hover,
+.cx-nav a:focus-visible {
+  border-color: var(--cx-red);
+  background: var(--cx-red);
+}
+
+.cx-socials {
+  display: flex;
+  gap: 8px;
+}
+
+.cx-section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.cx-subtitle {
+  margin: 28px 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cx-muted);
+}
+
+.cx-empty {
+  margin: 0;
+  padding: 18px 20px;
+  border: 1px dashed var(--cx-border);
+  border-radius: 14px;
+  color: var(--cx-muted);
+}
+
+/* ---- Jugadores ---- */
+.cx-players {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.cx-player {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--cx-border);
+  border-radius: 14px;
+  background: var(--cx-surface);
+}
+
+.cx-player::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--cx-red);
+}
+
+.cx-player-tag {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.cx-player-name {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: var(--cx-muted);
+}
+
+.cx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.cx-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(211, 21, 69, 0.16);
+  color: var(--cx-red-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cx-player-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ---- Juegos ---- */
+.cx-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.cx-game {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 130px;
+  padding: 18px;
+  border: 1px solid var(--cx-border);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(211, 21, 69, 0.18), transparent 60%),
+    var(--cx-surface);
+  text-decoration: none;
+  transition: border-color 0.25s, transform 0.25s;
+}
+
+.cx-game:hover,
+.cx-game:focus-visible {
+  border-color: var(--cx-red);
+  transform: translateY(-2px);
+}
+
+.cx-game-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.cx-game-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cx-red-text);
+}
+
+/* ---- Torneos ---- */
+.cx-tournaments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cx-tournament {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid var(--cx-border);
+  border-radius: 12px;
+  background: var(--cx-surface);
+}
+
+.cx-tournament-date {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--cx-muted);
+  text-transform: uppercase;
+}
+
+.cx-tournament-name {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cx-tournament-name small {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cx-muted);
+  text-transform: none;
+}
+
+.cx-tournament-result {
+  font-weight: 800;
+  color: var(--cx-red-text);
+  text-align: right;
+}
+
+.cx-tournament-result.is-pending {
+  color: var(--cx-muted);
+  font-weight: 600;
+}
+
+.cx-overlay {
+  scroll-margin-top: 24px;
+}
+
+@media (max-width: 560px) {
+  .cx-tournament {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cx-tournament-date {
+    grid-column: 1 / -1;
+  }
+}
