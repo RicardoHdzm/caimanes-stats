@@ -10938,7 +10938,7 @@ a.sp-row:hover .sp-row-cta i {
 }
 
 /* Mismo peso visual entre logos (el de fútbol tiene más "tinta", el de
-   pádel menos, el de eSports es un letrero ancho). */
+   pádel menos). */
 .sp-stage .sp-logo {
   display: block;
   width: clamp(200px, 24vw, 380px);
@@ -10954,8 +10954,10 @@ a.sp-row:hover .sp-row-cta i {
   width: clamp(210px, 25vw, 400px);
 }
 
+/* Caiman X (cuadrado, mucha tinta roja): un poco más chico que el de sóftbol
+   para que pesen igual. */
 .sp-stage .sp-logo--esports {
-  width: clamp(260px, 32vw, 500px);
+  width: clamp(180px, 21.5vw, 340px);
 }
 
 /* Pantallas medianas: más espacio para la lista que para el logo. */
