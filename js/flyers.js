@@ -1004,7 +1004,7 @@ export async function powerRankingFlyer(data, format = "post", color) {
 const DUES_COLORS = { paid: "#3fb56f" };
 const duesMoney = (n) => (n < 0 ? `−$${(-n).toLocaleString("es-MX")}` : `$${n.toLocaleString("es-MX")}`);
 
-// `data`: { dateLabel, total, leagueFee, played, gamesInSeason, left, rows: [{ name,
+// `data`: { dateLabel, total, leagueFee, duesFee, gameCost, played, gamesInSeason, left, rows: [{ name,
 // status (true | false | "saldo"), amount (número o null) }] } — los
 // totales arriba y, abajo, cada jugador en dos columnas (de arriba hacia
 // abajo) con su cantidad, del color de su estado.
@@ -1027,14 +1027,20 @@ export async function duesFlyer(data, format = "post", color) {
     4
   );
 
+  // Las dos cuotas, para que se entiendan las cuentas.
+  text(ctx, `INSCRIPCIÓN POR JUGADOR: ${duesMoney(data.duesFee)}  ·  COSTO POR JUEGO: ${duesMoney(data.gameCost)}`, W / 2, 506, {
+    size: 30,
+    color: P.accentText,
+  });
+
   const statusColor = (r) => (r.status === "saldo" ? P.gold : r.status ? DUES_COLORS.paid : P.accentText);
   const left = 90;
   const gap = 22;
   const cols = 2;
   const tw = (W - left * 2 - gap) / cols;
   const perCol = Math.ceil(data.rows.length / cols);
-  const top = 494;
-  const bottom = 1062;
+  const top = 532;
+  const bottom = 1066;
   const rowGap = 6;
   const rowH = Math.min(52, (bottom - top - rowGap * (perCol - 1)) / perCol);
   data.rows.forEach((r, i) => {

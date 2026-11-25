@@ -89,7 +89,7 @@ function openDuesFlyer() {
     (a, b) => STATUS_ORDER(a.status) - STATUS_ORDER(b.status) || a.name.localeCompare(b.name, "es")
   );
   const today = new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long" }).toUpperCase();
-  const data = { dateLabel: `CORTE AL ${today}`, total, leagueFee: LEAGUE_FEE, played, gamesInSeason: TEAM.gamesInSeason, left, rows };
+  const data = { dateLabel: `CORTE AL ${today}`, total, leagueFee: LEAGUE_FEE, duesFee: DUES_FEE, gameCost: GAME_COST, played, gamesInSeason: TEAM.gamesInSeason, left, rows };
   openFlyer(
     (format, color) => duesFlyer(data, format, color),
     "estado-de-pago",

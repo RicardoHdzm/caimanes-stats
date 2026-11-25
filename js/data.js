@@ -122,7 +122,7 @@ export const ROSTER = PLAYERS.filter((p) => p.seasons?.includes(CURRENT_SEASON))
 // GAME_COST: lo que cuesta cada juego. LEAGUE_FEE: inscripción del equipo
 // a la liga. Admin → Estado de pago: Restante = recaudado − LEAGUE_FEE −
 // juegos jugados × GAME_COST.
-export const DUES_FEE = 550;
+export const DUES_FEE = 548;
 export const GAME_COST = 650;
 export const LEAGUE_FEE = 5000;
 
