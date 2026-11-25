@@ -69,6 +69,8 @@ export const FLYER_COLORS = [
     id: "moderno",
     label: "Moderno",
     bg: "#0d0d0d",
+    // Resplandor rojo tenue, igual que en Clásico.
+    glow: 0.05,
     text: "#f2f3f4",
     muted: "#8d96a0",
     accent: "#bf0f35",

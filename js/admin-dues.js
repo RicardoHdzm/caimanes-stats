@@ -79,9 +79,9 @@ async function render() {
 }
 
 // Imagen tipo anuncio para el grupo de WhatsApp (js/flyers.js): totales +
-// cada jugador con su cantidad. Pendientes primero, luego abonando y al
-// final los que ya pagaron.
-const STATUS_ORDER = (s) => (s === false ? 0 : s === "saldo" ? 1 : 2);
+// cada jugador con su cantidad. Primero los que ya pagaron, luego los que
+// van abonando y al final los pendientes.
+const STATUS_ORDER = (s) => (s === false ? 2 : s === "saldo" ? 1 : 0);
 function openDuesFlyer() {
   const detail = getDuesDetail(ROSTER.map((p) => p.id));
   const { total, played, left } = duesTotals(detail);
