@@ -2,10 +2,12 @@
 // <canvas> de 1920×1080 con fondo transparente y se descarga como PNG: en OBS
 // va como fuente de Imagen encima del juego y la cámara. Los huecos
 // (cámara, juego) quedan transparentes; los recuadros vacíos (marcador,
-// récord, equipo) son para encimarles texto o imágenes en OBS.
+// equipo) son para encimarles texto o imágenes en OBS. Los patrocinadores
+// (SPONSORS en js/caimanx/data.js) salen en todos, en blanco.
 //
 // Para agregar otro tipo: una entrada más en OVERLAYS (o SCREENS) con su
 // `draw`.
+import { SPONSORS } from "./data.js";
 
 const W = 1920;
 const H = 1080;
@@ -19,18 +21,58 @@ const LOGO_CROP = { x: 0, y: 0, w: 1, h: 1 };
 
 // ---- recursos ----
 
+function loadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+// Logo de patrocinador listo para pintar: recortado a su parte con tinta
+// (los PNG traen margen) y en blanco, para que se lea sobre lo oscuro.
+function prepareSponsor(img) {
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth;
+  c.height = img.naturalHeight;
+  const cx = c.getContext("2d");
+  cx.drawImage(img, 0, 0);
+  const { data } = cx.getImageData(0, 0, c.width, c.height);
+  let x0 = c.width;
+  let y0 = c.height;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      if (data[(y * c.width + x) * 4 + 3] > 20) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  if (x1 < 0) return null;
+  const out = document.createElement("canvas");
+  out.width = x1 - x0 + 1;
+  out.height = y1 - y0 + 1;
+  const oc = out.getContext("2d");
+  oc.drawImage(c, x0, y0, out.width, out.height, 0, 0, out.width, out.height);
+  oc.globalCompositeOperation = "source-in";
+  oc.fillStyle = "#fff";
+  oc.fillRect(0, 0, out.width, out.height);
+  return { img: out, ratio: out.width / out.height };
+}
+
 let assetsPromise = null;
 function loadAssets() {
   assetsPromise ??= Promise.all([
-    new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = LOGO_SRC;
-    }),
+    loadImage(LOGO_SRC),
+    Promise.all(SPONSORS.map((s) => loadImage(s.logo))),
     document.fonts?.load(`800 40px ${FONT}`).catch(() => null),
     document.fonts?.load(`600 20px ${FONT}`).catch(() => null),
-  ]).then(([logo]) => ({ logo }));
+  ]).then(([logo, imgs]) => ({ logo, sponsors: imgs.filter(Boolean).map(prepareSponsor).filter(Boolean) }));
   return assetsPromise;
 }
 
@@ -127,7 +169,7 @@ function frame(ctx, x, y, w, h, { thick = 6, corner = 34 } = {}) {
 
 // Placa con el logo a la izquierda (en su recuadro oscuro, con raya roja),
 // el nombre y "CAIMAN X GAMING".
-function namePlate(ctx, logo, x, y, w, h, tag) {
+function namePlate(ctx, logo, x, y, w, h, tag, reserve = 0) {
   panel(ctx, x, y, w, h);
   ctx.save();
   roundRect(ctx, x, y, w, h, 10);
@@ -140,13 +182,39 @@ function namePlate(ctx, logo, x, y, w, h, tag) {
   ctx.restore();
   drawLogo(ctx, logo, x + (h * 1.3) / 2, y + h / 2 + 1, h * 0.7);
   const tx = x + h * 1.3 + 18;
-  const maxW = w - h * 1.3 - 34;
+  const maxW = w - h * 1.3 - 34 - reserve;
   if (h >= 70) {
     text(ctx, tag, tx, y + h * 0.42, { size: Math.round(h * 0.4), italic: true, maxWidth: maxW });
     text(ctx, "CAIMAN X GAMING", tx, y + h * 0.76, { size: Math.round(h * 0.17), weight: 700, color: RED, maxWidth: maxW, spacing: 3 });
   } else {
     text(ctx, tag, tx, y + h / 2 + 1, { size: Math.round(h * 0.5), italic: true, maxWidth: maxW });
   }
+}
+
+// ---- patrocinadores ----
+
+// Logos en fila, de `h` de alto, centrados en `cy`; se achican si no caben
+// en maxW. `align`: de dónde parte `x` (left, center, right).
+function sponsorLogos(ctx, sponsors, x, cy, h, maxW, align = "left") {
+  const gap = h * 0.6;
+  const total = sponsors.reduce((sum, s) => sum + h * s.ratio, 0) + gap * (sponsors.length - 1);
+  const k = Math.min(1, maxW / total);
+  let cx = align === "center" ? x - (total * k) / 2 : align === "right" ? x - total * k : x;
+  for (const s of sponsors) {
+    const w = h * s.ratio * k;
+    ctx.drawImage(s.img, cx, cy - (h * k) / 2, w, h * k);
+    cx += w + gap * k;
+  }
+}
+
+// Barrita oscura con "PATROCINA" y los logos.
+function sponsorBar(ctx, sponsors, x, y, w, h) {
+  if (!sponsors.length) return;
+  panel(ctx, x, y, w, h, 8);
+  text(ctx, "PATROCINA", x + 14, y + h / 2 + 2, { size: 14, weight: 700, color: RED, spacing: 2 });
+  ctx.font = font(14, 700);
+  const lx = x + 14 + ctx.measureText("PATROCINA").width + 44;
+  sponsorLogos(ctx, sponsors, lx, y + h / 2 + 2, h * 0.5, x + w - 14 - lx);
 }
 
 // Recuadro vacío con su etiqueta arriba (para texto/imagen en OBS).
@@ -213,9 +281,10 @@ function fullBackground(ctx) {
 // GAMES en js/caimanx/data.js para llevar a su tarjeta.
 
 // Cámara + placa con el nombre justo debajo.
-function camWithPlate(ctx, logo, tag, x, y, w, h) {
+function camWithPlate(ctx, logo, tag, x, y, w, h, sponsors = []) {
   frame(ctx, x, y, w, h);
   namePlate(ctx, logo, x - 6, y + h + 16, w + 12, 60, tag);
+  sponsorBar(ctx, sponsors, x - 6, y + h + 16 + 60 + 8, w + 12, 44);
 }
 
 const OVERLAYS = [
@@ -223,7 +292,8 @@ const OVERLAYS = [
     id: "general",
     name: "General",
     desc: "Cualquier juego en pantalla completa: cámara abajo a la izquierda.",
-    draw(ctx, { logo, tag }) {
+    draw(ctx, { logo, tag, sponsors }) {
+      sponsorBar(ctx, sponsors, 34, 634, 492, 44);
       frame(ctx, 40, 694, 480, 270);
       namePlate(ctx, logo, 34, 982, 492, 64, tag);
       // Logo chico arriba a la derecha.
@@ -239,8 +309,9 @@ const OVERLAYS = [
     id: "peleas",
     name: "Peleas (1 vs 1)",
     desc: "Smash Bros y juegos de peleas: marcador arriba al centro y cámara arriba a la izquierda.",
-    draw(ctx, { logo, tag, rival }) {
+    draw(ctx, { logo, tag, rival, sponsors }) {
       frame(ctx, 30, 30, 352, 198, { corner: 24 });
+      sponsorBar(ctx, sponsors, 24, 246, 364, 44);
       const y = 18;
       const h = 72;
       // Placas de nombre.
@@ -282,31 +353,31 @@ const OVERLAYS = [
     id: "deportes",
     name: "Deportes",
     desc: "EA FC (FIFA), NBA 2K y similares: el juego trae su marcador arriba a la izquierda, la cámara va a la derecha.",
-    draw(ctx, { logo, tag }) {
-      camWithPlate(ctx, logo, tag, 1490, 30, 400, 225);
+    draw(ctx, { logo, tag, sponsors }) {
+      camWithPlate(ctx, logo, tag, 1490, 30, 400, 225, sponsors);
     },
   },
   {
     id: "shooters",
     name: "Shooters",
     desc: "Fortnite, Warzone, Valorant y similares: cámara a media altura a la izquierda, lejos del minimapa y las armas.",
-    draw(ctx, { logo, tag }) {
-      camWithPlate(ctx, logo, tag, 30, 380, 384, 216);
+    draw(ctx, { logo, tag, sponsors }) {
+      camWithPlate(ctx, logo, tag, 30, 380, 384, 216, sponsors);
     },
   },
   {
     id: "moba",
     name: "MOBA",
     desc: "League of Legends: cámara a la izquierda, lejos del chat, el minimapa y los controles.",
-    draw(ctx, { logo, tag }) {
-      camWithPlate(ctx, logo, tag, 30, 210, 400, 225);
+    draw(ctx, { logo, tag, sponsors }) {
+      camWithPlate(ctx, logo, tag, 30, 210, 400, 225, sponsors);
     },
   },
   {
     id: "pokemon",
     name: "Pokémon",
-    desc: "Juego en el recuadro grande, cámara y tu equipo a la derecha, récord abajo.",
-    draw(ctx, { logo, tag }) {
+    desc: "Juego en el recuadro grande, cámara y tu equipo a la derecha, tu nombre abajo.",
+    draw(ctx, { logo, tag, sponsors }) {
       fullBackground(ctx);
       // Juego (16:9) y cámara.
       frame(ctx, 36, 36, 1404, 790);
@@ -320,13 +391,16 @@ const OVERLAYS = [
       for (let i = 0; i < 6; i++) {
         slot(ctx, 1476 + (i % 2) * (sw + 16), 356 + Math.floor(i / 2) * (sh + 12), sw, sh, String(i + 1));
       }
-      // Abajo: nombre y récord.
-      namePlate(ctx, logo, 36, 862, 1404, 182, tag);
-      panel(ctx, 1476, 862, 408, 182);
-      text(ctx, "RÉCORD", 1680, 900, { size: 24, weight: 700, color: RED, align: "center", spacing: 4 });
-      slot(ctx, 1500, 926, 160, 96, "V");
-      slot(ctx, 1700, 926, 160, 96, "D");
-      text(ctx, "–", 1680, 975, { size: 48, align: "center", color: "rgba(255, 255, 255, 0.5)" });
+      // Abajo, a todo lo ancho: nombre y, a la derecha, patrocinadores.
+      const reserve = sponsors.length ? 440 : 0;
+      namePlate(ctx, logo, 36, 862, 1848, 182, tag, reserve);
+      if (sponsors.length) {
+        const cx = 1884 - reserve / 2 - 10;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.fillRect(1884 - reserve, 894, 2, 118);
+        text(ctx, "PATROCINA", cx, 914, { size: 18, weight: 700, color: RED, align: "center", spacing: 3 });
+        sponsorLogos(ctx, sponsors, cx, 968, 64, reserve - 70, "center");
+      }
     },
   },
 ];
@@ -335,7 +409,7 @@ const OVERLAYS = [
 //
 // Imagen completa: logo al centro, título en dos tonos, tu nombre abajo.
 
-function screen(ctx, logo, tag, custom, [white, red]) {
+function screen(ctx, logo, tag, custom, sponsors, [white, red]) {
   fullBackground(ctx);
   const glow = ctx.createRadialGradient(W / 2, 380, 40, W / 2, 380, 620);
   glow.addColorStop(0, "rgba(191, 15, 53, 0.22)");
@@ -368,14 +442,18 @@ function screen(ctx, logo, tag, custom, [white, red]) {
   // Sin nombre escrito, solo "CAIMAN X GAMING" (si no, se repetiría).
   if (custom) text(ctx, tag, W / 2, 800, { size: 56, italic: true, align: "center", maxWidth: 1200 });
   text(ctx, "CAIMAN X GAMING", W / 2, custom ? 858 : 800, { size: 26, weight: 700, color: RED, align: "center", spacing: 8 });
-  text(ctx, "CAIMANES.TEAM", W / 2, 1030, { size: 22, weight: 700, color: "rgba(255, 255, 255, 0.45)", align: "center", spacing: 8 });
+  if (sponsors.length) {
+    text(ctx, "PATROCINA", W / 2, 934, { size: 18, weight: 700, color: "rgba(255, 255, 255, 0.55)", align: "center", spacing: 6 });
+    sponsorLogos(ctx, sponsors, W / 2, 978, 52, 1200, "center");
+  }
+  text(ctx, "CAIMANES.TEAM", W / 2, 1040, { size: 22, weight: 700, color: "rgba(255, 255, 255, 0.45)", align: "center", spacing: 8 });
 }
 
 const SCREENS = [
   { id: "empezando", name: "Empezando pronto", words: ["EMPEZANDO", "PRONTO"] },
   { id: "regreso", name: "Ahorita regreso", words: ["AHORITA", "REGRESO"] },
   { id: "fin", name: "Fin del stream", words: ["FIN DEL", "STREAM"] },
-].map((s) => ({ ...s, draw: (ctx, { logo, tag, custom }) => screen(ctx, logo, tag, custom, s.words) }));
+].map((s) => ({ ...s, draw: (ctx, { logo, tag, custom, sponsors }) => screen(ctx, logo, tag, custom, sponsors, s.words) }));
 
 // ---- página (#/overlays, la pinta js/caimanx/main.js) ----
 
@@ -431,7 +509,7 @@ export function renderOverlays(container) {
         <li>En OBS, en <b>Fuentes</b>, toca <b>+</b> → <b>Imagen</b> y elige el archivo.</li>
         <li>Déjalo hasta arriba de la lista de fuentes, encima de la captura del juego y de la cámara.</li>
         <li>Acomoda tu cámara dentro del marco rojo. En Pokémon, mete la captura del juego en el recuadro grande.</li>
-        <li>Para marcador, récord o tu equipo, agrega fuentes de <b>Texto</b> o <b>Imagen</b> encima de los recuadros vacíos.</li>
+        <li>Para el marcador o tu equipo, agrega fuentes de <b>Texto</b> o <b>Imagen</b> encima de los recuadros vacíos.</li>
         <li>Las pantallas (empezando, regreso, fin) van cada una en su propia escena.</li>
       </ol>
     </div>`;
@@ -441,7 +519,7 @@ export function renderOverlays(container) {
   for (const input of inputs) input.value = typed[input.dataset.field];
 
   async function draw() {
-    const { logo } = await loadAssets();
+    const { logo, sponsors } = await loadAssets();
     if (!root.isConnected) return;
     const v = {
       tag: (typed.tag.trim() || "CAIMAN X").toUpperCase(),
@@ -452,7 +530,7 @@ export function renderOverlays(container) {
       const canvas = root.querySelector(`[data-id="${o.id}"] canvas`);
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, W, H);
-      o.draw(ctx, { logo, ...v });
+      o.draw(ctx, { logo, sponsors, ...v });
     }
   }
 
