@@ -10926,7 +10926,7 @@ body.is-sport-picker main {
   width: clamp(210px, 25vw, 400px);
 }
 
-/* Caiman X (cuadrado, mucha tinta roja): un poco más chico que el de sóftbol
+/* CaimanX (cuadrado, mucha tinta roja): un poco más chico que el de sóftbol
    para que pesen igual. */
 .sp-stage .sp-logo--esports {
   width: clamp(180px, 21.5vw, 340px);

@@ -98,6 +98,36 @@ function text(ctx, str, x, y, { size, weight = 800, italic = false, color = "#ff
   if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
 }
 
+// "CAIMANX GAMING" en rojo con la X en blanco, para que destaque. Mismas
+// opciones que text() (siempre peso 700).
+function brandText(ctx, x, y, { size, align = "left", maxWidth = 9999, spacing = 0 }) {
+  const parts = [
+    ["CAIMAN", RED],
+    ["X", "#fff"],
+    [" GAMING", RED],
+  ];
+  let s = size;
+  const measure = () => {
+    ctx.font = font(s, 700);
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${spacing}px`;
+    return parts.reduce((sum, [str]) => sum + ctx.measureText(str).width, 0);
+  };
+  let total = measure();
+  while (s > 12 && total > maxWidth) {
+    s -= 2;
+    total = measure();
+  }
+  let cx = align === "center" ? x - total / 2 : align === "right" ? x - total : x;
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  for (const [str, color] of parts) {
+    ctx.fillStyle = color;
+    ctx.fillText(str, cx, y);
+    cx += ctx.measureText(str).width;
+  }
+  if ("letterSpacing" in ctx) ctx.letterSpacing = "0px";
+}
+
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
@@ -168,7 +198,7 @@ function frame(ctx, x, y, w, h, { thick = 6, corner = 34 } = {}) {
 }
 
 // Placa con el logo a la izquierda (en su recuadro oscuro, con raya roja),
-// el nombre y "CAIMAN X GAMING".
+// el nombre y "CAIMANX GAMING".
 function namePlate(ctx, logo, x, y, w, h, tag, reserve = 0) {
   panel(ctx, x, y, w, h);
   ctx.save();
@@ -185,7 +215,7 @@ function namePlate(ctx, logo, x, y, w, h, tag, reserve = 0) {
   const maxW = w - h * 1.3 - 34 - reserve;
   if (h >= 70) {
     text(ctx, tag, tx, y + h * 0.42, { size: Math.round(h * 0.4), italic: true, maxWidth: maxW });
-    text(ctx, "CAIMAN X GAMING", tx, y + h * 0.76, { size: Math.round(h * 0.17), weight: 700, color: RED, maxWidth: maxW, spacing: 3 });
+    brandText(ctx, tx, y + h * 0.76, { size: Math.round(h * 0.17), maxWidth: maxW, spacing: 3 });
   } else {
     text(ctx, tag, tx, y + h / 2 + 1, { size: Math.round(h * 0.5), italic: true, maxWidth: maxW });
   }
@@ -207,13 +237,13 @@ function sponsorLogos(ctx, sponsors, x, cy, h, maxW, align = "left") {
   }
 }
 
-// Barrita oscura con "PATROCINA" y los logos.
+// Barrita oscura con "SPONSORS" y los logos.
 function sponsorBar(ctx, sponsors, x, y, w, h) {
   if (!sponsors.length) return;
   panel(ctx, x, y, w, h, 8);
-  text(ctx, "PATROCINA", x + 14, y + h / 2 + 2, { size: 14, weight: 700, color: RED, spacing: 2 });
+  text(ctx, "SPONSORS", x + 14, y + h / 2 + 2, { size: 14, weight: 700, color: RED, spacing: 2 });
   ctx.font = font(14, 700);
-  const lx = x + 14 + ctx.measureText("PATROCINA").width + 44;
+  const lx = x + 14 + ctx.measureText("SPONSORS").width + 44;
   sponsorLogos(ctx, sponsors, lx, y + h / 2 + 2, h * 0.5, x + w - 14 - lx);
 }
 
@@ -346,7 +376,7 @@ const OVERLAYS = [
       ctx.fillStyle = PANEL;
       slant(ctx, 840, y + h, 240, 30, 10);
       ctx.fill();
-      text(ctx, "CAIMAN X GAMING", 960, y + h + 15, { size: 16, weight: 700, color: RED, align: "center", spacing: 3 });
+      brandText(ctx, 960, y + h + 15, { size: 16, align: "center", spacing: 3 });
     },
   },
   {
@@ -398,7 +428,7 @@ const OVERLAYS = [
         const cx = 1884 - reserve / 2 - 10;
         ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
         ctx.fillRect(1884 - reserve, 894, 2, 118);
-        text(ctx, "PATROCINA", cx, 914, { size: 18, weight: 700, color: RED, align: "center", spacing: 3 });
+        text(ctx, "SPONSORS", cx, 914, { size: 18, weight: 700, color: RED, align: "center", spacing: 3 });
         sponsorLogos(ctx, sponsors, cx, 968, 64, reserve - 70, "center");
       }
     },
@@ -439,11 +469,11 @@ function screen(ctx, logo, tag, custom, sponsors, [white, red]) {
   ctx.fillStyle = RED;
   ctx.fillRect(W / 2 - 70, 730, 140, 6);
 
-  // Sin nombre escrito, solo "CAIMAN X GAMING" (si no, se repetiría).
+  // Sin nombre escrito, solo "CAIMANX GAMING" (si no, se repetiría).
   if (custom) text(ctx, tag, W / 2, 800, { size: 56, italic: true, align: "center", maxWidth: 1200 });
-  text(ctx, "CAIMAN X GAMING", W / 2, custom ? 858 : 800, { size: 26, weight: 700, color: RED, align: "center", spacing: 8 });
+  brandText(ctx, W / 2, custom ? 858 : 800, { size: 26, align: "center", spacing: 8 });
   if (sponsors.length) {
-    text(ctx, "PATROCINA", W / 2, 934, { size: 18, weight: 700, color: "rgba(255, 255, 255, 0.55)", align: "center", spacing: 6 });
+    text(ctx, "SPONSORS", W / 2, 934, { size: 18, weight: 700, color: "rgba(255, 255, 255, 0.55)", align: "center", spacing: 6 });
     sponsorLogos(ctx, sponsors, W / 2, 978, 52, 1200, "center");
   }
   text(ctx, "CAIMANES.TEAM", W / 2, 1040, { size: 22, weight: 700, color: "rgba(255, 255, 255, 0.45)", align: "center", spacing: 8 });
@@ -488,7 +518,7 @@ export function renderOverlays(container) {
     <div class="cx-fields">
       <label class="cx-field">
         <span>Tu nombre o tag</span>
-        <input type="text" data-field="tag" maxlength="20" placeholder="CAIMAN X" autocomplete="off" />
+        <input type="text" data-field="tag" maxlength="20" placeholder="CAIMANX" autocomplete="off" />
       </label>
       <label class="cx-field">
         <span>Rival (peleas)</span>
@@ -522,7 +552,7 @@ export function renderOverlays(container) {
     const { logo, sponsors } = await loadAssets();
     if (!root.isConnected) return;
     const v = {
-      tag: (typed.tag.trim() || "CAIMAN X").toUpperCase(),
+      tag: (typed.tag.trim() || "CAIMANX").toUpperCase(),
       rival: typed.rival.trim().toUpperCase(),
       custom: typed.tag.trim() !== "",
     };

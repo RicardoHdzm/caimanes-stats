@@ -2,7 +2,7 @@
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
 // cambia el fondo a su foto y a la derecha sale su logo. Con el mouse
 // encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
-// (Caimanes FC, fc.html) y Gaming (Caiman X, caimanx.html) son link; Pádel
+// (Caimanes FC, fc.html) y Gaming (CaimanX, caimanx.html) son link; Pádel
 // (Caimanes Padel Squad) todavía no. Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro; la línea roja debajo del nombre activo se
 // va llenando y, al llenarse, pasa al siguiente.
@@ -51,8 +51,8 @@ const SPORTS = [
   {
     key: "esports",
     name: "Gaming",
-    team: "Caiman X Gaming",
-    teamLines: ["Caiman X", "Gaming"],
+    team: "CaimanX Gaming",
+    teamLines: ["CaimanX", "Gaming"],
     href: "caimanx.html",
     logo: `<img src="assets/logos/caimanx.png?v=3" alt="" class="sp-logo sp-logo--esports" />`,
   },

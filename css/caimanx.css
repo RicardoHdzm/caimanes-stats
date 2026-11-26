@@ -1,10 +1,10 @@
-/* Caiman X (caimanx.html): lo propio del sitio de gaming. Todo lo demás
+/* CaimanX (caimanx.html): lo propio del sitio de gaming. Todo lo demás
    (header, menú ☰, hero, secciones, footer, temas) sale de css/styles.css,
    igual que el sóftbol y Caimanes FC; aquí solo se usan sus variables
    (--bg, --surface, --border, --text, --muted, --accent...), así que
    funciona en Sol, Eclipse y Luna. */
 
-/* ---- Logo de Caiman X (cuadrado, con margen en el PNG) ---- */
+/* ---- Logo de CaimanX (cuadrado, con margen en el PNG) ---- */
 .cx-site .site-brand .cx-brand-logo {
   height: 46px;
 }

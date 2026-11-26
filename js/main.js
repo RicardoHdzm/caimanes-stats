@@ -129,7 +129,7 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
       <a href="fc.html" data-sport-switch="futbol">Fútbol · Caimanes FC</a>
-      <a href="caimanx.html">Gaming · Caiman X</a>
+      <a href="caimanx.html">Gaming · CaimanX</a>
       <a href="#/">Cambiar deporte</a>
     </div>`;
 
@@ -292,7 +292,7 @@ function buildBottomTabs() {
       </a>
       <a href="caimanx.html">
         <span class="more-app-icon"><i class="fa-solid fa-gamepad"></i></span>
-        <span>Caiman X</span>
+        <span>CaimanX</span>
       </a>
       <a href="#/">
         <span class="more-app-icon"><i class="fa-solid fa-shuffle"></i></span>

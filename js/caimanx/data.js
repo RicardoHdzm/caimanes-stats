@@ -1,4 +1,4 @@
-// Datos del sitio de Caiman X (caimanx.html) — a mano, como js/data.js del
+// Datos del sitio de CaimanX (caimanx.html) — a mano, como js/data.js del
 // sóftbol. Lo que esté vacío muestra un aviso en su sección.
 
 // Redes. `null` = no sale el botón. Para agregar una, pon su link completo

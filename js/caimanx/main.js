@@ -1,4 +1,4 @@
-// CAIMAN X (gaming) — sitio aparte (caimanx.html), con el mismo header,
+// CAIMANX (gaming) — sitio aparte (caimanx.html), con el mismo header,
 // menú ☰, temas y estilos que el sóftbol y Caimanes FC (ver js/fc/main.js,
 // del que sale este armado). Se llega desde el selector de deporte de la
 // portada (index.html#/, ver js/views/sports.js).
@@ -79,7 +79,7 @@ function renderHome(container) {
         <div class="home-hero-bg" aria-hidden="true"></div>
         <div class="home-hero-content">
           <img src="assets/logos/caimanx.png?v=3" alt="" class="home-hero-logo cx-hero-logo" />
-          <h1 class="home-hero-name">Caiman X</h1>
+          <h1 class="home-hero-name">CaimanX</h1>
           <p class="home-hero-tag">Gaming</p>
           <p class="home-hero-league">Caimanes.Team · Culiacán</p>
           <div class="home-hero-ctas">
@@ -98,7 +98,7 @@ function renderHome(container) {
 
       <div class="home-marquee" aria-hidden="true">
         <div class="home-marquee-track">
-          ${Array.from({ length: 8 }, () => `<span>Caiman X</span><span class="home-marquee-accent">#CaimanX</span><span>Gaming</span><span class="home-marquee-accent">#Caimanation</span>`).join("")}
+          ${Array.from({ length: 8 }, () => `<span>CaimanX</span><span class="home-marquee-accent">#CaimanX</span><span>Gaming</span><span class="home-marquee-accent">#Caimanation</span>`).join("")}
         </div>
       </div>
 
@@ -181,7 +181,7 @@ moreSheet.innerHTML = `
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-    <h4 class="more-sheet-group">Caiman X</h4>
+    <h4 class="more-sheet-group">CaimanX</h4>
     <div class="more-sheet-grid">${NAV.map(tile).join("")}</div>
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
@@ -213,7 +213,7 @@ moreSheet.innerHTML = `
 
 document.getElementById("footer-nav").innerHTML = `
     <div class="footer-col">
-      <h3 class="footer-col-title">Caiman X</h3>
+      <h3 class="footer-col-title">CaimanX</h3>
       ${NAV.map((t) => `<a href="${t.route}">${t.label}</a>`).join("")}
     </div>
     <div class="footer-col">
