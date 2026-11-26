@@ -15,7 +15,7 @@ const FONT = '"Saira", "Arial Narrow", sans-serif';
 // Rojo del logo (assets/logos/caimanx.png): rgb(191, 15, 53).
 const RED = "#bf0f35";
 const PANEL = "rgba(10, 14, 24, 0.9)";
-const LOGO_SRC = "assets/logos/caimanx.png?v=4";
+const LOGO_SRC = "assets/logos/caimanx.png?v=5";
 // Parte del PNG que se usa (el escudo actual no trae margen: todo).
 const LOGO_CROP = { x: 0, y: 0, w: 1, h: 1 };
 

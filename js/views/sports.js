@@ -54,7 +54,7 @@ const SPORTS = [
     team: "CaimanX Gaming",
     teamLines: ["CaimanX", "Gaming"],
     href: "caimanx.html",
-    logo: `<img src="assets/logos/caimanx.png?v=4" alt="" class="sp-logo sp-logo--esports" />`,
+    logo: `<img src="assets/logos/caimanx.png?v=5" alt="" class="sp-logo sp-logo--esports" />`,
   },
 ];
 
