@@ -1,0 +1,4 @@
+{
+  "rewrites": [{ "source": "/futbol", "destination": "/fc.html" }],
+  "redirects": [{ "source": "/fc.html", "destination": "/futbol", "permanent": true }]
+}

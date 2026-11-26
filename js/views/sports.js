@@ -2,7 +2,7 @@
 // nombres en grande, uno debajo del otro; el que señalas se pinta sólido,
 // cambia el fondo a su foto y a la derecha sale su logo. Con el mouse
 // encima, el nombre del deporte rueda hacia arriba y entra el del equipo. Sóftbol (Caimanes de Villas, #/softbol) y Fútbol
-// (Caimanes FC, fc.html) y Gaming (CaimanX, caimanx.html) son link; Pádel
+// (Caimanes FC, /futbol → fc.html, ver vercel.json) y Gaming (CaimanX, caimanx.html) son link; Pádel
 // (Caimanes Padel Squad) todavía no. Mientras nadie señala, el fondo va
 // rotando solo entre los cuatro; la línea roja debajo del nombre activo se
 // va llenando y, al llenarse, pasa al siguiente.
@@ -39,7 +39,7 @@ const ALL_SPORTS = [
     name: "Fútbol",
     team: "Caimanes Football Club",
     teamLines: ["Caimanes", "Football Club"],
-    href: "fc.html",
+    href: "futbol",
     logo: fcLogoHtml(220, "sp-logo sp-logo--fc"),
   },
   {

@@ -128,7 +128,7 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
 ).join("") + `
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="fc.html" data-sport-switch="futbol">Fútbol · Caimanes FC</a>
+      <a href="futbol" data-sport-switch="futbol">Fútbol · Caimanes FC</a>
       <a href="caimanx.html">Gaming · CaimanX</a>
       <a href="#/">Cambiar deporte</a>
     </div>`;
@@ -286,7 +286,7 @@ function buildBottomTabs() {
     ).join("")}
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
-      <a href="fc.html" data-sport-switch="futbol">
+      <a href="futbol" data-sport-switch="futbol">
         <span class="more-app-icon"><i class="fa-solid fa-futbol"></i></span>
         <span>Caimanes FC</span>
       </a>

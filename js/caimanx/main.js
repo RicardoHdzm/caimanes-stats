@@ -189,7 +189,7 @@ moreSheet.innerHTML = `
         <span class="more-app-icon"><i class="fa-solid fa-baseball-bat-ball"></i></span>
         <span>Sóftbol</span>
       </a>
-      <a href="fc.html">
+      <a href="futbol">
         <span class="more-app-icon"><i class="fa-solid fa-futbol"></i></span>
         <span>Fútbol</span>
       </a>
@@ -219,7 +219,7 @@ document.getElementById("footer-nav").innerHTML = `
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
       <a href="./#/softbol">Sóftbol · Caimanes de Villas</a>
-      <a href="fc.html">Fútbol · Caimanes FC</a>
+      <a href="futbol">Fútbol · Caimanes FC</a>
       <a href="./#/">Cambiar deporte</a>
     </div>`;
 document.getElementById("footer-socials").innerHTML = socials

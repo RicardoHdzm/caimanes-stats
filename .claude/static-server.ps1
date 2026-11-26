@@ -24,6 +24,13 @@ while ($listener.IsListening) {
   try {
     $path = $request.Url.AbsolutePath
     if ($path -eq "/") { $path = "/index.html" }
+    # Como Vercel: los "rewrites" exactos de vercel.json (ej. /futbol -> /fc.html).
+    $vercel = Join-Path $Root "vercel.json"
+    if (Test-Path $vercel) {
+      foreach ($rw in (Get-Content $vercel -Raw | ConvertFrom-Json).rewrites) {
+        if ($rw.source -eq $path) { $path = $rw.destination }
+      }
+    }
     $filePath = Join-Path $Root ($path.TrimEnd("/").TrimStart("/"))
     # Como en GitHub Pages / Vercel: una carpeta sin archivo exacto (ej.
     # /lineup o /lineup/) sirve su index.html — así las URLs sin extensión

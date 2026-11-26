@@ -5,7 +5,7 @@
   "description": "Caimanes FC, equipo de fútbol de Culiacán: partidos, resultados, tabla, plantilla y estadísticas.",
   "lang": "es-MX",
   "dir": "ltr",
-  "start_url": "./fc.html",
+  "start_url": "./futbol",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
