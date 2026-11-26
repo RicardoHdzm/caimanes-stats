@@ -23,7 +23,9 @@ const SOCIALS = [{ label: "Instagram", icon: "fa-instagram", url: "https://www.i
 // aparece en lugar del deporte al pasar el mouse (el segundo, en rojo).
 // Las fotos de fondo van en css/styles.css (.sp-media--<key>). Si se reemplaza un logo con el mismo
 // nombre de archivo, agregar/subir un "?v=" para que no se quede el viejo.
-const SPORTS = [
+// `hidden: true` = no sale en la portada (ni en la rotación); para volver a
+// mostrarlo, quitar esa línea.
+const ALL_SPORTS = [
   {
     key: "softbol",
     name: "Sóftbol",
@@ -46,6 +48,7 @@ const SPORTS = [
     team: "Caimanes Padel Squad",
     teamLines: ["Caimanes", "Padel Squad"],
     href: null,
+    hidden: true,
     logo: `<img src="assets/logos/padel.png" alt="" class="sp-logo sp-logo--padel" />`,
   },
   {
@@ -54,9 +57,12 @@ const SPORTS = [
     team: "CaimanX Gaming",
     teamLines: ["CaimanX", "Gaming"],
     href: "caimanx.html",
+    hidden: true,
     logo: `<img src="assets/logos/caimanx.png?v=5" alt="" class="sp-logo sp-logo--esports" />`,
   },
 ];
+
+const SPORTS = ALL_SPORTS.filter((s) => !s.hidden);
 
 const ROTATE_MS = 5000;
 
