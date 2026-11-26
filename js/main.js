@@ -33,7 +33,9 @@ import { initRecovery } from "./recovery.js";
 const routes = {
   // #/ es el selector de deporte (softbol / fútbol, ver js/views/sports.js)
   // y la portada del softbol estilo lyon.gg (js/views/home.js) vive en
-  // #/softbol — la de todos, con o sin sesión.
+  // #/softbol — la de todos, con o sin sesión. Su link público es
+  // caimanes.team/softbol (vercel.json la manda a este mismo index.html; ver
+  // currentRoute y cleanUrl).
   home: renderSportPicker,
   softbol: renderHome,
   inicio: renderFeed,
@@ -129,7 +131,6 @@ document.getElementById("footer-nav").innerHTML = NAV_GROUPS.map(
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
       <a href="futbol" data-sport-switch="futbol">Fútbol · Caimanes FC</a>
-      <a href="caimanx.html">Gaming · CaimanX</a>
       <a href="#/">Cambiar deporte</a>
     </div>`;
 
@@ -141,6 +142,24 @@ function renderNotFound(container) {
       <p>Esta página no existe (o ya no). Mejor regresa al dugout.</p>
       <a href="#/softbol" class="home-btn home-btn--solid">Volver al inicio</a>
     </div>`;
+}
+
+// ¿La página se abrió como /softbol? (vercel.json sirve ahí este index.html.)
+function onSoftbolPath() {
+  return /\/softbol\/?$/.test(location.pathname);
+}
+
+// Dirección limpia: la portada del softbol se ve como caimanes.team/softbol
+// (no /#/softbol) y el selector como caimanes.team/ (no /softbol#/). Con
+// replaceState, sin recargar; las demás páginas siguen con su #/ (en
+// /softbol#/roster o /#/roster, las dos abren lo mismo).
+let lastUrl = null;
+function cleanUrl(tab) {
+  let target = null;
+  if (tab === "softbol" && location.hash === "#/softbol") target = "softbol";
+  else if (tab === "home" && location.hash === "#/" && onSoftbolPath()) target = "./";
+  if (target) history.replaceState(history.state, "", new URL(target, location.href).pathname + location.search);
+  lastUrl = location.href;
 }
 
 function currentRoute() {
@@ -198,7 +217,9 @@ function currentRoute() {
   if (location.hash.startsWith("#/") && first && !routes[first]) {
     return { tab: null, render: renderNotFound };
   }
-  const tab = routes[first] ? first : "home";
+  // caimanes.team/softbol sin hash: la portada del softbol, no el selector.
+  const bare = location.hash === "" || location.hash === "#";
+  const tab = routes[first] ? first : bare && onSoftbolPath() ? "softbol" : "home";
 
   // El Feed (js/views/feed.js) es exclusivo de cuentas con sesión, a
   // petición expresa. Sin sesión, su link no aparece (ver
@@ -508,6 +529,7 @@ function render() {
   // header ni footer (ver .is-sport-picker en css/styles.css).
   document.body.classList.toggle("is-sport-picker", route.tab === "home");
 
+  cleanUrl(route.tab);
   app.innerHTML = "";
   route.render(app);
   // Entrada suave de la página nueva (ver .page-enter en styles.css): se
@@ -552,11 +574,16 @@ function startApp() {
 // de render() porque esa misma función también se llama al cambiar la
 // sesión (ver más abajo), y ahí sí se quiere mantener el scroll donde
 // estaba.
-window.addEventListener("hashchange", () => {
-  if (!appStarted) return;
+// popstate: "atrás"/"adelante" entre /softbol y / (cleanUrl cambia la ruta,
+// no solo el hash, y ahí no hay hashchange). lastUrl evita pintar dos veces
+// cuando llegan los dos eventos.
+function onNavigate() {
+  if (!appStarted || location.href === lastUrl) return;
   render();
   window.scrollTo(0, 0);
-});
+}
+window.addEventListener("hashchange", onNavigate);
+window.addEventListener("popstate", onNavigate);
 // Se dispara desde js/auth.js cada vez que cambia la sesión (login, logout,
 // se resuelve el player_id) — la vista actual se repinta con el estado
 // nuevo, mismo tratamiento que un cambio de hash.

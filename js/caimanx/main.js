@@ -185,7 +185,7 @@ moreSheet.innerHTML = `
     <div class="more-sheet-grid">${NAV.map(tile).join("")}</div>
     <h4 class="more-sheet-group">Más</h4>
     <div class="more-sheet-grid">
-      <a href="./#/softbol">
+      <a href="softbol">
         <span class="more-app-icon"><i class="fa-solid fa-baseball-bat-ball"></i></span>
         <span>Sóftbol</span>
       </a>
@@ -218,7 +218,7 @@ document.getElementById("footer-nav").innerHTML = `
     </div>
     <div class="footer-col">
       <h3 class="footer-col-title">Otros deportes</h3>
-      <a href="./#/softbol">Sóftbol · Caimanes de Villas</a>
+      <a href="softbol">Sóftbol · Caimanes de Villas</a>
       <a href="futbol">Fútbol · Caimanes FC</a>
       <a href="./#/">Cambiar deporte</a>
     </div>`;

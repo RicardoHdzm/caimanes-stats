@@ -16,9 +16,11 @@
     // Mientras js/main.js pinta la primera vista (ver html[data-boot] en
     // css/styles.css): en el selector de deporte (#/) y en la portada con
     // hero (#/softbol) se reserva el espacio ya oscuro, sin el destello claro.
+    // caimanes.team/softbol sin hash también es la portada del softbol.
     var h = location.hash;
-    if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "picker";
-    else if (h === "#/softbol") document.documentElement.dataset.boot = "hero";
+    var softbolPath = /\/softbol\/?$/.test(location.pathname);
+    if (h === "#/softbol" || (softbolPath && (h === "" || h === "#"))) document.documentElement.dataset.boot = "hero";
+    else if (h === "" || h === "#" || h === "#/") document.documentElement.dataset.boot = "picker";
     // Llegando de cambiar de deporte (ver js/sport-switch.js): la pantalla de
     // "Cargando" se pone antes de pintar nada, para que no haya corte.
     try {
