@@ -10,7 +10,8 @@
 const W = 1920;
 const H = 1080;
 const FONT = '"Saira", "Arial Narrow", sans-serif';
-const RED = "#d31545";
+// Rojo del logo (assets/logos/caimanx.png): rgb(191, 15, 53).
+const RED = "#bf0f35";
 const PANEL = "rgba(10, 14, 24, 0.9)";
 const LOGO_SRC = "assets/logos/caimanx.png?v=3";
 // Parte del PNG que se usa (el escudo actual no trae margen: todo).
@@ -142,7 +143,7 @@ function namePlate(ctx, logo, x, y, w, h, tag) {
   const maxW = w - h * 1.3 - 34;
   if (h >= 70) {
     text(ctx, tag, tx, y + h * 0.42, { size: Math.round(h * 0.4), italic: true, maxWidth: maxW });
-    text(ctx, "CAIMAN X GAMING", tx, y + h * 0.76, { size: Math.round(h * 0.17), weight: 700, color: "#e8375c", maxWidth: maxW, spacing: 3 });
+    text(ctx, "CAIMAN X GAMING", tx, y + h * 0.76, { size: Math.round(h * 0.17), weight: 700, color: RED, maxWidth: maxW, spacing: 3 });
   } else {
     text(ctx, tag, tx, y + h / 2 + 1, { size: Math.round(h * 0.5), italic: true, maxWidth: maxW });
   }
@@ -160,7 +161,8 @@ function slot(ctx, x, y, w, h, label) {
 }
 
 // Fondo para los overlays de pantalla completa: azul marino con un
-// resplandor rojo suave y rayas diagonales muy tenues.
+// resplandor rojo suave y cuadrícula tipo pantalla/HUD (fina cada 40 px,
+// más marcada cada 200 px, con una cruz roja en cada cruce grande).
 function fullBackground(ctx) {
   const g = ctx.createLinearGradient(0, 0, W, H);
   g.addColorStop(0, "#0b0f1a");
@@ -168,19 +170,39 @@ function fullBackground(ctx) {
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
   const glow = ctx.createRadialGradient(W * 0.85, H * 0.9, 50, W * 0.85, H * 0.9, 900);
-  glow.addColorStop(0, "rgba(211, 21, 69, 0.18)");
-  glow.addColorStop(1, "rgba(211, 21, 69, 0)");
+  glow.addColorStop(0, "rgba(191, 15, 53, 0.18)");
+  glow.addColorStop(1, "rgba(191, 15, 53, 0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.025)";
-  ctx.lineWidth = 2;
-  for (let i = -H; i < W; i += 28) {
+  const lines = (step, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(i, H);
-    ctx.lineTo(i + H, 0);
+    for (let x = step; x < W; x += step) {
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, H);
+    }
+    for (let y = step; y < H; y += step) {
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(W, y + 0.5);
+    }
     ctx.stroke();
+  };
+  lines(40, "rgba(255, 255, 255, 0.035)");
+  lines(200, "rgba(255, 255, 255, 0.07)");
+  ctx.strokeStyle = "rgba(191, 15, 53, 0.55)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let x = 200; x < W; x += 200) {
+    for (let y = 200; y < H; y += 200) {
+      ctx.moveTo(x - 7, y + 0.5);
+      ctx.lineTo(x + 8, y + 0.5);
+      ctx.moveTo(x + 0.5, y - 7);
+      ctx.lineTo(x + 0.5, y + 8);
+    }
   }
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -253,7 +275,7 @@ const OVERLAYS = [
       ctx.fillStyle = PANEL;
       slant(ctx, 840, y + h, 240, 30, 10);
       ctx.fill();
-      text(ctx, "CAIMAN X GAMING", 960, y + h + 15, { size: 16, weight: 700, color: "#e8375c", align: "center", spacing: 3 });
+      text(ctx, "CAIMAN X GAMING", 960, y + h + 15, { size: 16, weight: 700, color: RED, align: "center", spacing: 3 });
     },
   },
   {
@@ -301,7 +323,7 @@ const OVERLAYS = [
       // Abajo: nombre y récord.
       namePlate(ctx, logo, 36, 862, 1404, 182, tag);
       panel(ctx, 1476, 862, 408, 182);
-      text(ctx, "RÉCORD", 1680, 900, { size: 24, weight: 700, color: "#e8375c", align: "center", spacing: 4 });
+      text(ctx, "RÉCORD", 1680, 900, { size: 24, weight: 700, color: RED, align: "center", spacing: 4 });
       slot(ctx, 1500, 926, 160, 96, "V");
       slot(ctx, 1700, 926, 160, 96, "D");
       text(ctx, "–", 1680, 975, { size: 48, align: "center", color: "rgba(255, 255, 255, 0.5)" });
@@ -316,8 +338,8 @@ const OVERLAYS = [
 function screen(ctx, logo, tag, custom, [white, red]) {
   fullBackground(ctx);
   const glow = ctx.createRadialGradient(W / 2, 380, 40, W / 2, 380, 620);
-  glow.addColorStop(0, "rgba(211, 21, 69, 0.22)");
-  glow.addColorStop(1, "rgba(211, 21, 69, 0)");
+  glow.addColorStop(0, "rgba(191, 15, 53, 0.22)");
+  glow.addColorStop(1, "rgba(191, 15, 53, 0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
@@ -338,14 +360,14 @@ function screen(ctx, logo, tag, custom, [white, red]) {
   ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
   ctx.shadowBlur = 30;
   text(ctx, white, x0, 640, { size, italic: true });
-  text(ctx, red, x0 + w1 + gap, 640, { size, italic: true, color: "#e8375c" });
+  text(ctx, red, x0 + w1 + gap, 640, { size, italic: true, color: RED });
   ctx.restore();
   ctx.fillStyle = RED;
   ctx.fillRect(W / 2 - 70, 730, 140, 6);
 
   // Sin nombre escrito, solo "CAIMAN X GAMING" (si no, se repetiría).
   if (custom) text(ctx, tag, W / 2, 800, { size: 56, italic: true, align: "center", maxWidth: 1200 });
-  text(ctx, "CAIMAN X GAMING", W / 2, custom ? 858 : 800, { size: 26, weight: 700, color: "#e8375c", align: "center", spacing: 8 });
+  text(ctx, "CAIMAN X GAMING", W / 2, custom ? 858 : 800, { size: 26, weight: 700, color: RED, align: "center", spacing: 8 });
   text(ctx, "CAIMANES.TEAM", W / 2, 1030, { size: 22, weight: 700, color: "rgba(255, 255, 255, 0.45)", align: "center", spacing: 8 });
 }
 
