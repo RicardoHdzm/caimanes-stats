@@ -53,6 +53,7 @@ export const FC_PLAYERS = [
   { id: "luis-galaviz", name: "Luis Galaviz", number: null, position: null, photo: null },
   { id: "luis-nunez", name: "Luis Nuñez", number: null, position: null, photo: null },
   { id: "alberto-buelna", name: "Alberto Buelna", number: null, position: null, photo: null },
+  { id: "miguel-vega", name: "Miguel Vega", number: null, position: null, photo: null },
   // { id: "juan-perez", name: "Juan Pérez", number: 10, position: "DEL", photo: null },
 ];
 
