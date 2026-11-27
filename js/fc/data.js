@@ -42,10 +42,7 @@ const fcPhoto = (character) => `assets/players/fc/personajes/${character}.jpg`;
 // (ver el final de este bloque). Fuera de la lista: ego-jinpachi y
 // teieri-anri (no son jugadores; quedan por si hay entrenador o mánager).
 const FREE_CHARACTERS = [
-  "leonardo-luna",
-  "oliver-aiku",
   "adam-blake",
-  "igarashi-gurimu",
   "itoshi-rin",
   "yukimiya-kenyu",
   "wanima-keisuke",
@@ -60,7 +57,6 @@ const FREE_CHARACTERS = [
   "kiyora-jin",
   "itoshi-sae",
   "aryu-jyubei",
-  "julien-loki",
   "kurona-ranze",
   "tokimitsu-aoshi",
   "shidou-ryusei",
@@ -70,6 +66,10 @@ const FREE_CHARACTERS = [
   "otoya-eita",
   "bachira-meguru",
   "imamura-yudai",
+  "gagamaru-gin",
+  "niko-ikki",
+  "nanase-nijiro",
+  "pablo-cavazos",
 ];
 
 // Plantilla. `id` único y sin espacios (sale en la URL del perfil).
@@ -80,13 +80,13 @@ const FREE_CHARACTERS = [
 // Opcionales: `captain: true` (medalla "Captain") y `seasons` (cuántas
 // temporadas lleva en el equipo).
 export const FC_PLAYERS = [
-  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: fcPhoto("pablo-cavazos"), softbolId: "p4" },
+  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: fcPhoto("julien-loki"), softbolId: "p4" },
   { id: "fernando-olivas", name: "Fernando Olivas", number: null, position: null, photo: fcPhoto("dada-silva"), softbolId: "p25" },
-  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: fcPhoto("gagamaru-gin"), softbolId: "p3" },
-  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: fcPhoto("raichi-jingo"), softbolId: "p6" },
+  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: fcPhoto("igarashi-gurimu"), softbolId: "p3" },
+  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: fcPhoto("leonardo-luna"), softbolId: "p6" },
   { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: fcPhoto("sendou-shuto"), softbolId: "p13" },
-  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: fcPhoto("niko-ikki"), softbolId: "p16" },
-  { id: "teddy-sainz", name: "Teddy Sainz", number: null, position: null, photo: fcPhoto("nanase-nijiro"), softbolId: "p17" },
+  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: fcPhoto("raichi-jingo"), softbolId: "p16" },
+  { id: "teddy-sainz", name: "Teddy Sainz", number: null, position: null, photo: fcPhoto("oliver-aiku"), softbolId: "p17" },
   { id: "luis-galaviz", name: "Luis Galaviz", number: null, position: null, photo: fcPhoto("naruhaya-asahi") },
   { id: "luis-nunez", name: "Luis Nuñez", number: null, position: null, photo: fcPhoto("kuon-wataru") },
   { id: "alberto-buelna", name: "Alberto Buelna", number: null, position: null, photo: fcPhoto("kunigami-rensuke") },
