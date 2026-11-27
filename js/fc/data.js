@@ -31,31 +31,75 @@ export const FC_POSITIONS = {
   DEL: "Delantero",
 };
 
+// Fotos de perfil del fútbol: personajes de Blue Lock, recortados en
+// cuadrado en assets/players/fc/personajes/<personaje>.jpg (los 41 del sitio
+// oficial). Son distintas a las del sóftbol a propósito, aunque el jugador
+// juegue los dos deportes.
+const fcPhoto = (character) => `assets/players/fc/personajes/${character}.jpg`;
+
+// Personajes libres para los jugadores que se vayan agregando, en un orden al
+// azar ya fijo: quien entre con `photo: null` toma solo el siguiente libre
+// (ver el final de este bloque). Fuera de la lista: ego-jinpachi y
+// teieri-anri (no son jugadores; quedan por si hay entrenador o mánager).
+const FREE_CHARACTERS = [
+  "leonardo-luna",
+  "oliver-aiku",
+  "adam-blake",
+  "igarashi-gurimu",
+  "itoshi-rin",
+  "yukimiya-kenyu",
+  "wanima-keisuke",
+  "isagi-yoichi",
+  "wanima-junichi",
+  "barou-shouei",
+  "nagi-seishiro",
+  "karasu-tabito",
+  "tsurugi-zantetsu",
+  "chigiri-hyoma",
+  "kira-ryosuke",
+  "kiyora-jin",
+  "itoshi-sae",
+  "aryu-jyubei",
+  "julien-loki",
+  "kurona-ranze",
+  "tokimitsu-aoshi",
+  "shidou-ryusei",
+  "hiori-yo",
+  "mikage-reo",
+  "ohkawa-hibiki",
+  "otoya-eita",
+  "bachira-meguru",
+  "imamura-yudai",
+];
+
 // Plantilla. `id` único y sin espacios (sale en la URL del perfil).
-// `photo` es opcional; sin foto se muestran las iniciales. `number` y
-// `position` (POR/DEF/MED/DEL) se llenan cuando estén definidos.
-// Los que también juegan sóftbol usan la misma foto de assets/players/ y
-// llevan `softbolId` (su id en js/data.js; les da la medalla "Two-Way").
+// `photo`: su personaje (fcPhoto("…")); con null se le asigna solo el
+// siguiente de FREE_CHARACTERS. `number` y `position` (POR/DEF/MED/DEL) se
+// llenan cuando estén definidos. Los que también juegan sóftbol llevan
+// `softbolId` (su id en js/data.js; les da la medalla "Two-Way").
 // Opcionales: `captain: true` (medalla "Captain") y `seasons` (cuántas
 // temporadas lleva en el equipo).
 export const FC_PLAYERS = [
-  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: "assets/players/p4.jpg", softbolId: "p4" },
-  { id: "fernando-olivas", name: "Fernando Olivas", number: null, position: null, photo: "assets/players/p25.jpg", softbolId: "p25" },
-  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: "assets/players/p3.jpg", softbolId: "p3" },
-  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: "assets/players/p6.jpg", softbolId: "p6" },
-  { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: "assets/players/p13.jpg", softbolId: "p13" },
-  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: "assets/players/p16.jpg", softbolId: "p16" },
-  // Sin foto todavía (tampoco en sóftbol): salen sus iniciales. Al tener una,
-  // ponerla en assets/players/p17.jpg y aquí photo: "assets/players/p17.jpg".
-  { id: "teddy-sainz", name: "Teddy Sainz", number: null, position: null, photo: null, softbolId: "p17" },
-  // Solo fútbol (no están en el sóftbol). Sin foto todavía: salen sus
-  // iniciales; al tener una, guardarla en assets/players/fc/ y poner su ruta.
-  { id: "luis-galaviz", name: "Luis Galaviz", number: null, position: null, photo: null },
-  { id: "luis-nunez", name: "Luis Nuñez", number: null, position: null, photo: null },
-  { id: "alberto-buelna", name: "Alberto Buelna", number: null, position: null, photo: null },
-  { id: "miguel-vega", name: "Miguel Vega", number: null, position: null, photo: null },
+  { id: "carlos-borboa", name: "Carlos Borboa", number: null, position: null, photo: fcPhoto("pablo-cavazos"), softbolId: "p4" },
+  { id: "fernando-olivas", name: "Fernando Olivas", number: null, position: null, photo: fcPhoto("dada-silva"), softbolId: "p25" },
+  { id: "omar-ramirez", name: "Omar Ramirez", number: null, position: null, photo: fcPhoto("gagamaru-gin"), softbolId: "p3" },
+  { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: fcPhoto("raichi-jingo"), softbolId: "p6" },
+  { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: fcPhoto("sendou-shuto"), softbolId: "p13" },
+  { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: fcPhoto("niko-ikki"), softbolId: "p16" },
+  { id: "teddy-sainz", name: "Teddy Sainz", number: null, position: null, photo: fcPhoto("nanase-nijiro"), softbolId: "p17" },
+  { id: "luis-galaviz", name: "Luis Galaviz", number: null, position: null, photo: fcPhoto("naruhaya-asahi") },
+  { id: "luis-nunez", name: "Luis Nuñez", number: null, position: null, photo: fcPhoto("kuon-wataru") },
+  { id: "alberto-buelna", name: "Alberto Buelna", number: null, position: null, photo: fcPhoto("kunigami-rensuke") },
+  { id: "miguel-vega", name: "Miguel Vega", number: null, position: null, photo: fcPhoto("iemon-okuhito") },
   // { id: "juan-perez", name: "Juan Pérez", number: 10, position: "DEL", photo: null },
 ];
+
+// Jugadores nuevos sin foto: el siguiente personaje libre, sin repetir.
+{
+  const taken = new Set(FC_PLAYERS.map((p) => p.photo).filter(Boolean));
+  const free = FREE_CHARACTERS.map(fcPhoto).filter((f) => !taken.has(f));
+  for (const p of FC_PLAYERS) if (!p.photo && free.length) p.photo = free.shift();
+}
 
 // Partidos: los ya jugados y los próximos en la misma lista. Uno próximo
 // lleva goalsFor/goalsAgainst en null.
@@ -84,7 +128,7 @@ export const FC_MATCHES = [
 // Patrocinadores (mismo formato que SPONSORS en js/data.js). `url` es
 // opcional: sin él, la tarjeta se ve pero no es clicable.
 export const FC_SPONSORS = [
-  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png", url: "https://jrhm.studio/" },
 ];
 
 // Tabla de la liga como la publica la liga. `us: true` marca nuestro renglón.
