@@ -1205,7 +1205,7 @@ export const STANDINGS_HISTORY = {
 export const SPONSORS = [
   { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png", url: "https://www.instagram.com/jerseyhub.cln/" },
   { name: "EJML — Asesor Patrimonial", logo: "assets/sponsors/sponsor005.png", url: "https://www.instagram.com/asesorejml/" },
-  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" },
+  { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png", url: "https://jrhm.studio/" },
   { name: "Valpro", logo: "assets/sponsors/sponsor004.png", url: "https://www.instagram.com/valpro.automotriz/" },
   { name: "Jorge Zazueta — Entrenador Personal", logo: "assets/sponsors/sponsor003.png", url: "https://www.instagram.com/jorgezazueta.fit/" },
 ];

@@ -4515,6 +4515,16 @@ html[data-session="in"] .record-hero-avatar-group .avatar {
   font-size: var(--text-xs);
 }
 
+.footer-legal a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-legal a:hover {
+  color: var(--accent-text);
+}
+
 @media (max-width: 860px) {
   .footer-main {
     grid-template-columns: 1fr;

@@ -26,7 +26,7 @@ export const GAMES = [
 
 // Patrocinadores: salen en los overlays y las pantallas (en blanco). `logo`:
 // PNG con fondo transparente (como los de assets/sponsors/).
-export const SPONSORS = [{ name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png" }];
+export const SPONSORS = [{ name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png", url: "https://jrhm.studio/" }];
 
 // Torneos, del más reciente al más viejo:
 //   { date: "2026-12-06", name: "Copa Culiacán", game: "Smash Bros", result: "3er lugar" }
