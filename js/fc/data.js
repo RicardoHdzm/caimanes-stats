@@ -45,6 +45,14 @@ export const FC_PLAYERS = [
   { id: "edwyn-pompa", name: "Edwyn Pompa", number: null, position: null, photo: "assets/players/p6.jpg", softbolId: "p6" },
   { id: "luis-pompa", name: "Luis Pompa", number: null, position: null, photo: "assets/players/p13.jpg", softbolId: "p13" },
   { id: "ruben-perez", name: "Ruben Perez", number: null, position: null, photo: "assets/players/p16.jpg", softbolId: "p16" },
+  // Sin foto todavía (tampoco en sóftbol): salen sus iniciales. Al tener una,
+  // ponerla en assets/players/p17.jpg y aquí photo: "assets/players/p17.jpg".
+  { id: "teddy-sainz", name: "Teddy Sainz", number: null, position: null, photo: null, softbolId: "p17" },
+  // Solo fútbol (no están en el sóftbol). Sin foto todavía: salen sus
+  // iniciales; al tener una, guardarla en assets/players/fc/ y poner su ruta.
+  { id: "luis-galaviz", name: "Luis Galaviz", number: null, position: null, photo: null },
+  { id: "luis-nunez", name: "Luis Nuñez", number: null, position: null, photo: null },
+  { id: "alberto-buelna", name: "Alberto Buelna", number: null, position: null, photo: null },
   // { id: "juan-perez", name: "Juan Pérez", number: 10, position: "DEL", photo: null },
 ];
 
