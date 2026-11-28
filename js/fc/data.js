@@ -129,6 +129,7 @@ export const FC_MATCHES = [
 // opcional: sin él, la tarjeta se ve pero no es clicable.
 export const FC_SPONSORS = [
   { name: "JRHM.STUDIO", logo: "assets/sponsors/sponsor00.png", url: "https://jrhm.studio/" },
+  { name: "Jersey Hub", logo: "assets/sponsors/sponsor002.png", url: "https://www.instagram.com/jerseyhub.cln/" },
 ];
 
 // Tabla de la liga como la publica la liga. `us: true` marca nuestro renglón.
