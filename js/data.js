@@ -1135,13 +1135,6 @@ export const PLAYOFFS = [
 
 // Próximos juegos (todavía sin jugar, sin marcador).
 export const SCHEDULE = [
-   // `time` es opcional: si no lo pones, solo se muestra la fecha.
-   // { id: "s1", date: "2026-08-20", time: "19:00", opponent: "Softbol Valle Alto" },
-   // { id: "s2", date: "2026-09-01", time: "19:00", opponent: "Los Primos" },
-  // { id: "s1", date: "2026-09-11", time: "19:00", opponent: "Pendiente" },
-  // { id: "s1", date: "2026-10-27", time: "19:00", opponent: "Blockreto" }, // ya se jugó: es g13 en GAMES
-  // { id: "s3", date: "2026-11-07", time: "17:00", opponent: "Gallos" }, // ya se jugó: es g14 en GAMES
-  // { id: "s4", date: "2026-11-13", time: "19:00", opponent: "Santara" }, // ya se jugó: es g15 en GAMES
   { id: "s5", date: "2026-12-03", time: "19:00", opponent: "Padres de San Diego" }, // ya se jugó: es g15 en GAMES
 
 ];
