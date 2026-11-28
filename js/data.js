@@ -85,12 +85,12 @@ export const PLAYERS = [
   { id: "p18", number: 26, name: "Javier Urquiza", position: "SS/LF/RF", walkup: { title: "Look What You Made Me Do", artist: "Taylor Swift", url: "https://open.spotify.com/track/1P17dC1amhFzptugyAO7Il" }, seasons: [2, 3, 4, 5, 6, 8, 9] },
   { id: "p19", number: 2, name: "Xico Espinoza", position: "C/3B/SS", walkup: { title: "good 4 u", artist: "Olivia Rodrigo", url: "https://open.spotify.com/track/4ZtFanR9U6ndgddUvNcjcG" }, seasons: [1, 8] },
   { id: "p20", number: 0, name: "Andres Aceves", position: "CF/2B/SS", walkup: { title: "Shake It Off", artist: "Taylor Swift", url: "https://open.spotify.com/track/0cqRj7pUJDkTCEsJkx8snD" }, seasons: [8] },
-  { id: "p21", number: 0, name: "Alberto Solis", position: "RF", walkup: { title: "vampire", artist: "Olivia Rodrigo", url: "https://open.spotify.com/track/1kuGVB7EU95pJObxwvfwKS" }, seasons: [7, 9] },
-  { id: "p22", number: 0, name: "Luis Celis", position: "CF", walkup: { title: "Cruel Summer", artist: "Taylor Swift", url: "https://open.spotify.com/track/1BxfuPKGuaTgP7aM0Bbdwr" }, seasons: [9] },
-  { id: "p23", number: 0, name: "Emanuel Ramos", position: "RF", walkup: { title: "Nonsense", artist: "Sabrina Carpenter", url: "https://open.spotify.com/track/6dgUya35uo964z7GZXM07g" }, seasons: [9] },
+  { id: "p21", number: 00, name: "Alberto Solis", position: "RF", walkup: { title: "vampire", artist: "Olivia Rodrigo", url: "https://open.spotify.com/track/1kuGVB7EU95pJObxwvfwKS" }, seasons: [7, 9] },
+  { id: "p22", number: 00, name: "Luis Celis", position: "CF", walkup: { title: "Cruel Summer", artist: "Taylor Swift", url: "https://open.spotify.com/track/1BxfuPKGuaTgP7aM0Bbdwr" }, seasons: [9] },
+  { id: "p23", number: 00, name: "Emanuel Ramos", position: "RF", walkup: { title: "Nonsense", artist: "Sabrina Carpenter", url: "https://open.spotify.com/track/6dgUya35uo964z7GZXM07g" }, seasons: [9] },
   { id: "p24", number: 3, name: "Alex Escalante", position: "RF", walkup: { title: "Espresso", artist: "Sabrina Carpenter", url: "https://open.spotify.com/track/2HRqTpkrJO5ggZyyK6NPWz" }, seasons: [9] },
   { id: "p25", number: 11, name: "Fernando Olivas", position: "RF", walkup: { title: "Please Please Please", artist: "Sabrina Carpenter", url: "https://open.spotify.com/track/5N3hjp1WNayUPZrA8kJmJP" }, seasons: [1, 2 , 3, 4 ,5 ,6, 9] },
-  { id: "p26", number: 14, name: "Marco Olivas", position: "CF", walkup: { title: "get him back!", artist: "Olivia Rodrigo", url: "https://open.spotify.com/track/2gyxAWHebV7xPYVxqoi86f" }, seasons: [1, 2, 9] },
+  { id: "p26", number: 13, name: "Marco Olivas", position: "CF", walkup: { title: "get him back!", artist: "Olivia Rodrigo", url: "https://open.spotify.com/track/2gyxAWHebV7xPYVxqoi86f" }, seasons: [1, 2, 9] },
 ];
 
 // Roster de la temporada ACTUAL: los de PLAYERS que traen CURRENT_SEASON en
